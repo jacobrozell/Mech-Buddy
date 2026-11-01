@@ -1,7 +1,8 @@
 # Bundled Alpha Strike fixtures (owner-locked)
 
-**Source:** walkthrough HTML / MUL-aligned numbers used in the prototype.  
-**Policy (2026-08-21):** Ship **bundled** Ridge Line + box roster metadata in the app. User may edit; MUL paste remains optional.
+**Source:** the four Ridge Line cards were checked against [masterunitlist.battletech.com](https://masterunitlist.battletech.com/) unit pages on 2026-11-01. They already matched.  
+**Policy (2026-08-21):** Ship **bundled** Ridge Line + box roster metadata in the app. User may edit; MUL paste remains optional.  
+**Later:** army building and any new roster use that same site as the card lookup. 1.0 stays Ridge Line only. Do not bulk-download the catalog.
 
 Skill default: **4** for all unless edited.
 

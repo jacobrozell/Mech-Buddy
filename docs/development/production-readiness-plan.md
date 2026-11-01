@@ -421,11 +421,9 @@ Check against the official free Alpha Strike Quick-Start rules (linked in-app vi
 
 ### C1 · P0 — Ridge Line unit stats against the printed cards
 
-`Resources/Content/AlphaStrike/as-ridge-line.json` says its numbers come from "walkthrough HTML / MUL-aligned numbers used in the prototype" ([bundled-fixtures](../game-modes/alpha-strike/bundled-fixtures.md)). Nobody has recorded checking them against the printed cards. One value looks suspicious:
+**Decided 2026-11-01.** All four units match their pages on [masterunitlist.battletech.com](https://masterunitlist.battletech.com/). No JSON change. Locust LCT-1V TMM 3 is correct: 13"–18" is +3, and +4 starts at 19". Recorded in [product-readiness.md](../product-readiness.md).
 
-- **Locust LCT-1V: `mv 16"`, `tmm 3`.** In the Alpha Strike TMM table as we understand it, 13–18" of movement gives TMM **2**, and TMM 3 starts at 19". Check the printed card. If it says 2, then every shot at the Locust is currently 1 harder than it should be.
-
-**Agent deliverable:** a table in the PR listing all four units × (PV, MV, TMM, SZ, S/M/L, OV, A, S, abilities), with an empty "card says" column for the owner to fill in. After sign-off, fix the JSON, the matching row in `bundled-fixtures.md`, and the test fixtures that copy these numbers (`ContentCatalogTests`, `CombatSolverTests`, `PreviewFixtures`).
+Army building is not this task. When that work starts, use the same site as the card lookup. 1.0 stays Ridge Line only. Do not bulk-download the catalog.
 
 ### C2 · P0 — Does heat cool down in the End phase?
 

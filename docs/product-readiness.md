@@ -1,7 +1,7 @@
 # Pre-build product readiness — TableMech
 
 **Audience:** owner + agents before Phase 0/3.  
-**Last updated:** 2026-08-21
+**Last updated:** 2026-11-01
 
 ---
 
@@ -24,6 +24,9 @@
 | 2026-08-21 | iPad | **Supported** (sidebar-adaptable; not phone-only) |
 | 2026-08-21 | Tip jar | **None** (`AppLinks.tipJar = nil`) |
 | 2026-08-21 | Free Battle | **1.1** (gated off in 1.0 Release) |
+| 2026-11-01 | Playable forces in 1.0 | **Ridge Line only.** Army building, Free Battle, and other rosters stay later. |
+| 2026-11-01 | Card lookup for army building | When that work starts, look up Alpha Strike cards on [masterunitlist.battletech.com](https://masterunitlist.battletech.com/). Do not bulk-download or ship the catalog. |
+| 2026-11-01 | C1 Ridge Line stats | Checked the four units against their MUL pages. Numbers already match, including Locust LCT-1V TMM 3 (13"–18" is +3). No JSON change. |
 
 ---
 

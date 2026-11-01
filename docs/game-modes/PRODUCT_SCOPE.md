@@ -25,6 +25,7 @@ flowchart TD
 - Networked multiplayer / shared match sync
 - Official MUL bulk redistribution
 - Classic full campaign / BV list building
+- Army building and Free Battle (1.1). When that work starts, look up cards on [masterunitlist.battletech.com](https://masterunitlist.battletech.com/). 1.0 playable content is Ridge Line only.
 
 ## Related
 

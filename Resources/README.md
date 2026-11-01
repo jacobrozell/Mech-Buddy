@@ -22,6 +22,7 @@ Resources/Content/
 - Unknown schema → fail soft in the loader
 - Human-readable twins: [docs/game-modes/alpha-strike/bundled-fixtures.md](../../docs/game-modes/alpha-strike/bundled-fixtures.md)
 - Do not commit copyrighted card art or full MUL dumps
+- 1.0 ships Ridge Line only. Later army-building cards are looked up on [masterunitlist.battletech.com](https://masterunitlist.battletech.com/), not copied in as a catalog dump
 
 ## Phase 0 note
 
