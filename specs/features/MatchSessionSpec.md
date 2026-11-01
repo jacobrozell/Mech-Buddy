@@ -20,6 +20,10 @@ Use `MatchSession` from DomainModelSpec (includes `activeSide`, `initiativeRolls
 
 When `ApplyDamage` zeroes structure → set `destroyedPendingEnd` (do **not** set `removed` until End phase command).
 
+### Unreadable saves
+
+`statusRaw` on the SwiftData row is a string, not only `MatchStatus`. When the newest active row fails to decode, or its payload schema is newer than this build, `loadActive` sets that row to `unreadable` and tries the next active row. It does not delete the row (a later build may read it) and it does not throw, so Play can start a new game. `deleteAll()` still removes unreadable rows. Play shows one notice: "A saved game couldn't be opened, so it was set aside. You can start a new game."
+
 ## State machine — phases
 
 ```
@@ -114,6 +118,6 @@ Command exists for 1.1; ReleaseSurface hides entry in 1.0.
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-08-21 |
+| Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | *not implemented* |
+| Code paths | `Persistence/SwiftDataMatchSessionRepository.swift` (`loadActive` sets `unreadable`); `Features/Play/PlayMatchCoordinator.swift` |

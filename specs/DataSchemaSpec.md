@@ -168,7 +168,9 @@ Screen IDs: `rules.as.{id}` with `sator` → screen `rules.as.satorRef` alias OK
 
 **Versioning:** `SchemaV1` registered in `VersionedSchema`; `MigrationPlan` empty initially; next bump = `SchemaV2` + tests.
 
-Bootstrap failure → full-screen recovery: Retry / Delete All Local Data (Settings path).
+`SDMatchSession.statusRaw` stays a plain string. Gameplay writes `active`, `completed`, and `abandoned`. `loadActive` writes `unreadable` when a payload will not decode or its schema version is newer than `MatchSession.currentSchemaVersion`, then returns the next readable active row, or nil. Unreadable rows are kept. `deleteAll()` still fetches every row and removes them. A SwiftData container failure falls back to memory and Play shows a non-dismissible banner (`AppDependencies.isUsingVolatileStore`), except when `-ui_testing` asked for an in-memory store.
+
+Bootstrap failure → full-screen recovery: Retry / Delete All Local Data (Settings path). The unreadable-row path is the per-save version of that recovery: the bad row is set aside and a new game can start.
 
 ## MUL paste (v1)
 
@@ -179,6 +181,6 @@ Accept QuickList-like JSON with `Units` array; map `Name`, AS damage fields when
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-08-21 |
+| Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | `Resources/Content/**/*.json` (bundled); loaders *not implemented* |
+| Code paths | `Persistence/SwiftDataMatchSessionRepository.swift`; `Persistence/SchemaV1/SchemaV1.swift`; `App/AppDependencies.swift` |

@@ -18,6 +18,16 @@ struct PlayHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
+                if dependencies.isUsingVolatileStore {
+                    ErrorBanner(
+                        message: "Games can't be saved on this device right now. Restart the app. If this keeps happening, contact support.",
+                        linkTitle: "Contact support",
+                        linkURL: AppLinks.support
+                    )
+                }
+                if let notice = matches.unreadableNotice {
+                    ErrorBanner(message: notice)
+                }
                 heroes
                 if dependencies.releaseSurface.isEnabled(.classicComingSoonEntry) {
                     classicBlock

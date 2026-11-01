@@ -69,21 +69,74 @@ struct MatchPersistenceTests {
         #expect(try repo.loadActive(mode: .alphaStrike) == nil)
     }
 
-    @Test("Rejects future payload schema versions")
-    func rejectsFutureSchema() throws {
+    @Test("A future payload schema is set aside so a new game can start")
+    func futureSchemaIsSetAside() throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let repo = SwiftDataMatchSessionRepository(container: container)
-        var session = MatchSession(
+        let future = MatchSession(
             schemaVersion: MatchSession.currentSchemaVersion + 1,
             ruleset: .ridgeLine,
             status: .active,
             tableReady: true,
             forcesLoaded: true
         )
-        try repo.save(session)
-        #expect(throws: MatchPersistenceError.self) {
-            _ = try repo.loadActive(mode: .alphaStrike)
-        }
+        try repo.save(future)
+        #expect(try repo.loadActive(mode: .alphaStrike) == nil)
+        #expect(repo.unreadableSessionIDs == [future.id])
+        try expectRowStatus(id: future.id, status: "unreadable", in: container)
+
+        let fresh = MatchSession(
+            ruleset: .ridgeLine,
+            status: .active,
+            tableReady: true,
+            forcesLoaded: true
+        )
+        try repo.save(fresh)
+        let loaded = try #require(try repo.loadActive(mode: .alphaStrike))
+        #expect(loaded.id == fresh.id)
+    }
+
+    @Test("A garbage payload is set aside so a new game can start")
+    func garbagePayloadIsSetAside() throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let id = UUID()
+        let context = ModelContext(container)
+        context.insert(
+            SDMatchSession(
+                id: id,
+                modeId: GameModeId.alphaStrike.rawValue,
+                scenarioId: nil,
+                statusRaw: MatchStatus.active.rawValue,
+                turn: 1,
+                phaseRaw: PhaseId.initiative.rawValue,
+                activeSideRaw: SideId.lanceA.rawValue,
+                payload: Data("garbage".utf8),
+                updatedAt: Date()
+            )
+        )
+        try context.save()
+
+        let repo = SwiftDataMatchSessionRepository(container: container)
+        #expect(try repo.loadActive(mode: .alphaStrike) == nil)
+        #expect(repo.unreadableSessionIDs == [id])
+        try expectRowStatus(id: id, status: "unreadable", in: container)
+
+        let fresh = MatchSession(
+            ruleset: .ridgeLine,
+            status: .active,
+            tableReady: true,
+            forcesLoaded: true
+        )
+        try repo.save(fresh)
+        let loaded = try #require(try repo.loadActive(mode: .alphaStrike))
+        #expect(loaded.id == fresh.id)
+    }
+
+    private func expectRowStatus(id: UUID, status: String, in container: ModelContainer) throws {
+        let context = ModelContext(container)
+        let rows = try context.fetch(FetchDescriptor<SDMatchSession>())
+        let row = try #require(rows.first { $0.id == id })
+        #expect(row.statusRaw == status)
     }
 
     @Test("In-memory repository keeps newest active")

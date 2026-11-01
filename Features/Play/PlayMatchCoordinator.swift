@@ -3,7 +3,7 @@ import TableMechData
 import TableMechDomain
 
 extension EnvironmentValues {
-    @Entry var playZoomNamespace: Namespace.ID? = nil
+    @Entry var playZoomNamespace: Namespace.ID?
 }
 
 @Observable
@@ -12,6 +12,7 @@ final class PlayMatchCoordinator {
     var matchStore: MatchStore?
     var showReplaceConfirm = false
     var lastError: String?
+    var unreadableNotice: String?
     var resumeSession: MatchSession?
     var zoomSource = "mission"
     var prefersZoom = true
@@ -22,6 +23,13 @@ final class PlayMatchCoordinator {
         } catch {
             resumeSession = nil
             dependencies.logger.error("\(error)", category: "persistence")
+        }
+        let unreadable = dependencies.matchSessions.unreadableSessionIDs
+        if !unreadable.isEmpty, unreadableNotice == nil {
+            unreadableNotice = "A saved game couldn't be opened, so it was set aside. You can start a new game."
+            for id in unreadable {
+                dependencies.logger.error("unreadable saved game \(id.uuidString)", category: "persistence")
+            }
         }
     }
 

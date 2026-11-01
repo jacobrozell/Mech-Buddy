@@ -3,6 +3,7 @@ import TableMechDomain
 
 @MainActor
 public protocol MatchSessionRepository: AnyObject {
+    var unreadableSessionIDs: [UUID] { get }
     func loadActive(mode: GameModeId) throws -> MatchSession?
     func save(_ session: MatchSession) throws
     func delete(id: UUID) throws
@@ -14,6 +15,8 @@ public final class InMemoryMatchSessionRepository: MatchSessionRepository {
     private var sessions: [UUID: MatchSession] = [:]
 
     public init() {}
+
+    public var unreadableSessionIDs: [UUID] { [] }
 
     public func loadActive(mode: GameModeId) throws -> MatchSession? {
         sessions.values

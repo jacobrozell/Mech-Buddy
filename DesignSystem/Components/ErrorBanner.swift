@@ -4,6 +4,8 @@ struct ErrorBanner: View {
     var message: String
     var retryTitle: String = "Try again"
     var accessibilityIdentifier: String?
+    var linkTitle: String?
+    var linkURL: URL?
     var onRetry: (() -> Void)?
 
     var body: some View {
@@ -16,6 +18,10 @@ struct ErrorBanner: View {
                     Text(message)
                         .font(TMFont.body)
                         .fixedSize(horizontal: false, vertical: true)
+                    if let linkURL, let linkTitle {
+                        Link(linkTitle, destination: linkURL)
+                            .font(TMFont.detail)
+                    }
                     if let onRetry {
                         Button(retryTitle, action: onRetry)
                             .buttonStyle(.bordered)

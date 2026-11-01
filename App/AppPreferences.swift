@@ -40,32 +40,65 @@ final class AppPreferences {
 
     private let defaults: UserDefaults
 
+    private var isReloading = false
+
+    private static let ownedKeys = [
+        hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey, hasSeenIntroKey
+    ]
+
     var hapticsEnabled: Bool {
-        didSet { defaults.set(hapticsEnabled, forKey: Self.hapticsKey) }
+        didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
     }
 
     var theme: AppColorSchemePreference {
-        didSet { defaults.set(theme.rawValue, forKey: Self.themeKey) }
+        didSet { persist(theme.rawValue, forKey: Self.themeKey) }
     }
 
     var keepScreenAwake: Bool {
-        didSet { defaults.set(keepScreenAwake, forKey: Self.keepScreenAwakeKey) }
+        didSet { persist(keepScreenAwake, forKey: Self.keepScreenAwakeKey) }
     }
 
     var defaultDiceMode: DiceMode {
-        didSet { defaults.set(defaultDiceMode.rawValue, forKey: Self.defaultDiceModeKey) }
+        didSet { persist(defaultDiceMode.rawValue, forKey: Self.defaultDiceModeKey) }
     }
 
     var gettingStartedChecks: Set<String> {
-        didSet { defaults.set(Array(gettingStartedChecks).sorted(), forKey: Self.gettingStartedChecksKey) }
+        didSet { persist(Array(gettingStartedChecks).sorted(), forKey: Self.gettingStartedChecksKey) }
     }
 
     var hasSeenIntro: Bool {
-        didSet { defaults.set(hasSeenIntro, forKey: Self.hasSeenIntroKey) }
+        didSet { persist(hasSeenIntro, forKey: Self.hasSeenIntroKey) }
     }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        isReloading = true
+        hapticsEnabled = true
+        theme = .system
+        keepScreenAwake = true
+        defaultDiceMode = .manual
+        gettingStartedChecks = []
+        hasSeenIntro = false
+        isReloading = false
+        reload()
+    }
+
+    /// Removes every key this type owns, then reloads the built-in defaults.
+    func reset() {
+        for key in Self.ownedKeys {
+            defaults.removeObject(forKey: key)
+        }
+        reload()
+    }
+
+    private func persist(_ value: Any, forKey key: String) {
+        guard !isReloading else { return }
+        defaults.set(value, forKey: key)
+    }
+
+    private func reload() {
+        isReloading = true
+        defer { isReloading = false }
         if defaults.object(forKey: Self.hapticsKey) == nil {
             hapticsEnabled = true
         } else {

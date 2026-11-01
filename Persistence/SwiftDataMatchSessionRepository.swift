@@ -22,6 +22,7 @@ public final class SwiftDataMatchSessionRepository: MatchSessionRepository {
     private let context: ModelContext
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
+    public private(set) var unreadableSessionIDs: [UUID] = []
 
     public init(container: ModelContainer) {
         self.container = container
@@ -37,8 +38,18 @@ public final class SwiftDataMatchSessionRepository: MatchSessionRepository {
             },
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
-        guard let row = try context.fetch(descriptor).first else { return nil }
-        return try decodeSession(from: row)
+        for row in try context.fetch(descriptor) {
+            do {
+                return try decodeSession(from: row)
+            } catch {
+                row.statusRaw = "unreadable"
+                try context.save()
+                if !unreadableSessionIDs.contains(row.id) {
+                    unreadableSessionIDs.append(row.id)
+                }
+            }
+        }
+        return nil
     }
 
     public func save(_ session: MatchSession) throws {

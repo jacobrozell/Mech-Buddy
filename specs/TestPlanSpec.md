@@ -11,8 +11,7 @@
 
 ## CI
 
-- PR: `TableMechCI` — unit + a11y identifier contracts  
-- Nightly: UI smoke when present  
+GitHub Actions `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`. The `CI / unit` job generates the Xcode project, runs SwiftLint, and runs the `TableMechCI` scheme (unit tests) on the newest available iPhone simulator. UI smoke stays out of that job until it exists, then runs nightly rather than on every pull request.
 
 ## Domain vectors (required)
 
@@ -32,18 +31,19 @@ Implement cases in [SATORAttackSpec](features/SATORAttackSpec.md) § Golden test
 
 | Arg | Effect |
 |-----|--------|
-| `-skip_onboarding` | Skip intro |
-| `-enable_full_product_surface` | Free Battle, Full Lances, Classic tools, etc. |
-| `-enable_mul_fetch` | Network MUL |
-| `-reset_state` | Wipe local |
-| `-open_as_battle` | Resume/open battle |
-| `-load_ridge_line` | Prefill mission ready (tests) |
+| `-skip_onboarding` | Skip intro (`LaunchArguments.skipOnboarding`, Debug only) |
+| `-enable_full_product_surface` | Free Battle, Full Lances, Classic tools, etc. (`ReleaseSurface`) |
+| `-enable_mul_fetch` | Network MUL. Not implemented. |
+| `-reset_state` | Wipe saved games and settings keys (`LaunchArguments.resetState`, Debug only) |
+| `-ui_testing` | In-memory match store (`LaunchArguments.inMemoryStore`, Debug only). Does not show the volatile-store banner. |
+| `-open_as_battle` | Not implemented (not needed) |
+| `-load_ridge_line` | Not implemented (not needed) |
 
 ## Verification
 
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-08-21 |
+| Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | *not implemented* |
+| Code paths | `.github/workflows/ci.yml`; `Support/Release/LaunchArguments.swift`; `App/AppDependencies.swift`; `Tests/Unit/RidgeLineSimulationTests.swift` |
