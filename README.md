@@ -2,7 +2,7 @@
 
 BattleTech tableside companion for iPhone and iPad (iOS 26). **0.2.0** on `main` is the Ridge Line tableside UI: design tokens, battle layout, sheets, and rebuilt Play, Force, Rules, and Settings screens. **0.1.0** was the first playable slice (stock lists, auto and manual shot rolls). Classic stays Coming soon.
 
-Plan: [docs/development/ui-overhaul-plan.md](docs/development/ui-overhaul-plan.md). Specs: [specs/](specs/).
+Plan: [docs/development/ui-overhaul-plan.md](docs/development/ui-overhaul-plan.md). 1.0 readiness: [docs/development/production-readiness-plan.md](docs/development/production-readiness-plan.md). Specs: [specs/](specs/).
 
 ## Build
 
@@ -10,6 +10,8 @@ Plan: [docs/development/ui-overhaul-plan.md](docs/development/ui-overhaul-plan.m
 xcodegen generate
 xcodebuild -scheme TableMechCI -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
+
+The same unit suite runs on every pull request and on `main` (`.github/workflows/ci.yml`).
 
 Open `TableMech.xcodeproj` in Xcode 26+.
 
