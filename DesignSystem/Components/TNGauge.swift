@@ -5,7 +5,7 @@ struct TNGauge: View {
     var rolledTotal: Int?
     var reason: String?
     /// Replaces the numeral when the shot is illegal before a target number exists.
-    var blockedTitle: String? = nil
+    var blockedTitle: String?
     var previewIdentifier: String? = "as.sator.tnPreview"
     var gaugeIdentifier: String? = "as.sator.tn"
 
@@ -64,7 +64,7 @@ struct TNGauge: View {
                     .foregroundStyle(.secondary)
             }
             histogram
-            if (blockedTitle != nil || autoMiss), let reason, !reason.isEmpty {
+            if let reason, !reason.isEmpty, blockedTitle != nil || autoMiss {
                 Text(reason)
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)

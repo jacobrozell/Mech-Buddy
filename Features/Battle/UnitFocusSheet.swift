@@ -5,8 +5,8 @@ struct UnitFocusSheet: View {
     let unit: MatchUnitState
     let session: MatchSession
     var isReadOnly: Bool = false
-    var onResolveAttack: (() -> Void)? = nil
-    var onRollCrit: (() -> Void)? = nil
+    var onResolveAttack: (() -> Void)?
+    var onRollCrit: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
 

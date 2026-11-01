@@ -11,7 +11,7 @@ struct UnitCard: View {
     var isEnabled: Bool = true
     var showsIdleStatus: Bool = true
     var hint: String = "Opens this ’Mech"
-    var note: String? = nil
+    var note: String?
     var action: () -> Void
 
     var body: some View {

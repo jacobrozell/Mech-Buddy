@@ -48,7 +48,7 @@ struct PipTrack: View {
     var size: Size = .regular
     var showsCount: Bool = true
     var accessibilityIdentifier: String?
-    var accessibilityName: String? = nil
+    var accessibilityName: String?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flashing: Set<Int> = []

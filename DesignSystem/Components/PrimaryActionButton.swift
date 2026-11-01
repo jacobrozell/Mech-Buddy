@@ -15,7 +15,7 @@ struct PrimaryActionButton: View {
     var accessibilityIdentifier: String?
     var accessibilityHint: String?
     /// Replaces the button’s spoken name when the visible title is not enough.
-    var spokenLabel: String? = nil
+    var spokenLabel: String?
     var action: () -> Void
 
     var body: some View {
