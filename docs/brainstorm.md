@@ -14,6 +14,8 @@ An **offline-first** iOS tableside companion for BattleTech players who own a bo
 
 **Not** a digital rules substitute for Catalyst books — summaries + helpers that link to free official downloads.
 
+Later shape (rosters, starter boxes, then Classic): [FutureIdeas/guided-play.md](../FutureIdeas/guided-play.md). Not 1.0.
+
 ## Modes
 
 | Mode | Player shorthand | Play engine | v1 intent |
