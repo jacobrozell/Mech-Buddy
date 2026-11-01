@@ -120,20 +120,15 @@ public enum CombatSolver {
         if cannot == nil {
             do {
                 tn = try SATORResolver.resolve(
-                    SATORInput(
-                        skill: attacker.skill,
+                    satorInput(
+                        attacker: attacker,
+                        defender: defender,
                         attackerMove: move,
                         targetMove: insight.targetMove,
-                        targetTMM: defender.effectiveTMM,
-                        other: OtherModifiers(
-                            woods: insight.woods,
-                            partialCover: insight.partialCover,
-                            targetHasSTL: defender.hasStealth,
-                            fireControlHits: attacker.crits.fireControlHits,
-                            attackerHeat: attacker.heat
-                        ),
+                        woods: insight.woods,
+                        partialCover: insight.partialCover,
                         rangeInches: Double(insight.rangeInches),
-                        rangeBracket: bracket
+                        bracket: bracket
                     )
                 )
             } catch SATORError.cannotAttack(let reason) {
@@ -145,17 +140,12 @@ public enum CombatSolver {
             }
         }
 
-        let dmg = attacker.effectiveDamage
         let delivered = AlphaStrikeDamage.delivered(
-            DamageInput(
-                short: dmg.s,
-                medium: dmg.m,
-                long: dmg.l,
+            damageInput(
+                attacker: attacker,
                 bracket: bracket,
                 rearHit: insight.rearHit,
-                overheatUsed: insight.overheatUsed,
-                maxOverheat: attacker.ov,
-                ovlAllowsLong: attacker.abilities.uppercased().contains("OVL")
+                overheatUsed: insight.overheatUsed
             ),
             overheatAllowed: overheatAllowed
         ).delivered
@@ -180,6 +170,52 @@ public enum CombatSolver {
             ifNaturalTwelve: ifTwelve,
             roll: roll,
             isHit: isHit
+        )
+    }
+
+    static func satorInput(
+        attacker: MatchUnitState,
+        defender: MatchUnitState,
+        attackerMove: MovementMode,
+        targetMove: TargetMoveModifier,
+        woods: Bool,
+        partialCover: Bool,
+        rangeInches: Double?,
+        bracket: RangeBracket
+    ) -> SATORInput {
+        SATORInput(
+            skill: attacker.skill,
+            attackerMove: attackerMove,
+            targetMove: targetMove,
+            targetTMM: defender.effectiveTMM,
+            other: OtherModifiers(
+                woods: woods,
+                partialCover: partialCover,
+                targetHasSTL: defender.hasStealth,
+                fireControlHits: attacker.crits.fireControlHits,
+                attackerHeat: attacker.heat
+            ),
+            rangeInches: rangeInches,
+            rangeBracket: bracket
+        )
+    }
+
+    static func damageInput(
+        attacker: MatchUnitState,
+        bracket: RangeBracket,
+        rearHit: Bool,
+        overheatUsed: Int
+    ) -> DamageInput {
+        let damage = attacker.effectiveDamage
+        return DamageInput(
+            short: damage.s,
+            medium: damage.m,
+            long: damage.l,
+            bracket: bracket,
+            rearHit: rearHit,
+            overheatUsed: overheatUsed,
+            maxOverheat: attacker.ov,
+            ovlAllowsLong: attacker.hasOVL
         )
     }
 

@@ -270,18 +270,15 @@ public enum MatchReducer {
         let move = attack.attackerMove
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
         let tn = try SATORResolver.resolve(
-            SATORInput(
-                skill: attacker.skill,
+            CombatSolver.satorInput(
+                attacker: attacker,
+                defender: defender,
                 attackerMove: move,
                 targetMove: attack.targetMove,
-                targetTMM: defender.effectiveTMM,
-                other: OtherModifiers(
-                    woods: attack.woods,
-                    partialCover: attack.partialCover,
-                    fireControlHits: attacker.crits.fireControlHits,
-                    attackerHeat: attacker.heat
-                ),
-                rangeBracket: attack.range
+                woods: attack.woods,
+                partialCover: attack.partialCover,
+                rangeInches: nil,
+                bracket: attack.range
             )
         )
 
@@ -290,16 +287,12 @@ public enum MatchReducer {
         var note = ""
 
         if hit {
-            let dmgStats = attacker.effectiveDamage
             let delivered = AlphaStrikeDamage.delivered(
-                DamageInput(
-                    short: dmgStats.s,
-                    medium: dmgStats.m,
-                    long: dmgStats.l,
+                CombatSolver.damageInput(
+                    attacker: attacker,
                     bracket: attack.range,
                     rearHit: attack.rearHit,
-                    overheatUsed: attack.overheatUsed,
-                    maxOverheat: attacker.ov
+                    overheatUsed: attack.overheatUsed
                 ),
                 overheatAllowed: next.ruleset.overheatAllowed
             )

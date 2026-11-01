@@ -200,6 +200,10 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         abilities.uppercased().contains("STL")
     }
 
+    public var hasOVL: Bool {
+        abilities.uppercased().contains("OVL")
+    }
+
     /// Eligible to open SATOR this combat impulse.
     public var canAttackThisTurn: Bool {
         canFire && !hasAttackedThisTurn && movementMode != .sprint

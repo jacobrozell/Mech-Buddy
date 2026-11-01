@@ -173,4 +173,108 @@ struct CombatSolverTests {
         )
         #expect(rear.ifHit.delivered == front.ifHit.delivered + 1)
     }
+
+    @Test("Shot preview and applied target number agree for stealth")
+    func stealthTargetNumberParity() throws {
+        var attacker = locust()
+        attacker.side = .lanceA
+        attacker.skill = 4
+        attacker.movementMode = .standstill
+        var defender = hawk()
+        defender.side = .lanceB
+        defender.abilities = "STL"
+        defender.movementMode = .standstill
+
+        let preview = try #require(
+            CombatSolver.solve(
+                attacker: attacker,
+                defender: defender,
+                insight: CombatTableInsight(
+                    rangeInches: 12,
+                    targetMove: .standstill,
+                    attackerMoveOverride: .standstill
+                ),
+                overheatAllowed: false
+            ).targetNumber
+        )
+
+        let session = try appliedShot(
+            attacker: attacker,
+            defender: defender,
+            range: .medium,
+            overheatUsed: 0,
+            overheatAllowed: false
+        )
+        let shot = try #require(session.units.first { $0.id == attacker.id }?.turnShot)
+        #expect(shot.targetNumber == preview.value)
+    }
+
+    @Test("Shot preview and applied damage agree for OVL overheat")
+    func ovlDamageParity() throws {
+        var attacker = hawk()
+        attacker.abilities = "OVL"
+        attacker.ov = 2
+        attacker.l = 1
+        attacker.movementMode = .standstill
+        var defender = locust()
+        defender.movementMode = .standstill
+
+        let preview = CombatSolver.solve(
+            attacker: attacker,
+            defender: defender,
+            insight: CombatTableInsight(
+                rangeInches: 30,
+                targetMove: .standstill,
+                overheatUsed: 2,
+                attackerMoveOverride: .standstill
+            ),
+            overheatAllowed: true,
+            roll: DiceRoll2D6(die1: 6, die2: 6)
+        )
+
+        let session = try appliedShot(
+            attacker: attacker,
+            defender: defender,
+            range: .long,
+            overheatUsed: 2,
+            overheatAllowed: true
+        )
+        let shot = try #require(session.units.first { $0.id == attacker.id }?.turnShot)
+        #expect(shot.damage == preview.ifHit.delivered)
+        #expect(preview.ifHit.delivered == 3)
+    }
+
+    private func appliedShot(
+        attacker: MatchUnitState,
+        defender: MatchUnitState,
+        range: RangeBracket,
+        overheatUsed: Int,
+        overheatAllowed: Bool
+    ) throws -> MatchSession {
+        var ruleset = ScenarioRuleset.ridgeLine
+        ruleset.overheatAllowed = overheatAllowed
+        let session = MatchSession(
+            ruleset: ruleset,
+            phase: .combat,
+            activeSide: attacker.side,
+            units: [attacker, defender],
+            status: .active,
+            tableReady: true,
+            forcesLoaded: true
+        )
+        return try MatchReducer.reduce(
+            session,
+            .resolveSATOR(
+                SATORAttackCommand(
+                    attackerId: attacker.id,
+                    defenderId: defender.id,
+                    range: range,
+                    roll: DiceRoll2D6(die1: 6, die2: 6),
+                    attackerMove: .standstill,
+                    targetMove: .standstill,
+                    overheatUsed: overheatUsed
+                )
+            )
+        )
+    }
 }
