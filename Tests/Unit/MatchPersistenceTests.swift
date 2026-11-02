@@ -180,4 +180,38 @@ struct MatchPersistenceTests {
         try repo.deleteAll()
         #expect(try repo.loadActive(mode: .alphaStrike) == nil)
     }
+
+    @Test("Deleting a set-aside save forgets its id")
+    func deleteForgetsUnreadableID() throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let context = ModelContext(container)
+        let older = UUID()
+        let newer = UUID()
+        for (id, age) in [(older, -60.0), (newer, 0.0)] {
+            context.insert(
+                SDMatchSession(
+                    id: id,
+                    modeId: GameModeId.alphaStrike.rawValue,
+                    scenarioId: nil,
+                    statusRaw: MatchStatus.active.rawValue,
+                    turn: 1,
+                    phaseRaw: PhaseId.initiative.rawValue,
+                    activeSideRaw: SideId.lanceA.rawValue,
+                    payload: Data("garbage".utf8),
+                    updatedAt: Date().addingTimeInterval(age)
+                )
+            )
+        }
+        try context.save()
+
+        let repo = SwiftDataMatchSessionRepository(container: container)
+        #expect(try repo.loadActive(mode: .alphaStrike) == nil)
+        #expect(Set(repo.unreadableSessionIDs) == Set([older, newer]))
+
+        try repo.delete(id: older)
+        #expect(repo.unreadableSessionIDs == [newer])
+
+        try repo.deleteAll()
+        #expect(repo.unreadableSessionIDs.isEmpty)
+    }
 }

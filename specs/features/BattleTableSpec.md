@@ -141,7 +141,7 @@ Identifiers: `as.victory` on the root, `as.victory.screen` on a sibling, `as.vic
 
 1. Initiative — both roll; higher acts last; re-roll ties
 2. Movement — loser first; alternating; proportional if uneven counts
-3. Combat — loser resolves all, then winner; damage marked immediately; effects at End
+3. Combat — loser resolves all, then winner; damage marked immediately; effects at End. The shot feed repeats the applied result, including damage on a hit (“Shooter hit Target for N”).
 4. End — remove destroyed; heat; victory check
 
 Movement modes on unit state: `standstill | ground | sprint | jump` — feed SATOR.
@@ -169,6 +169,6 @@ Movement modes on unit state: `standstill | ground | sprint | jump` — feed SAT
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-10-28 |
-| Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `BattleStage.swift`, `Domain/Commands/BattleCoach.swift`, `Features/Battle/Steps/InitiativeStep.swift`, `TableSetupStep.swift`, `Features/Battle/VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `PhaseDock.swift` |
+| Last verified | 2026-11-01 |
+| Commit | — |
+| Code paths | `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `BattleStage.swift`, `Domain/Commands/BattleCoach.swift`, `Features/Battle/Steps/InitiativeStep.swift`, `CombatStep.swift`, `TableSetupStep.swift`, `Features/Battle/VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `PhaseDock.swift` |

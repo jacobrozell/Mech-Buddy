@@ -404,13 +404,21 @@ struct CombatSolverSheet: View {
     private var rangeControl: some View {
         VStack(alignment: .leading, spacing: TMSpace.sm) {
             Eyebrow("Range")
-            Picker("Range", selection: rangeBand) {
-                Text("Short ≤6″").tag(RangeBracket.short as RangeBracket?)
-                Text("Medium 7–24″").tag(RangeBracket.medium as RangeBracket?)
-                Text("Long 25–42″").tag(RangeBracket.long as RangeBracket?)
+            if insight.rangeBracket == .outOfRange {
+                Text("Past 42 inches, so the range bands are off.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.sator.range")
+            } else {
+                Picker("Range", selection: rangeBand) {
+                    Text("Short ≤6″").tag(RangeBracket.short)
+                    Text("Medium 7–24″").tag(RangeBracket.medium)
+                    Text("Long 25–42″").tag(RangeBracket.long)
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("as.sator.range")
             }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("as.sator.range")
             Toggle(isOn: beyondRange) {
                 Text(">42″")
             }
@@ -419,10 +427,10 @@ struct CombatSolverSheet: View {
         }
     }
 
-    private var rangeBand: Binding<RangeBracket?> {
+    private var rangeBand: Binding<RangeBracket> {
         Binding(
             get: {
-                insight.rangeBracket == .outOfRange ? nil : insight.rangeBracket
+                insight.rangeBracket == .outOfRange ? .long : insight.rangeBracket
             },
             set: { newValue in
                 switch newValue {
@@ -430,7 +438,6 @@ struct CombatSolverSheet: View {
                 case .medium: insight.rangeInches = 24
                 case .long: insight.rangeInches = 42
                 case .outOfRange: insight.rangeInches = 43
-                case nil: break
                 }
             }
         )
@@ -839,29 +846,60 @@ private struct DamagePreviewCard: View {
     var solve: CombatSolve
     var defender: MatchUnitState
 
-    private var boxcarsOweCritical: Bool {
-        solve.isHit == true && solve.roll?.isNaturalTwelve == true && solve.ifNaturalTwelve.needsCritical
+    private var missed: Bool { solve.isHit == false }
+    private var landedHit: Bool { solve.isHit == true }
+    private var boxcars: Bool { landedHit && solve.roll?.isNaturalTwelve == true }
+
+    /// Damage numbers match a normal hit. A natural 12 only adds the critical.
+    private var shown: CombatDamagePreview {
+        boxcars ? solve.ifNaturalTwelve : solve.ifHit
+    }
+
+    private var cardEyebrow: String {
+        if solve.ifHit.zeroDamage { return "This shot" }
+        if landedHit { return "This hit" }
+        return "If this hits"
     }
 
     private var statusLine: String? {
-        if solve.ifHit.wrecksThisTurn { return "This wrecks them." }
-        if solve.ifHit.needsCritical || boxcarsOweCritical { return "A critical is owed." }
+        if missed { return nil }
+        if landedHit {
+            if shown.wrecksThisTurn { return "This wrecks them." }
+            if shown.needsCritical { return "A critical is owed." }
+            return nil
+        }
+        if solve.ifHit.wrecksThisTurn { return "A hit wrecks them." }
+        if solve.ifHit.needsCritical { return "A hit owes a critical." }
         return nil
     }
 
     private var whatHappensNext: String? {
-        var parts: [String] = []
-        if !solve.ifHit.zeroDamage {
-            if solve.ifHit.wrecksThisTurn {
-                parts.append("That wrecks them. They can still shoot this turn; take the model off at Clean up.")
-            } else if solve.ifHit.needsCritical {
-                parts.append("You’ll also roll a critical. Structure was hit.")
-            } else {
-                parts.append("Armor absorbs it. A critical only happens on two 6s.")
+        if missed { return nil }
+        let preview = shown
+        if preview.zeroDamage {
+            if boxcars && preview.needsCritical {
+                return "Two 6s: a critical happens even though this range deals 0 damage."
             }
+            return nil
         }
-        if boxcarsOweCritical {
+        var parts: [String] = []
+        if preview.wrecksThisTurn {
+            let cleanup = "They can still shoot this turn; take the model off at Clean up."
+            parts.append(landedHit ? "That wrecks them. \(cleanup)" : "If it hits, that wrecks them. \(cleanup)")
+        } else if preview.needsCritical && preview.chipsStructure == 0 {
             parts.append("Two 6s: a critical happens even if armor stopped the damage.")
+        } else if preview.needsCritical {
+            parts.append(
+                landedHit
+                    ? "You’ll also roll a critical. Structure was hit."
+                    : "If it hits structure, you’ll roll a critical."
+            )
+        } else if !boxcars {
+            parts.append(
+                landedHit
+                    ? "Armor absorbs it."
+                    : "Armor absorbs it. A critical only happens on two 6s."
+            )
         }
         guard !parts.isEmpty else { return nil }
         return parts.joined(separator: " ")
@@ -871,7 +909,7 @@ private struct DamagePreviewCard: View {
         let hit = solve.ifHit
         TMCard {
             VStack(alignment: .leading, spacing: TMSpace.md) {
-                Eyebrow(hit.zeroDamage ? "This shot" : "If this hits")
+                Eyebrow(cardEyebrow)
                 if hit.zeroDamage {
                     Text("0 damage at this range. Applying it still uses this ’Mech’s shot.")
                         .font(TMFont.detail)

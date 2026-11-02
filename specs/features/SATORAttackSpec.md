@@ -29,7 +29,7 @@ Title **Solve a shot**. Large detent only, drag indicator visible. Presented fro
 4. Range control and **Target moved**.
 5. **Conditions** chips.
 6. `DiceTray`, then `OutcomeBanner` once both faces are set.
-7. Damage preview card when the shot can hit.
+7. Damage preview card when the shot can hit. Before the dice, a wreck or critical is worded as what a hit would do. After a hit, the card states that result, including a critical on two 6s through armor. After a miss, the pips stay hypothetical and the card does not say a critical is owed or that the target is wrecked.
 8. Glass apply bar.
 
 `TNGauge` (`as.sator.tnPreview`, also `as.sator.tn`) shows a large “N+”, “P% to hit”, and a 2d6 histogram on `surface.readout`. Above 12 it reads **Can’t hit**. A blocked shot reads **Can’t shoot** plus the reason. Compact height places the gauge beside the dice.
@@ -53,7 +53,7 @@ The helper line under More says to leave them off for a normal shot. Charge/DFA 
 
 ### Range and target move
 
-Range is a segmented control **Short ≤6″ / Medium 7–24″ / Long 25–42″** (`as.sator.range`) plus a **>42″** toggle. Target moved is a **Change** menu (`as.sator.tgtMove`): Walked, Sprinted, Stood still, Jumped, Can’t move. It starts from the defender’s recorded move. Walk and sprint share the ground TMM; sprint only changes the word on the T chip.
+Range is a segmented control **Short ≤6″ / Medium 7–24″ / Long 25–42″** (`as.sator.range`) plus a **>42″** toggle. While the toggle is on, the band picker is hidden (`as.sator.range` stays on the explanation) so it cannot show a band that is not in use. Turning it off returns to Long. Target moved is a **Change** menu (`as.sator.tgtMove`): Walked, Sprinted, Stood still, Jumped, Can’t move. It starts from the defender’s recorded move. Walk and sprint share the ground TMM; sprint only changes the word on the T chip.
 
 ### SATOR modifiers (numeric)
 
@@ -134,7 +134,7 @@ delivered = base + (rearHit ? 1 : 0) + overheatUsed
 
 ## Critical table (`as.critRoll`)
 
-Enter physical 2D6 (same control pattern). Apply to **target**:
+Enter physical 2D6 (same control pattern). The result name and the reference rows use `AlphaStrikeCriticals.title` (roll 7 is “MP hit”), which is also the event-log name. Apply to **target**:
 
 | Roll | Result | Effect |
 |------|--------|--------|
@@ -183,6 +183,6 @@ More vectors welcome; these are the CI floor.
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-10-28 |
-| Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `Features/Battle/CombatSolverSheet.swift`, `DesignSystem/Components/TNGauge.swift`, `DiceTray.swift`, `OutcomeBanner.swift`, `Domain/Engines/AlphaStrike/CombatSolver.swift`, `SATORResolver.swift` |
+| Last verified | 2026-11-01 |
+| Commit | — |
+| Code paths | `Features/Battle/CombatSolverSheet.swift`, `Features/Battle/CritSheet.swift`, `DesignSystem/Components/TNGauge.swift`, `DiceTray.swift`, `OutcomeBanner.swift`, `Domain/Engines/AlphaStrike/CombatSolver.swift`, `SATORResolver.swift`, `AlphaStrikeCriticals.swift` |

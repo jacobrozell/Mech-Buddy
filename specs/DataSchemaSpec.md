@@ -168,7 +168,7 @@ Screen IDs: `rules.as.{id}` with `sator` → screen `rules.as.satorRef` alias OK
 
 **Versioning:** `SchemaV1` registered in `VersionedSchema`; `MigrationPlan` empty initially; next bump = `SchemaV2` + tests.
 
-`SDMatchSession.statusRaw` stays a plain string. Gameplay writes `active`, `completed`, and `abandoned`. `loadActive` writes `unreadable` when a payload will not decode or its schema version is newer than `MatchSession.currentSchemaVersion`, then returns the next readable active row, or nil. Unreadable rows are kept. `deleteAll()` still fetches every row and removes them. A SwiftData container failure falls back to memory and Play shows a non-dismissible banner (`AppDependencies.isUsingVolatileStore`), except when `-ui_testing` asked for an in-memory store.
+`SDMatchSession.statusRaw` stays a plain string. Gameplay writes `active`, `completed`, and `abandoned`. `loadActive` writes `unreadable` when a payload will not decode or its schema version is newer than `MatchSession.currentSchemaVersion`, then returns the next readable active row, or nil. Unreadable rows are kept. `delete(id:)` and `deleteAll()` still remove them and clear those ids from `unreadableSessionIDs`. Play drops the set-aside notice when that list is empty. A SwiftData container failure falls back to memory and Play shows a non-dismissible banner (`AppDependencies.isUsingVolatileStore`), except when `-ui_testing` asked for an in-memory store.
 
 Bootstrap failure → full-screen recovery: Retry / Delete All Local Data (Settings path). The unreadable-row path is the per-save version of that recovery: the bad row is set aside and a new game can start.
 

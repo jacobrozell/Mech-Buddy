@@ -12,7 +12,7 @@ Screen map locked; deep rules engine deferred until Alpha Strike vertical slice 
 | Surface | Behavior |
 |---------|----------|
 | Mode picker / Play | Classic row with **Coming soon** badge |
-| Tap | Info sheet — copy in [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md) |
+| Tap | Info sheet — copy in [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md). Does not start Classic. The badge stays one line; the row stacks at large type. |
 | A11y | `play.classicComingSoon`, `classic.comingSoon.sheet`, `classic.comingSoon.playAS` |
 | Force / Rules Classic | Not shown until tools ungated |
 
@@ -67,6 +67,6 @@ User-entered record sheets preferred. Bundled blank sheet templates OK. No copyr
 | Field | Value |
 |-------|-------|
 | Target release | post-1.0 (tools slice TBD) |
-| Last verified | 2026-08-21 |
+| Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | *not implemented* |
+| Code paths | `Features/Play/PlayHomeView.swift` (`classicBlock`); `Features/Play/ClassicComingSoonSheet.swift`. Play tools are not implemented. |

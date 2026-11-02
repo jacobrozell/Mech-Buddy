@@ -11,6 +11,7 @@ extension EnvironmentValues {
 final class PlayMatchCoordinator {
     var matchStore: MatchStore?
     var showReplaceConfirm = false
+    var lastErrorTitle = "Couldn’t open the game"
     var lastError: String?
     var unreadableNotice: String?
     var resumeSession: MatchSession?
@@ -25,7 +26,9 @@ final class PlayMatchCoordinator {
             dependencies.logger.error("\(error)", category: "persistence")
         }
         let unreadable = dependencies.matchSessions.unreadableSessionIDs
-        if !unreadable.isEmpty, unreadableNotice == nil {
+        if unreadable.isEmpty {
+            unreadableNotice = nil
+        } else if unreadableNotice == nil {
             unreadableNotice = "A saved game couldn't be opened, so it was set aside. You can start a new game."
             for id in unreadable {
                 dependencies.logger.error("unreadable saved game \(id.uuidString)", category: "persistence")
@@ -65,6 +68,7 @@ final class PlayMatchCoordinator {
             lastError = nil
             matchStore = store
         } catch {
+            lastErrorTitle = "Couldn’t open the game"
             lastError = "Could not resume: \(error.localizedDescription)"
         }
     }
@@ -73,6 +77,7 @@ final class PlayMatchCoordinator {
         let store = MatchStore(repository: dependencies.matchSessions)
         store.startRidgeLine(from: dependencies.content, replaceActive: replaceActive)
         guard store.session != nil else {
+            lastErrorTitle = store.lastErrorTitle
             lastError = store.lastError ?? "Could not start Ridge Line"
             return
         }

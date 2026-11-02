@@ -81,14 +81,21 @@ struct CombatStep: View {
                     .font(TMFont.stat)
                     .monospacedDigit()
                     .contentTransition(.numericText())
-                Text("\(row.shooter) \(row.shot.hit ? "hit" : "missed") \(row.shot.targetName)")
+                Text(shotLine(row))
                     .font(TMFont.detail)
             }
             Spacer(minLength: TMSpace.sm)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(row.shooter) \(row.shot.hit ? "hit" : "missed") \(row.shot.targetName). \(row.shot.rowDetail)")
+        .accessibilityLabel("\(shotLine(row)). \(row.shot.rowDetail)")
         .accessibilityIdentifier(row.shot.hit ? "as.battle.shot.hit" : "as.battle.shot.miss")
+    }
+
+    private func shotLine(_ row: ShotFeed.Row) -> String {
+        if row.shot.hit {
+            return "\(row.shooter) hit \(row.shot.targetName) for \(row.shot.damage)"
+        }
+        return "\(row.shooter) missed \(row.shot.targetName)"
     }
 
     private func unitGroup(title: String, units: [MatchUnitState], offersShoot: Bool) -> some View {

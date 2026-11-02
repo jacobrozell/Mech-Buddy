@@ -22,7 +22,7 @@ When `ApplyDamage` zeroes structure → set `destroyedPendingEnd` (do **not** se
 
 ### Unreadable saves
 
-`statusRaw` on the SwiftData row is a string, not only `MatchStatus`. When the newest active row fails to decode, or its payload schema is newer than this build, `loadActive` sets that row to `unreadable` and tries the next active row. It does not delete the row (a later build may read it) and it does not throw, so Play can start a new game. `deleteAll()` still removes unreadable rows. Play shows one notice: "A saved game couldn't be opened, so it was set aside. You can start a new game."
+`statusRaw` on the SwiftData row is a string, not only `MatchStatus`. When the newest active row fails to decode, or its payload schema is newer than this build, `loadActive` sets that row to `unreadable` and tries the next active row. It does not delete the row (a later build may read it) and it does not throw, so Play can start a new game. `delete(id:)` and `deleteAll()` still remove unreadable rows, and they drop those ids from the in-memory list. Play shows one notice: "A saved game couldn't be opened, so it was set aside. You can start a new game." The notice goes away once that list is empty.
 
 ## State machine — phases
 
@@ -120,4 +120,4 @@ Command exists for 1.1; ReleaseSurface hides entry in 1.0.
 | Target release | 1.0.0 |
 | Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | `Persistence/SwiftDataMatchSessionRepository.swift` (`loadActive` sets `unreadable`); `Features/Play/PlayMatchCoordinator.swift` |
+| Code paths | `Persistence/SwiftDataMatchSessionRepository.swift` (`loadActive` sets `unreadable`; `delete` / `deleteAll` forget those ids); `Features/Play/PlayMatchCoordinator.swift` |

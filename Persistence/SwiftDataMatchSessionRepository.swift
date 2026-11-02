@@ -95,6 +95,7 @@ public final class SwiftDataMatchSessionRepository: MatchSessionRepository {
             context.delete(row)
         }
         try context.save()
+        unreadableSessionIDs.removeAll { $0 == id }
     }
 
     public func deleteAll() throws {
@@ -103,6 +104,7 @@ public final class SwiftDataMatchSessionRepository: MatchSessionRepository {
             context.delete(row)
         }
         try context.save()
+        unreadableSessionIDs.removeAll()
     }
 
     private func decodeSession(from row: SDMatchSession) throws -> MatchSession {

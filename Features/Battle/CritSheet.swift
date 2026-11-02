@@ -9,19 +9,12 @@ struct CritSheet: View {
     @State private var d2: Int?
     @State private var tableOpen = false
 
-    private static let table: [(total: Int, name: String)] = [
-        (2, "Ammo"),
-        (3, "Engine"),
-        (4, "Fire control"),
-        (5, "None"),
-        (6, "Weapon"),
-        (7, "Motive"),
-        (8, "Weapon"),
-        (9, "None"),
-        (10, "Fire control"),
-        (11, "Engine"),
-        (12, "Destroyed")
-    ]
+    private var tableRows: [(total: Int, name: String)] {
+        (2...12).map { total in
+            let id = AlphaStrikeCriticals.resultId(forTotal: total)
+            return (total, AlphaStrikeCriticals.title(for: id))
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -115,7 +108,7 @@ struct CritSheet: View {
     private var referenceTable: some View {
         DisclosureGroup(isExpanded: $tableOpen) {
             VStack(spacing: TMSpace.xxs) {
-                ForEach(Self.table, id: \.total) { row in
+                ForEach(tableRows, id: \.total) { row in
                     let selected = rolledTotal == row.total
                     HStack(spacing: TMSpace.sm) {
                         Text("\(row.total)")
@@ -178,27 +171,12 @@ struct CritSheet: View {
     }
 
     private func displayName(for id: CritResultId) -> String {
-        switch id {
-        case .ammo: "Ammo hit"
-        case .engine: "Engine hit"
-        case .fireControl: "Fire control hit"
-        case .none: "No critical"
-        case .weapon: "Weapon hit"
-        case .mp: "Motive hit"
-        case .destroyed: "Destroyed"
-        }
+        AlphaStrikeCriticals.title(for: id)
     }
 
     private func applyTitle(for id: CritResultId) -> String {
-        switch id {
-        case .none: "Apply — no effect"
-        case .ammo: "Apply ammo hit"
-        case .engine: "Apply engine hit"
-        case .fireControl: "Apply fire control hit"
-        case .weapon: "Apply weapon hit"
-        case .mp: "Apply motive hit"
-        case .destroyed: "Apply destroyed"
-        }
+        if id == .none { return "Apply — no effect" }
+        return "Apply \(AlphaStrikeCriticals.title(for: id))"
     }
 
     private func explanation(for id: CritResultId) -> String {
@@ -211,7 +189,7 @@ struct CritSheet: View {
         case .fireControl: "Fire control hit. Its shots get harder."
         case .none: "No critical."
         case .weapon: "Weapon hit. Its damage goes down."
-        case .mp: "Motive hit. It moves half as far. A second one stops it."
+        case .mp: "MP hit. It moves half as far. A second one stops it."
         case .destroyed: "Destroyed. It is wrecked, and it can still shoot this turn."
         }
     }

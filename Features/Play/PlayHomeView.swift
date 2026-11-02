@@ -164,33 +164,67 @@ struct PlayHomeView: View {
                 showClassic = true
             } label: {
                 TMCard {
-                    HStack(spacing: TMSpace.md) {
-                        VStack(alignment: .leading, spacing: TMSpace.xs) {
-                            Text("Classic BattleTech")
-                                .font(TMFont.cardTitle)
-                                .foregroundStyle(.primary)
-                            Text("Paper sheets, heat, and hit locations")
-                                .font(TMFont.detail)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer(minLength: TMSpace.sm)
-                        Text("Coming soon")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, TMSpace.sm)
-                            .padding(.vertical, TMSpace.xs)
-                            .background(Color.secondary.opacity(0.15), in: Capsule())
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                            .accessibilityHidden(true)
+                    ViewThatFits(in: .horizontal) {
+                        classicRow(stacksBadge: false)
+                        classicRow(stacksBadge: true)
                     }
                 }
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("play.classicComingSoon")
-            .accessibilityHint("Opens what’s coming later")
+            .accessibilityHint("Opens what’s coming later. Classic is not playable yet.")
         }
+    }
+
+    @ViewBuilder
+    private func classicRow(stacksBadge: Bool) -> some View {
+        if stacksBadge {
+            VStack(alignment: .leading, spacing: TMSpace.sm) {
+                classicCopy
+                HStack(spacing: TMSpace.sm) {
+                    comingSoonBadge
+                    Spacer(minLength: 0)
+                    classicChevron
+                }
+            }
+        } else {
+            HStack(spacing: TMSpace.md) {
+                classicCopy
+                Spacer(minLength: TMSpace.sm)
+                comingSoonBadge
+                classicChevron
+            }
+        }
+    }
+
+    private var classicCopy: some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            Text("Classic BattleTech")
+                .font(TMFont.cardTitle)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("Paper sheets, heat, and hit locations")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var comingSoonBadge: some View {
+        Text("Coming soon")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, TMSpace.sm)
+            .padding(.vertical, TMSpace.xs)
+            .background(TMColor.readout, in: Capsule())
+            .fixedSize()
+    }
+
+    private var classicChevron: some View {
+        Image(systemName: "chevron.right")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
     }
 
     private func followUpClassic() {

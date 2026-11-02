@@ -74,7 +74,7 @@ struct RootTabView: View {
             matches.confirmReplace(using: dependencies)
         }
         .alert(
-            "Couldn’t open the game",
+            matches.lastErrorTitle,
             isPresented: Binding(
                 get: { matches.lastError != nil },
                 set: { if !$0 { matches.lastError = nil } }
