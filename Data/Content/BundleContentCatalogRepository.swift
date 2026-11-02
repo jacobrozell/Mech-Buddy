@@ -1,5 +1,5 @@
 import Foundation
-import TableMechDomain
+import MechBuddyDomain
 
 public enum ContentLoadError: Error, Sendable, Equatable, LocalizedError {
     case missingResource(String)

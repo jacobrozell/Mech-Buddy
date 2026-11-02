@@ -1,5 +1,5 @@
 import Foundation
-import TableMechDomain
+import MechBuddyDomain
 
 // MARK: - DTOs matching Resources/Content JSON
 

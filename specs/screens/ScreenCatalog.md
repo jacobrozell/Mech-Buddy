@@ -1,4 +1,4 @@
-# Screen Catalog — TableMech (mobile)
+# Screen Catalog — Mech Buddy (mobile)
 
 Master inventory of **every user-visible screen / sheet / dock**. Authoritative for IA. Feature specs own detailed behavior.
 

@@ -16,7 +16,7 @@ A `Form`. Appearance follows the system until Theme is changed. There is no defa
 
 | Row | Behavior |
 |-----|----------|
-| Theme | **System** (default) / **Light** / **Dark**. Applied with `preferredColorScheme` in `TableMechApp` |
+| Theme | **System** (default) / **Light** / **Dark**. Applied with `preferredColorScheme` in `MechBuddyApp` |
 
 ### About
 
@@ -44,9 +44,9 @@ Last section. **Delete saved games** (`settings.deleteAll`) confirms, then delet
 
 ```swift
 enum AppLinks {
-    static let privacy = URL(string: "https://jacobrozell.github.io/TableMech/privacy.html")!
-    static let support = URL(string: "https://jacobrozell.github.io/TableMech/support.html")!
-    static let accessibility = URL(string: "https://jacobrozell.github.io/TableMech/accessibility.html")!
+    static let privacy = URL(string: "https://jacobrozell.github.io/Mech-Buddy/privacy.html")!
+    static let support = URL(string: "https://jacobrozell.github.io/Mech-Buddy/support.html")!
+    static let accessibility = URL(string: "https://jacobrozell.github.io/Mech-Buddy/accessibility.html")!
     static let tipJar: URL? = nil  // locked: no tip jar
 }
 ```
@@ -64,4 +64,4 @@ Live code: `Support/Navigation/AppLinks.swift` (URLs built with `makeURL`).
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `Features/Play/SettingsHomeView.swift`, `App/AppPreferences.swift`, `App/TableMechApp.swift`, `Support/Navigation/AppLinks.swift`, `project.yml` (`MARKETING_VERSION` 0.2.0, `CURRENT_PROJECT_VERSION` 1) |
+| Code paths | `Features/Play/SettingsHomeView.swift`, `App/AppPreferences.swift`, `App/MechBuddyApp.swift`, `Support/Navigation/AppLinks.swift`, `project.yml` (`MARKETING_VERSION` 0.2.0, `CURRENT_PROJECT_VERSION` 1) |

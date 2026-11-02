@@ -1,13 +1,13 @@
 ---
-description: TableMech agent defaults
+description: Mech Buddy agent defaults
 globs:
 alwaysApply: true
 ---
 
-# TableMech
+# Mech Buddy
 
 - Specs under `specs/` win over brainstorm/HTML.
-- Min iOS 26, Swift 6, team `7JT2JB89AV`, bundle `com.jacobrozell.tablemech`.
+- Min iOS 26, Swift 6, team `7JT2JB89AV`, bundle `com.jacobrozell.mechbuddy`.
 - Regenerate with `xcodegen generate` — do not hand-edit `.xcodeproj`.
-- Push via `git@github.com-personal:jacobrozell/TableMech.git` when remote exists.
+- Push via `git@github.com-personal:jacobrozell/Mech-Buddy.git`.
 - Free Battle is 1.1; Classic is Coming soon only in 1.0.

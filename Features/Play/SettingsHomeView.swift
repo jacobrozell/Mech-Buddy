@@ -1,6 +1,6 @@
 import SwiftUI
-import TableMechData
-import TableMechDomain
+import MechBuddyData
+import MechBuddyDomain
 
 struct SettingsHomeView: View {
     @Environment(AppDependencies.self) private var dependencies

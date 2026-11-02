@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct InitiativeStep: View {
     var preview: InitiativeDicePreview?

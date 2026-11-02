@@ -1,4 +1,4 @@
-# TableMech — game mode product scope
+# Mech Buddy — game mode product scope
 
 **Last updated:** 2026-08-21
 

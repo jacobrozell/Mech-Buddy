@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct UnitCard: View {
     var unit: MatchUnitState

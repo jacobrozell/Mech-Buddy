@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct CleanUpStep: View {
     var session: MatchSession

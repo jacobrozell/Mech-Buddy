@@ -1,5 +1,5 @@
 import Testing
-import TableMechDomain
+import MechBuddyDomain
 
 @Suite("Combat solver")
 struct CombatSolverTests {

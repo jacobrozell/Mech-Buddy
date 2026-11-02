@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 /// Manual faces are the primary control. "Let the app roll" switches the session dice mode.
 struct DiceTray: View {

@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import TableMechDomain
+import MechBuddyDomain
 
 struct BattleFlowView: View {
     @Environment(AppDependencies.self) private var dependencies

@@ -6,7 +6,7 @@
 
 ## Vision
 
-TableMech becomes the guided-play app for BattleTech. Start small. Each step is a complete way to play at the table, on one shared phone.
+Mech Buddy becomes the guided-play app for BattleTech. Start small. Each step is a complete way to play at the table, on one shared phone.
 
 The app guides the turn. The player brings the physical cards. [masterunitlist.battletech.com](https://masterunitlist.battletech.com/) is the lookup when a card is ported. Do not bulk-download or ship the catalog.
 

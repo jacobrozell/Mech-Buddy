@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 /// Visual walkthrough for Ridge Line. Game math stays in the Rules tab.
 struct HowToPlayRidgeLineView: View {

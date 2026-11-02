@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct PhaseTrack: View {
     var current: PhaseId

@@ -1,6 +1,6 @@
-# AGENTS.md — TableMech
+# AGENTS.md — Mech Buddy
 
-You are building **TableMech**, an iOS 26 BattleTech tableside companion. Specs are authoritative; brainstorm/HTML is not.
+You are building **Mech Buddy**, an iOS 26 BattleTech tableside companion. Specs are authoritative; brainstorm/HTML is not.
 
 ## Read first (in order)
 

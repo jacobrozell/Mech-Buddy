@@ -1,4 +1,4 @@
-# Brainstorm — TableMech (non-authoritative)
+# Brainstorm — Mech Buddy (non-authoritative)
 
 > Ideas and product direction. Promote to `specs/` when behavior is locked.  
 > Source walkthrough: [`../FutureIdeas/alpha-strike-walkthrough.html`](../FutureIdeas/alpha-strike-walkthrough.html)
@@ -78,7 +78,7 @@ Mobile IA should **not** copy nine top-level tabs. Organize by **jobs** (Play / 
 
 | Decision | Choice |
 |----------|--------|
-| App name / bundle | **TableMech** / `com.jacobrozell.tablemech` |
+| App name / bundle | **Mech Buddy** / `com.jacobrozell.mechbuddy` |
 | Positioning | BattleTech guided matches |
 | Min iOS | **26.0** |
 | Classic in v1 | **Visible Coming soon** (not playable) |

@@ -1,6 +1,6 @@
 import SwiftUI
-import TableMechData
-import TableMechDomain
+import MechBuddyData
+import MechBuddyDomain
 
 extension EnvironmentValues {
     @Entry var playZoomNamespace: Namespace.ID?

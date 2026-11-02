@@ -1,6 +1,6 @@
 import Foundation
 import SwiftData
-import TableMechDomain
+import MechBuddyDomain
 
 public enum MatchPersistenceError: Error, Sendable, Equatable, LocalizedError {
     case unsupportedPayloadSchema(Int)

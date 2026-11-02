@@ -1,4 +1,4 @@
-# iOS 26 Platform Spec — TableMech
+# iOS 26 Platform Spec — Mech Buddy
 
 **Status:** Authoritative for platform UX and SDK assumptions.  
 **Deployment:** iOS **26.0** / iPadOS **26.0** minimum. Xcode **26**. Swift **6**.
@@ -11,7 +11,7 @@ No compatibility shims for earlier OS versions. Prefer current APIs; do not carr
 
 Apple’s iOS 26 model:
 
-| Layer | Role in TableMech | Brand? |
+| Layer | Role in Mech Buddy | Brand? |
 |-------|-------------------|--------|
 | **UI / navigation** | Tab bar, toolbars, sheets, menus, phase dock chrome | Prefer **system Liquid Glass**; monochrome symbols; tint only for meaning |
 | **Content** | Battle readouts, roster cards, TN gauge, pip tracks, rules copy | **Brand expression** (signal / coolant / damage) lives here |

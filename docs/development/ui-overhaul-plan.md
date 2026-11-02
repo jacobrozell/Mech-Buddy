@@ -1,8 +1,8 @@
-# UI overhaul plan — TableMech
+# UI overhaul plan — Mech Buddy
 
 **Status:** Proposal (not yet authoritative). Promote pieces into `specs/` per [SpecGovernance](../../specs/SpecGovernance.md) as they are accepted.
 **Written:** 2026-10-28 against `main` @ `bd4cb5e`.
-**Goal:** Move TableMech from "working prototype built from stock `List` rows" to "polished, production-grade iOS 26 app" without breaking the Ridge Line vertical slice, the accessibility-identifier contract, or the platform rules in [IOS26PlatformSpec](../../specs/IOS26PlatformSpec.md).
+**Goal:** Move Mech Buddy from "working prototype built from stock `List` rows" to "polished, production-grade iOS 26 app" without breaking the Ridge Line vertical slice, the accessibility-identifier contract, or the platform rules in [IOS26PlatformSpec](../../specs/IOS26PlatformSpec.md).
 
 ---
 
@@ -72,7 +72,7 @@ The battle table is the clearest case: the whole live game is **one `Section`** 
 
 ### 2.2 The brand palette exists but is never used
 
-`DesignSystem/TableMechColors.swift` defines `signal`, `coolant`, `damage`, `structure` — and **nothing references it**. Color in the app today is:
+`DesignSystem/MechBuddyColors.swift` defines `signal`, `coolant`, `damage`, `structure` — and **nothing references it**. Color in the app today is:
 
 | Where | Color used | Problem |
 |-------|-----------|---------|
@@ -189,7 +189,7 @@ All of this lives in `DesignSystem/` (already compiled into the app target via `
 
 ### 4.1 Color tokens
 
-Replace `TableMechColors.swift` with an asset-catalog-backed token set. Every color gets **Any / Dark** appearances and an **Increase Contrast** variant in `Assets.xcassets/Colors/`. Code accesses them via a single namespace so call sites read as intent, not hue.
+Replace `MechBuddyColors.swift` with an asset-catalog-backed token set. Every color gets **Any / Dark** appearances and an **Increase Contrast** variant in `Assets.xcassets/Colors/`. Code accesses them via a single namespace so call sites read as intent, not hue.
 
 ```
 DesignSystem/
@@ -337,7 +337,7 @@ Use SwiftUI's `.sensoryFeedback(_:trigger:)` on the view that owns the state, ne
 
 ## 5. Component library
 
-Each component lives in `DesignSystem/Components/`, has a `#Preview` covering light/dark, AX5 Dynamic Type, and Reduce Motion, and has no dependency on `MatchStore` (takes plain values). Components that need domain types import `TableMechDomain` only for value types.
+Each component lives in `DesignSystem/Components/`, has a `#Preview` covering light/dark, AX5 Dynamic Type, and Reduce Motion, and has no dependency on `MatchStore` (takes plain values). Components that need domain types import `MechBuddyDomain` only for value types.
 
 ### 5.1 `Eyebrow`
 Uppercase condensed section label with optional trailing accessory (e.g. "Swap" button). Replaces `Section("…")` headers on custom surfaces and the ad-hoc `.caption.weight(.semibold)` labels in `compactHealth` (`BattleFlowView.swift:502-508`). Adds `.accessibilityAddTraits(.isHeader)`.
@@ -569,7 +569,7 @@ Classic BattleTech                 [Close]
 
 Coming later
 Classic uses paper record sheets, heat,
-and hit locations. TableMech will guide
+and hit locations. Mech Buddy will guide
 those too.
 
 For a first night, play Ridge Line.
@@ -1432,7 +1432,7 @@ Every component and every battle step gets `#Preview`s with fixture sessions (`M
 Add a snapshot testing target (e.g., `swift-snapshot-testing` via SPM in `project.yml`) for components and steps in light/dark × default/AX5. ~40 snapshots cover the overhaul; they prevent the visual regressions a 1,200-line refactor will otherwise cause.
 
 ### 10.3 UI tests
-There is no UI test target yet (`project.yml` has `TableMechTests` only). Add `TableMechUITests` with the Phase 6 happy path driven entirely by the identifiers in §16 — this is what proves the overhaul didn't break the slice. Launch with an in-memory store argument.
+There is no UI test target yet (`project.yml` has `MechBuddyTests` only). Add `MechBuddyUITests` with the Phase 6 happy path driven entirely by the identifiers in §16 — this is what proves the overhaul didn't break the slice. Launch with an in-memory store argument.
 
 ### 10.4 Unit tests
 - `PrintedMove` parsing (moved out of the view).
@@ -1453,7 +1453,7 @@ There is no UI test target yet (`project.yml` has `TableMechTests` only). Add `T
 
 ## 11. Phased rollout
 
-Each phase is one or more PRs; each ends green on `TableMechCI` and the manual checklist for touched screens.
+Each phase is one or more PRs; each ends green on `MechBuddyCI` and the manual checklist for touched screens.
 
 ### Phase U0 — Foundations (≈2–3 days)
 - Tokens (color assets with light/dark/high-contrast), `TMFont`, `TMSpace`, `TMRadius`, `TMMotion`, `TMHaptics`.

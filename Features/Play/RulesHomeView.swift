@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import TableMechData
+import MechBuddyData
 
 struct RulesHomeView: View {
     @Environment(AppDependencies.self) private var dependencies

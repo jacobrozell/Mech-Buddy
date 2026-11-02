@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 enum BattleChrome {
     static func showsHeader(_ step: BattleCoach.Step) -> Bool {

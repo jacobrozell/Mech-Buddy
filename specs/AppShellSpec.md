@@ -1,4 +1,4 @@
-# App Shell Spec — TableMech
+# App Shell Spec — Mech Buddy
 
 Companion: [IOS26PlatformSpec](IOS26PlatformSpec.md) · [MatchSessionSpec](features/MatchSessionSpec.md).
 
@@ -35,7 +35,7 @@ How to play and Getting Started are `navigationDestination` pushes from Play, so
 
 Free Battle hidden in Release (1.1). There is no separate first-launch intro screen. Until a game starts or resumes, Play can subtitle the mission “New here? Start with the 2-minute checklist” (`hasSeenIntro`). Starting or resuming sets the flag.
 
-Appearance follows the system. Settings → Theme overrides it (`AppPreferences.theme`, applied in `TableMechApp`).
+Appearance follows the system. Settings → Theme overrides it (`AppPreferences.theme`, applied in `MechBuddyApp`).
 
 ## Battle immersion
 
@@ -78,4 +78,4 @@ The checklist is optional. It never blocks Play Ridge Line.
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `App/RootTabView.swift`, `App/TableMechApp.swift`, `App/AppPreferences.swift`, `Features/Play/PlayHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `Steps/CriticalPendingStep.swift`, `CritSheet.swift` |
+| Code paths | `App/RootTabView.swift`, `App/MechBuddyApp.swift`, `App/AppPreferences.swift`, `Features/Play/PlayHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `Steps/CriticalPendingStep.swift`, `CritSheet.swift` |

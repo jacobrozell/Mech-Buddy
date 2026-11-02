@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import TableMechDomain
+import MechBuddyDomain
 
 enum BattleStageLayout: Equatable {
     case stacked

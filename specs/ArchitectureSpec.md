@@ -1,8 +1,8 @@
-# Architecture Spec — TableMech
+# Architecture Spec — Mech Buddy
 
 ## Goal vs Tabletome
 
-Tabletome works, but multi-mode growth produced `switch gameSystemId` sprawl. TableMech adopts a **play-engine + content-pack registry** from day one:
+Tabletome works, but multi-mode growth produced `switch gameSystemId` sprawl. Mech Buddy adopts a **play-engine + content-pack registry** from day one:
 
 - Features never branch on raw mode strings for combat/turn behavior
 - Capabilities and engines come from Domain registry + manifest JSON
@@ -43,10 +43,10 @@ Domain (Models, Commands, PlayEngines, pure math) — Foundation only
 
 | Target | Contents |
 |--------|----------|
-| TableMech | App, Features, DesignSystem, Support |
-| TableMechDomain | Domain |
-| TableMechData | Data + Persistence |
-| TableMechTests | Unit + a11y contracts |
+| Mech Buddy | App, Features, DesignSystem, Support |
+| MechBuddyDomain | Domain |
+| MechBuddyData | Data + Persistence |
+| MechBuddyTests | Unit + a11y contracts |
 
 ## Dependency rules
 

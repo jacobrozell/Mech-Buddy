@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-import TableMechDomain
+import MechBuddyDomain
 
 @Suite("MatchReducer")
 struct MatchReducerTests {

@@ -55,7 +55,7 @@ struct ChecklistRow: View {
             ChecklistRow(
                 title: "Quick-start rules",
                 isChecked: false,
-                externalURL: URL(string: "https://jacobrozell.github.io/TableMech/support.html"),
+                externalURL: URL(string: "https://jacobrozell.github.io/Mech-Buddy/support.html"),
                 onToggle: {}
             )
         }

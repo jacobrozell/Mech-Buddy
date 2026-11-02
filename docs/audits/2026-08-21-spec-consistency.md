@@ -1,6 +1,6 @@
 # Spec consistency audit — 2026-08-21
 
-Audit of TableMech Phase 1 specs before coding. Resolutions applied in the same change set.
+Audit of Mech Buddy Phase 1 specs before coding. Resolutions applied in the same change set.
 
 ## Findings (severity → resolution)
 
@@ -23,7 +23,7 @@ Audit of TableMech Phase 1 specs before coding. Resolutions applied in the same 
 
 | Item | Notes |
 |------|-------|
-| App display name vs TableMech | Confirm before App Store metadata |
+| App display name vs Mech Buddy | Confirm before App Store metadata |
 | Tip jar URL | Remains `nil` |
 | Classic tools slice tag | post-1.0; no date |
 

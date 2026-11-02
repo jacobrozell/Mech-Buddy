@@ -1,4 +1,4 @@
-# Production readiness plan — TableMech 0.2.0 → 1.0.0
+# Production readiness plan — Mech Buddy 0.2.0 → 1.0.0
 
 **Status:** Working plan (not a spec). Where a task changes behavior, the matching spec changes in the same PR per [SpecGovernance](../../specs/SpecGovernance.md).
 **Written:** 2026-11-01 against `main` @ `cbabf2d` (0.2.0 build 1).
@@ -38,7 +38,7 @@
 - Feature gates go through `ReleaseSurface` (`Support/Release/ReleaseSurface.swift`) only.
 - Physical dice are primary. One device, hotseat. Free Battle is 1.1. Classic stays "Coming soon" only.
 - **Never rename or remove an accessibility identifier.** Add new ones next to old ones. The list is in [AccessibilitySpec](../../specs/AccessibilitySpec.md).
-- Don't hand-edit `TableMech.xcodeproj`. Edit `project.yml`, then run `xcodegen generate`. The `.xcodeproj` is git-ignored.
+- Don't hand-edit `MechBuddy.xcodeproj`. Edit `project.yml`, then run `xcodegen generate`. The `.xcodeproj` is git-ignored.
 
 ### 0.2 Environment you need
 
@@ -51,7 +51,7 @@ xcodegen generate
 ```
 
 ```bash
-xcodebuild -scheme TableMechCI -destination 'platform=iOS Simulator,name=iPhone 17' test
+xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
 If `iPhone 17` isn't installed, list what is with `xcrun simctl list devices available` and use the newest iPhone.
@@ -86,7 +86,7 @@ Facts checked in code at `cbabf2d`:
 |------|-------|
 | Version | `MARKETING_VERSION 0.2.0`, `CURRENT_PROJECT_VERSION 1` (`project.yml`) |
 | Size | About 13.8k lines of Swift across App, Domain, Data, Persistence, Features, DesignSystem, Support and Tests |
-| Targets | `TableMech` (app), `TableMechDomain` (framework), `TableMechData` (framework, which includes Persistence), `TableMechTests` (unit tests, **not app-hosted**, so they can only see Domain and Data) |
+| Targets | `MechBuddy` (app), `MechBuddyDomain` (framework), `MechBuddyData` (framework, which includes Persistence), `MechBuddyTests` (unit tests, **not app-hosted**, so they can only see Domain and Data) |
 | Domain | `MatchReducer` (commands → new session), `BattleCoach` (the step and primary action for the UI), `MatchRecovery` (Back and Undo), engines for SATOR, damage, crits, phases and victory. Clean and well factored. |
 | Persistence | One `SDMatchSession` row per match: a JSON payload plus indexed columns. `recoverySnapshots` (the undo stack, up to 12 entries) is inside the payload. |
 | UI | The 0.2.0 tableside overhaul shipped: design tokens, components, battle stage with header, dock and step views, sheets, plus Play, Force, Rules and Settings. iPad and landscape layouts exist (`BattleStageLayout`). |
@@ -188,7 +188,7 @@ jobs:
       - name: Unit tests
         run: |
           set -o pipefail
-          xcodebuild -scheme TableMechCI \
+          xcodebuild -scheme MechBuddyCI \
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
@@ -236,7 +236,7 @@ jobs:
 
 **Why.** UI tests need a clean, deterministic start. [TestPlanSpec](../../specs/TestPlanSpec.md) already names the arguments.
 
-**Files.** Add `Support/Release/LaunchArguments.swift`, `App/AppDependencies.swift`, `App/TableMechApp.swift`. Update TestPlanSpec § Verification.
+**Files.** Add `Support/Release/LaunchArguments.swift`, `App/AppDependencies.swift`, `App/MechBuddyApp.swift`. Update TestPlanSpec § Verification.
 
 **Steps.**
 
@@ -281,21 +281,21 @@ enum LaunchArguments {
 1. Add the target in `project.yml`:
 
 ```yaml
-  TableMechUITests:
+  MechBuddyUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
       - path: Tests/UI
     dependencies:
-      - target: TableMech
+      - target: MechBuddy
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.tablemech.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy.uitests
         GENERATE_INFOPLIST_FILE: YES
-        TEST_TARGET_NAME: TableMech
+        TEST_TARGET_NAME: MechBuddy
 ```
 
-   Add a scheme `TableMechUI` whose test action runs `TableMechUITests`. Keep `TableMechCI` unit-only so PR CI stays fast.
+   Add a scheme `MechBuddyUI` whose test action runs `MechBuddyUITests`. Keep `MechBuddyCI` unit-only so PR CI stays fast.
 2. **Identifiers.** Individual die faces have no identifiers today; only the picker does (`{prefix}.die1`). Add a per-face id **on each face button**, `"\(accessibilityIdentifier).\(face)"` (for example `as.crit.die1.6`), and leave the existing picker id where it is. Find the initiative pickers' `diePrefix` in `Features/Battle/Steps/InitiativeStep.swift` and record the resulting ids in AccessibilitySpec.
 3. Write the test with arguments `["-reset_state", "-skip_onboarding"]`. Don't pass `-ui_testing` here: the resume check below needs the on-disk store.
    - Tap `as.modeHome.ridgeLine`. Wait for `as.ridge.tablePrep`. Tap `as.ridge.tableReady`.
@@ -306,24 +306,24 @@ enum LaunchArguments {
    - Tap `as.battle.doneShooting` (confirm if asked) for both sides. Then tap `as.battle.primary` ("Next turn").
    - **Resume check:** call `app.terminate()`, relaunch with only `-skip_onboarding` (no `-reset_state`), and assert `as.modeHome.resume` exists. Tap it and assert `as.battle.screen` comes back on the same turn.
    - Victory: it's fine to reach victory through `-load_ridge_line` with a near-finished fixture if the full loop is too slow or flaky. Assert `as.victory.screen`, then tap Done.
-4. Add a nightly or `workflow_dispatch` job to CI that runs `TableMechUI`. Per TestPlanSpec, UI smoke runs nightly, not on every PR.
+4. Add a nightly or `workflow_dispatch` job to CI that runs `MechBuddyUI`. Per TestPlanSpec, UI smoke runs nightly, not on every PR.
 
-**Done when.** `TableMechUI` passes three times in a row locally and once in CI. No `sleep` calls: use `waitForExistence(timeout:)`.
+**Done when.** `MechBuddyUI` passes three times in a row locally and once in CI. No `sleep` calls: use `waitForExistence(timeout:)`.
 
 ---
 
 ### A5 · P1 · M — App-hosted tests for `MatchStore`
 
-**Why.** `Features/Battle/MatchStore.swift` (430 lines) owns undo, Back, persistence, abandon and rematch, and has no tests, because `TableMechTests` isn't hosted by the app.
+**Why.** `Features/Battle/MatchStore.swift` (430 lines) owns undo, Back, persistence, abandon and rematch, and has no tests, because `MechBuddyTests` isn't hosted by the app.
 
 **Options (pick 1; recommended first):**
 
-1. **Add `TableMechAppTests`** (`bundle.unit-test`, `TEST_HOST` set to the app, `@testable import TableMech`) under `Tests/App/`. Test `MatchStore` with `InMemoryMatchSessionRepository`.
-2. Move `MatchStore` and `ScenarioPresentation` into `TableMechData`. That's more churn, and it puts `@Observable` UI state in the data layer. Not recommended.
+1. **Add `MechBuddyAppTests`** (`bundle.unit-test`, `TEST_HOST` set to the app, `@testable import MechBuddy`) under `Tests/App/`. Test `MatchStore` with `InMemoryMatchSessionRepository`.
+2. Move `MatchStore` and `ScenarioPresentation` into `MechBuddyData`. That's more churn, and it puts `@Observable` UI state in the data layer. Not recommended.
 
 **Cases to cover.** Start → undo returns to the previous session. The undo stack caps at 12. `back()` hands movement back without losing moves. `backNeedsConfirm` is true after a shot. `abandon()` deletes the row. `rematch` deletes the completed game and starts fresh. `startRidgeLine(replaceActive: false)` with an active save sets `lastError`. `persist()` writes `recoverySnapshots` with each nested snapshot's own `recoverySnapshots` empty.
 
-**Done when.** At least 10 cases pass in CI, and the new target runs in the `TableMechCI` scheme.
+**Done when.** At least 10 cases pass in CI, and the new target runs in the `MechBuddyCI` scheme.
 
 ---
 
@@ -522,7 +522,7 @@ Set `MARKETING_VERSION: "1.0.0"` in `project.yml`, and update README and [featur
 
 Draft in `docs/release/app-store-metadata.md`:
 
-- **Name and subtitle.** Owner decision O1 below. Avoid trademarks in the **name**. Something like "TableMech — Tabletop Mech Companion" is safer than putting "BattleTech" in the title.
+- **Name and subtitle.** Owner decision O1 below. Avoid trademarks in the **name**. Something like "Mech Buddy — Tabletop Mech Companion" is safer than putting "BattleTech" in the title.
 - **Description.** It must say plainly that this is an unofficial fan aid, it needs the physical game, and it's offline. Reuse the disclaimer from `as-rules-topics.json` and Settings.
 - **Keywords**, **category** (Games → Board, or Utilities), **age rating** questionnaire (expect 4+ or 9+ for "infrequent cartoon or fantasy violence").
 - **Privacy nutrition label:** Data Not Collected. This must match `PrivacyInfo.xcprivacy` and `docs/privacy.html`.
@@ -564,7 +564,7 @@ Rule of thumb: every PR that changes behavior also changes the spec's **Verifica
 
 | # | Decision | Recommendation | Blocks |
 |---|----------|----------------|--------|
-| O1 | App Store name and subtitle; whether "BattleTech" appears in them | Name "TableMech". Mention BattleTech only in the description, with the disclaimer. | F2 |
+| O1 | App Store name and subtitle; whether "BattleTech" appears in them | Name "Mech Buddy". Mention BattleTech only in the description, with the disclaimer. | F2 |
 | O2 | Are bundled card stats and unit names acceptable under the fan policy? | Read the policy. If unsure, keep the stats; the app is useless without them. | F4, store submission |
 | O3 | Rules rulings C1–C4 | C4: waive crits on wrecked 'Mechs. C1–C3: follow the printed rules. | C-series |
 | O4 | In-battle screen awake: honor the setting or always on? | Honor the setting (default on). | D1 |
@@ -596,5 +596,5 @@ These are what the review found beyond the tasks above. They're low priority; ac
 - `Domain/Models/MatchSession.swift` `DiceRoll2D6.init` uses `precondition`, which crashes on bad input. All UI paths call `validated(...)` first, and synthesized decoding doesn't call `init`, so it's safe today. Keep it that way.
 - `Features/Battle/BattleFlowView.swift` (715 lines) and `CombatSolverSheet.swift` (966 lines) are the largest files. Don't split them for 1.0 unless a task needs it. The UI overhaul plan §9.1 has the split recipe.
 - `project.yml`: `ENABLE_USER_SCRIPT_SANDBOXING: NO` exists only so the SwiftLint build phase can run. Leave it.
-- `Persistence/SchemaV1/SchemaV1.swift`: `TableMechMigrationPlan` has no stages. That's right for now. The first change to `SDMatchSession`'s columns must add `SchemaV2` and a lightweight stage. Payload-only changes (new optional fields in `MatchSession`) don't need a SwiftData migration, only `decodeIfPresent` defaults, as `deploymentAcknowledged` already does.
+- `Persistence/SchemaV1/SchemaV1.swift`: `MechBuddyMigrationPlan` has no stages. That's right for now. The first change to `SDMatchSession`'s columns must add `SchemaV2` and a lightweight stage. Payload-only changes (new optional fields in `MatchSession`) don't need a SwiftData migration, only `decodeIfPresent` defaults, as `deploymentAcknowledged` already does.
 - `MatchStore.persist()` writes up to 12 full-session snapshots into every save. Ridge Line sessions are small, so this is fine. Revisit if Full Lances (8 units, longer logs) lands.

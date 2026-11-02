@@ -1,8 +1,8 @@
-# Agent Build Checklist — TableMech
+# Agent Build Checklist — Mech Buddy
 
 Domain-agnostic process adapted for this app. Full template: `~/Desktop/personal/workspace/agent-build-checklist-template.md`.
 
-**App idea:** TableMech — BattleTech guided matches; Alpha Strike Ridge Line MVP; Classic Coming soon.
+**App idea:** Mech Buddy — BattleTech guided matches; Alpha Strike Ridge Line MVP; Classic Coming soon.
 
 **Read first:** [AGENTS.md](../AGENTS.md) · [product-readiness](product-readiness.md) · [phase-6 DoD](development/phase-6-vertical-slice.md)
 

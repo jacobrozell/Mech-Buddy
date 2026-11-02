@@ -1,4 +1,4 @@
-# Domain Model Spec — TableMech
+# Domain Model Spec — Mech Buddy
 
 **Status:** Authoritative for Domain types used by engines, commands, and persistence DTOs.  
 **Language:** Swift 6, all types `Sendable` unless noted. Domain imports Foundation only.

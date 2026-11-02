@@ -1,4 +1,4 @@
-import TableMechDomain
+import MechBuddyDomain
 
 enum GettingStartedCatalog {
     static let playCueID = "roster"

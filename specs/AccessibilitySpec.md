@@ -1,4 +1,4 @@
-# Accessibility Spec — TableMech
+# Accessibility Spec — Mech Buddy
 
 ## Target
 

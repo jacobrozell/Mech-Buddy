@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct TableMechApp: App {
+struct MechBuddyApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var dependencies = AppDependencies()
 

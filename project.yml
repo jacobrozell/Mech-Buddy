@@ -1,4 +1,4 @@
-name: TableMech
+name: MechBuddy
 attributes:
   ORGANIZATIONNAME: Jacob Rozell
 options:
@@ -25,7 +25,7 @@ configs:
   Release: release
 
 targets:
-  TableMech:
+  MechBuddy:
     type: application
     platform: iOS
     sources:
@@ -49,13 +49,13 @@ targets:
         buildPhase: resources
         type: folder
     dependencies:
-      - target: TableMechDomain
-      - target: TableMechData
+      - target: MechBuddyDomain
+      - target: MechBuddyData
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.tablemech
-        PRODUCT_NAME: TableMech
-        INFOPLIST_KEY_CFBundleDisplayName: TableMech
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy
+        PRODUCT_NAME: MechBuddy
+        INFOPLIST_KEY_CFBundleDisplayName: Mech Buddy
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.games
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UILaunchScreen_BackgroundColor: LaunchBackground
@@ -76,7 +76,7 @@ targets:
           fi
         basedOnDependencyAnalysis: false
 
-  TableMechDomain:
+  MechBuddyDomain:
     type: framework
     platform: iOS
     sources:
@@ -85,10 +85,10 @@ targets:
           - "**/README.md"
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.tablemech.domain
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy.domain
         GENERATE_INFOPLIST_FILE: YES
 
-  TableMechData:
+  MechBuddyData:
     type: framework
     platform: iOS
     sources:
@@ -99,13 +99,13 @@ targets:
         excludes:
           - "**/README.md"
     dependencies:
-      - target: TableMechDomain
+      - target: MechBuddyDomain
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.tablemech.data
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy.data
         GENERATE_INFOPLIST_FILE: YES
 
-  TableMechTests:
+  MechBuddyTests:
     type: bundle.unit-test
     platform: iOS
     sources:
@@ -114,33 +114,33 @@ targets:
         buildPhase: resources
         type: folder
     dependencies:
-      - target: TableMechDomain
-      - target: TableMechData
+      - target: MechBuddyDomain
+      - target: MechBuddyData
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.tablemech.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy.tests
         GENERATE_INFOPLIST_FILE: YES
 
 schemes:
-  TableMech:
+  MechBuddy:
     build:
       targets:
-        TableMech: all
-        TableMechTests: [test]
+        MechBuddy: all
+        MechBuddyTests: [test]
     test:
       targets:
-        - TableMechTests
+        - MechBuddyTests
     run:
       config: Debug
 
-  TableMechCI:
+  MechBuddyCI:
     build:
       targets:
-        TableMech: all
-        TableMechTests: [test]
+        MechBuddy: all
+        MechBuddyTests: [test]
     test:
       targets:
-        - TableMechTests
+        - MechBuddyTests
       config: Debug
     run:
       config: Debug

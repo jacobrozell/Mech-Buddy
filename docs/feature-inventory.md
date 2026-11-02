@@ -1,4 +1,4 @@
-# Feature Inventory — TableMech
+# Feature Inventory — Mech Buddy
 
 What the app exposes. Specs describe behavior; this file says whether code exists.
 

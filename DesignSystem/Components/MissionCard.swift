@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct MissionFact: Identifiable, Sendable {
     var id: String

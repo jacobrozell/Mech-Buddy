@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct PlaceMiniaturesStep: View {
     var session: MatchSession

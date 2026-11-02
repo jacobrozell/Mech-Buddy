@@ -1,8 +1,8 @@
-# Mode Home Spec — TableMech
+# Mode Home Spec — Mech Buddy
 
 ## User story
 
-As a player opening TableMech, I land on Play, see resume if needed, and get clear next actions for Alpha Strike guided play (Classic shows Coming soon).
+As a player opening Mech Buddy, I land on Play, see resume if needed, and get clear next actions for Alpha Strike guided play (Classic shows Coming soon).
 
 ## Screen IDs
 

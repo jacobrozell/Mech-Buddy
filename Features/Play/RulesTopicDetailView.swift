@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechData
+import MechBuddyData
 
 struct RulesTopicDetailView: View {
     let topic: RulesTopicDTO

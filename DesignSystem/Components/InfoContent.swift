@@ -35,7 +35,7 @@ struct InfoContent: View {
         InfoContent(
             title: "Move",
             message: "Inches this ’Mech can walk. Jump, when printed, is the number before the j.",
-            links: [InfoLink(title: "Rules", url: URL(string: "https://jacobrozell.github.io/TableMech/support.html")!)]
+            links: [InfoLink(title: "Rules", url: URL(string: "https://jacobrozell.github.io/Mech-Buddy/support.html")!)]
         )
     }
 }

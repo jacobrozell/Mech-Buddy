@@ -12,7 +12,7 @@ struct ClassicComingSoonSheet: View {
                     hexCluster
                     Text("Coming later")
                         .font(TMFont.stepTitle)
-                    Text("Classic uses paper record sheets, heat, and hit locations. TableMech will guide those too.")
+                    Text("Classic uses paper record sheets, heat, and hit locations. Mech Buddy will guide those too.")
                         .font(TMFont.body)
                         .fixedSize(horizontal: false, vertical: true)
                     Text("For a first night, play Ridge Line.")

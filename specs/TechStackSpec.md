@@ -1,4 +1,4 @@
-# Tech Stack Spec — TableMech
+# Tech Stack Spec — Mech Buddy
 
 | Choice | Value |
 |--------|-------|
@@ -14,7 +14,7 @@
 | Lint | SwiftLint |
 | CI | GitHub Actions — unit + a11y contracts first |
 | Apple team | `7JT2JB89AV` |
-| Bundle ID | `com.jacobrozell.tablemech` |
+| Bundle ID | `com.jacobrozell.mechbuddy` |
 
 ## Persistence (locked)
 

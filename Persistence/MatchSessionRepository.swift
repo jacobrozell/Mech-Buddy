@@ -1,5 +1,5 @@
 import Foundation
-import TableMechDomain
+import MechBuddyDomain
 
 @MainActor
 public protocol MatchSessionRepository: AnyObject {

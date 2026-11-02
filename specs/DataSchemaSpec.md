@@ -1,4 +1,4 @@
-# Data Schema Spec — TableMech
+# Data Schema Spec — Mech Buddy
 
 Persistence: **SwiftData** + `SchemaV1`… Content: versioned JSON bundles.
 

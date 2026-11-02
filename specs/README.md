@@ -1,4 +1,4 @@
-# Specs Index — TableMech
+# Specs Index — Mech Buddy
 
 Authoritative behavior contracts. Brainstorm (`docs/brainstorm.md`) is **not** authoritative.
 

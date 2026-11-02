@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct EventLogSheet: View {
     @Bindable var store: MatchStore

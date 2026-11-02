@@ -1,5 +1,5 @@
 import Testing
-import TableMechDomain
+import MechBuddyDomain
 
 @Suite("Victory and edge cases")
 struct VictoryEdgeCaseTests {

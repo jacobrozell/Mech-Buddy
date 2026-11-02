@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct DiceRollEntry: View {
     @Binding var mode: DiceMode

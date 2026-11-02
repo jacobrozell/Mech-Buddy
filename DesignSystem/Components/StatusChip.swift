@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct StatusChip: View {
     enum Kind: Sendable, Equatable {

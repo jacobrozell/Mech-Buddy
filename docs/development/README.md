@@ -1,4 +1,4 @@
-# Development docs — TableMech
+# Development docs — Mech Buddy
 
 | Doc | Purpose |
 |-----|---------|

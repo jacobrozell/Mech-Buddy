@@ -1,7 +1,7 @@
 import Foundation
 import Testing
-import TableMechData
-import TableMechDomain
+import MechBuddyData
+import MechBuddyDomain
 
 @Suite("Content catalog")
 struct ContentCatalogTests {

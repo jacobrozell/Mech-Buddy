@@ -1,4 +1,4 @@
-# Match Session Spec — TableMech
+# Match Session Spec — Mech Buddy
 
 Types: [DomainModelSpec](../DomainModelSpec.md). Hotseat: [HotseatSpec](HotseatSpec.md).
 

@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 import UIKit
 
 enum AppColorSchemePreference: String, CaseIterable, Identifiable, Sendable {

@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 extension TMColor {
     static func side(_ side: SideId) -> Color {

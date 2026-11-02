@@ -1,7 +1,7 @@
-# Pre-build product readiness — TableMech
+# Pre-build product readiness — Mech Buddy
 
 **Audience:** owner + agents before Phase 0/3.  
-**Last updated:** 2026-11-01
+**Last updated:** 2026-11-02
 
 ---
 
@@ -12,8 +12,10 @@
 | 2026-08-21 | Min iOS | **26.0** |
 | 2026-08-21 | MVP mode | Alpha Strike Ridge Line guided match |
 | 2026-08-21 | Display name | **TableMech** |
+| 2026-11-01 | Display name | **Mech Buddy**. Bundle ID stays `com.jacobrozell.tablemech`. |
+| 2026-11-02 | Repo and bundle | Folder `MechBuddy`. Bundle `com.jacobrozell.mechbuddy`. GitHub repo name `Mech-Buddy`. |
 | 2026-08-21 | Positioning | BattleTech **guided matches** (tableside companion) |
-| 2026-08-21 | Bundle ID | `com.jacobrozell.tablemech` |
+| 2026-08-21 | Bundle ID | `com.jacobrozell.tablemech` (superseded 2026-11-02) |
 | 2026-08-21 | Classic visibility | **Visible “Coming soon”** (not fully hidden) |
 | 2026-08-21 | Hotseat | **One phone/iPad** shared — [HotseatSpec](../specs/features/HotseatSpec.md) |
 | 2026-08-21 | Dice | **Physical primary** — app **enters results** (in-app roll secondary/hidden or advanced) |
@@ -45,4 +47,4 @@
 - HotseatSpec, BattleTableSpec, SATORAttackSpec, UnitFocus (movement), MatchSessionSpec  
 - ReleaseSurfaceSpec + ClassicModeSpec (coming soon)  
 - DataSchemaSpec + TechStackSpec (SwiftData + SchemaV*)  
-- SettingsSpec (no tip jar), README / branding → TableMech  
+- SettingsSpec (no tip jar), README / branding → Mech Buddy  

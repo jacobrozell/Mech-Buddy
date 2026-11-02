@@ -13,5 +13,5 @@ disabled_rules:
   - force_try
 opt_in_rules: []
 excluded:
-  - TableMech.xcodeproj
+  - MechBuddy.xcodeproj
   - DerivedData

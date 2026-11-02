@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import TableMechDomain
+import MechBuddyDomain
 
 struct VictoryView: View {
     let session: MatchSession

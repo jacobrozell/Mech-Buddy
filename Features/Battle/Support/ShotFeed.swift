@@ -1,5 +1,5 @@
 import Foundation
-import TableMechDomain
+import MechBuddyDomain
 
 /// Shots this turn, ordered by the combat event that recorded them.
 /// Matches the full log sentence. A name-only prefix collides when one name starts another.

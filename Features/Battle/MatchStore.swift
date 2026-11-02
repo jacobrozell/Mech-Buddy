@@ -1,7 +1,7 @@
 import Foundation
 import Observation
-import TableMechData
-import TableMechDomain
+import MechBuddyData
+import MechBuddyDomain
 
 @Observable
 @MainActor

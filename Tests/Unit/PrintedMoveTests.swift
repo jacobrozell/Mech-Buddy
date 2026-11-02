@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import TableMechDomain
+@testable import MechBuddyDomain
 
 @Suite("Printed move")
 struct PrintedMoveTests {

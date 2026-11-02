@@ -53,7 +53,7 @@ public enum MatchSessionPayloadSchema {
     public static let current = 1
 }
 
-public enum TableMechMigrationPlan: SchemaMigrationPlan {
+public enum MechBuddyMigrationPlan: SchemaMigrationPlan {
     public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
     public static var stages: [MigrationStage] { [] }
 }
@@ -67,7 +67,7 @@ public enum PersistenceController {
         )
         return try ModelContainer(
             for: schema,
-            migrationPlan: TableMechMigrationPlan.self,
+            migrationPlan: MechBuddyMigrationPlan.self,
             configurations: [configuration]
         )
     }

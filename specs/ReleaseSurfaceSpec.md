@@ -1,4 +1,4 @@
-# Release Surface Spec — TableMech
+# Release Surface Spec — Mech Buddy
 
 ## Principle
 

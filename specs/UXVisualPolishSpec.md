@@ -1,4 +1,4 @@
-# UX / Visual Polish Spec — TableMech
+# UX / Visual Polish Spec — Mech Buddy
 
 **Status:** Authoritative for visual and interaction polish.  
 **Companion:** [DesignSystemSpec](DesignSystemSpec.md) · [IOS26PlatformSpec](IOS26PlatformSpec.md) · [AccessibilitySpec](AccessibilitySpec.md)

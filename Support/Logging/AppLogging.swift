@@ -8,7 +8,7 @@ public protocol AppLogging: Sendable {
 }
 
 public struct ConsoleAppLogger: AppLogging, Sendable {
-    private let logger = Logger(subsystem: "com.jacobrozell.tablemech", category: "App")
+    private let logger = Logger(subsystem: "com.jacobrozell.mechbuddy", category: "App")
 
     public init() {}
 

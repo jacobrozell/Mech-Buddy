@@ -1,5 +1,5 @@
 import Foundation
-import TableMechDomain
+import MechBuddyDomain
 
 #if DEBUG
 enum PreviewFixtures {

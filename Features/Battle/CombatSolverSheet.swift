@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechDomain
+import MechBuddyDomain
 
 struct CombatSolverSheet: View {
     let session: MatchSession

@@ -1,9 +1,9 @@
 import Foundation
 
 public enum AppLinks {
-    public static let privacy = makeURL("https://jacobrozell.github.io/TableMech/privacy.html")
-    public static let support = makeURL("https://jacobrozell.github.io/TableMech/support.html")
-    public static let accessibility = makeURL("https://jacobrozell.github.io/TableMech/accessibility.html")
+    public static let privacy = makeURL("https://jacobrozell.github.io/Mech-Buddy/privacy.html")
+    public static let support = makeURL("https://jacobrozell.github.io/Mech-Buddy/support.html")
+    public static let accessibility = makeURL("https://jacobrozell.github.io/Mech-Buddy/accessibility.html")
     public static let tipJar: URL? = nil
     public static let quickStartDownloads = makeURL("https://battletech.com/downloads/")
 

@@ -1,5 +1,5 @@
 import SwiftUI
-import TableMechData
+import MechBuddyData
 
 #if DEBUG
 struct PlayPreviewHost<Content: View>: View {

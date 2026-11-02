@@ -31,7 +31,7 @@ jobs:
       - name: Unit tests
         run: |
           set -o pipefail
-          xcodebuild -scheme TableMechCI \
+          xcodebuild -scheme MechBuddyCI \
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \

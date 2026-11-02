@@ -1,4 +1,4 @@
-# Design System Spec — TableMech
+# Design System Spec — Mech Buddy
 
 Companion: [IOS26PlatformSpec](IOS26PlatformSpec.md) · [UXVisualPolishSpec](UXVisualPolishSpec.md).
 
@@ -130,4 +130,4 @@ Type, spacing, radius, motion, and haptics: `TMFont`, `TMSpace`, `TMRadius`, `TM
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `DesignSystem/Tokens/`, `DesignSystem/Components/`, `DesignSystem/AccessibilityID.swift`, `Resources/Assets.xcassets/Colors/`, `App/AppPreferences.swift`, `App/TableMechApp.swift` |
+| Code paths | `DesignSystem/Tokens/`, `DesignSystem/Components/`, `DesignSystem/AccessibilityID.swift`, `Resources/Assets.xcassets/Colors/`, `App/AppPreferences.swift`, `App/MechBuddyApp.swift` |

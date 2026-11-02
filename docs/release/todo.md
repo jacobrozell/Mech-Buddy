@@ -1,4 +1,4 @@
-# TableMech — release todo
+# Mech Buddy — release todo
 
 Status legend: `[ ]` todo · `[x]` done
 

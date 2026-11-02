@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 import SwiftData
-import TableMechData
-import TableMechDomain
+import MechBuddyData
+import MechBuddyDomain
 
 @Suite("SwiftData match persistence")
 @MainActor

@@ -1,4 +1,4 @@
-# Test Plan Spec — TableMech
+# Test Plan Spec — Mech Buddy
 
 ## Pyramid
 
@@ -11,7 +11,7 @@
 
 ## CI
 
-GitHub Actions `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`. The `CI / unit` job generates the Xcode project, runs SwiftLint, and runs the `TableMechCI` scheme (unit tests) on the newest available iPhone simulator. UI smoke stays out of that job until it exists, then runs nightly rather than on every pull request.
+GitHub Actions `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`. The `CI / unit` job generates the Xcode project, runs SwiftLint, and runs the `MechBuddyCI` scheme (unit tests) on the newest available iPhone simulator. UI smoke stays out of that job until it exists, then runs nightly rather than on every pull request.
 
 ## Domain vectors (required)
 
