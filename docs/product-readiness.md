@@ -29,6 +29,7 @@
 | 2026-11-01 | Playable forces in 1.0 | **Ridge Line only.** Army building, Free Battle, and other rosters stay later. |
 | 2026-11-01 | Card lookup for army building | When that work starts, look up Alpha Strike cards on [masterunitlist.battletech.com](https://masterunitlist.battletech.com/). Do not bulk-download or ship the catalog. |
 | 2026-11-01 | C1 Ridge Line stats | Checked the four units against their MUL pages. Numbers already match, including Locust LCT-1V TMM 3 (13"–18" is +3). No JSON change. |
+| 2026-11-02 | Analytics | **Later.** Not in the first TestFlight. Plan: [FutureIdeas/analytics.md](../FutureIdeas/analytics.md). |
 
 ---
 

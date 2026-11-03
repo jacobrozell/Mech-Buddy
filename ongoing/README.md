@@ -1,6 +1,6 @@
 # Ongoing work
 
-**Last updated:** 2026-11-01
+**Last updated:** 2026-11-02
 
 ## Active
 
@@ -11,3 +11,4 @@
 ## See also
 
 - Release todo: [`docs/release/todo.md`](../docs/release/todo.md)
+- Later: [analytics](../FutureIdeas/analytics.md), [guided play](../FutureIdeas/guided-play.md)
