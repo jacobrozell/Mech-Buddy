@@ -1,6 +1,6 @@
 # Mech Buddy
 
-BattleTech tableside companion for iPhone and iPad (iOS 26). **0.2.0** on `main` is the Ridge Line tableside UI: design tokens, battle layout, sheets, and rebuilt Play, Force, Rules, and Settings screens. **0.1.0** was the first playable slice (stock lists, auto and manual shot rolls). Classic stays Coming soon.
+BattleTech tableside companion for iPhone and iPad (iOS 26). **1.0.0** on `main` is the Ridge Line TestFlight: the tableside UI from 0.2.0, plus the playtest rules fixes. **0.1.0** was the first playable slice (stock lists, auto and manual shot rolls). Classic stays Coming soon.
 
 Plan: [docs/development/ui-overhaul-plan.md](docs/development/ui-overhaul-plan.md). 1.0 readiness: [docs/development/production-readiness-plan.md](docs/development/production-readiness-plan.md). Specs: [specs/](specs/).
 
@@ -30,7 +30,7 @@ Open `MechBuddy.xcodeproj` in Xcode 26+.
 
 Start at [AGENTS.md](AGENTS.md). Owner decisions: [docs/product-readiness.md](docs/product-readiness.md).
 
-Team `7JT2JB89AV` · Bundle `com.jacobrozell.mechbuddy` · Version **0.2.0 (1)**
+Team `7JT2JB89AV` · Bundle `com.jacobrozell.mechbuddy` · Version **1.0.0 (1)**
 
 Legal pages live in [`docs/`](docs/) and are linked from Settings. After they are on `main`, publish GitHub Pages from the `/docs` folder so these URLs resolve:
 

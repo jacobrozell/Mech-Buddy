@@ -2,7 +2,7 @@
 
 What the app exposes. Specs describe behavior; this file says whether code exists.
 
-**App version:** 0.2.0 (build 1), tag `0.2.0`.  
+**App version:** 1.0.0 (build 1). Not tagged until the build is approved.  
 **Product release target:** 1.0.0 — Alpha Strike Ridge Line. Rows below keep 1.0.0 when that is the product release, including work that already ships in 0.2.0.
 
 | Feature | Status | Release | Notes |

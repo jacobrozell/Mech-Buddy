@@ -24,7 +24,7 @@ A `Form`. Appearance follows the system until Theme is changed. There is no defa
 |-----|----------|
 | How to play Ridge Line | Push |
 | New here checklist | Push |
-| Version | Bundle short version and build. This build is **0.2.0 (1)** |
+| Version | Bundle short version and build. This build is **1.0.0 (1)** |
 
 ### Support & legal
 
@@ -64,4 +64,4 @@ Live code: `Support/Navigation/AppLinks.swift` (URLs built with `makeURL`).
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `Features/Play/SettingsHomeView.swift`, `App/AppPreferences.swift`, `App/MechBuddyApp.swift`, `Support/Navigation/AppLinks.swift`, `project.yml` (`MARKETING_VERSION` 0.2.0, `CURRENT_PROJECT_VERSION` 1) |
+| Code paths | `Features/Play/SettingsHomeView.swift`, `App/AppPreferences.swift`, `App/MechBuddyApp.swift`, `Support/Navigation/AppLinks.swift`, `project.yml` (`MARKETING_VERSION` 1.0.0, `CURRENT_PROJECT_VERSION` 1) |
