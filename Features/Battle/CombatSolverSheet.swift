@@ -266,38 +266,8 @@ struct CombatSolverSheet: View {
     private var gaugeBesideDice: Bool { verticalSizeClass == .compact }
 
     private func shotScreen(attacker: MatchUnitState, defender: MatchUnitState, solve: CombatSolve) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: TMSpace.lg) {
-                if defender.combatStatus == .destroyedPendingEnd {
-                    Text("\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                rangeControl
-                targetMovedControl(defender)
-                conditions
-                if gaugeBesideDice {
-                    compactRoll(solve)
-                } else if solve.cannotShootReason == nil {
-                    rollSection
-                }
-                if let tn = solve.targetNumber {
-                    breakdown(tn)
-                }
-                if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
-                    OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
-                }
-                if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
-                   defender.combatStatus != .destroyedPendingEnd {
-                    DamagePreviewCard(solve: solve, defender: defender)
-                }
-            }
-            .padding(TMSpace.lg)
-        }
-        .scrollEdgeEffectStyle(.soft, for: .bottom)
-        .safeAreaInset(edge: .top, spacing: 0) {
-            // Compact pinned header: the full gauge used to cover the controls being changed.
+        VStack(spacing: 0) {
+            // Pinned above the scroll: a top inset used to cover the range and condition controls.
             VStack(alignment: .leading, spacing: TMSpace.xs) {
                 Text("\(attacker.name) → \(defender.name)")
                     .font(TMFont.cardTitle)
@@ -310,8 +280,36 @@ struct CombatSolverSheet: View {
             .padding(.bottom, gaugeBesideDice ? TMSpace.sm : TMSpace.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.systemBackground))
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: TMSpace.lg) {
+                    if defender.combatStatus == .destroyedPendingEnd {
+                        Text("\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    rangeControl
+                    targetMovedControl(defender)
+                    conditions
+                    if gaugeBesideDice {
+                        compactRoll(solve)
+                    } else if solve.cannotShootReason == nil {
+                        rollSection
+                    }
+                    if let tn = solve.targetNumber {
+                        breakdown(tn)
+                    }
+                    if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
+                        OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
+                    }
+                    if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
+                       defender.combatStatus != .destroyedPendingEnd {
+                        DamagePreviewCard(solve: solve, defender: defender)
+                    }
+                }
+                .padding(TMSpace.lg)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             applyBar(solve)
                 .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
         }
@@ -516,8 +514,6 @@ struct CombatSolverSheet: View {
                 chipToggle("Partial cover", isOn: $insight.partialCover)
                 chipToggle("Rear shot", isOn: $insight.rearHit)
             }
-            // Keep "More…" clear of the chips: their lower halves used to toggle it.
-            .padding(.bottom, TMSpace.sm)
             Button {
                 showUnusual.toggle()
             } label: {
@@ -528,8 +524,11 @@ struct CombatSolverSheet: View {
                         .font(TMFont.detail.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.plain)
+            .padding(.top, TMSpace.md)
             .accessibilityHint("Line of sight and front arc")
             if showUnusual {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -570,7 +569,7 @@ struct CombatSolverSheet: View {
     @ViewBuilder
     private func chipToggle(_ title: String, isOn: Binding<Bool>, hint: String? = nil) -> some View {
         let toggle = Toggle(isOn: isOn) {
-            Text(title).frame(minHeight: 36)
+            Text(title).frame(minHeight: 44)
         }
             .toggleStyle(.button)
             .font(TMFont.detail)

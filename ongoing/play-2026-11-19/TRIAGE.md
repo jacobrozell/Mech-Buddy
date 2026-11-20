@@ -1,6 +1,28 @@
 # Triage — Ridge Line playtest 2026-11-19
 
-Source: `NOTES.md` (notes 1–82, L1–L10). This was a read-only code review: no source files were changed. File pointers were checked against the current tree, and each one names its symbol.
+Source: `NOTES.md` (notes 1–82, L1–L10).
+
+## Done
+
+TestFlight archive of **0.2.0 (1)** is Xcode Cloud Release build `088bef16-7b2c-4d46-a0e2-c7b0a4dd983f` (run 2), from `41b8d35`. That commit is the rules pass. The dock layout below is the commit after it and is not in that archive.
+
+| Item | Where it landed |
+|---|---|
+| P0-1 Crits wait until the end of the phase | `41b8d35` — `combatPhaseCrits` / `firingCrits` |
+| P0-2 Killing blow owes no critical | `41b8d35` — `AlphaStrikeDamage.apply` |
+| P0-3 Wrecked units drop out of later shot feeds | `41b8d35` — `resetTurnFlags` clears every `turnShot` |
+| P0-4 Second tap on Apply does not raise "No critical owed" | `41b8d35` — `isApplying` on the crit and solver sheets |
+| P0-5 Wrecked target no longer says armor absorbs the shot | `41b8d35` — solver banner, preview card skipped, target dimmed |
+| P1-3 Pick which ’Mech moves | `41b8d35` — "Move this one" |
+| P1-4 Crit card says whose dice and that it is not a shot | `41b8d35` |
+| P1-5 Solver is one column; Change keeps the shooter | `41b8d35` |
+| P1-7 Initiative button names who moves; a tie says to clear the dice | `41b8d35` |
+| P1-8 Each phase opens at the top | `41b8d35` |
+| Phone landscape (L1, L8, L9) | `41b8d35` — `BattleStageLayout.resolve` returns `.stacked` on iPhone, including compact height. Shoot and Clean up keep their lists. |
+| P1-1 Dock covers the next control | This commit — the battle dock, the solver need line and Apply bar, and the crit Apply bar are siblings of the scroll view, not safe-area insets |
+| Woods chip opens More… (36) | This commit — chips are 44 pt and More… is a plain button with its own row |
+
+Still open, and not game-breaking for the next table session: simultaneous fire (P1-6), "Motive" vs "MP", clean-up copy when nothing is wrecked, range-band wording, and the victory-screen log.
 
 ## Executive summary
 1. Rules: crit effects apply as soon as the crit is rolled, so a unit's same-phase return fire is penalized (58). A crit is also demanded on a unit that its own damage just destroyed (54). Both are small fixes in `Domain/Engines/AlphaStrike`.

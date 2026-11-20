@@ -21,34 +21,34 @@ struct CritSheet: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: TMSpace.lg) {
-                    header
-                    DiceTray(
-                        mode: Binding(
-                            get: { diceMode },
-                            set: { newMode in
-                                guard newMode != diceMode else { return }
-                                d1 = nil
-                                d2 = nil
-                                diceMode = newMode
-                            }
-                        ),
-                        die1: $d1,
-                        die2: $d2,
-                        manualPrompt: "Roll two dice on the table, then tap the faces.",
-                        autoPrompt: "The app rolls two dice.",
-                        identifierPrefix: "as.crit"
-                    )
-                    if let d1, let d2 {
-                        resultCard(total: d1 + d2)
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: TMSpace.lg) {
+                        header
+                        DiceTray(
+                            mode: Binding(
+                                get: { diceMode },
+                                set: { newMode in
+                                    guard newMode != diceMode else { return }
+                                    d1 = nil
+                                    d2 = nil
+                                    diceMode = newMode
+                                }
+                            ),
+                            die1: $d1,
+                            die2: $d2,
+                            manualPrompt: "Roll two dice on the table, then tap the faces.",
+                            autoPrompt: "The app rolls two dice.",
+                            identifierPrefix: "as.crit"
+                        )
+                        if let d1, let d2 {
+                            resultCard(total: d1 + d2)
+                        }
+                        referenceTable
                     }
-                    referenceTable
+                    .padding(TMSpace.lg)
                 }
-                .padding(TMSpace.lg)
-            }
-            .scrollEdgeEffectStyle(.soft, for: .bottom)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 applyBar
                     .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
             }

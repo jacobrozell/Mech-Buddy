@@ -226,45 +226,45 @@ struct BattleFlowView: View {
     }
 
     private func toolColumn(_ session: MatchSession, coach: BattleCoach, showsUnits: Bool) -> some View {
-        ScrollView {
-            ScrollViewReader { proxy in
-                LazyVStack(alignment: .leading, spacing: TMSpace.md) {
-                    step(session, coach: coach, showsUnits: showsUnits)
-                }
-                .padding(TMSpace.lg)
-                .onChange(of: landingUnitID) { _, id in
-                    guard showsUnits, let id else { return }
-                    if reduceMotion {
-                        proxy.scrollTo(id, anchor: .center)
-                    } else {
-                        withAnimation(TMMotion.drain) {
+        VStack(spacing: 0) {
+            headerInset(session, coach: coach)
+            ScrollView {
+                ScrollViewReader { proxy in
+                    LazyVStack(alignment: .leading, spacing: TMSpace.md) {
+                        step(session, coach: coach, showsUnits: showsUnits)
+                    }
+                    .padding(TMSpace.lg)
+                    .onChange(of: landingUnitID) { _, id in
+                        guard showsUnits, let id else { return }
+                        if reduceMotion {
                             proxy.scrollTo(id, anchor: .center)
+                        } else {
+                            withAnimation(TMMotion.drain) {
+                                proxy.scrollTo(id, anchor: .center)
+                            }
                         }
                     }
                 }
             }
-        }
-        .id(scrollKey(session, coach: coach))
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .safeAreaInset(edge: .top, spacing: 0) {
-            headerInset(session, coach: coach)
-        }
-        .overlay(alignment: .top) {
-            // Overlay, not inset: the pass banner used to push the list ~50 pt and then pull it
-            // back, so taps landed on the wrong card.
-            if let passSide {
-                SidePassBanner(side: passSide)
-                    .padding(.top, TMSpace.sm)
-                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
-                    .allowsHitTesting(false)
+            .id(scrollKey(session, coach: coach))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .overlay(alignment: .top) {
+                // Overlay, not inset: the pass banner used to push the list ~50 pt and then pull it
+                // back, so taps landed on the wrong card.
+                if let passSide {
+                    SidePassBanner(side: passSide)
+                        .padding(.top, TMSpace.sm)
+                        .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                        .allowsHitTesting(false)
+                }
             }
-        }
-        .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: passSide)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
             dockInset(session, coach: coach)
-                // Opaque: content used to show through the glass dock but could not be tapped.
+                // Sibling of the scroll view, not a safe-area inset. An inset let the next
+                // die row, Shoot button, or move list draw under the glass and eat the tap.
                 .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: passSide)
     }
 
     @ViewBuilder
