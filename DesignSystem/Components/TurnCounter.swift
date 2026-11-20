@@ -4,6 +4,8 @@ struct TurnCounter: View {
     var turn: Int
     var maxTurns: Int?
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
     private var isLastTurn: Bool {
         guard let maxTurns else { return false }
         return turn >= maxTurns
@@ -11,8 +13,16 @@ struct TurnCounter: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xs) {
-            Eyebrow("Turn")
+            // Landscape phones: drop the eyebrow line so the counter fits on one row.
+            if verticalSizeClass != .compact {
+                Eyebrow("Turn")
+            }
             HStack(alignment: .firstTextBaseline, spacing: TMSpace.xs) {
+                if verticalSizeClass == .compact {
+                    Text("Turn")
+                        .font(TMFont.detail.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 Text("\(turn)")
                     .font(TMFont.readoutM)
                     .monospacedDigit()

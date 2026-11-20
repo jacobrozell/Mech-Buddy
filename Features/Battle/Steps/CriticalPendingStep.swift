@@ -53,10 +53,9 @@ struct CriticalPendingStep: View {
     }
 
     private var message: String {
-        if diceMode == .auto {
-            return "\(unit.name) took a serious hit. The app rolls before anyone else shoots."
-        }
-        return "\(unit.name) took a serious hit. Roll two dice before anyone else shoots."
+        // Name the roller and say it is not a shot: players read "Roll two dice" as their attack.
+        let who = unit.side.displayName
+        return "\(unit.name) took structure damage. \(who) rolls two dice for its critical check — this is not a shot."
     }
 }
 

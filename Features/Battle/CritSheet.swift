@@ -8,6 +8,9 @@ struct CritSheet: View {
     @State private var d1: Int?
     @State private var d2: Int?
     @State private var tableOpen = false
+    /// Per-roll: tapping "Let the app roll" here must not switch later shots to app-rolled dice.
+    @State private var diceMode: DiceMode = .manual
+    @State private var isApplying = false
 
     private var tableRows: [(total: Int, name: String)] {
         (2...12).map { total in
@@ -23,12 +26,12 @@ struct CritSheet: View {
                     header
                     DiceTray(
                         mode: Binding(
-                            get: { store.session?.diceMode ?? .manual },
+                            get: { diceMode },
                             set: { newMode in
-                                guard newMode != (store.session?.diceMode ?? .manual) else { return }
+                                guard newMode != diceMode else { return }
                                 d1 = nil
                                 d2 = nil
-                                store.setDiceMode(newMode)
+                                diceMode = newMode
                             }
                         ),
                         die1: $d1,
@@ -47,6 +50,7 @@ struct CritSheet: View {
             .scrollEdgeEffectStyle(.soft, for: .bottom)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 applyBar
+                    .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
             }
             .navigationTitle("Critical hit")
             .navigationBarTitleDisplayMode(.inline)
@@ -56,7 +60,7 @@ struct CritSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .accessibilityIdentifier("as.crit.sheet")
     }
@@ -72,7 +76,7 @@ struct CritSheet: View {
                     StatusChip(kind: .critOwed(unit.criticalsOwed))
                 }
             }
-            Text("\(unit.name) took a serious hit. The app applies the result, including a wreck or no effect.")
+            Text("\(unit.side.displayName) rolls for their \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -143,7 +147,7 @@ struct CritSheet: View {
                 title: confirmTitle,
                 placement: .dock,
                 tint: TMColor.signal,
-                isDisabled: d1 == nil || d2 == nil,
+                isDisabled: d1 == nil || d2 == nil || isApplying,
                 accessibilityIdentifier: "as.crit.confirm",
                 accessibilityHint: "Records this critical",
                 action: apply
@@ -164,9 +168,13 @@ struct CritSheet: View {
     }
 
     private func apply() {
-        guard let d1, let d2 else { return }
+        // A second tap while the sheet dismisses must not re-submit (it raised "No critical owed").
+        guard let d1, let d2, !isApplying else { return }
+        isApplying = true
         if store.applyPendingCrit(unitId: unit.id, die1: d1, die2: d2) {
             dismiss()
+        } else {
+            isApplying = false
         }
     }
 

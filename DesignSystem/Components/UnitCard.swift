@@ -186,7 +186,7 @@ private struct UnitCardBody: View {
             return .critOwed(unit.criticalsOwed)
         }
         if unit.combatStatus == .destroyedPendingEnd {
-            return .wrecked
+            return unit.canAttackThisTurn ? .wrecked : .wreckedDone
         }
         if unit.combatStatus == .removed {
             return nil

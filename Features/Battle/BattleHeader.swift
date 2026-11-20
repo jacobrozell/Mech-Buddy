@@ -73,7 +73,7 @@ struct BattleHeader: View {
             }
         }
         .padding(.horizontal, TMSpace.lg)
-        .padding(.vertical, TMSpace.sm)
+        .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xxs : TMSpace.sm)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.bar)
     }
@@ -84,7 +84,10 @@ struct BattleHeader: View {
             Spacer(minLength: TMSpace.sm)
             PhaseTrack(current: phase, isCompact: true)
             if let activeSide {
-                sideMark(activeSide)
+                // One line in landscape: every point of height goes to the step content.
+                SideTag(side: activeSide)
+                    .accessibilityLabel("Active side, \(activeSide.displayName)")
+                    .accessibilityIdentifier("as.battle.activeSide")
             }
         }
     }

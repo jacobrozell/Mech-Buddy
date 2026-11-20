@@ -32,6 +32,9 @@ struct BattleFlowView: View {
     @State private var healthBefore: [UUID: Int] = [:]
     @State private var landingUnitID: UUID?
     @State private var wreckToken = 0
+    /// Short-lived Undo after each recorded change (a mis-tap on a big tile was easy at the table).
+    @State private var undoOffered = false
+    @State private var undoOfferToken = 0
 
     var body: some View {
         screen
@@ -55,6 +58,9 @@ struct BattleFlowView: View {
             }
             .onChange(of: showSATOR) { _, showing in
                 handleSolver(showing)
+            }
+            .onChange(of: store.undoToken) { _, _ in
+                offerUndo()
             }
             .tmHaptic(.phaseAdvance, trigger: passToken, when: { $0 > 0 })
             .tmHaptic(.criticalOwed, trigger: cue?.criticalID, when: { $0 != nil })
@@ -238,13 +244,26 @@ struct BattleFlowView: View {
                 }
             }
         }
-        .scrollEdgeEffectStyle(.soft, for: .bottom)
+        .id(scrollKey(session, coach: coach))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .safeAreaInset(edge: .top, spacing: 0) {
             headerInset(session, coach: coach)
         }
+        .overlay(alignment: .top) {
+            // Overlay, not inset: the pass banner used to push the list ~50 pt and then pull it
+            // back, so taps landed on the wrong card.
+            if let passSide {
+                SidePassBanner(side: passSide)
+                    .padding(.top, TMSpace.sm)
+                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                    .allowsHitTesting(false)
+            }
+        }
+        .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: passSide)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             dockInset(session, coach: coach)
+                // Opaque: content used to show through the glass dock but could not be tapped.
+                .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
         }
     }
 
@@ -256,28 +275,63 @@ struct BattleFlowView: View {
                     turn: session.turn,
                     maxTurns: session.ruleset.maxTurns,
                     phase: session.phase,
-                    activeSide: BattleChrome.showsActiveSide(coach.step) ? session.activeSide : nil
+                    activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
+                        ? session.activeSide : nil
                 )
-                if let passSide {
-                    SidePassBanner(side: passSide)
-                        .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
-                }
             }
-            .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: passSide)
         }
+    }
+
+    /// Scroll identity per step and side, so each phase opens at its top instead of
+    /// inheriting the previous phase's offset.
+    private func scrollKey(_ session: MatchSession, coach: BattleCoach) -> String {
+        "\(session.turn)-\(coach.step)-\(session.activeSide)-\(coach.pendingCritical?.unitId.uuidString ?? "")"
     }
 
     @ViewBuilder
     private func dockInset(_ session: MatchSession, coach: BattleCoach) -> some View {
         let primary = primaryButton(session, coach: coach)
         let secondary = secondaryButton(session, coach: coach)
-        if primary != nil || secondary != nil {
-            BattleDock(
-                primary: primary,
-                secondary: secondary,
-                tint: BattleChrome.dockTint(session: session, coach: coach)
-            )
+        let undoInDock = verticalSizeClass == .compact && undoOffered && store.canUndo
+        VStack(spacing: TMSpace.xs) {
+            if undoOffered, store.canUndo, !undoInDock {
+                Button {
+                    undoOffered = false
+                    store.undo()
+                } label: {
+                    Label(store.undoMenuTitle, systemImage: "arrow.uturn.backward")
+                        .font(TMFont.detail.weight(.semibold))
+                        .frame(minHeight: verticalSizeClass == .compact ? 28 : 36)
+                        .padding(.horizontal, TMSpace.md)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(verticalSizeClass == .compact ? .small : .regular)
+                .buttonBorderShape(.capsule)
+                .padding(.top, TMSpace.xs)
+                .transition(.opacity)
+                .accessibilityIdentifier("as.battle.undoToast")
+            }
+            if primary != nil || secondary != nil {
+                BattleDock(
+                    primary: primary,
+                    secondary: secondary,
+                    // Landscape: Undo rides in the dock row instead of costing a row of height.
+                    leading: undoInDock
+                        ? BattleDockButton(
+                            title: "Undo",
+                            identifier: "as.battle.undoToast",
+                            hint: store.undoMenuTitle,
+                            action: {
+                                undoOffered = false
+                                store.undo()
+                            }
+                        )
+                        : nil,
+                    tint: BattleChrome.dockTint(session: session, coach: coach)
+                )
+            }
         }
+        .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: undoOffered)
     }
 
     private var stageLayout: BattleStageLayout {
@@ -462,8 +516,19 @@ struct BattleFlowView: View {
             )
         case .useInitiativeRolls:
             let winner = InitiativeDice.winner(a1: a1, a2: a2, b1: b1, b2: b2)
+            let allEntered = a1 != nil && a2 != nil && b1 != nil && b2 != nil
+            if allEntered, winner == nil {
+                return BattleDockButton(
+                    title: "Tie — clear and roll again",
+                    identifier: "as.battle.primary",
+                    specIdentifier: "as.initiative.confirm",
+                    hint: "Both sides rolled the same total. Clears the dice so both sides roll again.",
+                    action: clearDice
+                )
+            }
             return BattleDockButton(
-                title: winner.map { "\($0.displayName) wins — start moving" } ?? "Enter all four dice",
+                // Lead with who moves: "Side B wins — start moving" read as if Side B moved.
+                title: winner.map { "\($0.other.displayName) moves first — start" } ?? "Enter all four dice",
                 identifier: "as.battle.primary",
                 specIdentifier: "as.initiative.confirm",
                 hint: winner.map { "\($0.displayName) won initiative. \($0.other.displayName) moves first." }
@@ -474,7 +539,7 @@ struct BattleFlowView: View {
         case .rollInitiative:
             if let autoPreview, let winner = autoPreview.winner {
                 return BattleDockButton(
-                    title: "\(winner.displayName) wins — start moving",
+                    title: "\(winner.other.displayName) moves first — start",
                     identifier: "as.battle.primary",
                     specIdentifier: "as.initiative.confirm",
                     hint: "\(winner.displayName) won initiative. \(winner.other.displayName) moves first.",
@@ -607,6 +672,17 @@ struct BattleFlowView: View {
             }
         }
         AccessibilityNotification.Announcement(BattleChrome.announcement(session: session, coach: coach)).post()
+    }
+
+    private func offerUndo() {
+        undoOfferToken += 1
+        let token = undoOfferToken
+        undoOffered = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(5))
+            guard token == undoOfferToken else { return }
+            undoOffered = false
+        }
     }
 
     private func presentPassBanner(_ side: SideId) {

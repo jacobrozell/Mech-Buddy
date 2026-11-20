@@ -187,12 +187,12 @@ public enum CombatSolver {
             skill: attacker.skill,
             attackerMove: attackerMove,
             targetMove: targetMove,
-            targetTMM: defender.effectiveTMM,
+            targetTMM: defender.firingTMM,
             other: OtherModifiers(
                 woods: woods,
                 partialCover: partialCover,
                 targetHasSTL: defender.hasStealth,
-                fireControlHits: attacker.crits.fireControlHits,
+                fireControlHits: attacker.firingCrits.fireControlHits,
                 attackerHeat: attacker.heat
             ),
             rangeInches: rangeInches,
@@ -206,7 +206,7 @@ public enum CombatSolver {
         rearHit: Bool,
         overheatUsed: Int
     ) -> DamageInput {
-        let damage = attacker.effectiveDamage
+        let damage = attacker.firingDamage
         return DamageInput(
             short: damage.s,
             medium: damage.m,

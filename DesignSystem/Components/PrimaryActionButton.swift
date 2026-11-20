@@ -18,6 +18,9 @@ struct PrimaryActionButton: View {
     var spokenLabel: String?
     var action: () -> Void
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    private var isShort: Bool { verticalSizeClass == .compact }
+
     var body: some View {
         styled(button)
     }
@@ -25,9 +28,9 @@ struct PrimaryActionButton: View {
     private var button: some View {
         Button(role: role, action: action) {
             label
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: isShort ? 36 : 50)
         }
-        .controlSize(.large)
+        .controlSize(isShort ? .regular : .large)
         .disabled(isDisabled)
         .tint(tint)
         .accessibilityID(accessibilityIdentifier)
@@ -71,6 +74,9 @@ struct SecondaryActionButton: View {
     var accessibilityHint: String?
     var action: () -> Void
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    private var isShort: Bool { verticalSizeClass == .compact }
+
     var body: some View {
         styled(button)
     }
@@ -84,9 +90,9 @@ struct SecondaryActionButton: View {
                 Text(title)
                     .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 50)
+            .frame(maxWidth: .infinity, minHeight: isShort ? 36 : 50)
         }
-        .controlSize(.large)
+        .controlSize(isShort ? .regular : .large)
         .disabled(isDisabled)
         .accessibilityID(accessibilityIdentifier)
         .modifier(OptionalHint(hint: accessibilityHint))

@@ -47,6 +47,8 @@ public enum AlphaStrikePhaseEngine {
 
     public static func resetTurnFlags(_ units: inout [MatchUnitState]) {
         for i in units.indices {
+            // Removed wrecks keep no per-turn state; a stale turnShot leaks into later shot feeds.
+            units[i].turnShot = nil
             guard units[i].combatStatus == .active || units[i].combatStatus == .destroyedPendingEnd else {
                 continue
             }

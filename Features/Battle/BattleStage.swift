@@ -20,9 +20,8 @@ enum BattleStageLayout: Equatable {
         if idiom == .pad, horizontal == .regular {
             return .padColumns
         }
-        if idiom == .phone, vertical == .compact {
-            return .phoneLandscape
-        }
+        // Phone landscape uses the stacked column too. The 248 pt side rail clipped its cards,
+        // and the main column dropped shooter/clean-up lists that only the rail could show.
         return .stacked
     }
 

@@ -336,7 +336,9 @@ struct MatchReducerTests {
     func engineHeatOnFire() throws {
         var session = try combatReadySession()
         let aIdx = session.units.firstIndex { $0.side == .lanceB }!
+        // An engine crit carried in from an earlier turn: it is part of this phase's snapshot.
         session.units[aIdx].crits.engineHits = 1
+        session.units[aIdx].combatPhaseCrits = session.units[aIdx].crits
         let attacker = session.units[aIdx]
         let defender = session.units.first { $0.side == .lanceA }!
         session = try MatchReducer.reduce(

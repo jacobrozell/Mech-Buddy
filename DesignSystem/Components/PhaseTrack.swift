@@ -24,7 +24,8 @@ struct PhaseTrack: View {
     ]
 
     var body: some View {
-        if dynamicTypeSize.isAccessibilitySize || verticalSizeClass == .compact {
+        // Phones: the four chips wrapped mid-word ("Shoo/t", "Clea/n up"). The one-line summary reads cleanly.
+        if dynamicTypeSize.isAccessibilitySize || verticalSizeClass == .compact || UIDevice.current.userInterfaceIdiom == .phone {
             accessibleSummary
         } else {
             track

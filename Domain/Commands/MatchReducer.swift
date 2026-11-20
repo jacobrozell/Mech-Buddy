@@ -216,6 +216,9 @@ public enum MatchReducer {
                 throw MatchDomainError.illegalPhaseTransition("Not in end phase")
             }
             AlphaStrikePhaseEngine.removeDestroyedAtEnd(&next.units)
+            for i in next.units.indices {
+                next.units[i].combatPhaseCrits = nil
+            }
             if let outcome = VictoryEvaluator.evaluateAfterEnd(session: next) {
                 next.status = .completed
                 next.outcome = outcome
@@ -312,7 +315,7 @@ public enum MatchReducer {
         }
 
         // Engine crit: +1 heat per engine hit whenever the unit fires, capped at 4.
-        attacker.heat = min(4, attacker.heat + attacker.crits.engineHits)
+        attacker.heat = min(4, attacker.heat + attacker.firingCrits.engineHits)
         attacker.hasAttackedThisTurn = true
         attacker.turnShot = TurnShot(
             targetName: defender.name,
@@ -349,6 +352,9 @@ public enum MatchReducer {
                 throw MatchDomainError.illegalPhaseTransition("Movement incomplete")
             }
             next.phase = .combat
+            for i in next.units.indices {
+                next.units[i].combatPhaseCrits = next.units[i].crits
+            }
             if let winner = next.initiativeWinner {
                 next.activeSide = winner.other
             }

@@ -90,7 +90,8 @@ public enum AlphaStrikeDamage {
         }
 
         let structureMarked = updated.structureDamage > beforeStructure
-        let needsCritical = structureMarked || naturalTwelveHit
+        // A unit this hit destroyed owes no critical: the roll could not change anything.
+        let needsCritical = (structureMarked || naturalTwelveHit) && !updated.isStructurallyDestroyed
         var becameDestroyed = false
         if updated.isStructurallyDestroyed, updated.combatStatus == .active {
             updated.combatStatus = .destroyedPendingEnd

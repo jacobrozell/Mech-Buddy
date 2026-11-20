@@ -21,7 +21,9 @@ struct CleanUpStep: View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
                 title: "Clean up",
-                message: "Take wrecked ’Mechs off the table.",
+                message: wrecks.isEmpty
+                    ? "Nothing was wrecked this turn. Tap Next turn."
+                    : "Take wrecked ’Mechs off the table.",
                 accessibilityIdentifier: "as.battle.table"
             )
             if !wrecks.isEmpty {
@@ -40,18 +42,23 @@ struct CleanUpStep: View {
                                 Text(unit.name)
                                     .font(TMFont.cardTitle)
                             }
-                            Text("Pick up this miniature")
-                                .font(TMFont.detail)
-                                .foregroundStyle(.secondary)
-                            Button(pickedUp.contains(unit.id) ? "Picked up" : "Still on the table") {
+                            // A checklist row, not a state label posing as a button.
+                            Button {
                                 if pickedUp.contains(unit.id) {
                                     pickedUp.remove(unit.id)
                                 } else {
                                     pickedUp.insert(unit.id)
                                 }
+                            } label: {
+                                Label(
+                                    "Picked up the \(unit.name) mini",
+                                    systemImage: pickedUp.contains(unit.id) ? "checkmark.circle.fill" : "circle"
+                                )
+                                .font(TMFont.body)
+                                .frame(minHeight: 44, alignment: .leading)
                             }
-                            .font(TMFont.detail.weight(.semibold))
-                            .frame(minHeight: 44)
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(pickedUp.contains(unit.id) ? .isSelected : [])
                         }
                     }
                 }
@@ -69,7 +76,8 @@ struct CleanUpStep: View {
                     }
                 }
             }
-            if coach.isLastTurn {
+            // From turn 5 so players can plan the structure tiebreak, not only on the last turn.
+            if coach.isLastTurn || session.ruleset.maxTurns.map({ session.turn >= $0 - 1 }) == true {
                 scoreCard
             }
         }

@@ -5,6 +5,8 @@ struct StatusChip: View {
     enum Kind: Sendable, Equatable {
         case critOwed(Int)
         case wrecked
+        /// Wrecked and already fired (or shooting is over): "still fires" no longer applies.
+        case wreckedDone
         case immobile
         case sprinted
         case moved(MovementMode)
@@ -22,6 +24,8 @@ struct StatusChip: View {
                 count > 1 ? "\(count) crits owed" : "Crit owed"
             case .wrecked:
                 "Wrecked · still fires"
+            case .wreckedDone:
+                "Wrecked"
             case .immobile:
                 "Can’t move"
             case .sprinted:
@@ -53,7 +57,7 @@ struct StatusChip: View {
             switch self {
             case .critOwed, .lastTurn:
                 "exclamationmark.triangle.fill"
-            case .wrecked:
+            case .wrecked, .wreckedDone:
                 "flame.fill"
             case .immobile:
                 "figure.stand"
@@ -83,7 +87,7 @@ struct StatusChip: View {
             switch self {
             case .critOwed, .ready, .lastTurn, .recordedCrit:
                 .warning
-            case .wrecked, .missed:
+            case .wrecked, .wreckedDone, .missed:
                 .danger
             case .hit:
                 .success

@@ -71,7 +71,7 @@ struct CombatSolverTests {
         #expect(solve.ifHit.zeroDamage)
     }
 
-    @Test("Structure mark previews a critical")
+    @Test("A killing blow previews a wreck and no critical")
     func structureCrit() {
         var target = locust()
         target.armorDamage = 2
@@ -82,7 +82,7 @@ struct CombatSolverTests {
             overheatAllowed: false
         )
         #expect(solve.ifHit.chipsStructure == 2)
-        #expect(solve.ifHit.needsCritical)
+        #expect(solve.ifHit.needsCritical == false)
         #expect(solve.ifHit.wrecksThisTurn)
     }
 

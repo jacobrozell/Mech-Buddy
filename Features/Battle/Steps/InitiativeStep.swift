@@ -12,6 +12,8 @@ struct InitiativeStep: View {
 
     private var manual: Bool { diceMode.wrappedValue == .manual }
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
@@ -20,8 +22,14 @@ struct InitiativeStep: View {
                 help: "The side that rolls lower moves first. Winning the roll means you move after you’ve seen where they went.",
                 accessibilityIdentifier: "as.battle.table"
             )
-            sideCard(.lanceA, first: manual ? $a1 : .constant(preview?.a1), second: manual ? $a2 : .constant(preview?.a2))
-            sideCard(.lanceB, first: manual ? $b1 : .constant(preview?.b1), second: manual ? $b2 : .constant(preview?.b2))
+            // Landscape: both sides side by side, so all four dice fit without scrolling.
+            let layout = verticalSizeClass == .compact
+                ? AnyLayout(HStackLayout(alignment: .top, spacing: TMSpace.md))
+                : AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.lg))
+            layout {
+                sideCard(.lanceA, first: manual ? $a1 : .constant(preview?.a1), second: manual ? $a2 : .constant(preview?.a2))
+                sideCard(.lanceB, first: manual ? $b1 : .constant(preview?.b1), second: manual ? $b2 : .constant(preview?.b2))
+            }
             result
             DiceModeLink(mode: diceMode, accessibilityIdentifier: "as.battle.rollInit")
         }

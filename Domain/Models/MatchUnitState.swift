@@ -74,6 +74,9 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var heat: Int
     public var abilities: String
     public var crits: CritFlags
+    /// Crits as they stood when this combat phase began. Alpha Strike resolves crit effects at the
+    /// end of the phase, so shots this phase (including return fire) read this snapshot, not `crits`.
+    public var combatPhaseCrits: CritFlags?
     public var movementMode: MovementMode
     public var hasMovedThisTurn: Bool
     public var hasAttackedThisTurn: Bool
@@ -114,6 +117,7 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         heat: Int = 0,
         abilities: String = "",
         crits: CritFlags = CritFlags(),
+        combatPhaseCrits: CritFlags? = nil,
         movementMode: MovementMode = .unset,
         hasMovedThisTurn: Bool = false,
         hasAttackedThisTurn: Bool = false,
@@ -141,6 +145,7 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         self.heat = heat
         self.abilities = abilities
         self.crits = crits
+        self.combatPhaseCrits = combatPhaseCrits
         self.movementMode = movementMode
         self.hasMovedThisTurn = hasMovedThisTurn
         self.hasAttackedThisTurn = hasAttackedThisTurn
@@ -191,6 +196,20 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         return (max(0, s - w), max(0, m - w), max(0, l - w))
     }
 
+    /// Crits that count for shots this combat phase (snapshot when one exists).
+    public var firingCrits: CritFlags { combatPhaseCrits ?? crits }
+
+    /// Damage this unit deals this phase: a weapon crit taken mid-phase waits for the end phase.
+    public var firingDamage: (s: Int, m: Int, l: Int) {
+        let w = firingCrits.weaponHits
+        return (max(0, s - w), max(0, m - w), max(0, l - w))
+    }
+
+    /// TMM when targeted this phase: an MP crit taken mid-phase waits for the end phase.
+    public var firingTMM: Int {
+        firingCrits.mpHit ? tmm / 2 : tmm
+    }
+
     public var hasAmmoImmunity: Bool {
         let upper = abilities.uppercased()
         return upper.contains("ENE") || upper.contains("CASE")
@@ -230,7 +249,7 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
 extension MatchUnitState {
     private enum CodingKeys: String, CodingKey {
         case id, libraryUnitId, name, side, skill, pv, sz, mv, tmm, s, m, l, ov
-        case armorCap, structureCap, armorDamage, structureDamage, heat, abilities, crits
+        case armorCap, structureCap, armorDamage, structureDamage, heat, abilities, crits, combatPhaseCrits
         case movementMode, hasMovedThisTurn, hasAttackedThisTurn, turnShot, combatStatus
         case pendingCritical, criticalsOwed
     }
@@ -257,6 +276,7 @@ extension MatchUnitState {
         heat = try container.decode(Int.self, forKey: .heat)
         abilities = try container.decode(String.self, forKey: .abilities)
         crits = try container.decode(CritFlags.self, forKey: .crits)
+        combatPhaseCrits = try container.decodeIfPresent(CritFlags.self, forKey: .combatPhaseCrits)
         movementMode = try container.decode(MovementMode.self, forKey: .movementMode)
         hasMovedThisTurn = try container.decode(Bool.self, forKey: .hasMovedThisTurn)
         hasAttackedThisTurn = try container.decode(Bool.self, forKey: .hasAttackedThisTurn)
@@ -292,6 +312,7 @@ extension MatchUnitState {
         try container.encode(heat, forKey: .heat)
         try container.encode(abilities, forKey: .abilities)
         try container.encode(crits, forKey: .crits)
+        try container.encodeIfPresent(combatPhaseCrits, forKey: .combatPhaseCrits)
         try container.encode(movementMode, forKey: .movementMode)
         try container.encode(hasMovedThisTurn, forKey: .hasMovedThisTurn)
         try container.encode(hasAttackedThisTurn, forKey: .hasAttackedThisTurn)

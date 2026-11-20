@@ -20,6 +20,9 @@ struct CombatSolverSheet: View {
     @State private var selectedLetter: String?
     /// Walk and sprint share one target modifier. This only chooses the word on screen.
     @State private var countedSprint = false
+    /// Per-shot dice mode. "Let the app roll" must not leak into later shots or crits.
+    @State private var diceMode: DiceMode = .manual
+    @State private var isApplying = false
 
     init(session: MatchSession, store: MatchStore, initialAttackerId: UUID? = nil) {
         self.session = session
@@ -66,12 +69,12 @@ struct CombatSolverSheet: View {
 
     private var modeBinding: Binding<DiceMode> {
         Binding(
-            get: { store.session?.diceMode ?? session.diceMode },
+            get: { diceMode },
             set: { newMode in
-                guard newMode != (store.session?.diceMode ?? session.diceMode) else { return }
+                guard newMode != diceMode else { return }
                 d1 = nil
                 d2 = nil
-                store.setDiceMode(newMode)
+                diceMode = newMode
             }
         )
     }
@@ -91,14 +94,9 @@ struct CombatSolverSheet: View {
         "\(attackerId?.uuidString ?? "")|\(defenderId?.uuidString ?? "")"
     }
 
+    /// One full-width card per row: two-up tiles broke names mid-word on phones ("Shad/ow Hawk").
     private var pairColumns: [GridItem] {
-        if dynamicTypeSize.isAccessibilitySize {
-            return [GridItem(.flexible())]
-        }
-        return [
-            GridItem(.flexible(), spacing: TMSpace.sm),
-            GridItem(.flexible(), spacing: TMSpace.sm)
-        ]
+        [GridItem(.flexible())]
     }
 
     var body: some View {
@@ -113,12 +111,19 @@ struct CombatSolverSheet: View {
                     d2 = nil
                     selectedLetter = nil
                     syncTargetMoveFromDefender()
+                    restoreRange()
                 }
                 .onChange(of: attackerId) { _, _ in
                     d1 = nil
                     d2 = nil
                     selectedLetter = nil
+                    restoreRange()
                 }
+                .onChange(of: insight.rangeInches) { _, inches in
+                    guard let attackerId, let defenderId else { return }
+                    store.rememberRange(inches, attacker: attackerId, defender: defenderId)
+                }
+                .onAppear(perform: restoreRange)
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
@@ -132,11 +137,11 @@ struct CombatSolverSheet: View {
         }
         if attacker != nil, defender != nil {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Change") {
-                    attackerId = nil
+                Button("Change target") {
+                    // Keep the shooter: the usual change is "same ’Mech, other target".
                     defenderId = nil
                 }
-                .accessibilityLabel("Different ’Mechs")
+                .accessibilityLabel("Different target")
             }
         }
     }
@@ -251,6 +256,7 @@ struct CombatSolverSheet: View {
                 note: caption,
                 action: { defenderId = unit.id }
             )
+            .opacity(unit.combatStatus == .destroyedPendingEnd ? 0.55 : 1)
             Text(caption)
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
@@ -262,8 +268,11 @@ struct CombatSolverSheet: View {
     private func shotScreen(attacker: MatchUnitState, defender: MatchUnitState, solve: CombatSolve) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.lg) {
-                if let tn = solve.targetNumber {
-                    breakdown(tn)
+                if defender.combatStatus == .destroyedPendingEnd {
+                    Text("\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 rangeControl
                 targetMovedControl(defender)
@@ -273,10 +282,14 @@ struct CombatSolverSheet: View {
                 } else if solve.cannotShootReason == nil {
                     rollSection
                 }
+                if let tn = solve.targetNumber {
+                    breakdown(tn)
+                }
                 if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
                     OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
                 }
-                if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true {
+                if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
+                   defender.combatStatus != .destroyedPendingEnd {
                     DamagePreviewCard(solve: solve, defender: defender)
                 }
             }
@@ -284,14 +297,13 @@ struct CombatSolverSheet: View {
         }
         .scrollEdgeEffectStyle(.soft, for: .bottom)
         .safeAreaInset(edge: .top, spacing: 0) {
-            VStack(alignment: .leading, spacing: TMSpace.sm) {
+            // Compact pinned header: the full gauge used to cover the controls being changed.
+            VStack(alignment: .leading, spacing: TMSpace.xs) {
                 Text("\(attacker.name) → \(defender.name)")
                     .font(TMFont.cardTitle)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityLabel("\(attacker.name) shooting \(defender.name)")
-                if !gaugeBesideDice {
-                    gauge(for: solve)
-                }
+                needLine(solve)
             }
             .padding(.horizontal, TMSpace.lg)
             .padding(.top, TMSpace.sm)
@@ -301,6 +313,7 @@ struct CombatSolverSheet: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             applyBar(solve)
+                .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
         }
     }
 
@@ -320,15 +333,9 @@ struct CombatSolverSheet: View {
 
     @ViewBuilder
     private func compactRoll(_ solve: CombatSolve) -> some View {
+        // The pinned need line already shows the number; landscape keeps just the dice here.
         if solve.cannotShootReason == nil {
-            HStack(alignment: .top, spacing: TMSpace.md) {
-                gauge(for: solve)
-                    .frame(maxWidth: 280)
-                rollSection
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        } else {
-            gauge(for: solve)
+            rollSection
         }
     }
 
@@ -412,9 +419,9 @@ struct CombatSolverSheet: View {
                     .accessibilityIdentifier("as.sator.range")
             } else {
                 Picker("Range", selection: rangeBand) {
-                    Text("Short ≤6″").tag(RangeBracket.short)
-                    Text("Medium 7–24″").tag(RangeBracket.medium)
-                    Text("Long 25–42″").tag(RangeBracket.long)
+                    Text("0–6″").tag(RangeBracket.short)
+                    Text("6–24″").tag(RangeBracket.medium)
+                    Text("24–42″").tag(RangeBracket.long)
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("as.sator.range")
@@ -509,6 +516,8 @@ struct CombatSolverSheet: View {
                 chipToggle("Partial cover", isOn: $insight.partialCover)
                 chipToggle("Rear shot", isOn: $insight.rearHit)
             }
+            // Keep "More…" clear of the chips: their lower halves used to toggle it.
+            .padding(.bottom, TMSpace.sm)
             Button {
                 showUnusual.toggle()
             } label: {
@@ -560,9 +569,12 @@ struct CombatSolverSheet: View {
 
     @ViewBuilder
     private func chipToggle(_ title: String, isOn: Binding<Bool>, hint: String? = nil) -> some View {
-        let toggle = Toggle(title, isOn: isOn)
+        let toggle = Toggle(isOn: isOn) {
+            Text(title).frame(minHeight: 36)
+        }
             .toggleStyle(.button)
             .font(TMFont.detail)
+            .contentShape(Capsule())
         if let hint {
             toggle
                 .buttonStyle(.borderless)
@@ -579,7 +591,7 @@ struct CombatSolverSheet: View {
                 title: title,
                 placement: .dock,
                 tint: TMColor.signal,
-                isDisabled: !canApply(solve),
+                isDisabled: !canApply(solve) || isApplying,
                 accessibilityIdentifier: "as.sator.resolve",
                 accessibilityHint: "Records this shot",
                 action: applyShot
@@ -619,7 +631,8 @@ struct CombatSolverSheet: View {
     }
 
     private func applyShot() {
-        guard let attackerId, let defenderId, let attacker, let faces = applyingFaces else { return }
+        guard !isApplying, let attackerId, let defenderId, let attacker, let faces = applyingFaces else { return }
+        isApplying = true
         let move = attacker.movementMode == .unset ? MovementMode.ground : attacker.movementMode
         if store.applyAttack(
             attackerId: attackerId,
@@ -634,6 +647,8 @@ struct CombatSolverSheet: View {
             rearHit: insight.rearHit
         ) {
             dismiss()
+        } else {
+            isApplying = false
         }
     }
 
@@ -676,6 +691,7 @@ struct CombatSolverSheet: View {
     }
 
     private func targetCaption(_ unit: MatchUnitState) -> String {
+        if unit.combatStatus == .destroyedPendingEnd { return "Already wrecked" }
         if unit.isImmobile { return "Can’t move" }
         if unit.hasMovedThisTurn, unit.movementMode != .unset {
             return "Moved: \(unit.movementMode.displayName)"
@@ -705,6 +721,35 @@ struct CombatSolverSheet: View {
             return "\(defender.name) · no move recorded"
         }
         return "\(defender.name) · changed for this shot"
+    }
+
+    /// Reopen on the band measured last time for this pair; otherwise Medium, never the
+    /// most generous band (a Short default invited skipping the tape measure).
+    private func restoreRange() {
+        guard let attackerId, let defenderId else { return }
+        insight.rangeInches = store.rememberedRange(attacker: attackerId, defender: defenderId) ?? 24
+    }
+
+    @ViewBuilder
+    private func needLine(_ solve: CombatSolve) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+            if solve.cannotShootReason != nil {
+                Text("Can’t shoot")
+                    .font(TMFont.readoutM)
+            } else if let tn = solve.targetNumber {
+                Text(tn.autoMiss ? "Always misses" : "Need \(tn.value)+")
+                    .font(TMFont.readoutM)
+                    .contentTransition(.numericText())
+                if !tn.autoMiss {
+                    Text("\(TwoD6Display.percent(for: tn.value))% to hit")
+                        .font(TMFont.cardTitle)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("as.sator.tn")
     }
 
     private static func openingAttacker(session: MatchSession, initial: UUID?) -> UUID? {

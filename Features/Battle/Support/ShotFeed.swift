@@ -15,7 +15,7 @@ enum ShotFeed {
 
     static func rows(in session: MatchSession) -> [Row] {
         session.units.enumerated().compactMap { offset, unit in
-            guard let shot = unit.turnShot else { return nil }
+            guard unit.combatStatus != .removed, let shot = unit.turnShot else { return nil }
             let sentence = signature(shooter: unit.name, shot: shot)
             let order = session.eventLog.lastIndex {
                 $0.turn == session.turn && $0.phase == .combat && $0.message.contains(sentence)

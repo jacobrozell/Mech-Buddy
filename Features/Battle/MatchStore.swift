@@ -15,6 +15,17 @@ final class MatchStore: Identifiable {
     private var scenarioLoaded = false
     private let repository: any MatchSessionRepository
     private var undoStack: [MatchSession] = []
+    /// Range (inches) last used for a shooter→target pair. Minis rarely move far between turns,
+    /// so the solver reopens on the measured band instead of the most generous one.
+    private(set) var lastRangeInches: [String: Int] = [:]
+
+    func rememberRange(_ inches: Int, attacker: UUID, defender: UUID) {
+        lastRangeInches["\(attacker)|\(defender)"] = inches
+    }
+
+    func rememberedRange(attacker: UUID, defender: UUID) -> Int? {
+        lastRangeInches["\(attacker)|\(defender)"]
+    }
 
     var isActive: Bool {
         guard let session else { return false }
@@ -282,6 +293,8 @@ final class MatchStore: Identifiable {
             lastError = "Invalid crit roll"
             return false
         }
+        // Already resolved (e.g. a double tap): nothing to do, and no developer-speak alert.
+        guard session?.units.first(where: { $0.id == unitId })?.pendingCritical == true else { return true }
         mutate(.applyCritical(unitId: unitId, roll: roll), failureTitle: "Couldn’t save the critical")
         return lastError == nil
     }
@@ -336,7 +349,11 @@ final class MatchStore: Identifiable {
         }
     }
 
+    /// Bumps on every undoable change so the battle screen can offer a short-lived Undo.
+    private(set) var undoToken = 0
+
     private func pushUndo(_ snapshot: MatchSession) {
+        undoToken += 1
         var trimmed = snapshot
         trimmed.recoverySnapshots = []
         undoStack.append(trimmed)

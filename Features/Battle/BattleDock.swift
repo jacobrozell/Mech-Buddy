@@ -12,6 +12,8 @@ struct BattleDockButton {
 struct BattleDock: View {
     var primary: BattleDockButton?
     var secondary: BattleDockButton?
+    /// Optional leading button, e.g. a short-lived Undo kept inside the dock row in landscape.
+    var leading: BattleDockButton?
     var tint: Color = TMColor.signal
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -30,7 +32,10 @@ struct BattleDock: View {
                 secondaryIdentifier: secondary?.identifier ?? "as.battle.doneShooting",
                 secondarySpecIdentifier: secondary?.specIdentifier,
                 secondaryHint: secondary?.hint,
-                secondaryAction: secondary?.action
+                secondaryAction: secondary?.action,
+                leadingTitle: leading?.title,
+                leadingIdentifier: leading?.identifier,
+                leadingAction: leading?.action
             )
             .background {
                 if primary.specIdentifier != nil, primary.specIdentifier != "as.battle.phaseDock.next" {
@@ -44,6 +49,15 @@ struct BattleDock: View {
             }
         } else if let secondary {
             GlassEffectContainer(spacing: TMSpace.md) {
+              HStack(spacing: TMSpace.md) {
+                if let leading {
+                    SecondaryActionButton(
+                        title: leading.title,
+                        placement: .dock,
+                        accessibilityIdentifier: leading.identifier,
+                        action: leading.action
+                    )
+                }
                 SecondaryActionButton(
                     title: secondary.title,
                     placement: .dock,
@@ -51,6 +65,7 @@ struct BattleDock: View {
                     accessibilityHint: secondary.hint,
                     action: secondary.action
                 )
+              }
             }
             .padding(.horizontal, TMSpace.lg)
             .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xs : TMSpace.sm)

@@ -11,23 +11,35 @@ struct MovementStep: View {
 
     @State private var showTable = false
     @State private var lastChoice: String?
+    /// The active side picks which of its ’Mechs moves next (Alpha Strike lets players choose).
+    @State private var chosenUnitId: UUID?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var candidates: [MatchUnitState] {
+        AlphaStrikePhaseEngine.unitsNeedingMove(side: session.activeSide, units: session.units)
+    }
 
     private var current: MatchUnitState? {
-        AlphaStrikePhaseEngine.unitsNeedingMove(side: session.activeSide, units: session.units).first
+        candidates.first { $0.id == chosenUnitId } ?? candidates.first
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: TMSpace.lg) {
+        VStack(alignment: .leading, spacing: verticalSizeClass == .compact ? TMSpace.md : TMSpace.lg) {
             CoachPrompt(
-                title: coach.otherMechStillToMove
-                    ? "\(session.activeSide.displayName)’s other ’Mech"
-                    : "\(session.activeSide.displayName) moves",
+                title: coach.movementComplete
+                    ? "Moves locked in"
+                    : coach.otherMechStillToMove
+                        ? "\(session.activeSide.displayName)’s other ’Mech"
+                        : "\(session.activeSide.displayName) moves",
+                // "Everyone has moved" read wrong when a ’Mech stood still.
                 message: coach.movementComplete
-                    ? "Everyone has moved."
-                    : "Measure on the table, then tap how it moved.",
+                    ? "Every ’Mech’s move is set. Change any of them before you start shooting."
+                    : candidates.count > 1
+                        ? "Pick which ’Mech moves, measure on the table, then tap how it moved."
+                        : "Measure on the table, then tap how it moved.",
                 side: session.activeSide,
                 accessibilityIdentifier: "as.battle.table"
             )
@@ -70,14 +82,26 @@ struct MovementStep: View {
     private func moverCard(_ unit: MatchUnitState) -> some View {
         let move = PrintedMove(unit.effectiveMV)
         return TMCard(edgeColor: TMColor.side(unit.side), isRaised: true) {
-            VStack(alignment: .leading, spacing: TMSpace.md) {
-                Eyebrow("Now moving")
+            VStack(alignment: .leading, spacing: verticalSizeClass == .compact ? TMSpace.sm : TMSpace.md) {
+                if verticalSizeClass != .compact {
+                    Eyebrow("Now moving")
+                }
                 HStack(spacing: TMSpace.sm) {
                     SideBadge(side: unit.side)
                     Text(unit.name)
                         .font(TMFont.stepTitle)
+                    // Landscape: move stats share the name row so the tiles stay above the fold.
+                    if verticalSizeClass == .compact, !unit.isImmobile, let move {
+                        Spacer(minLength: TMSpace.sm)
+                        Text(move.summary)
+                            .font(TMFont.cardTitle)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel(move.spokenSummary)
+                    }
                 }
-                if unit.isImmobile {
+                if verticalSizeClass == .compact, !unit.isImmobile {
+                    EmptyView()
+                } else if unit.isImmobile {
                     Text("Can’t move this turn")
                         .font(TMFont.body)
                     StatusChip(kind: .immobile)
@@ -99,7 +123,8 @@ struct MovementStep: View {
         if dynamicTypeSize.isAccessibilitySize {
             return [GridItem(.flexible())]
         }
-        if sizeClass == .regular {
+        // iPad and phone landscape: all four move tiles in one row, above the fold.
+        if sizeClass == .regular || verticalSizeClass == .compact {
             return Array(repeating: GridItem(.flexible(), spacing: TMSpace.sm), count: 4)
         }
         return [GridItem(.flexible(), spacing: TMSpace.sm), GridItem(.flexible(), spacing: TMSpace.sm)]
@@ -160,9 +185,19 @@ struct MovementStep: View {
             Spacer(minLength: TMSpace.sm)
             if entry.marker == .done {
                 changeMenu(entry.unit)
+            } else if entry.unit.side == session.activeSide, entry.unit.id != current?.id {
+                Button("Move this one") {
+                    chosenUnitId = entry.unit.id
+                }
+                .font(TMFont.detail.weight(.semibold))
+                .frame(minHeight: 44)
+                .accessibilityLabel("Move \(entry.unit.name) instead")
             }
         }
-        .accessibilityElement(children: entry.marker == .done ? .contain : .combine)
+        .accessibilityElement(
+            children: entry.marker == .done || (entry.unit.side == session.activeSide && entry.unit.id != current?.id)
+                ? .contain : .combine
+        )
     }
 
     private func changeMenu(_ unit: MatchUnitState) -> some View {
@@ -215,6 +250,12 @@ struct MovementStep: View {
             .lanceA: active.filter { $0.side == .lanceA && !$0.hasMovedThisTurn },
             .lanceB: active.filter { $0.side == .lanceB && !$0.hasMovedThisTurn }
         ]
+        // The chosen ’Mech is "Now"; the rest of its side follows.
+        if let current, var queue = remaining[current.side],
+           let index = queue.firstIndex(where: { $0.id == current.id }) {
+            queue.insert(queue.remove(at: index), at: 0)
+            remaining[current.side] = queue
+        }
         var upcoming: [MatchUnitState] = []
         var side = session.activeSide
         while upcoming.count < active.count {
