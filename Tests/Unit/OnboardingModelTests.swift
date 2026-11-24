@@ -5,26 +5,42 @@ import MechBuddyData
 
 @Suite("Onboarding steps")
 struct OnboardingStepTests {
-    @Test("First run asks all four questions when Classic is visible")
+    @Test("First run asks every question when Classic is visible")
     func firstRun() {
-        #expect(OnboardingStep.steps(for: .firstRun, classicAvailable: true) == [.welcome, .track, .kit, .firstMission])
+        #expect(OnboardingStep.steps(for: .firstRun, classicAvailable: true)
+            == [.welcome, .track, .boxes, .mechs, .kit, .firstMission])
     }
 
     @Test("Changing game skips Welcome")
     func changeTrack() {
-        #expect(OnboardingStep.steps(for: .changeTrack, classicAvailable: true) == [.track, .kit, .firstMission])
+        #expect(OnboardingStep.steps(for: .changeTrack, classicAvailable: true)
+            == [.track, .boxes, .mechs, .kit, .firstMission])
     }
 
     @Test("Without the Classic entry there is no track question", arguments: [OnboardingEntry.firstRun, .changeTrack])
     func noClassic(entry: OnboardingEntry) {
-        #expect(OnboardingStep.steps(for: entry, classicAvailable: false) == [.welcome, .kit, .firstMission])
+        #expect(OnboardingStep.steps(for: entry, classicAvailable: false)
+            == [.welcome, .boxes, .mechs, .kit, .firstMission])
+    }
+
+    @Test("Boxes come after the track question and before the kit", arguments: [true, false])
+    func boxesPlacement(classicAvailable: Bool) throws {
+        for entry in [OnboardingEntry.firstRun, .changeTrack] {
+            let steps = OnboardingStep.steps(for: entry, classicAvailable: classicAvailable)
+            let boxes = try #require(steps.firstIndex(of: .boxes))
+            #expect(steps[boxes + 1] == .mechs)
+            #expect(steps[boxes + 2] == .kit)
+            if let track = steps.firstIndex(of: .track) {
+                #expect(track < boxes)
+            }
+        }
     }
 
     @Test("Progress runs 1 of n to n of n")
     func progress() {
         let steps = OnboardingStep.steps(for: .firstRun, classicAvailable: true)
-        #expect(OnboardingStep.progress(of: .welcome, in: steps) == 0.25)
-        #expect(OnboardingStep.progress(of: .kit, in: steps) == 0.75)
+        #expect(OnboardingStep.progress(of: .welcome, in: steps) == 1.0 / 6)
+        #expect(OnboardingStep.progress(of: .kit, in: steps) == 5.0 / 6)
         #expect(OnboardingStep.progress(of: .firstMission, in: steps) == 1)
         #expect(OnboardingStep.progress(of: .track, in: [.welcome, .kit]) == 0)
     }

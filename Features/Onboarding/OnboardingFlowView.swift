@@ -20,6 +20,10 @@ struct OnboardingFlowView: View {
     @State private var kit: [GettingStartedItemDTO] = []
     @State private var kitLoadFailed = false
     @State private var firstMission: OnboardingMissionSummary?
+    /// Boxes and singles picked on the box screens. Saved on finish (or Skip once answered), never on Close.
+    @State private var collection: OwnedCollection = .empty
+    /// "None yet" picked on the box screen.
+    @State private var noneYet = false
     @State private var didLoad = false
 
     private var classicAvailable: Bool {
@@ -122,7 +126,7 @@ struct OnboardingFlowView: View {
         .controlSize(.large)
         .tint(TMColor.signal)
         .disabled(!canContinue)
-        .accessibilityHint(canContinue ? "" : "Pick a game first")
+        .accessibilityHint(canContinue ? "" : (step == .boxes ? "Pick a box or None yet" : "Pick a game first"))
         .accessibilityIdentifier("onboarding.continue")
         .padding(.horizontal, TMSpace.lg)
         .padding(.top, TMSpace.sm)
@@ -135,13 +139,22 @@ struct OnboardingFlowView: View {
     private var continueTitle: String {
         switch step {
         case .welcome: "Get started"
-        case .track, .kit: "Continue"
+        case .track, .boxes, .mechs, .kit: "Continue"
         case .firstMission: "Go to my mission path"
         }
     }
 
     private var canContinue: Bool {
-        step != .track || track != nil
+        switch step {
+        case .track: track != nil
+        case .boxes: boxesAnswered
+        default: true
+        }
+    }
+
+    /// A box or "None yet" was picked, so the collection is worth saving.
+    private var boxesAnswered: Bool {
+        noneYet || !collection.boxes.isEmpty
     }
 
     private var stepTransition: AnyTransition {
@@ -161,6 +174,10 @@ struct OnboardingFlowView: View {
             OnboardingWelcomeStep(upcoming: Array(steps.drop { $0 == .welcome }))
         case .track:
             OnboardingTrackStep(selection: $track)
+        case .boxes:
+            OnboardingBoxesStep(boxes: dependencies.boxSets, collection: $collection, noneYet: $noneYet)
+        case .mechs:
+            OnboardingMechsStep(boxes: dependencies.boxSets, collection: $collection)
         case .kit:
             OnboardingKitStep(items: kit, loadFailed: kitLoadFailed)
         case .firstMission:
@@ -189,6 +206,13 @@ struct OnboardingFlowView: View {
             finish()
             return
         }
+        if step == .boxes || step == .mechs {
+            // Owning a box ticks Miniatures on the kit screen that follows.
+            dependencies.preferences.gettingStartedChecks = OnboardingCollection.kitChecks(
+                dependencies.preferences.gettingStartedChecks,
+                after: collection
+            )
+        }
         move(to: index + 1, forward: true)
     }
 
@@ -206,6 +230,7 @@ struct OnboardingFlowView: View {
 
     private func finish() {
         let chosen = resolvedTrack
+        saveCollectionIfAnswered()
         dependencies.preferences.completeOnboarding(track: chosen)
         dependencies.logger.info("finished entry=\(entry.rawValue) track=\(chosen.rawValue)", category: "onboarding")
         dismiss()
@@ -216,6 +241,7 @@ struct OnboardingFlowView: View {
         switch entry {
         case .firstRun:
             // Keep a pick if they made one; Play treats no pick as Alpha Strike.
+            saveCollectionIfAnswered()
             dependencies.preferences.completeOnboarding(track: classicAvailable ? track : .alphaStrike)
             dependencies.logger.info("skipped at=\(step.rawValue)", category: "onboarding")
             dismiss()
@@ -225,11 +251,22 @@ struct OnboardingFlowView: View {
         }
     }
 
+    private func saveCollectionIfAnswered() {
+        guard boxesAnswered else { return }
+        dependencies.preferences.recordCollection(collection)
+        let ids = collection.boxes.keys.sorted().joined(separator: ",")
+        dependencies.logger.info("collection boxes=\(ids.isEmpty ? "none" : ids) singles=\(collection.singles.count)", category: "onboarding")
+    }
+
     private func load() {
         guard !didLoad else { return }
         didLoad = true
         if entry == .changeTrack {
             track = dependencies.preferences.learningTrack
+        }
+        if let saved = dependencies.preferences.collection {
+            collection = saved
+            noneYet = saved.boxes.isEmpty
         }
         do {
             kit = try dependencies.content.gettingStarted().items

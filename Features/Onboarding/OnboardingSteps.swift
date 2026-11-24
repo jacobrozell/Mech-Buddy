@@ -1,7 +1,7 @@
 import SwiftUI
 import MechBuddyData
 
-// The four onboarding screens. Each asks one thing. Spec: specs/features/OnboardingSpec.md
+// The onboarding screens (box screens are in OnboardingCollectionSteps.swift). Each asks one thing. Spec: specs/features/OnboardingSpec.md
 
 // MARK: - Welcome
 
@@ -45,6 +45,8 @@ struct OnboardingWelcomeStep: View {
         switch step {
         case .welcome: "Welcome"
         case .track: "Pick the game you want to learn"
+        case .boxes: "Tell us which boxes you own"
+        case .mechs: "Check your ’Mechs"
         case .kit: "Check what you have"
         case .firstMission: "Start your first mission"
         }

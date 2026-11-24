@@ -22,6 +22,7 @@ struct MissionBrief: View {
     var links: [Link] = []
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(AppDependencies.self) private var dependencies
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
@@ -71,6 +72,9 @@ struct MissionBrief: View {
                         roster(.lanceB, names: sideB)
                     }
                 }
+                if let check = miniCheck(for: mission) {
+                    minisLine(check)
+                }
             }
             if stop.state == .locked, let soon = stop.comingSoon {
                 Text(soon)
@@ -110,6 +114,33 @@ struct MissionBrief: View {
         if let minutes = mission.estimatedMinutes { parts.append("about \(minutes) min") }
         if let turns = mission.ruleset.maxTurns { parts.append("\(turns) turns") }
         return parts.joined(separator: " · ")
+    }
+
+    /// Only once the player has recorded a collection (onboarding or the Force tab).
+    private func miniCheck(for mission: GuidedScenarioDTO) -> MiniCheck? {
+        guard let owned = dependencies.preferences.collection else { return nil }
+        let forces = (mission.sides.lanceA + mission.sides.lanceB).map(\.name)
+        return CollectionMath.miniCheck(forces: forces, collection: owned, boxes: dependencies.boxSets)
+    }
+
+    private func minisLine(_ check: MiniCheck) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            if showsDetails {
+                sectionTitle("Your minis")
+            }
+            Label {
+                Text(check.summary)
+                    .font(TMFont.detail)
+                    .foregroundStyle(check.hasAll ? Color.primary : Color.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: check.hasAll ? "checkmark.circle.fill" : "figure.stand")
+                    .foregroundStyle(check.hasAll ? TMColor.success : Color.secondary)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Your minis. \(check.summary)")
+        .accessibilityIdentifier("as.modeHome.minis")
     }
 
     private var playTitle: String {

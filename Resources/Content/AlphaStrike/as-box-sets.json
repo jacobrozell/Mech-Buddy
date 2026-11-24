@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "sourceNote": "Box contents for the 'which boxes do you own' question. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
+  "boxes": [
+    {
+      "id": "agoac",
+      "title": "A Game of Armored Combat",
+      "subtitle": "2019 box · includes Alpha Strike cards",
+      "game": "both",
+      "miniCount": 8,
+      "units": [
+        "Awesome AWS-8Q",
+        "BattleMaster BLR-1G",
+        "Catapult CPLT-C1",
+        "Commando COM-2D",
+        "Locust LCT-1V",
+        "Shadow Hawk SHD-2H",
+        "Thunderbolt TDR-5S",
+        "Wolverine WVR-6M"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/",
+      "contentsConfirmed": true
+    },
+    {
+      "id": "alpha-strike-box",
+      "title": "Alpha Strike Box Set",
+      "subtitle": "Learn Alpha Strike",
+      "game": "alphaStrike",
+      "miniCount": 13,
+      "units": [
+        "Fire Moth",
+        "Nova",
+        "Pouncer",
+        "Timber Wolf",
+        "Warhawk",
+        "Archer",
+        "Atlas",
+        "Blackjack",
+        "Locust",
+        "Phoenix Hawk",
+        "Warhammer",
+        "Wasp",
+        "Wraith"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/",
+      "contentsConfirmed": true
+    },
+    {
+      "id": "starter-box",
+      "title": "Starter Box",
+      "subtitle": "Classic quick-start",
+      "game": "classic",
+      "miniCount": 2,
+      "units": [
+        "Hammerhead",
+        "Kontio"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/",
+      "contentsConfirmed": true
+    },
+    {
+      "id": "core-box",
+      "title": "Core Box Set",
+      "subtitle": "The Classic core rules",
+      "game": "classic",
+      "miniCount": 8,
+      "units": [
+        "Hollander",
+        "Rakshasa",
+        "Solitaire",
+        "Uziel",
+        "Mad Cat Mk II",
+        "Vulture Mk IV",
+        "Regent",
+        "Eris"
+      ],
+      "sourceURL": "https://www.catalystgamelabs.com/",
+      "contentsConfirmed": true
+    },
+    {
+      "id": "mercenaries-box",
+      "title": "Mercenaries Box Set",
+      "subtitle": "Needs A Game of Armored Combat",
+      "game": "classic",
+      "miniCount": 12,
+      "requires": [
+        "agoac"
+      ],
+      "units": [],
+      "sourceURL": "https://store.catalystgamelabs.com/",
+      "contentsConfirmed": false
+    }
+  ]
+}

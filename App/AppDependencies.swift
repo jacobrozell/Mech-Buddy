@@ -15,6 +15,8 @@ public final class AppDependencies {
     /// True when SwiftData failed and matches exist only in memory. Hidden for `-ui_testing`.
     private(set) var isUsingVolatileStore = false
     let preferences: AppPreferences
+    /// `as-box-sets.json`, loaded once. Empty when the file is missing; collection UI then shows singles only.
+    let boxSets: [BoxSetDTO]
     /// Bumps when a match is saved or deleted. Play and Force reload from this.
     var sessionRevision = 0
 
@@ -68,6 +70,12 @@ public final class AppDependencies {
         self.logger = logger
         self.isUsingVolatileStore = volatileStore
         self.preferences = preferences
+        do {
+            self.boxSets = try content.boxSets().boxes
+        } catch {
+            logger.error("box sets: \(error)", category: "content")
+            self.boxSets = []
+        }
         revising.onMutation = { [weak self] in
             guard let self else { return }
             self.sessionRevision += 1

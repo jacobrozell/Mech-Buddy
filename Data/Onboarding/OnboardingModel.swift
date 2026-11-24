@@ -81,16 +81,21 @@ public enum OnboardingEntry: String, Identifiable, Sendable {
 public enum OnboardingStep: String, CaseIterable, Sendable {
     case welcome
     case track
+    /// "Which boxes do you own?"
+    case boxes
+    /// "Your ’Mechs": the picked boxes' units, ticked, plus singles.
+    case mechs
     case kit
     case firstMission
 
     /// The screens to show, in order. The track question needs Classic to be visible
     /// (`ReleaseFlag.classicComingSoonEntry`); without it there is only one game to pick.
+    /// The box questions sit after the track and before the kit, so owning a box can tick Miniatures.
     public static func steps(for entry: OnboardingEntry, classicAvailable: Bool) -> [OnboardingStep] {
         switch (entry, classicAvailable) {
-        case (.firstRun, true): [.welcome, .track, .kit, .firstMission]
-        case (.changeTrack, true): [.track, .kit, .firstMission]
-        case (_, false): [.welcome, .kit, .firstMission]
+        case (.firstRun, true): [.welcome, .track, .boxes, .mechs, .kit, .firstMission]
+        case (.changeTrack, true): [.track, .boxes, .mechs, .kit, .firstMission]
+        case (_, false): [.welcome, .boxes, .mechs, .kit, .firstMission]
         }
     }
 
