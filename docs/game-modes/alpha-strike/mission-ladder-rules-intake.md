@@ -7,7 +7,7 @@ Missions 3–5 stay "Coming soon" until everything below is confirmed.
 - Rules: *Alpha Strike Box Set Quick-Start Rulebook*, 3rd printing. Page numbers below are the printed page numbers.
 - The PDF is the user's copy in `ongoing/` and is not committed to the repo.
 
-**Status:** answered from the rulebook on 2026-11-24. One question is still open: **P5**.
+**Status:** answered from the rulebook on 2026-11-24. P5 settled by the owner: rear +1 applies to any successful attack, punches and kicks included. Mission 4 is built (§3).
 
 ## 1. Cards (Master Unit List, Alpha Strike card)
 
@@ -46,14 +46,16 @@ With these, Mission 3 has enough 'Mechs that can overheat. The Catapult, Thunder
 
 ## 3. Physical attacks (Mission 4, Close Quarters)
 
+**Status: built.** Standard attacks (punch or kick) are on the shot sheet when the mission allows them. MEL (Size + 1, 2″) is supported for cards that list it. Charge and Death From Above are left out; the copy says they're not in this mission. Rules as the app applies them: GuidedMissionSpec, Physical attacks.
+
 | # | Question | Rulebook answer |
 |---|---|---|
 | P1 | Reach | **Standard** (punch or kick): within 1″, target in the front arc. **Melee** (only for cards with MEL, which none of the eight box cards have): within 2″, counting any height difference. **Charge and Death From Above:** must end in base-to-base contact, and are declared in the Movement Phase against a 'Mech that has already moved. Weapon attacks aren't allowed in base-to-base contact (pp. 20, 22) |
 | P2 | Timing | Combat Phase. Each 'Mech makes **one** attack a turn: weapon *or* physical, never both (pp. 18, 22) |
 | P3 | To-hit | Skill + attacker move + target move + terrain or cover. No range modifier. Heat and fire-control modifiers don't apply. Charge and Death From Above are +1 (pp. 20, 22) |
 | P4 | Damage | Standard = Size. Melee = Size + 1. Charge = Size + ½ TMM (round down); the attacker takes ½ its own TMM (round down), +1 if the target is Size 3 or more. Death From Above = Charge damage + 1, always gets a critical roll; the attacker takes its own Size, or Size + 1 on a miss. Weapon hits don't lower physical damage, and overheat can't add to it (pp. 22–24) |
-| P5 | Rear hits and criticals | Criticals: yes, any hit that damages structure rolls (p. 23). Rear +1: stated only in the weapon-damage step ("any successful attack"), so **unclear for physical attacks. Your call** |
-| P6 | Charge and Death From Above in Mission 4? | My suggestion: leave them out. They need a Movement-Phase declaration and self-damage, which is too much at once. Teach Standard physical attacks only |
+| P5 | Rear hits and criticals | Criticals: yes, any hit that damages structure rolls (p. 23). Rear +1: stated in the weapon-damage step ("any successful attack"). **Owner decision: applies to physical attacks too.** Built |
+| P6 | Charge and Death From Above in Mission 4? | Left out. They need a Movement-Phase declaration and self-damage. Standard physical attacks only. Built |
 
 ## 4. Forced Withdrawal (Mission 5, Full Lances)
 
@@ -68,5 +70,5 @@ With these, Mission 3 has enough 'Mechs that can overheat. The Catapult, Thunder
 | Mission | Forces | Turns | Rules on |
 |---|---|---|---|
 | 3 Running Hot | 2 vs 2. Ridge Line cards plus the OV-capable new cards from §1 | 8 | Overheat, heat scale, shutdown |
-| 4 Close Quarters | 3 vs 3. Adds Catapult and Thunderbolt | 8 | + physical attacks |
+| 4 Close Quarters | 3 vs 3. Awesome, BattleMaster, Locust vs Thunderbolt, Wolverine, Shadow Hawk (PV 97 vs 98). Built | 8 | + physical attacks (overheat stays on) |
 | 5 Full Lances | 4 vs 4. All eight box 'Mechs | 10 | Everything, + Forced Withdrawal |

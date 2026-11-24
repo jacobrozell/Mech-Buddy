@@ -68,6 +68,14 @@ public enum AlphaStrikeDamage {
         return DamageResult(delivered: max(0, base + rear + ov))
     }
 
+    /// Standard physical attack (punch or kick): damage equals the attacker's Size, Size + 1 with MEL.
+    /// Weapon-hit crits don't lower it and overheat can't add to it (rulebook pp. 22–24).
+    /// A rear hit adds 1, as for any successful attack (owner call on rulebook question P5).
+    public static func physical(attacker: MatchUnitState, rearHit: Bool) -> DamageResult {
+        let base = max(0, attacker.sz) + (attacker.hasMEL ? 1 : 0)
+        return DamageResult(delivered: base + (rearHit ? 1 : 0))
+    }
+
     public static func apply(
         to unit: MatchUnitState,
         amount: Int,

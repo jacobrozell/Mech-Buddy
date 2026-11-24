@@ -38,6 +38,8 @@ public struct SATORAttackCommand: Sendable, Equatable {
     public var partialCover: Bool
     public var rearHit: Bool
     public var overheatUsed: Int
+    /// Weapon fire or a punch/kick. A physical attack ignores `range` and `overheatUsed`.
+    public var attackKind: AttackKind
 
     public init(
         attackerId: UUID,
@@ -49,7 +51,8 @@ public struct SATORAttackCommand: Sendable, Equatable {
         woods: Bool = false,
         partialCover: Bool = false,
         rearHit: Bool = false,
-        overheatUsed: Int = 0
+        overheatUsed: Int = 0,
+        attackKind: AttackKind = .weapon
     ) {
         self.attackerId = attackerId
         self.defenderId = defenderId
@@ -61,6 +64,32 @@ public struct SATORAttackCommand: Sendable, Equatable {
         self.partialCover = partialCover
         self.rearHit = rearHit
         self.overheatUsed = overheatUsed
+        self.attackKind = attackKind
+    }
+
+    /// A punch or kick: within 1″, target in the front arc, damage = Size (rulebook pp. 20–22).
+    public static func physical(
+        attackerId: UUID,
+        defenderId: UUID,
+        roll: DiceRoll2D6,
+        attackerMove: MovementMode? = nil,
+        targetMove: TargetMoveModifier,
+        woods: Bool = false,
+        partialCover: Bool = false,
+        rearHit: Bool = false
+    ) -> SATORAttackCommand {
+        SATORAttackCommand(
+            attackerId: attackerId,
+            defenderId: defenderId,
+            range: .short,
+            roll: roll,
+            attackerMove: attackerMove,
+            targetMove: targetMove,
+            woods: woods,
+            partialCover: partialCover,
+            rearHit: rearHit,
+            attackKind: .physical
+        )
     }
 }
 
@@ -291,9 +320,14 @@ public enum MatchReducer {
             throw MatchDomainError.cannotAttack("Target removed")
         }
 
+        let physical = attack.attackKind == .physical
+        if physical, !next.ruleset.physicalAttacksAllowed {
+            throw MatchDomainError.cannotAttack("Punches and kicks aren’t used in this mission.")
+        }
+        let bracket = physical ? RangeBracket.short : attack.range
         let move = attack.attackerMove
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
-        if let reason = CombatSolver.noDamageReason(attacker: attacker, bracket: attack.range) {
+        if !physical, let reason = CombatSolver.noDamageReason(attacker: attacker, bracket: bracket) {
             throw MatchDomainError.cannotAttack(reason)
         }
         let tn = try SATORResolver.resolve(
@@ -305,7 +339,8 @@ public enum MatchReducer {
                 woods: attack.woods,
                 partialCover: attack.partialCover,
                 rangeInches: nil,
-                bracket: attack.range
+                bracket: bracket,
+                attackKind: attack.attackKind
             )
         )
 
@@ -313,23 +348,28 @@ public enum MatchReducer {
         var deliveredDamage = 0
         var note = ""
         // Overheat is declared before the roll, so the heat comes whether the shot hits or not.
-        let overheat = AlphaStrikeHeat.usableOverheat(
+        // It can't add to a punch or kick (p. 24).
+        let overheat = physical ? 0 : AlphaStrikeHeat.usableOverheat(
             requested: attack.overheatUsed,
             attacker: attacker,
-            bracket: attack.range,
+            bracket: bracket,
             overheatAllowed: next.ruleset.overheatAllowed
         )
+        // Keep the "X hit Y for N. Rolled R, needed T." shape: ShotFeed and Victory stats read it.
+        let how = physical ? " Punch or kick." : ""
 
         if hit {
-            let delivered = AlphaStrikeDamage.delivered(
-                CombatSolver.damageInput(
-                    attacker: attacker,
-                    bracket: attack.range,
-                    rearHit: attack.rearHit,
-                    overheatUsed: overheat
-                ),
-                overheatAllowed: next.ruleset.overheatAllowed
-            )
+            let delivered = physical
+                ? AlphaStrikeDamage.physical(attacker: attacker, rearHit: attack.rearHit)
+                : AlphaStrikeDamage.delivered(
+                    CombatSolver.damageInput(
+                        attacker: attacker,
+                        bracket: bracket,
+                        rearHit: attack.rearHit,
+                        overheatUsed: overheat
+                    ),
+                    overheatAllowed: next.ruleset.overheatAllowed
+                )
             let applied = AlphaStrikeDamage.apply(
                 to: defender,
                 amount: delivered.delivered,
@@ -337,12 +377,12 @@ public enum MatchReducer {
             )
             next.units[defenderIdx] = applied.unit
             deliveredDamage = delivered.delivered
-            note = "\(attacker.name) hit \(defender.name) for \(delivered.delivered). Rolled \(attack.roll.total), needed \(tn.value)."
+            note = "\(attacker.name) hit \(defender.name) for \(delivered.delivered). Rolled \(attack.roll.total), needed \(tn.value).\(how)"
             if applied.needsCritical {
                 note += " A critical is owed."
             }
         } else {
-            note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value). No damage."
+            note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value).\(how) No damage."
         }
 
         if overheat > 0 {
@@ -356,7 +396,8 @@ public enum MatchReducer {
             hit: hit,
             total: attack.roll.total,
             targetNumber: tn.value,
-            damage: deliveredDamage
+            damage: deliveredDamage,
+            kind: attack.attackKind
         )
         // Persist attacker's chosen move if provided (UI may pass sheet move).
         if let attackerMove = attack.attackerMove {

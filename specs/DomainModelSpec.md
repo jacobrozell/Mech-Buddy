@@ -260,6 +260,12 @@ public struct DamageResult: Sendable, Equatable {
     public var delivered: Int
 }
 
+/// One attack a turn: weapon fire or a Standard physical attack (punch or kick).
+/// Carried by `SATORInput`, `CombatTableInsight`, `SATORAttackCommand` and `TurnShot`
+/// (`TurnShot.kind` decodes as `.weapon` when missing, for saves from before Close Quarters).
+public enum AttackKind: String, Codable, Sendable { case weapon, physical }
+// Physical damage: AlphaStrikeDamage.physical(attacker:rearHit:) = Size (+1 with MEL) + rear 1.
+
 public struct ApplyDamageResult: Sendable, Equatable {
     public var unit: MatchUnitState
     public var needsCritical: Bool       // any structure marked this hit, or natural 12 hit through armor per rules

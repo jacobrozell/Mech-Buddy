@@ -18,7 +18,9 @@ struct CombatStep: View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
                 title: "Both sides shoot",
-                message: "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
+                message: session.ruleset.physicalAttacksAllowed
+                    ? "Roll together, in any order. Within 1″ of an enemy, a ’Mech can punch or kick instead of shooting. Damage lands at the end of the phase."
+                    : "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
                 accessibilityIdentifier: "as.battle.table"
             )
             shotFeed
@@ -90,10 +92,11 @@ struct CombatStep: View {
     }
 
     private func shotLine(_ row: ShotFeed.Row) -> String {
+        let how = row.shot.isPhysical ? " (punch or kick)" : ""
         if row.shot.hit {
-            return "\(row.shooter) hit \(row.shot.targetName) for \(row.shot.damage)"
+            return "\(row.shooter) hit \(row.shot.targetName) for \(row.shot.damage)\(how)"
         }
-        return "\(row.shooter) missed \(row.shot.targetName)"
+        return "\(row.shooter) missed \(row.shot.targetName)\(how)"
     }
 
     private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {

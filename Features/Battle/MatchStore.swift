@@ -277,7 +277,8 @@ final class MatchStore: Identifiable {
         woods: Bool = false,
         partialCover: Bool = false,
         rearHit: Bool = false,
-        overheatUsed: Int = 0
+        overheatUsed: Int = 0,
+        attackKind: AttackKind = .weapon
     ) -> Bool {
         guard let roll = DiceRoll2D6.validated(die1: die1, die2: die2) else {
             lastErrorTitle = "Couldn’t save the shot"
@@ -296,10 +297,11 @@ final class MatchStore: Identifiable {
                     woods: woods,
                     partialCover: partialCover,
                     rearHit: rearHit,
-                    overheatUsed: overheatUsed
+                    overheatUsed: overheatUsed,
+                    attackKind: attackKind
                 )
             ),
-            failureTitle: "Couldn’t save the shot"
+            failureTitle: attackKind == .physical ? "Couldn’t save the attack" : "Couldn’t save the shot"
         )
         return lastError == nil
     }

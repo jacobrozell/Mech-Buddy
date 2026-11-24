@@ -108,6 +108,34 @@ struct MissionLadderTests {
         }
     }
 
+    @Test("Close Quarters: punches and overheat on, 3 vs 3, the two Size 4s on one side, 8 turns")
+    func closeQuarters() throws {
+        let entry = try #require(try catalog.scenarios().scenarios.first { $0.id == ScenarioId.closeQuarters.rawValue })
+        #expect(!entry.gated)
+        #expect(entry.release == "1.3.0")
+        #expect(entry.icon == "hand.raised.fill")
+        #expect(entry.introduces?.contains("Physical attacks") == true)
+
+        let dto = try catalog.scenario(id: .closeQuarters)
+        #expect(dto.missionNumber == 4)
+        #expect(dto.coachNotes?.contains { $0.contains("Punch or kick") } == true)
+        let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+        #expect(ruleset.physicalAttacksAllowed && ruleset.overheatAllowed)
+        #expect(!ruleset.forcedWithdrawal)
+        #expect(ruleset.maxTurns == 8)
+        #expect(ruleset.victory == .destroyAllEnemiesOrStructureAfterTurn(maxTurn: 8))
+
+        let units = GuidedScenarioFactory.makeUnits(from: dto)
+        let sideA = units.filter { $0.side == .lanceA }
+        let sideB = units.filter { $0.side == .lanceB }
+        #expect(sideA.count == 3 && sideB.count == 3)
+        let names = Set(sideA.map(\.name))
+        #expect(names.isSuperset(of: ["Awesome AWS-8Q", "BattleMaster BLR-1G"]))
+        let pvA = sideA.map(\.pv).reduce(0, +)
+        let pvB = sideB.map(\.pv).reduce(0, +)
+        #expect(abs(pvA - pvB) <= 3, "PV \(pvA) vs \(pvB)")
+    }
+
     @Test("Broken Ground: new pairings, 8 turns, no overheat or melee yet")
     func brokenGround() throws {
         let dto = try catalog.scenario(id: .brokenGround)

@@ -7,24 +7,51 @@ public struct TurnShot: Codable, Sendable, Equatable {
     public var total: Int
     public var targetNumber: Int
     public var damage: Int
+    /// Weapon fire or a punch/kick. Saves from before physical attacks decode as `.weapon`.
+    public var kind: AttackKind
 
-    public init(targetName: String, hit: Bool, total: Int, targetNumber: Int, damage: Int) {
+    public init(
+        targetName: String,
+        hit: Bool,
+        total: Int,
+        targetNumber: Int,
+        damage: Int,
+        kind: AttackKind = .weapon
+    ) {
         self.targetName = targetName
         self.hit = hit
         self.total = total
         self.targetNumber = targetNumber
         self.damage = damage
+        self.kind = kind
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case targetName, hit, total, targetNumber, damage, kind
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        targetName = try c.decode(String.self, forKey: .targetName)
+        hit = try c.decode(Bool.self, forKey: .hit)
+        total = try c.decode(Int.self, forKey: .total)
+        targetNumber = try c.decode(Int.self, forKey: .targetNumber)
+        damage = try c.decode(Int.self, forKey: .damage)
+        kind = try c.decodeIfPresent(AttackKind.self, forKey: .kind) ?? .weapon
+    }
+
+    public var isPhysical: Bool { kind == .physical }
 
     public var rowTitle: String {
         hit ? "Hit \(targetName) for \(damage)" : "Missed \(targetName)"
     }
 
     public var rowDetail: String {
+        let how = isPhysical ? "Punch or kick. " : ""
         if hit {
-            return "Rolled \(total), needed \(targetNumber)."
+            return "\(how)Rolled \(total), needed \(targetNumber)."
         }
-        return "Rolled \(total), needed \(targetNumber). No damage."
+        return "\(how)Rolled \(total), needed \(targetNumber). No damage."
     }
 }
 
@@ -316,6 +343,16 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
 
     public var hasOVL: Bool {
         abilities.uppercased().contains("OVL")
+    }
+
+    /// MEL: physical attacks reach 2″ and deal Size + 1 (rulebook p. 22). No box card has it.
+    public var hasMEL: Bool {
+        abilityTags.contains("MEL")
+    }
+
+    /// Heat cools only on a turn without a weapon attack; a punch or kick doesn't count (p. 24).
+    public var madeWeaponAttackThisTurn: Bool {
+        hasAttackedThisTurn && turnShot?.kind != .physical
     }
 
     /// Eligible to open SATOR this combat impulse.

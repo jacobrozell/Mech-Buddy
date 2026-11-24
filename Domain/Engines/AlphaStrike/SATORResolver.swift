@@ -7,6 +7,14 @@ public enum TargetMoveModifier: String, Sendable, Codable, Equatable {
     case jumpedUsesTMMPlus1
 }
 
+/// A 'Mech makes one attack a turn: a weapon attack or a physical one, never both (rulebook pp. 18, 22).
+public enum AttackKind: String, Sendable, Codable, Equatable, CaseIterable {
+    case weapon
+    /// Standard physical attack: a punch or kick within 1″ (2″ with MEL), target in the front arc.
+    /// No range modifier; heat and fire-control hits don't apply (p. 20). Charge and Death From Above aren't modelled.
+    case physical
+}
+
 public enum RangeBracket: String, Sendable, Codable, Equatable {
     case short
     case medium
@@ -47,6 +55,7 @@ public struct SATORInput: Sendable, Equatable {
     public var other: OtherModifiers
     public var rangeInches: Double?
     public var rangeBracket: RangeBracket?
+    public var attackKind: AttackKind
 
     public init(
         skill: Int,
@@ -55,7 +64,8 @@ public struct SATORInput: Sendable, Equatable {
         targetTMM: Int,
         other: OtherModifiers = OtherModifiers(),
         rangeInches: Double? = nil,
-        rangeBracket: RangeBracket? = nil
+        rangeBracket: RangeBracket? = nil,
+        attackKind: AttackKind = .weapon
     ) {
         self.skill = skill
         self.attackerMove = attackerMove
@@ -64,6 +74,7 @@ public struct SATORInput: Sendable, Equatable {
         self.other = other
         self.rangeInches = rangeInches
         self.rangeBracket = rangeBracket
+        self.attackKind = attackKind
     }
 }
 
@@ -114,6 +125,7 @@ public enum SATORResolver {
     public static func resolve(_ input: SATORInput) throws -> TargetNumber {
         var breakdown: [String] = []
         let move = input.attackerMove == .unset ? .ground : input.attackerMove
+        let physical = input.attackKind == .physical
         if move == .sprint {
             throw SATORError.cannotAttack(reason: "Sprinted units cannot attack")
         }
@@ -130,7 +142,7 @@ public enum SATORResolver {
         }
         tn += aDelta
         breakdown.append("A \(move.rawValue) \(signed(aDelta))")
-        var reasons = attackerReasons(skill: input.skill, move: move, delta: aDelta)
+        var reasons = attackerReasons(skill: input.skill, move: move, delta: aDelta, physical: physical)
 
         let tDelta: Int
         switch input.targetMove {
@@ -143,29 +155,55 @@ public enum SATORResolver {
         breakdown.append("T \(input.targetMove.rawValue) \(signed(tDelta))")
         reasons.append(targetReason(input.targetMove, tmm: input.targetTMM, delta: tDelta))
 
-        guard let bracket = input.rangeBracket ?? input.rangeInches.map(bracket(forInches:)) else {
-            throw SATORError.cannotAttack(reason: "Range required")
+        // A punch or kick is always within reach, so it has no range band (p. 20).
+        let bracket: RangeBracket
+        if physical {
+            bracket = .short
+        } else {
+            guard let measured = input.rangeBracket ?? input.rangeInches.map(bracket(forInches:)) else {
+                throw SATORError.cannotAttack(reason: "Range required")
+            }
+            bracket = measured
         }
         if bracket == .outOfRange {
             throw SATORError.outOfRange
         }
+        // Heat and fire-control hits only affect weapon attacks.
+        var other = input.other
+        if physical {
+            other.fireControlHits = 0
+            other.attackerHeat = 0
+        }
 
         var oDelta = 0
-        if input.other.woods { oDelta += 1 }
-        if input.other.partialCover { oDelta += 1 }
-        if input.other.chargeOrDFA { oDelta += 1 }
-        if input.other.targetHasSTL {
+        if other.woods { oDelta += 1 }
+        if other.partialCover { oDelta += 1 }
+        if other.chargeOrDFA { oDelta += 1 }
+        if other.targetHasSTL {
             switch bracket {
             case .medium: oDelta += 1
             case .long: oDelta += 2
             default: break
             }
         }
-        oDelta += input.other.fireControlHits * 2
-        oDelta += min(4, max(0, input.other.attackerHeat))
+        oDelta += other.fireControlHits * 2
+        oDelta += min(4, max(0, other.attackerHeat))
         tn += oDelta
         breakdown.append("O \(signed(oDelta))")
-        reasons.append(contentsOf: otherReasons(input.other, bracket: bracket))
+        reasons.append(contentsOf: otherReasons(other, bracket: bracket))
+
+        if physical {
+            reasons.append("Punch or kick, no range modifier")
+            reasons.append("Need \(tn) or higher")
+            return TargetNumber(
+                value: tn,
+                autoMiss: tn > 12,
+                hitOddsPercent: oddsPercent(forTN: tn),
+                breakdown: breakdown,
+                reasons: reasons,
+                rangeBracket: bracket
+            )
+        }
 
         let rDelta: Int
         switch bracket {
@@ -190,15 +228,16 @@ public enum SATORResolver {
         )
     }
 
-    private static func attackerReasons(skill: Int, move: MovementMode, delta: Int) -> [String] {
+    private static func attackerReasons(skill: Int, move: MovementMode, delta: Int, physical: Bool) -> [String] {
+        let who = physical ? "Attacker" : "Shooter"
         let moveLine: String
         switch move {
         case .standstill:
-            moveLine = "Shooter stood still, \(signed(delta))"
+            moveLine = "\(who) stood still, \(signed(delta))"
         case .jump:
-            moveLine = "Shooter jumped, \(signed(delta))"
+            moveLine = "\(who) jumped, \(signed(delta))"
         case .ground, .unset, .sprint:
-            moveLine = "Shooter walked, \(signed(delta))"
+            moveLine = "\(who) walked, \(signed(delta))"
         }
         return ["Skill \(skill)", moveLine]
     }

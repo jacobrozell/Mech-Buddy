@@ -87,11 +87,15 @@
         },
         {
           "heading": "Touching bases",
-          "body": "If two ’Mechs’ bases are touching, neither can shoot the other: that close, only punches and kicks work, and these missions don’t use them yet. Back off first. In the shot screen, More… → Bases touching."
+          "body": "If two ’Mechs’ bases are touching, neither can shoot the other: that close, only punches and kicks work. In the first three missions, back off first. In the shot screen, More… → Bases touching."
         },
         {
-          "heading": "One shot per ’Mech per turn",
-          "body": "Each ’Mech fires once, then it’s done until next turn."
+          "heading": "Punch or kick (Close Quarters on)",
+          "body": "An enemy within 1 inch and in front of your ’Mech can be punched or kicked instead of shot. Damage equals your Size, +1 from behind. To-hit is Skill + your move + its move + woods or cover, with no range and no heat. Charge and Death From Above are not in these missions."
+        },
+        {
+          "heading": "One attack per ’Mech per turn",
+          "body": "Each ’Mech shoots or punches once, never both, then it’s done until next turn."
         }
       ]
     },

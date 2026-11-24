@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.3.0",
+  "scenarioId": "close-quarters",
+  "title": "Close Quarters",
+  "subtitle": "Mission 4 · 3 vs 3 · about 60 minutes",
+  "missionNumber": 4,
+  "introduces": ["Physical attacks", "3 vs 3", "Awesome and BattleMaster"],
+  "estimatedMinutes": 60,
+  "release": "1.3.0",
+  "ruleset": {
+    "overheatAllowed": true,
+    "physicalAttacksAllowed": true,
+    "forcedWithdrawal": false,
+    "maxTurns": 8,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 8
+    }
+  },
+  "coachNotes": [
+    "Three 'Mechs a side. Side A brings the two biggest 'Mechs in the box, the Awesome and the BattleMaster. Side B is quicker and has more jump jets.",
+    "New: punch or kick. If an enemy is within 1 inch and in front of your 'Mech, you can hit it instead of shooting. In the shot screen, pick Punch or kick.",
+    "A punch or kick does damage equal to the attacker's Size: 4 for the Awesome and BattleMaster, 3 for the Thunderbolt, 2 for the Shadow Hawk and Wolverine, 1 for the Locust.",
+    "The to-hit number is a shot without the range: Skill, your move, the target's move, woods and cover. Heat doesn't make it harder.",
+    "One attack a turn: shoot or punch, never both.",
+    "Bases touching? Those two can't shoot each other, but they can still punch or kick. Weapon hits don't weaken a punch, and overheat can't add to it. From behind it's +1, like a rear shot.",
+    "A punch isn't a weapon attack, so a 'Mech that only punches still cools off in the End Phase. Charge and Death From Above are not in this mission."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Awesome AWS-8Q",
+        "pv": 39,
+        "mv": "6\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 3,
+        "m": 3,
+        "l": 3,
+        "ov": 0,
+        "armor": 8,
+        "structure": 6,
+        "skill": 4,
+        "abilities": "ENE"
+      },
+      {
+        "name": "BattleMaster BLR-1G",
+        "pv": 40,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 1,
+        "armor": 8,
+        "structure": 7,
+        "skill": 4,
+        "abilities": "REAR1/1/-"
+      },
+      {
+        "name": "Locust LCT-1V",
+        "pv": 18,
+        "mv": "16\"",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": ""
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "Thunderbolt TDR-5S",
+        "pv": 36,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 3,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 1,
+        "armor": 7,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF1"
+      },
+      {
+        "name": "Wolverine WVR-6M",
+        "pv": 32,
+        "mv": "10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 1,
+        "armor": 6,
+        "structure": 5,
+        "skill": 4,
+        "abilities": ""
+      },
+      {
+        "name": "Shadow Hawk SHD-2H",
+        "pv": 30,
+        "mv": "10\"/6\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 1,
+        "ov": 0,
+        "armor": 5,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF0*,JMPW1"
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use the same open table, about 3 feet across. Measure in inches and ignore printed hexes.",
+    "Put a hill in the middle and three patches of woods close around it. Tight terrain pulls the fight in close. Hills, cover, and woods work like Broken Ground.",
+    "The Awesome and BattleMaster share one card, front and back. Put that card by one of them and read the other's numbers in the app.",
+    "Keep a die or small token next to each 'Mech card to mark heat (0 to 3, then S). The app tracks it too.",
+    "Each side places its three 'Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one 'Mech at a time."
+  ],
+  "winningSummary": "Knock out all three enemy 'Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
+}

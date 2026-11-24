@@ -26,7 +26,7 @@ What the app exposes. Specs describe behavior; this file says whether code exist
 | Classic coming soon | **shipped (code)** | 1.0.0 | Sheet `classic.modeHome`. Not playable |
 | Free Battle | planned | **1.1** | Gated in 1.0 Release |
 | Full Lances | planned | 1.x | Gated |
-| Physical / OV / withdrawal | planned | 1.x | Resolver flags exist; Ridge Line leaves them off. No sheet controls |
+| Physical / OV / withdrawal | partial | 1.x | Overheat picker in Running Hot; Punch or kick in Close Quarters. Forced Withdrawal not built |
 | Classic tools / guided | planned | post-1.0 | After the coming-soon sheet |
 | MUL network fetch | stub | dogfood | No paste UI in this build |
 | Match history | planned | 1.x | |
