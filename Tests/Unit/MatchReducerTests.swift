@@ -437,9 +437,10 @@ struct MatchReducerTests {
         let decoded = try JSONDecoder().decode(MatchSession.self, from: data)
         #expect(decoded.diceMode == .auto)
 
-        let json = try #require(String(data: data, encoding: .utf8))
-        let stripped = json.replacingOccurrences(of: ",\"diceMode\":\"auto\"", with: "")
-        let legacy = try JSONDecoder().decode(MatchSession.self, from: Data(stripped.utf8))
+        // Drop the key structurally: a text replace missed it whenever the encoder wrote it first (no leading comma).
+        var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        object.removeValue(forKey: "diceMode")
+        let legacy = try JSONDecoder().decode(MatchSession.self, from: try JSONSerialization.data(withJSONObject: object))
         #expect(legacy.diceMode == .manual)
     }
 }
