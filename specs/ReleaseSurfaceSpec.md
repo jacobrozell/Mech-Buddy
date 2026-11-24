@@ -10,9 +10,9 @@ Build wide internally; ship narrow. One module answers “is X reachable?”
 |------|---------|--------------|-------|
 | Alpha Strike Play | on | on | |
 | Ridge Line mission | on | on | |
-| Full Lances scenario | off | on | |
+| Full Lances scenario | off | on | Mission 5 on the path (`full-lances`) is playable under `missionLadder` from 1.4.0; this flag is unused by it |
 | Free Battle | **off** | on | **1.1** |
-| Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat; Close Quarters: physical attacks) shows that tool inside the mission; the flag gates it everywhere else |
+| Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat; Close Quarters: physical attacks; Full Lances: Forced Withdrawal) shows that tool inside the mission; the flag gates it everywhere else |
 | Classic mode entry | **on (Coming soon)** | on | Visible teaser — not playable |
 | Classic play / tools | off | on | |
 | MUL network fetch | off | on | Paste import OK |

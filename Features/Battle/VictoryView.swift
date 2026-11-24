@@ -156,15 +156,16 @@ struct VictoryView: View {
                     accessibilityName: "\(unit.name) structure"
                 )
             } else {
+                // Left the table counts as destroyed (Forced Withdrawal), but say what happened.
                 HStack(spacing: TMSpace.xs) {
-                    Image(systemName: "flame.fill")
+                    Image(systemName: unit.leftTable ? "figure.walk.departure" : "flame.fill")
                         .accessibilityHidden(true)
-                    Text("Wrecked")
+                    Text(unit.leftTable ? "Left the table" : "Wrecked")
                         .font(TMFont.detail)
                 }
                 .foregroundStyle(.secondary)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(unit.name), wrecked")
+                .accessibilityLabel("\(unit.name), \(unit.leftTable ? "left the table" : "wrecked")")
             }
         }
     }
@@ -323,6 +324,9 @@ struct VictoryView: View {
             let enemies = session.units.filter { $0.side != side }
             let allDown = !enemies.isEmpty && enemies.allSatisfy { $0.combatStatus != .active }
             if allDown {
+                if enemies.contains(where: \.leftTable) {
+                    return "Every enemy ’Mech wrecked or withdrawn · \(turnPhrase)"
+                }
                 if enemies.count == 2 {
                     return "Both enemy ’Mechs destroyed · \(turnPhrase)"
                 }

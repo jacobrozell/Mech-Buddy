@@ -1,13 +1,13 @@
 # Mission ladder — rules intake (Missions 3–5)
 
-Missions 3–5 stay "Coming soon" until everything below is confirmed.
+All three missions are built from the answers below.
 
 **Sources**
 - Cards: Master Unit List (§1).
 - Rules: *Alpha Strike Box Set Quick-Start Rulebook*, 3rd printing. Page numbers below are the printed page numbers.
 - The PDF is the user's copy in `ongoing/` and is not committed to the repo.
 
-**Status:** answered from the rulebook on 2026-11-24. P5 settled by the owner: rear +1 applies to any successful attack, punches and kicks included. Mission 4 is built (§3).
+**Status:** answered from the rulebook on 2026-11-24. P5 settled by the owner: rear +1 applies to any successful attack, punches and kicks included. Mission 4 is built (§3). Mission 5 is built (§4).
 
 ## 1. Cards (Master Unit List, Alpha Strike card)
 
@@ -59,6 +59,8 @@ With these, Mission 3 has enough 'Mechs that can overheat. The Catapult, Thunder
 
 ## 4. Forced Withdrawal (Mission 5, Full Lances)
 
+**Status: built.** `MatchUnitState.isCrippled`, `MatchSession.mustWithdraw`, `MatchCommand.leaveTable`. Rules as the app applies them: GuidedMissionSpec, Forced Withdrawal. Two readings to note: "reduced to 0" means a card that prints 0 Medium and 0 Long needs a weapon hit before it counts; a heat shutdown isn't "immobilized by critical hits".
+
 | # | Question | Rulebook answer |
 |---|---|---|
 | W1 | Crippled | Any one of: no armor left and structure down to half its starting value (rounded up); Medium **and** Long damage both 0; immobilized by critical hits (p. 12) |
@@ -71,4 +73,4 @@ With these, Mission 3 has enough 'Mechs that can overheat. The Catapult, Thunder
 |---|---|---|---|
 | 3 Running Hot | 2 vs 2. Ridge Line cards plus the OV-capable new cards from §1 | 8 | Overheat, heat scale, shutdown |
 | 4 Close Quarters | 3 vs 3. Awesome, BattleMaster, Locust vs Thunderbolt, Wolverine, Shadow Hawk (PV 97 vs 98). Built | 8 | + physical attacks (overheat stays on) |
-| 5 Full Lances | 4 vs 4. All eight box 'Mechs | 10 | Everything, + Forced Withdrawal |
+| 5 Full Lances | 4 vs 4. Awesome, Thunderbolt, Shadow Hawk, Commando vs BattleMaster, Catapult, Wolverine, Locust (PV 122 vs 122). Built | 10 | Everything, + Forced Withdrawal |

@@ -118,6 +118,9 @@ struct MovementStep: View {
                         .font(TMFont.readoutM)
                         .accessibilityLabel(move.spokenSummary)
                 }
+                if session.mustWithdraw(unit), !unit.isImmobile {
+                    withdrawNotice(unit)
+                }
                 if unit.heat > 0, !unit.isShutdown {
                     Label(
                         "Heat \(unit.heat): \(2 * unit.heat)″ less walking\(unit.heat >= 2 ? ", 1 easier to hit" : ""). Jumping isn’t affected.",
@@ -134,6 +137,39 @@ struct MovementStep: View {
                 }
             }
         }
+    }
+
+    /// Forced Withdrawal. Leaving the table is recorded from the ’Mech's own sheet, which asks first.
+    private func withdrawNotice(_ unit: MatchUnitState) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                withdrawLabel
+                Spacer(minLength: TMSpace.sm)
+                leaveTableButton(unit)
+            }
+            VStack(alignment: .leading, spacing: TMSpace.xs) {
+                withdrawLabel
+                leaveTableButton(unit)
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("as.battle.withdraw")
+    }
+
+    private var withdrawLabel: some View {
+        Label("Crippled: move toward your own edge. You can still shoot.", systemImage: "figure.walk.departure")
+            .font(TMFont.detail.weight(.semibold))
+            .foregroundStyle(TMColor.warning)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func leaveTableButton(_ unit: MatchUnitState) -> some View {
+        Button("Left the table?") {
+            onOpenUnit(unit)
+        }
+        .font(TMFont.detail.weight(.semibold))
+        .frame(minHeight: 44)
+        .accessibilityHint("Opens \(unit.name) to record that it left the table")
     }
 
     private var columns: [GridItem] {
@@ -277,7 +313,7 @@ struct MovementStep: View {
         var upcoming: [MatchUnitState] = []
         let firstToMove = session.initiativeWinner?.other ?? session.activeSide
         let sequence = AlphaStrikePhaseEngine.movementSequence(firstToMove: firstToMove, units: session.units)
-        let movedCount = active.filter(\.hasMovedThisTurn).count
+        let movedCount = AlphaStrikePhaseEngine.movesRecorded(units: session.units)
         for side in sequence.dropFirst(movedCount) {
             guard var queue = remaining[side], !queue.isEmpty else { continue }
             upcoming.append(queue.removeFirst())

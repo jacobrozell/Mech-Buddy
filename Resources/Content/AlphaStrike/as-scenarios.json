@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.3.0",
+  "contentVersion": "1.4.0",
   "scenarios": [
     {
       "id": "ridge-line",
@@ -67,17 +67,16 @@
     {
       "id": "full-lances",
       "title": "Full Lances",
-      "subtitle": "Mission 5 · 4 v 4 · ~90 min",
+      "subtitle": "Mission 5 · 4 vs 4 · ~90 min",
       "missionNumber": 5,
       "introduces": [
         "All eight box 'Mechs",
         "Forced Withdrawal",
         "Every rule on"
       ],
-      "bundle": null,
-      "release": "1.x",
-      "gated": true,
-      "comingSoonSummary": "A full Alpha Strike match: every 'Mech in the box, overheating, physical attacks, and Forced Withdrawal. Content pack lands with the 1.x gate.",
+      "bundle": "as-full-lances.json",
+      "release": "1.4.0",
+      "gated": false,
       "icon": "shield.lefthalf.filled"
     }
   ]

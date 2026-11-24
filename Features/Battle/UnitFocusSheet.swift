@@ -7,8 +7,23 @@ struct UnitFocusSheet: View {
     var isReadOnly: Bool = false
     var onResolveAttack: (() -> Void)?
     var onRollCrit: (() -> Void)?
+    /// Forced Withdrawal missions: record that this ’Mech drove off the table.
+    var onLeftTable: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
+    @State private var confirmLeave = false
+
+    /// `unit` is the snapshot the sheet opened with; the session is live.
+    private var live: MatchUnitState {
+        session.units.first { $0.id == unit.id } ?? unit
+    }
+
+    private var offersLeaveTable: Bool {
+        !isReadOnly
+            && onLeftTable != nil
+            && session.ruleset.forcedWithdrawal
+            && live.combatStatus == .active
+    }
 
     var body: some View {
         NavigationStack {
@@ -46,6 +61,9 @@ struct UnitFocusSheet: View {
                 }
                 if !isReadOnly {
                     thisTurn
+                }
+                if offersLeaveTable {
+                    leaveTable
                 }
                 if !abilitiesLine.isEmpty {
                     VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -153,6 +171,56 @@ struct UnitFocusSheet: View {
         }
     }
 
+    private var withdrawalNote: String {
+        guard session.mustWithdraw(live) else {
+            return "A ’Mech that leaves the table counts as destroyed and can’t come back."
+        }
+        if live.isImmobile {
+            return "Crippled, but it can’t move. You can still shoot."
+        }
+        return "Crippled: move toward your own edge. You can still shoot. Off the table, it counts as destroyed."
+    }
+
+    private var leaveTable: some View {
+        let blocked = session.leaveTableBlockReason(live)
+        return VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Forced Withdrawal")
+            Text(withdrawalNote)
+                .font(TMFont.body)
+                .fixedSize(horizontal: false, vertical: true)
+            Button(role: .destructive) {
+                confirmLeave = true
+            } label: {
+                Label("Left the table", systemImage: "figure.walk.departure")
+                    .font(TMFont.body.weight(.semibold))
+                    .frame(minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .disabled(blocked != nil)
+            .accessibilityIdentifier("as.unitFocus.leftTable")
+            .accessibilityHint("Asks first. It then counts as destroyed.")
+            if let blocked {
+                Text(blocked)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .confirmationDialog(
+            "Did \(unit.name) leave the table?",
+            isPresented: $confirmLeave,
+            titleVisibility: .visible
+        ) {
+            Button("Left the table", role: .destructive) {
+                onLeftTable?()
+                dismiss()
+            }
+            Button("Keep it on the table", role: .cancel) {}
+        } message: {
+            Text("It counts as destroyed and can’t come back. Only Undo puts it back.")
+        }
+    }
+
     private func actionBar(_ action: FocusAction) -> some View {
         GlassEffectContainer(spacing: TMSpace.md) {
             PrimaryActionButton(
@@ -176,6 +244,7 @@ struct UnitFocusSheet: View {
         if unit.combatStatus == .destroyedPendingEnd { return .wrecked }
         if unit.isShutdown { return .shutdown }
         if unit.isImmobile { return .immobile }
+        if session.mustWithdraw(live) { return .withdrawing }
         if unit.movementMode == .sprint { return .sprinted }
         return nil
     }
@@ -292,7 +361,8 @@ private struct FocusAction {
         session: PreviewFixtures.session(),
         isReadOnly: false,
         onResolveAttack: {},
-        onRollCrit: {}
+        onRollCrit: {},
+        onLeftTable: {}
     )
 }
 #endif
