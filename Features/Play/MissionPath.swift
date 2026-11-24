@@ -262,12 +262,16 @@ struct MissionNode: View {
         .frame(width: diameter, height: diameter + Self.lip, alignment: .top)
         .background(alignment: .top) {
             if stop.state == .next {
+                // Glow centred on the face (not the lip): a filled, blurred disc that
+                // runs under the face edge, so there is no dark gap or halo.
                 Circle()
-                    .stroke(TMColor.signal.opacity(0.45), lineWidth: 6)
-                    .frame(width: diameter + 14, height: diameter + 14)
-                    .offset(y: -7)
-                    .scaleEffect(pulse ? 1.18 : 1)
+                    .fill(TMColor.signal.opacity(0.4))
+                    .frame(width: diameter + 12, height: diameter + 12)
+                    .blur(radius: 5)
+                    .offset(y: -6)
+                    .scaleEffect(pulse ? 1.22 : 1)
                     .opacity(pulse ? 0 : 1)
+                    .allowsHitTesting(false)
             }
         }
         .overlay(alignment: .bottomTrailing) {
@@ -396,12 +400,65 @@ struct MissionPathHeader: View {
     }
 }
 
+/// Wrapping row layout that can centre each row (FlowLayout only leading-aligns).
+private struct CenteredWrap: Layout {
+    var spacing: CGFloat
+    var centered: Bool
+
+    private func rows(maxWidth: CGFloat, subviews: Subviews) -> [[(index: Int, size: CGSize)]] {
+        var result: [[(index: Int, size: CGSize)]] = [[]]
+        var width: CGFloat = 0
+        for index in subviews.indices {
+            let size = subviews[index].sizeThatFits(.unspecified)
+            let next = result[result.count - 1].isEmpty ? size.width : width + spacing + size.width
+            if !result[result.count - 1].isEmpty, next > maxWidth {
+                result.append([(index, size)])
+                width = size.width
+            } else {
+                result[result.count - 1].append((index, size))
+                width = next
+            }
+        }
+        return result
+    }
+
+    private func rowWidth(_ row: [(index: Int, size: CGSize)]) -> CGFloat {
+        row.reduce(0) { $0 + $1.size.width } + spacing * CGFloat(max(row.count - 1, 0))
+    }
+
+    private func rowHeight(_ row: [(index: Int, size: CGSize)]) -> CGFloat {
+        row.map(\.size.height).max() ?? 0
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .greatestFiniteMagnitude
+        let rows = rows(maxWidth: maxWidth, subviews: subviews)
+        let width = rows.map(rowWidth).max() ?? 0
+        let height = rows.reduce(0) { $0 + rowHeight($1) } + spacing * CGFloat(max(rows.count - 1, 0))
+        return CGSize(width: min(width, maxWidth), height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for row in rows(maxWidth: bounds.width, subviews: subviews) {
+            var x = bounds.minX + (centered ? max(bounds.width - rowWidth(row), 0) / 2 : 0)
+            for item in row {
+                subviews[item.index].place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(item.size))
+                x += item.size.width + spacing
+            }
+            y += rowHeight(row) + spacing
+        }
+    }
+}
+
 /// "What you get" chips: the rules a mission unlocks.
 struct UnlockChips: View {
     var rules: [String]
+    /// Centre every wrapped row (for centred cards).
+    var centered = false
 
     var body: some View {
-        FlowLayout(spacing: TMSpace.xs) {
+        CenteredWrap(spacing: TMSpace.xs, centered: centered) {
             ForEach(rules, id: \.self) { rule in
                 Label(rule, systemImage: "sparkles")
                     .font(.caption.weight(.semibold))

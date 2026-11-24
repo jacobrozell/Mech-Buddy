@@ -318,7 +318,7 @@ struct OnboardingFirstMissionStep: View {
                         Text(mission.isFirst ? "You’ll learn" : "Unlocks")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
-                        UnlockChips(rules: mission.introduces)
+                        UnlockChips(rules: mission.introduces, centered: true)
                     }
                 }
             } else {

@@ -531,7 +531,7 @@ Draft in `docs/release/app-store-metadata.md`:
 
 ### F3 · P1 · M — Screenshots
 
-Capture from the polished build: iPhone 6.9" and iPad 13", in light and dark. Cover Play home, the battle in movement, the shot solver with a TN shown, a crit, and Victory. Use the simulator with `-ui_testing -reset_state` plus a seeded mid-game fixture, so every capture is reproducible. Save the source PNGs under `docs/release/screenshots/` only if the owner wants them in git.
+Capture from the polished build: iPhone 6.9" and iPad 13", in light and dark. Cover Play home, the battle in movement, the shot solver with a TN shown, a crit, and Victory. Use the simulator with `-ui_testing -reset_state -skip_onboarding` plus a seeded mid-game fixture, so every capture is reproducible. Save the source PNGs under `docs/release/screenshots/` only if the owner wants them in git.
 
 ### F4 · P1 · S — IP and trademark review (owner)
 
