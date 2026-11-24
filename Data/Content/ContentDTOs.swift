@@ -196,3 +196,48 @@ public struct ScenarioCatalogItemDTO: Codable, Sendable, Identifiable {
     /// SF Symbol for the mission's node on the Play path.
     public var icon: String?
 }
+
+/// `as-box-sets.json`: the boxes a player can say they own. Unit names only, never card numbers.
+public struct BoxSetsDTO: Codable, Sendable, ContentSchemaVersioned {
+    public var schemaVersion: Int
+    public var contentVersion: String
+    public var sourceNote: String?
+    public var boxes: [BoxSetDTO]
+}
+
+public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {
+    public enum Game: String, Codable, Sendable {
+        case alphaStrike
+        case classic
+        case both
+    }
+
+    public var id: String
+    public var title: String
+    public var subtitle: String
+    public var game: Game
+    /// Miniatures in the box, vehicles included. Can be more than `units` when the list isn't confirmed.
+    public var miniCount: Int
+    /// Unit names as printed. A variant code is kept when the publisher states it.
+    public var units: [String]
+    /// Box ids this one needs to play (Mercenaries needs A Game of Armored Combat).
+    public var requires: [String]?
+    public var sourceURL: String
+    /// False when the unit list isn't confirmed: `units` is empty and the player adds them by hand.
+    public var contentsConfirmed: Bool
+
+    public init(
+        id: String, title: String, subtitle: String, game: Game, miniCount: Int,
+        units: [String], requires: [String]? = nil, sourceURL: String, contentsConfirmed: Bool
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.game = game
+        self.miniCount = miniCount
+        self.units = units
+        self.requires = requires
+        self.sourceURL = sourceURL
+        self.contentsConfirmed = contentsConfirmed
+    }
+}

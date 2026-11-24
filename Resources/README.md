@@ -13,6 +13,7 @@ Resources/Content/
     as-running-hot.json      # Mission 3: Running Hot (overheat)
     as-close-quarters.json   # Mission 4: Close Quarters (punch or kick, 3 vs 3)
     as-box-roster.json       # Eight box cards (4 with stats, 4 name/size seeds)
+    as-box-sets.json         # Boxes a player can own: unit names only, for the collection
     as-crit-table.json       # Critical 2–12
     as-rules-topics.json     # Rules browser copy
     as-getting-started.json  # Checklist items

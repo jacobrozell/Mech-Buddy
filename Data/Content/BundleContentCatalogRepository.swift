@@ -27,6 +27,8 @@ public protocol ContentCatalogRepository: Sendable {
     /// The playable mission with this id. Throws when the catalog has no bundle for it (gated or unknown).
     func scenario(id: ScenarioId) throws -> GuidedScenarioDTO
     func boxRoster() throws -> BoxRosterDTO
+    /// Boxes a player can own, for onboarding and the Force tab collection.
+    func boxSets() throws -> BoxSetsDTO
     func critTable() throws -> CritTableDTO
     func rulesTopics() throws -> RulesTopicsDTO
     func gettingStarted() throws -> GettingStartedDTO
@@ -69,6 +71,10 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
 
     public func boxRoster() throws -> BoxRosterDTO {
         try load("as-box-roster", subdirectory: "Content/AlphaStrike", as: BoxRosterDTO.self)
+    }
+
+    public func boxSets() throws -> BoxSetsDTO {
+        try load("as-box-sets", subdirectory: "Content/AlphaStrike", as: BoxSetsDTO.self)
     }
 
     public func critTable() throws -> CritTableDTO {

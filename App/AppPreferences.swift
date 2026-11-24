@@ -47,7 +47,7 @@ final class AppPreferences {
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey,
         completedMissionsKey
-    ] + OnboardingStore.ownedKeys
+    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys
 
     var hapticsEnabled: Bool {
         didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
@@ -84,6 +84,15 @@ final class AppPreferences {
         didSet { persist(Array(completedMissions).sorted(), forKey: Self.completedMissionsKey) }
     }
 
+    /// Boxes and minis the player owns. `nil` until they answer (onboarding or the Force tab);
+    /// missions only show "Your minis" once it is set. "None yet" saves an empty collection.
+    var collection: OwnedCollection? {
+        didSet {
+            guard !isReloading else { return }
+            CollectionStore.save(collection, to: defaults)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isReloading = true
@@ -95,6 +104,7 @@ final class AppPreferences {
         learningTrack = nil
         hasCompletedOnboarding = false
         completedMissions = []
+        collection = nil
         isReloading = false
         reload()
     }
@@ -132,6 +142,7 @@ final class AppPreferences {
         learningTrack = onboarding.track
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
+        collection = CollectionStore.load(from: defaults)
     }
 
     private func persistOnboarding() {
@@ -163,6 +174,12 @@ final class AppPreferences {
             next.insert(id)
         }
         gettingStartedChecks = next
+    }
+
+    /// Saves the collection and ticks "minis" on the kit screen when anything is owned.
+    func recordCollection(_ owned: OwnedCollection) {
+        collection = owned
+        gettingStartedChecks = OnboardingCollection.kitChecks(gettingStartedChecks, after: owned)
     }
 
     func applyKeepScreenAwake() {

@@ -11,6 +11,7 @@ struct ForceListView: View {
     @State private var loadError: String?
     @State private var didLoad: Bool
     @State private var selection: ForceSelection?
+    @State private var editingCollection = false
 
     init(previewUnits: [MatchUnitState]? = nil) {
         self.previewUnits = previewUnits
@@ -59,6 +60,19 @@ struct ForceListView: View {
                 isReadOnly: true
             )
         }
+        .sheet(isPresented: $editingCollection) {
+            CollectionEditSheet(
+                boxes: dependencies.boxSets,
+                initial: dependencies.preferences.collection,
+                onSave: { owned in
+                    dependencies.preferences.recordCollection(owned)
+                    dependencies.logger.info(
+                        "collection saved boxes=\(owned.boxes.count) singles=\(owned.singles.count)",
+                        category: "force"
+                    )
+                }
+            )
+        }
     }
 
     private var roster: some View {
@@ -71,6 +85,11 @@ struct ForceListView: View {
                 PVBalanceBar(
                     sideA: PlayForceMath.pointValue(of: .lanceA, in: units),
                     sideB: PlayForceMath.pointValue(of: .lanceB, in: units)
+                )
+                ForceCollectionSection(
+                    collection: dependencies.preferences.collection,
+                    boxes: dependencies.boxSets,
+                    onEdit: { editingCollection = true }
                 )
             }
             .padding(TMSpace.lg)
