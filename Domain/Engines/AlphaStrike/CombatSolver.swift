@@ -13,6 +13,8 @@ public struct CombatTableInsight: Sendable, Equatable {
     public var attackerMoveOverride: MovementMode?
     /// Bases touching: no weapon attack, only physical (rulebook p. 20).
     public var basesTouching: Bool = false
+    /// Weapon fire or a punch/kick. Physical attacks ignore range, overheat and bases touching.
+    public var attackKind: AttackKind = .weapon
 
     public init(
         rangeInches: Int = 6,
@@ -76,6 +78,9 @@ public struct CombatSolve: Sendable, Equatable {
     public var ifNaturalTwelve: CombatDamagePreview
     public var roll: DiceRoll2D6?
     public var isHit: Bool?
+    public var attackKind: AttackKind = .weapon
+
+    public var isPhysical: Bool { attackKind == .physical }
 
     public var canApply: Bool {
         cannotShootReason == nil && targetNumber != nil
@@ -97,30 +102,40 @@ public enum CombatSolver {
         defender: MatchUnitState,
         insight: CombatTableInsight,
         overheatAllowed: Bool,
+        physicalAttacksAllowed: Bool = false,
         roll: DiceRoll2D6? = nil
     ) -> CombatSolve {
         let move = insight.attackerMoveOverride
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
-        let bracket = insight.rangeBracket
+        let physical = insight.attackKind == .physical
+        // A punch or kick has no range band; .short keeps the range term at +0.
+        let bracket = physical ? .short : insight.rangeBracket
+        let verb = physical ? "attack" : "shoot"
 
         var cannot: String?
-        if !insight.canSeeTarget {
-            cannot = "You can’t shoot a ’Mech you can’t see."
+        if physical, !physicalAttacksAllowed {
+            cannot = "Punches and kicks aren’t used in this mission."
+        } else if !insight.canSeeTarget {
+            cannot = physical ? "You can’t hit a ’Mech you can’t see." : "You can’t shoot a ’Mech you can’t see."
         } else if !insight.targetInFrontArc {
-            cannot = "You can only shoot a ’Mech in front of the shooter."
+            cannot = physical
+                ? "You can only punch or kick a ’Mech in front of you."
+                : "You can only shoot a ’Mech in front of the shooter."
         } else if attacker.isShutdown {
-            cannot = "\(attacker.name) is shut down from heat, so it can’t shoot this turn."
+            cannot = "\(attacker.name) is shut down from heat, so it can’t \(verb) this turn."
         } else if !attacker.canAttackThisTurn {
             cannot = attacker.movementMode == .sprint
-                ? "\(attacker.name) sprinted, so it can’t shoot this turn."
-                : "\(attacker.name) can’t shoot right now."
+                ? "\(attacker.name) sprinted, so it can’t \(verb) this turn."
+                : "\(attacker.name) can’t \(verb) right now."
         } else if attacker.side == defender.side {
             cannot = "Pick an enemy, not a friendly 'Mech."
         } else if defender.combatStatus == .removed {
             cannot = "That 'Mech is already off the table."
-        } else if insight.basesTouching {
-            cannot = "The bases are touching, so there’s no weapon shot. Move apart first."
-        } else if let reason = noDamageReason(attacker: attacker, bracket: bracket) {
+        } else if !physical, insight.basesTouching {
+            cannot = physicalAttacksAllowed
+                ? "The bases are touching, so there’s no weapon shot. Punch or kick instead."
+                : "The bases are touching, so there’s no weapon shot. Move apart first."
+        } else if !physical, let reason = noDamageReason(attacker: attacker, bracket: bracket) {
             cannot = reason
         }
 
@@ -135,8 +150,9 @@ public enum CombatSolver {
                         targetMove: insight.targetMove,
                         woods: insight.woods,
                         partialCover: insight.partialCover,
-                        rangeInches: Double(insight.rangeInches),
-                        bracket: bracket
+                        rangeInches: physical ? nil : Double(insight.rangeInches),
+                        bracket: bracket,
+                        attackKind: insight.attackKind
                     )
                 )
             } catch SATORError.cannotAttack(let reason) {
@@ -148,20 +164,22 @@ public enum CombatSolver {
             }
         }
 
-        let delivered = AlphaStrikeDamage.delivered(
-            damageInput(
-                attacker: attacker,
-                bracket: bracket,
-                rearHit: insight.rearHit,
-                overheatUsed: AlphaStrikeHeat.usableOverheat(
-                    requested: insight.overheatUsed,
+        let delivered = physical
+            ? AlphaStrikeDamage.physical(attacker: attacker, rearHit: insight.rearHit).delivered
+            : AlphaStrikeDamage.delivered(
+                damageInput(
                     attacker: attacker,
                     bracket: bracket,
-                    overheatAllowed: overheatAllowed
-                )
-            ),
-            overheatAllowed: overheatAllowed
-        ).delivered
+                    rearHit: insight.rearHit,
+                    overheatUsed: AlphaStrikeHeat.usableOverheat(
+                        requested: insight.overheatUsed,
+                        attacker: attacker,
+                        bracket: bracket,
+                        overheatAllowed: overheatAllowed
+                    )
+                ),
+                overheatAllowed: overheatAllowed
+            ).delivered
 
         let ifHit = preview(defender: defender, amount: delivered, naturalTwelve: false)
         let ifTwelve = preview(defender: defender, amount: delivered, naturalTwelve: true)
@@ -182,7 +200,8 @@ public enum CombatSolver {
             ifHit: ifHit,
             ifNaturalTwelve: ifTwelve,
             roll: roll,
-            isHit: isHit
+            isHit: isHit,
+            attackKind: insight.attackKind
         )
     }
 
@@ -210,7 +229,8 @@ public enum CombatSolver {
         woods: Bool,
         partialCover: Bool,
         rangeInches: Double?,
-        bracket: RangeBracket
+        bracket: RangeBracket,
+        attackKind: AttackKind = .weapon
     ) -> SATORInput {
         SATORInput(
             skill: attacker.skill,
@@ -228,7 +248,8 @@ public enum CombatSolver {
                 attackerHeat: attacker.heat
             ),
             rangeInches: rangeInches,
-            rangeBracket: bracket
+            rangeBracket: bracket,
+            attackKind: attackKind
         )
     }
 

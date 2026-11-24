@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.2.0",
+  "contentVersion": "1.3.0",
   "scenarios": [
     {
       "id": "ridge-line",
@@ -52,17 +52,16 @@
     {
       "id": "close-quarters",
       "title": "Close Quarters",
-      "subtitle": "Mission 4 · 3 vs 3 · physical attacks",
+      "subtitle": "Mission 4 · 3 vs 3 · ~60 min",
       "missionNumber": 4,
       "introduces": [
         "Physical attacks",
         "3 vs 3",
         "Awesome and BattleMaster"
       ],
-      "bundle": null,
-      "release": "1.x",
-      "gated": true,
-      "comingSoonSummary": "Punches and kicks at base contact, with the Awesome and BattleMaster joining in. Lands with the physical-attack tools.",
+      "bundle": "as-close-quarters.json",
+      "release": "1.3.0",
+      "gated": false,
       "icon": "hand.raised.fill"
     },
     {

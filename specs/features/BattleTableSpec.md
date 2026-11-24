@@ -57,7 +57,7 @@ Phone landscape (`verticalSizeClass == .compact`): a horizontal unit strip besid
 
 The match log is a toolbar sheet (`as.battle.log`), titled **Match log**. It is not a collapsed section in the body.
 
-Honor `ScenarioRuleset`: Ridge Line leaves overheat and physical attacks off. The sheet does not offer those controls.
+Honor `ScenarioRuleset`: Ridge Line leaves overheat and physical attacks off. The sheet does not offer those controls. Close Quarters turns physical attacks on: the shot sheet offers Punch or kick, and the combat coach line says a ’Mech within 1″ can punch or kick instead of shooting.
 
 ### Table setup
 

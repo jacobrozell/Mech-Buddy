@@ -10,6 +10,8 @@ Resources/Content/
   AlphaStrike/
     as-ridge-line.json       # Mission 1: Ridge Line scenario + golden stats
     as-broken-ground.json    # Mission 2: Broken Ground (same four checked cards)
+    as-running-hot.json      # Mission 3: Running Hot (overheat)
+    as-close-quarters.json   # Mission 4: Close Quarters (punch or kick, 3 vs 3)
     as-box-roster.json       # Eight box cards (4 with stats, 4 name/size seeds)
     as-crit-table.json       # Critical 2–12
     as-rules-topics.json     # Rules browser copy

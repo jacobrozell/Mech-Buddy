@@ -36,12 +36,12 @@ public enum AlphaStrikeHeat {
     /// End Phase heat for one ’Mech, in rulebook order:
     /// 1. add overheat used this turn (and 1 per engine hit if it fired);
     /// 2. (standing in water −1: not tracked by the app);
-    /// 3. clear all heat if it made no weapon attack this turn;
+    /// 3. clear all heat if it made no weapon attack this turn (a punch or kick isn't one);
     /// 4. clear all heat and restart if it began this End Phase shut down.
     public static func endPhase(_ unit: inout MatchUnitState) -> Change? {
         let before = unit.heat
         let beganShutdown = unit.isShutdown
-        let fired = unit.hasAttackedThisTurn
+        let fired = unit.madeWeaponAttackThisTurn
         var heat = before
         if fired {
             heat += unit.overheatThisTurn

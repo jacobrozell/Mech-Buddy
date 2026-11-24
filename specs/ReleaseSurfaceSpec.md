@@ -12,7 +12,7 @@ Build wide internally; ship narrow. One module answers “is X reachable?”
 | Ridge Line mission | on | on | |
 | Full Lances scenario | off | on | |
 | Free Battle | **off** | on | **1.1** |
-| Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat) shows that tool inside the mission; the flag gates it everywhere else |
+| Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat; Close Quarters: physical attacks) shows that tool inside the mission; the flag gates it everywhere else |
 | Classic mode entry | **on (Coming soon)** | on | Visible teaser — not playable |
 | Classic play / tools | off | on | |
 | MUL network fetch | off | on | Paste import OK |

@@ -11,7 +11,7 @@ As a first-night player, I load Ridge Line forces, set the table from a short li
 | 1 | `ridge-line` | Ridge Line | 2v2 | ~40 min | Move, shoot, woods, damage, crits | **1.0** |
 | 2 | `broken-ground` | Broken Ground | 2v2 | ~50 min | Hills, partial cover, rear shots, jumping for position. 8 turns | 1.1 (`missionLadder`) |
 | 3 | `running-hot` | Running Hot | 2v2 | ~50 min | Overheat, heat scale, shutdown. Catapult and Thunderbolt join. 8 turns | 1.2 (`missionLadder`) |
-| 4 | `close-quarters` | Close Quarters | 3v3 | — | Physical attacks; Awesome + BattleMaster join | gated |
+| 4 | `close-quarters` | Close Quarters | 3v3 | ~60 min | Punch or kick (Standard physical attacks). Awesome + BattleMaster join. Overheat stays on. 8 turns | 1.3 (`missionLadder`) |
 | 5 | `full-lances` | Full Lances | 4v4 | ~90 min | All eight box ’Mechs, every rule, Forced Withdrawal | gated |
 
 ### Mission ladder
@@ -41,7 +41,7 @@ Missions after Ridge Line also show a **New in this mission** card (`as.mission.
 
 **Rules source:** Alpha Strike Box Set Quick-Start Rulebook (3rd printing). Answers and page numbers are in the rules intake doc.
 
-**Unblocking 4–5:** Close Quarters needs a physical-attack action (Standard only: within 1″, Size damage, no weapon attack that turn). Full Lances also needs Forced Withdrawal. Open question P5 (rear +1 on physical attacks) must be settled first.
+**Unblocking 5:** Full Lances needs Forced Withdrawal. Close Quarters shipped the physical attack (see below); question P5 is settled (rear +1 applies to punches and kicks).
 
 ### Heat (Running Hot and later)
 
@@ -66,6 +66,32 @@ Heat applies in every mission because engine hits make heat; only the Overheat p
 | Lance B | Wolverine WVR-6M, Commando COM-2D (PV 49) |
 
 One jumper per side. Victory: same rule as Ridge Line with an 8-turn cap. OV / physical / withdrawal stay off. Hills cost no extra movement in this mission (house simplification); they matter for line of sight and partial cover.
+
+### Physical attacks (Close Quarters and later)
+
+Only when `ruleset.physicalAttacksAllowed`. Standard attacks only; Charge and Death From Above are not modelled, and the copy says "not in this mission".
+
+| Rule | App |
+|------|-----|
+| Reach | Within 1″ (2″ with MEL), target in the front arc. The players judge reach; the sheet hides the range control |
+| To-hit | Skill + attacker move + target move + woods/cover. No range term, no heat, no fire-control hits (`SATORInput.attackKind == .physical`) |
+| Damage | Attacker's Size (Size + 1 with MEL), +1 rear. Weapon-hit crits don't lower it; overheat can't add to it (`AlphaStrikeDamage.physical`) |
+| One attack a turn | A punch sets `hasAttackedThisTurn`, so the 'Mech can't also shoot, and the other way round |
+| Bases touching | Blocks weapon shots only. The blocked shot says "Punch or kick instead." |
+| Criticals | Same as a weapon hit: structure damage or a natural 12 owes a roll |
+| Heat | A punch isn't a weapon attack: heat still clears that End Phase, and an engine hit adds no heat (`madeWeaponAttackThisTurn`) |
+| Log | "X hit Y for N. Rolled R, needed T. Punch or kick." / "X missed Y. Rolled R, needed T. Punch or kick. No damage." Same shape as shots, so ShotFeed and Victory stats count them |
+
+The reducer refuses a physical `SATORAttackCommand` when the ruleset keeps it off.
+
+### Close Quarters defaults
+
+| Side | Units |
+|------|-------|
+| Lance A | Awesome AWS-8Q, BattleMaster BLR-1G, Locust LCT-1V (PV 97) |
+| Lance B | Thunderbolt TDR-5S, Wolverine WVR-6M, Shadow Hawk SHD-2H (PV 98) |
+
+The two Size 4 'Mechs share one side (they also share one printed card; a table step says so). Light and medium cards alone can't match their PV (best 80), so the Thunderbolt joins Lance B. `physicalAttacksAllowed: true`, `overheatAllowed: true`, `forcedWithdrawal: false`. Victory: same as Broken Ground, 8-turn cap.
 
 ### Running Hot defaults
 
