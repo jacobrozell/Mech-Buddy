@@ -12,7 +12,7 @@ As a first-night player, I load Ridge Line forces, set the table from a short li
 | 2 | `broken-ground` | Broken Ground | 2v2 | ~50 min | Hills, partial cover, rear shots, jumping for position. 8 turns | 1.1 (`missionLadder`) |
 | 3 | `running-hot` | Running Hot | 2v2 | ~50 min | Overheat, heat scale, shutdown. Catapult and Thunderbolt join. 8 turns | 1.2 (`missionLadder`) |
 | 4 | `close-quarters` | Close Quarters | 3v3 | ~60 min | Punch or kick (Standard physical attacks). Awesome + BattleMaster join. Overheat stays on. 8 turns | 1.3 (`missionLadder`) |
-| 5 | `full-lances` | Full Lances | 4v4 | ~90 min | All eight box ’Mechs, every rule, Forced Withdrawal | gated |
+| 5 | `full-lances` | Full Lances | 4v4 | ~90 min | All eight box ’Mechs, every rule, Forced Withdrawal. 10 turns | 1.4 (`missionLadder`) |
 
 ### Mission ladder
 
@@ -41,7 +41,7 @@ Missions after Ridge Line also show a **New in this mission** card (`as.mission.
 
 **Rules source:** Alpha Strike Box Set Quick-Start Rulebook (3rd printing). Answers and page numbers are in the rules intake doc.
 
-**Unblocking 5:** Full Lances needs Forced Withdrawal. Close Quarters shipped the physical attack (see below); question P5 is settled (rear +1 applies to punches and kicks).
+**All five missions are playable** from 1.4.0, so the path's "Trained pilot" finish can be earned. Close Quarters shipped the physical attack; Full Lances shipped Forced Withdrawal (see below). Question P5 is settled (rear +1 applies to punches and kicks).
 
 ### Heat (Running Hot and later)
 
@@ -84,6 +84,30 @@ Only when `ruleset.physicalAttacksAllowed`. Standard attacks only; Charge and De
 
 The reducer refuses a physical `SATORAttackCommand` when the ruleset keeps it off.
 
+### Forced Withdrawal (Full Lances)
+
+Only when `ruleset.forcedWithdrawal`. Rulebook p. 12; rules intake §4.
+
+| Rule | App |
+|------|-----|
+| Crippled | Any one of: no armor and Structure at half its starting value, rounded up, or less (5 → 3, 7 → 4, 2 → 1); Medium and Long both 0 after weapon hits; move 0 from MP hits. `MatchUnitState.isCrippled`. A card that prints 0 Medium and 0 Long needs a weapon hit first; a heat shutdown isn't crippling |
+| Must withdraw | `MatchSession.mustWithdraw`: rule on, unit on the table, crippled. It must move toward its own edge; it needn't sprint and can still shoot or punch. The app doesn't check the direction; the players do |
+| Status | Unit cards and Unit Focus show a **Withdrawing** chip (`StatusChip.Kind.withdrawing`). Shut down, can't move, wreck and crit-owed chips outrank it. The battle screen sets `EnvironmentValues.forcedWithdrawal` so cards know the rule is on |
+| Mover card | "Crippled: move toward your own edge. You can still shoot." plus **Left the table?**, which opens Unit Focus (`as.battle.withdraw`). Not shown when the 'Mech can't move |
+| Leaving the table | Unit Focus **Forced Withdrawal** section (`as.unitFocus.leftTable`) for any 'Mech still on the table. A confirmation ("Did <name> leave the table?") comes first; only Undo puts it back. `MatchCommand.leaveTable` marks it removed and `leftTable`; it counts as destroyed for victory and the turn-cap score. Disabled with a reason mid-Movement for the other side's unmoved 'Mech or while a critical is owed |
+| Clean up | **Crippled this turn** lists `newlyCrippled` with the chip. Resolving the End Phase logs "<name> is crippled and must withdraw" once |
+| Log | "<name> is crippled and must withdraw", "<name> left the table" |
+| Victory | Roster rows say "Left the table" instead of "Wrecked"; a wipe that includes one reads "Every enemy ’Mech wrecked or withdrawn" |
+
+### Full Lances defaults
+
+| Side | Units |
+|------|-------|
+| Lance A | Awesome AWS-8Q, Thunderbolt TDR-5S, Shadow Hawk SHD-2H, Commando COM-2D (PV 122) |
+| Lance B | BattleMaster BLR-1G, Catapult CPLT-C1, Wolverine WVR-6M, Locust LCT-1V (PV 122) |
+
+All eight box 'Mechs, each on its box default side. Each lance has one 'Mech of each Size (4, 3, 2, 1) and exactly half the box's 244 PV. The Awesome and BattleMaster share one printed card and sit on opposite sides; a table step says one player reads theirs in the app. `overheatAllowed`, `physicalAttacksAllowed` and `forcedWithdrawal` all true. Victory: same type as the other missions, 10-turn cap. Coach notes teach crippled, withdrawing and Left the table.
+
 ### Close Quarters defaults
 
 | Side | Units |
@@ -114,10 +138,6 @@ Skill 4 all. Bundled AS stats (user-editable).
 **Victory (locked):** Destroy both enemy ’Mechs. If both sides still have living ’Mechs after turn **6**, higher remaining **structure** wins (tie → draw UI).  
 
 **ScenarioRuleset:** `overheatAllowed`, `physicalAttacksAllowed`, `forcedWithdrawal` = **false**. (Catalog copy must not say “cripple” for Ridge Line — that wording is Full Lances / later.)
-
-### Full Lances (planned)
-
-Forces and VP rules per walkthrough. Awesome vs BattleMaster card conflict → prompt to track one on Force roster.
 
 ## Setup screen: `as.mission.ridgeLine.setup`
 

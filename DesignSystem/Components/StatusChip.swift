@@ -17,6 +17,8 @@ struct StatusChip: View {
         case ready
         case waiting
         case lastTurn
+        /// Forced Withdrawal: crippled, so it must head for its own edge. It can still shoot.
+        case withdrawing
         /// A critical already on the card, such as "Engine ×1".
         case recordedCrit(title: String, systemImage: String)
 
@@ -59,6 +61,8 @@ struct StatusChip: View {
                 "Waits for other side"
             case .lastTurn:
                 "Last turn"
+            case .withdrawing:
+                "Withdrawing"
             case .recordedCrit(let title, _):
                 title
             }
@@ -91,6 +95,8 @@ struct StatusChip: View {
                 "scope"
             case .waiting:
                 "hourglass"
+            case .withdrawing:
+                "figure.walk.departure"
             case .recordedCrit(_, let systemImage):
                 systemImage
             }
@@ -98,7 +104,7 @@ struct StatusChip: View {
 
         fileprivate var tone: Tone {
             switch self {
-            case .critOwed, .ready, .lastTurn, .recordedCrit, .shutdown:
+            case .critOwed, .ready, .lastTurn, .recordedCrit, .shutdown, .withdrawing:
                 .warning
             case .wrecked, .wreckedDone, .missed:
                 .danger
@@ -171,6 +177,7 @@ struct StatusChip: View {
             StatusChip(kind: .missed(target: "Locust"))
             StatusChip(kind: .ready)
             StatusChip(kind: .lastTurn)
+            StatusChip(kind: .withdrawing)
         }
     }
 }

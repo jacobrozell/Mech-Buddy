@@ -1,6 +1,11 @@
 import SwiftUI
 import MechBuddyDomain
 
+extension EnvironmentValues {
+    /// The match uses Forced Withdrawal, so crippled ’Mechs show "Withdrawing". The battle screen sets it.
+    @Entry var forcedWithdrawal: Bool = false
+}
+
 struct UnitCard: View {
     var unit: MatchUnitState
     var isActiveSide: Bool
@@ -15,6 +20,8 @@ struct UnitCard: View {
     var hint: String = "Opens this ’Mech"
     var note: String?
     var action: () -> Void
+
+    @Environment(\.forcedWithdrawal) private var forcedWithdrawal
 
     var body: some View {
         Button(action: action) {
@@ -43,14 +50,14 @@ struct UnitCard: View {
     }
 
     private var spoken: String {
-        var text = Self.accessibilityLabel(for: unit)
+        var text = Self.accessibilityLabel(for: unit, forcedWithdrawal: forcedWithdrawal)
         if let note, !note.isEmpty {
             text += ", \(note)"
         }
         return text
     }
 
-    static func accessibilityLabel(for unit: MatchUnitState) -> String {
+    static func accessibilityLabel(for unit: MatchUnitState, forcedWithdrawal: Bool = false) -> String {
         var parts: [String] = [unit.name]
         if let mini = unit.mini {
             parts.append("\(mini.displayName) mini")
@@ -63,6 +70,8 @@ struct UnitCard: View {
             parts.append("Shut down from heat")
         } else if unit.isImmobile {
             parts.append("Can’t move")
+        } else if forcedWithdrawal, unit.combatStatus == .active, unit.isCrippled {
+            parts.append("Crippled, withdrawing")
         } else if unit.movementMode == .sprint {
             parts.append("Can’t shoot")
         } else if let shot = unit.turnShot {
@@ -139,7 +148,7 @@ struct ForceUnitCard: View {
             text += ", \(UnitCardBody.abilitiesLine(unit.abilities))"
         }
         if unit.combatStatus == .removed {
-            text += ", Off the table"
+            text += unit.leftTable ? ", Left the table" : ", Off the table"
         }
         return text
     }
@@ -153,6 +162,8 @@ private struct UnitCardBody: View {
     var showsAbilities: Bool = false
     var showsIdleStatus: Bool = true
     var shootingOver: Bool = false
+
+    @Environment(\.forcedWithdrawal) private var forcedWithdrawal
 
     var body: some View {
         TMCard(edgeColor: TMColor.side(unit.side), isRaised: isActiveSide) {
@@ -183,7 +194,7 @@ private struct UnitCardBody: View {
                     }
                 }
                 if unit.combatStatus == .removed {
-                    Text("Off the table")
+                    Text(unit.leftTable ? "Left the table" : "Off the table")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                 }
@@ -237,6 +248,9 @@ private struct UnitCardBody: View {
         }
         if unit.isImmobile {
             return .immobile
+        }
+        if forcedWithdrawal, unit.isCrippled {
+            return .withdrawing
         }
         if unit.movementMode == .sprint, unit.hasMovedThisTurn {
             return .sprinted

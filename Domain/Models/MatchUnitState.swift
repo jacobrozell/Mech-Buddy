@@ -159,6 +159,11 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var overheatThisTurn: Int
     /// Colour the players gave this miniature, if any.
     public var mini: MiniMarker?
+    /// It left the play area. It counts as destroyed and can't come back (rulebook p. 12).
+    /// Always paired with `combatStatus == .removed`.
+    public var leftTable: Bool
+    /// The End Phase has logged "… is crippled and must withdraw" for it (Forced Withdrawal).
+    public var withdrawalAnnounced: Bool
 
     public var pendingCritical: Bool {
         get { criticalsOwed > 0 }
@@ -200,7 +205,9 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         combatStatus: UnitCombatStatus = .active,
         criticalsOwed: Int = 0,
         overheatThisTurn: Int = 0,
-        mini: MiniMarker? = nil
+        mini: MiniMarker? = nil,
+        leftTable: Bool = false,
+        withdrawalAnnounced: Bool = false
     ) {
         self.id = id
         self.libraryUnitId = libraryUnitId
@@ -231,6 +238,8 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         self.criticalsOwed = criticalsOwed
         self.overheatThisTurn = overheatThisTurn
         self.mini = mini
+        self.leftTable = leftTable
+        self.withdrawalAnnounced = withdrawalAnnounced
     }
 
     public var remainingArmor: Int { max(0, armorCap - armorDamage) }
@@ -371,6 +380,34 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         isShutdown || motiveMV.prefix(while: { $0.isNumber }) == "0"
     }
 
+    /// Crippled (rulebook p. 12), any one of:
+    /// - no armor left and structure at half its starting value (rounded up) or less;
+    /// - Medium and Long damage both reduced to 0 by weapon hits;
+    /// - immobilized by MP critical hits.
+    /// Under Forced Withdrawal a crippled ’Mech must move toward its own edge (`MatchSession.mustWithdraw`).
+    public var isCrippled: Bool {
+        isArmorAndHalfStructureGone || areMediumAndLongGone || isImmobilizedByCrits
+    }
+
+    /// No armor left, and structure at or below half its starting value, rounded up (5 → 3, 7 → 4).
+    public var isArmorAndHalfStructureGone: Bool {
+        guard armorCap > 0 || structureCap > 0 else { return false }
+        return remainingArmor == 0 && remainingStructure <= (structureCap + 1) / 2
+    }
+
+    /// Medium and Long both 0 after weapon hits. A card that prints 0 for both was never "reduced",
+    /// so it needs a weapon hit before this counts.
+    public var areMediumAndLongGone: Bool {
+        let damage = effectiveDamage
+        guard damage.m == 0, damage.l == 0 else { return false }
+        return crits.weaponHits > 0 && (m > 0 || l > 0)
+    }
+
+    /// MP hits took its move to 0. Heat shutdown doesn't count: it restarts.
+    public var isImmobilizedByCrits: Bool {
+        crits.mpHits > 0 && motiveMV.prefix(while: { $0.isNumber }) == "0"
+    }
+
     public var legalMovementModes: [MovementMode] {
         if isImmobile { return [.standstill] }
         var modes: [MovementMode] = [.standstill, .ground, .sprint]
@@ -385,6 +422,7 @@ extension MatchUnitState {
         case armorCap, structureCap, armorDamage, structureDamage, heat, abilities, crits, combatPhaseCrits
         case movementMode, hasMovedThisTurn, hasAttackedThisTurn, turnShot, combatStatus
         case pendingCritical, criticalsOwed, overheatThisTurn, mini
+        case leftTable, withdrawalAnnounced
     }
 
     public init(from decoder: Decoder) throws {
@@ -423,6 +461,8 @@ extension MatchUnitState {
         }
         overheatThisTurn = try container.decodeIfPresent(Int.self, forKey: .overheatThisTurn) ?? 0
         mini = try container.decodeIfPresent(MiniMarker.self, forKey: .mini)
+        leftTable = try container.decodeIfPresent(Bool.self, forKey: .leftTable) ?? false
+        withdrawalAnnounced = try container.decodeIfPresent(Bool.self, forKey: .withdrawalAnnounced) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -457,5 +497,7 @@ extension MatchUnitState {
         try container.encode(pendingCritical, forKey: .pendingCritical)
         try container.encode(overheatThisTurn, forKey: .overheatThisTurn)
         try container.encodeIfPresent(mini, forKey: .mini)
+        try container.encode(leftTable, forKey: .leftTable)
+        try container.encode(withdrawalAnnounced, forKey: .withdrawalAnnounced)
     }
 }

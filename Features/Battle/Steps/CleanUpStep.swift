@@ -17,13 +17,26 @@ struct CleanUpStep: View {
         session.units.filter { $0.combatStatus == .active }
     }
 
+    /// Forced Withdrawal: crippled this turn. Next turn they head for their own edge.
+    private var crippled: [MatchUnitState] {
+        session.newlyCrippled
+    }
+
+    private var message: String {
+        if !wrecks.isEmpty {
+            return "Take wrecked ’Mechs off the table. Wrecks don’t explode or hurt anything nearby."
+        }
+        if !crippled.isEmpty {
+            return "Nothing was wrecked this turn. Crippled ’Mechs start to withdraw. Tap Next turn."
+        }
+        return "Nothing was wrecked this turn. Tap Next turn."
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
                 title: "Clean up",
-                message: wrecks.isEmpty
-                    ? "Nothing was wrecked this turn. Tap Next turn."
-                    : "Take wrecked ’Mechs off the table. Wrecks don’t explode or hurt anything nearby.",
+                message: message,
                 accessibilityIdentifier: "as.battle.table"
             )
             if !wrecks.isEmpty {
@@ -64,6 +77,9 @@ struct CleanUpStep: View {
                     }
                 }
             }
+            if !crippled.isEmpty {
+                crippledSection
+            }
             if showsUnits, !standing.isEmpty {
                 VStack(alignment: .leading, spacing: TMSpace.md) {
                     Eyebrow("Standing")
@@ -83,6 +99,25 @@ struct CleanUpStep: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var crippledSection: some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Crippled this turn")
+            ForEach(crippled) { unit in
+                FlowLayout(spacing: TMSpace.sm) {
+                    Text(unit.name)
+                        .font(TMFont.cardTitle)
+                    StatusChip(kind: .withdrawing)
+                }
+                .accessibilityElement(children: .combine)
+            }
+            Text("From next turn they must move toward their own edge. They can still shoot. Off the table counts as destroyed.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityIdentifier("as.battle.crippled")
     }
 
     private var scoreCard: some View {

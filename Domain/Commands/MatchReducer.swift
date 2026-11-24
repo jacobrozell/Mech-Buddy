@@ -23,6 +23,9 @@ public enum MatchCommand: Sendable {
     case acknowledgeDeployment
     case resolveSATOR(SATORAttackCommand)
     case applyCritical(unitId: UUID, roll: DiceRoll2D6)
+    /// The ’Mech left the play area. It counts as destroyed and can't come back (rulebook p. 12).
+    /// During Movement it is that ’Mech's move. Undo restores it like any other command.
+    case leaveTable(unitId: UUID)
     case resolveEndPhase
     case completeMatch(MatchOutcome)
 }
@@ -259,6 +262,33 @@ public enum MatchReducer {
             next.units[idx] = result.unit
             next.appendLog("Crit \(result.title) on \(result.unit.name)")
 
+        case .leaveTable(let unitId):
+            guard let idx = next.units.firstIndex(where: { $0.id == unitId }) else {
+                throw MatchDomainError.unitNotFound
+            }
+            if let reason = next.leaveTableBlockReason(next.units[idx]) {
+                throw MatchDomainError.illegalPhaseTransition(reason)
+            }
+            let movingOffNow = next.phase == .movement && !next.units[idx].hasMovedThisTurn
+            if movingOffNow {
+                next.units[idx].hasMovedThisTurn = true
+                if next.units[idx].movementMode == .unset {
+                    next.units[idx].movementMode = .ground
+                }
+            }
+            next.units[idx].leftTable = true
+            next.units[idx].combatStatus = .removed
+            next.units[idx].criticalsOwed = 0
+            if movingOffNow {
+                // It still counts in this turn's move order (AlphaStrikePhaseEngine.inMoveOrder).
+                next.activeSide = AlphaStrikePhaseEngine.nextMovementActiveSide(
+                    current: next.activeSide,
+                    units: next.units,
+                    firstToMove: next.initiativeWinner?.other
+                )
+            }
+            next.appendLog("\(next.units[idx].name) left the table")
+
         case .resolveEndPhase:
             guard next.phase == .end else {
                 throw MatchDomainError.illegalPhaseTransition("Not in end phase")
@@ -269,6 +299,11 @@ public enum MatchReducer {
             AlphaStrikePhaseEngine.removeDestroyedAtEnd(&next.units)
             for i in next.units.indices {
                 next.units[i].combatPhaseCrits = nil
+            }
+            // Forced Withdrawal: say once that a ’Mech is crippled. From now on it heads home.
+            for i in next.units.indices where next.mustWithdraw(next.units[i]) && !next.units[i].withdrawalAnnounced {
+                next.units[i].withdrawalAnnounced = true
+                next.appendLog("\(next.units[i].name) is crippled and must withdraw")
             }
             if let outcome = VictoryEvaluator.evaluateAfterEnd(session: next) {
                 next.status = .completed

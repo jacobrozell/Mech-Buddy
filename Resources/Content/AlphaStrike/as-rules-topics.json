@@ -71,6 +71,10 @@
         {
           "heading": "Don’t stack",
           "body": "You can walk through your own ’Mechs but not enemies. Two ’Mechs cannot end on top of each other — the whole base needs space."
+        },
+        {
+          "heading": "Forced Withdrawal (Full Lances on)",
+          "body": "A crippled ’Mech must move toward its own table edge every turn. It doesn’t have to sprint, and it can still shoot or punch enemies in range. Crippled means: no armor and Structure at half or less (rounded up), or Medium and Long damage both 0, or it can’t move because of MP hits. Any ’Mech that leaves the table counts as destroyed and can’t come back."
         }
       ]
     },

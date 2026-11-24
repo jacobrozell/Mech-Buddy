@@ -33,10 +33,10 @@ struct MissionLadderTests {
         }
     }
 
+    /// Full Lances was the last gated mission. Any mission gated later must still refuse to load.
     @Test("Gated missions have no pack and refuse to load")
     func gatedRefuse() throws {
         let gated = try catalog.scenarios().scenarios.filter(\.gated)
-        #expect(!gated.isEmpty)
         for item in gated {
             #expect(item.bundle == nil, "\(item.id)")
             #expect(item.comingSoonSummary?.isEmpty == false, "\(item.id)")
@@ -134,6 +134,62 @@ struct MissionLadderTests {
         let pvA = sideA.map(\.pv).reduce(0, +)
         let pvB = sideB.map(\.pv).reduce(0, +)
         #expect(abs(pvA - pvB) <= 3, "PV \(pvA) vs \(pvB)")
+    }
+
+    @Test("Every mission on the path is playable, so the finish trophy can be earned")
+    func wholePathPlayable() throws {
+        let items = try catalog.scenarios().scenarios
+        #expect(items.count == 5)
+        for item in items {
+            #expect(!item.gated, "\(item.id)")
+            #expect(item.bundle != nil, "\(item.id)")
+        }
+    }
+
+    @Test("Full Lances: all eight box 'Mechs, 4 vs 4, every rule and Forced Withdrawal on, 10 turns")
+    func fullLances() throws {
+        let entry = try #require(try catalog.scenarios().scenarios.first { $0.id == ScenarioId.fullLances.rawValue })
+        #expect(!entry.gated)
+        #expect(entry.bundle == "as-full-lances.json")
+        #expect(entry.release == "1.4.0")
+        #expect(entry.icon == "shield.lefthalf.filled")
+        #expect(entry.introduces?.contains("Forced Withdrawal") == true)
+
+        let dto = try catalog.scenario(id: .fullLances)
+        #expect(dto.missionNumber == 5)
+        #expect(dto.coachNotes?.contains { $0.contains("crippled") } == true)
+        #expect(dto.coachNotes?.contains { $0.contains("Left the table") } == true)
+        let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+        #expect(ruleset.overheatAllowed && ruleset.physicalAttacksAllowed && ruleset.forcedWithdrawal)
+        #expect(ruleset.maxTurns == 10)
+        #expect(ruleset.victory == .destroyAllEnemiesOrStructureAfterTurn(maxTurn: 10))
+
+        let units = GuidedScenarioFactory.makeUnits(from: dto)
+        let sideA = units.filter { $0.side == .lanceA }
+        let sideB = units.filter { $0.side == .lanceB }
+        #expect(sideA.count == 4 && sideB.count == 4)
+        let roster = try catalog.boxRoster().cards.map(\.name)
+        #expect(Set(units.map(\.name)) == Set(roster))
+        #expect(units.count == roster.count)
+        // One of each size per side.
+        #expect(sideA.map(\.sz).sorted() == [1, 2, 3, 4])
+        #expect(sideB.map(\.sz).sorted() == [1, 2, 3, 4])
+        let pvA = sideA.map(\.pv).reduce(0, +)
+        let pvB = sideB.map(\.pv).reduce(0, +)
+        #expect(pvA == 122 && pvB == 122, "PV \(pvA) vs \(pvB)")
+    }
+
+    @Test("Starting Full Lances records Forced Withdrawal on the session")
+    func startFullLances() throws {
+        let dto = try catalog.scenario(id: .fullLances)
+        let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+        let session = try MatchReducer.reduce(
+            MatchSession(ruleset: ruleset),
+            .startMission(scenarioId: .fullLances, ruleset: ruleset, units: GuidedScenarioFactory.makeUnits(from: dto))
+        )
+        #expect(session.ruleset.forcedWithdrawal)
+        #expect(session.units.count == 8)
+        #expect(session.newlyCrippled.isEmpty)
     }
 
     @Test("Broken Ground: new pairings, 8 turns, no overheat or melee yet")

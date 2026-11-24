@@ -319,6 +319,11 @@ final class MatchStore: Identifiable {
         return lastError == nil
     }
 
+    /// Forced Withdrawal: the ’Mech drove off the table. It counts as destroyed. Undo puts it back.
+    func leaveTable(unitId: UUID) {
+        mutate(.leaveTable(unitId: unitId), failureTitle: "Couldn’t record that")
+    }
+
     /// Autosave + dismiss — does not abandon.
     func leaveAndSave() {
         persist()
@@ -421,6 +426,10 @@ final class MatchStore: Identifiable {
         var names: [String] = []
         for unit in session.units {
             guard let before = previous.units.first(where: { $0.id == unit.id }) else { continue }
+            if unit.leftTable, !before.leftTable {
+                names.append("left the table")
+                continue
+            }
             let moveChanged = unit.movementMode != before.movementMode && unit.movementMode != .unset
             let justMoved = unit.hasMovedThisTurn && !before.hasMovedThisTurn && unit.movementMode != .unset
             if moveChanged || justMoved {

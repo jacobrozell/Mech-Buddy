@@ -51,7 +51,7 @@ public enum MovementMode: String, Codable, Sendable, CaseIterable {
 public enum UnitCombatStatus: String, Codable, Sendable {
     case active                    // on table, can act
     case destroyedPendingEnd       // structure gone; still fires until End
-    case removed                   // removed at End
+    case removed                   // removed at End, or left the table (`leftTable`)
 }
 ```
 
@@ -122,6 +122,9 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var hasMovedThisTurn: Bool
     public var hasAttackedThisTurn: Bool
     public var combatStatus: UnitCombatStatus
+    public var leftTable: Bool           // left the play area: .removed, counts as destroyed (p. 12)
+    public var withdrawalAnnounced: Bool // End Phase logged "… is crippled and must withdraw"
+    // Both decode as false when missing (saves from before Full Lances).
 }
 
 public extension MatchUnitState {
@@ -132,8 +135,27 @@ public extension MatchUnitState {
     var canFire: Bool {
         combatStatus == .active || combatStatus == .destroyedPendingEnd
     }
+    /// Crippled (rulebook p. 12), any one of:
+    /// no armor and remainingStructure <= (structureCap + 1) / 2;
+    /// effective Medium and Long both 0 after weapon hits (a card printing 0/0 needs a weapon hit first);
+    /// MP hits took its move to 0 (a heat shutdown doesn't count).
+    var isCrippled: Bool
+}
+
+public extension MatchSession {
+    /// ruleset.forcedWithdrawal && unit is .active && unit.isCrippled
+    func mustWithdraw(_ unit: MatchUnitState) -> Bool
+    /// Crippled and not yet announced (Clean up lists them).
+    var newlyCrippled: [MatchUnitState] { get }
+    /// nil when `.leaveTable` is legal: active match, unit .active, no critical owed,
+    /// and in Movement either already moved or its side's turn ("Record this on its move.").
+    func leaveTableBlockReason(_ unit: MatchUnitState) -> String?
 }
 ```
+
+**Leaving the table:** `MatchCommand.leaveTable(unitId:)` sets `leftTable`, `combatStatus = .removed`, clears owed criticals and logs "<name> left the table". It is undoable like any command. In Movement, before the unit has moved, it is that unit's move: `hasMovedThisTurn` is set and the turn passes on. `AlphaStrikePhaseEngine.inMoveOrder` keeps a unit that left on this turn's move in the move order, so alternation doesn't skip; `resetTurnFlags` clears it for the next turn. `VictoryEvaluator` counts only `.active` units, so a unit that left counts as destroyed and adds no structure to the turn-cap score.
+
+**Crippled announcement:** `.resolveEndPhase` logs "<name> is crippled and must withdraw" once per unit when `mustWithdraw`, then sets `withdrawalAnnounced`.
 
 **Library record** (`ASUnitRecord` in persistence) mirrors card fields without match-only flags (`hasMovedThisTurn`, `combatStatus`, `movementMode`). Mapping: copy card fields into `MatchUnitState` at mission start; `libraryUnitId` set when upserting from Force.
 

@@ -135,7 +135,8 @@ struct BattleFlowView: View {
                         session: session,
                         isReadOnly: false,
                         onResolveAttack: { focusFollowUp = .shot(unit.id) },
-                        onRollCrit: { focusFollowUp = .crit(unit) }
+                        onRollCrit: { focusFollowUp = .crit(unit) },
+                        onLeftTable: { store.leaveTable(unitId: unit.id) }
                     )
                 }
             }
@@ -147,6 +148,7 @@ struct BattleFlowView: View {
             } message: {
                 Text(store.lastError ?? "")
             }
+            .environment(\.forcedWithdrawal, store.session?.ruleset.forcedWithdrawal ?? false)
     }
 
     @ViewBuilder

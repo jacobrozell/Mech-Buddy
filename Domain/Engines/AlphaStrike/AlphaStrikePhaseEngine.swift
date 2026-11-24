@@ -49,6 +49,10 @@ public enum AlphaStrikePhaseEngine {
         for i in units.indices {
             // Removed wrecks keep no per-turn state; a stale turnShot leaks into later shot feeds.
             units[i].turnShot = nil
+            // A ’Mech that left the table counted in last turn's move order only.
+            if units[i].leftTable {
+                units[i].hasMovedThisTurn = false
+            }
             guard units[i].combatStatus == .active || units[i].combatStatus == .destroyedPendingEnd else {
                 continue
             }
@@ -67,6 +71,17 @@ public enum AlphaStrikePhaseEngine {
                 units[i].combatStatus = .removed
             }
         }
+    }
+
+    /// In this turn's move order: still on the table, or left it on this turn's move.
+    /// Keeps the alternation right when a ’Mech drives off mid-phase.
+    public static func inMoveOrder(_ unit: MatchUnitState) -> Bool {
+        unit.combatStatus == .active || (unit.leftTable && unit.hasMovedThisTurn)
+    }
+
+    /// Moves recorded this turn, counting a ’Mech that left the table on its move.
+    public static func movesRecorded(units: [MatchUnitState]) -> Int {
+        units.filter { inMoveOrder($0) && $0.hasMovedThisTurn }.count
     }
 
     public static func movementComplete(units: [MatchUnitState]) -> Bool {
@@ -91,7 +106,7 @@ public enum AlphaStrikePhaseEngine {
     ) -> SideId {
         if let firstToMove {
             let sequence = movementSequence(firstToMove: firstToMove, units: units)
-            let moved = units.filter { $0.combatStatus == .active && $0.hasMovedThisTurn }.count
+            let moved = movesRecorded(units: units)
             if moved < sequence.count { return sequence[moved] }
             return current
         }
@@ -104,7 +119,7 @@ public enum AlphaStrikePhaseEngine {
 
     /// The whole turn's move order by side, from this turn's starting counts.
     public static func movementSequence(firstToMove: SideId, units: [MatchUnitState]) -> [SideId] {
-        let active = units.filter { $0.combatStatus == .active }
+        let active = units.filter(inMoveOrder)
         var first = active.filter { $0.side == firstToMove }.count
         var second = active.filter { $0.side != firstToMove }.count
         var sequence: [SideId] = []
