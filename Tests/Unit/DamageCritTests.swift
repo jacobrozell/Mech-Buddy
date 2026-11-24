@@ -109,15 +109,18 @@ struct DamageCritTests {
         #expect(hawk.effectiveMV == "5\"/3\"j")
     }
 
-    @Test("Second MP hit immobilizes")
-    func secondMPImmobilizes() {
+    @Test("Second MP hit halves again, at least −2″ and −1 TMM (rulebook p. 23)")
+    func secondMPHalvesAgain() {
         var unit = freshUnit(armor: 2, structure: 2)
         unit.tmm = 2
         unit.mv = "10\""
         unit.crits.mpHit = true
         let result = AlphaStrikeCriticals.apply(to: unit, roll: DiceRoll2D6(die1: 3, die2: 4))
-        #expect(result.unit.tmm == 0)
-        #expect(result.unit.mv == "0\"")
+        #expect(result.unit.crits.mpHits == 2)
+        #expect(result.unit.effectiveMV == "2\"") // 10 → 5 → 2
+        #expect(result.unit.effectiveTMM == 0)   // 2 → 1 → 0
+        #expect(!result.unit.isImmobile)
+        #expect(result.unit.mv == "10\"")      // the card itself is untouched
     }
 
     @Test("Overheat clamped to unit OV")

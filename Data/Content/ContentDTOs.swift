@@ -30,21 +30,26 @@ public struct CapabilitiesDTO: Codable, Sendable {
     public var allowsMULPasteImport: Bool
 }
 
-public struct RidgeLineScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
+/// One ready-made guided mission (Ridge Line and the missions after it).
+public struct GuidedScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
     public var schemaVersion: Int
     public var contentVersion: String
     public var scenarioId: String
     public var title: String
     public var subtitle: String?
+    /// Place in the mission ladder, starting at 1. Omitted by older packs.
+    public var missionNumber: Int?
+    /// Short names of what this mission adds over the one before it. Empty for the first mission.
+    public var introduces: [String]?
     public var estimatedMinutes: Int?
-    public var ruleset: RidgeRulesetDTO
-    public var sides: RidgeSidesDTO
+    public var ruleset: ScenarioRulesetDTO
+    public var sides: ScenarioSidesDTO
     public var tableSteps: [String]
     public var winningSummary: String?
     public var coachNotes: [String]?
 }
 
-public struct RidgeRulesetDTO: Codable, Sendable {
+public struct ScenarioRulesetDTO: Codable, Sendable {
     public var overheatAllowed: Bool
     public var physicalAttacksAllowed: Bool
     public var forcedWithdrawal: Bool
@@ -57,12 +62,12 @@ public struct VictoryDTO: Codable, Sendable {
     public var maxTurn: Int?
 }
 
-public struct RidgeSidesDTO: Codable, Sendable {
-    public var lanceA: [RidgeUnitDTO]
-    public var lanceB: [RidgeUnitDTO]
+public struct ScenarioSidesDTO: Codable, Sendable {
+    public var lanceA: [ScenarioUnitDTO]
+    public var lanceB: [ScenarioUnitDTO]
 }
 
-public struct RidgeUnitDTO: Codable, Sendable {
+public struct ScenarioUnitDTO: Codable, Sendable {
     public var name: String
     public var pv: Int
     public var mv: String
@@ -76,6 +81,25 @@ public struct RidgeUnitDTO: Codable, Sendable {
     public var structure: Int
     public var skill: Int
     public var abilities: String
+
+    public init(
+        name: String, pv: Int, mv: String, tmm: Int, sz: Int, s: Int, m: Int, l: Int,
+        ov: Int, armor: Int, structure: Int, skill: Int, abilities: String
+    ) {
+        self.name = name
+        self.pv = pv
+        self.mv = mv
+        self.tmm = tmm
+        self.sz = sz
+        self.s = s
+        self.m = m
+        self.l = l
+        self.ov = ov
+        self.armor = armor
+        self.structure = structure
+        self.skill = skill
+        self.abilities = abilities
+    }
 }
 
 public struct BoxRosterDTO: Codable, Sendable, ContentSchemaVersioned {
@@ -161,8 +185,14 @@ public struct ScenarioCatalogItemDTO: Codable, Sendable, Identifiable {
     public var id: String
     public var title: String
     public var subtitle: String?
+    /// Place in the mission ladder, starting at 1.
+    public var missionNumber: Int?
+    /// What this mission adds over the one before it.
+    public var introduces: [String]?
     public var bundle: String?
     public var release: String?
     public var gated: Bool
     public var comingSoonSummary: String?
+    /// SF Symbol for the mission's node on the Play path.
+    public var icon: String?
 }

@@ -24,12 +24,19 @@ public protocol ContentSchemaVersioned {
 
 public protocol ContentCatalogRepository: Sendable {
     func gameModesManifest() throws -> GameModesManifestDTO
-    func ridgeLineScenario() throws -> RidgeLineScenarioDTO
+    /// The playable mission with this id. Throws when the catalog has no bundle for it (gated or unknown).
+    func scenario(id: ScenarioId) throws -> GuidedScenarioDTO
     func boxRoster() throws -> BoxRosterDTO
     func critTable() throws -> CritTableDTO
     func rulesTopics() throws -> RulesTopicsDTO
     func gettingStarted() throws -> GettingStartedDTO
     func scenarios() throws -> ScenariosCatalogDTO
+}
+
+public extension ContentCatalogRepository {
+    func ridgeLineScenario() throws -> GuidedScenarioDTO {
+        try scenario(id: .ridgeLine)
+    }
 }
 
 public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable {
@@ -47,8 +54,17 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("game-modes-manifest", subdirectory: "Content", as: GameModesManifestDTO.self)
     }
 
-    public func ridgeLineScenario() throws -> RidgeLineScenarioDTO {
-        try load("as-ridge-line", subdirectory: "Content/AlphaStrike", as: RidgeLineScenarioDTO.self)
+    public func scenario(id: ScenarioId) throws -> GuidedScenarioDTO {
+        let entry = try scenarios().scenarios.first { $0.id == id.rawValue }
+        guard let entry, !entry.gated, let bundleFile = entry.bundle else {
+            throw ContentLoadError.missingResource(id.rawValue)
+        }
+        let name = bundleFile.hasSuffix(".json") ? String(bundleFile.dropLast(5)) : bundleFile
+        let dto = try load(name, subdirectory: "Content/AlphaStrike", as: GuidedScenarioDTO.self)
+        guard dto.scenarioId == id.rawValue else {
+            throw ContentLoadError.decodingFailed("\(name): scenarioId \(dto.scenarioId) does not match \(id.rawValue)")
+        }
+        return dto
     }
 
     public func boxRoster() throws -> BoxRosterDTO {
@@ -105,15 +121,15 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
     }
 }
 
-public enum RidgeLineFactory {
-    public static func makeUnits(from scenario: RidgeLineScenarioDTO) -> [MatchUnitState] {
+public enum GuidedScenarioFactory {
+    public static func makeUnits(from scenario: GuidedScenarioDTO) -> [MatchUnitState] {
         var units: [MatchUnitState] = []
         units += scenario.sides.lanceA.map { mapUnit($0, side: .lanceA) }
         units += scenario.sides.lanceB.map { mapUnit($0, side: .lanceB) }
         return units
     }
 
-    public static func mapRuleset(_ dto: RidgeRulesetDTO) -> ScenarioRuleset {
+    public static func mapRuleset(_ dto: ScenarioRulesetDTO) -> ScenarioRuleset {
         let victory: VictoryRule
         if dto.victory.type == "destroyAllEnemiesOrStructureAfterTurn",
            let maxTurn = dto.victory.maxTurn {
@@ -130,7 +146,7 @@ public enum RidgeLineFactory {
         )
     }
 
-    private static func mapUnit(_ dto: RidgeUnitDTO, side: SideId) -> MatchUnitState {
+    private static func mapUnit(_ dto: ScenarioUnitDTO, side: SideId) -> MatchUnitState {
         MatchUnitState(
             name: dto.name,
             side: side,

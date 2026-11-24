@@ -29,7 +29,7 @@ struct CombatSolverSheet: View {
         self.store = store
         self.initialAttackerId = initialAttackerId
         let attacker = Self.openingAttacker(session: session, initial: initialAttackerId)
-        let defender = Self.openingDefender(session: session)
+        let defender = Self.openingDefender(session: session, attackerId: attacker)
         _attackerId = State(initialValue: attacker)
         _defenderId = State(initialValue: defender)
         _insight = State(initialValue: Self.openingInsight(session: session, defenderId: defender))
@@ -42,16 +42,26 @@ struct CombatSolverSheet: View {
 
     private var live: MatchSession { store.session ?? session }
 
+    /// Fire is simultaneous, so shooters come from both sides: the side that lost initiative first,
+    /// as the rulebook orders it, but nothing enforces that order.
     private var friendlies: [MatchUnitState] {
-        live.units.filter { $0.side == live.activeSide && $0.combatStatus != .removed }
+        let first = live.initiativeWinner?.other ?? live.activeSide
+        let onTable = live.units.filter { $0.combatStatus != .removed }
+        return onTable.filter { $0.side == first } + onTable.filter { $0.side != first }
     }
 
     private var shooters: [MatchUnitState] {
         friendlies.filter(\.canAttackThisTurn)
     }
 
+    /// Units on the table that can't fire right now, for the one-line "Done" note.
+    private var spentShooters: [MatchUnitState] {
+        friendlies.filter { !$0.canAttackThisTurn }
+    }
+
     private var defenders: [MatchUnitState] {
-        live.units.filter { $0.side != live.activeSide && $0.combatStatus != .removed }
+        guard let attacker else { return [] }
+        return live.units.filter { $0.side != attacker.side && $0.combatStatus != .removed }
     }
 
     private var attacker: MatchUnitState? {
@@ -117,6 +127,13 @@ struct CombatSolverSheet: View {
                     d1 = nil
                     d2 = nil
                     selectedLetter = nil
+                    insight.overheatUsed = 0
+                    // A shooter from the other side can't keep a target on its own side.
+                    if let attacker, let defender, defender.side == attacker.side {
+                        defenderId = nil
+                    } else if defenderId == nil, let only = Self.openingDefender(session: live, attackerId: attackerId) {
+                        defenderId = only
+                    }
                     restoreRange()
                 }
                 .onChange(of: insight.rangeInches) { _, inches in
@@ -162,7 +179,7 @@ struct CombatSolverSheet: View {
             Spacer()
             EmptyState(
                 systemImage: "checkmark.circle",
-                title: "\(live.activeSide.displayName) has fired everything",
+                title: "Every ’Mech has fired",
                 message: "Nothing left to shoot this turn.",
                 actionTitle: "Done shooting",
                 action: finishShooting
@@ -182,13 +199,21 @@ struct CombatSolverSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Eyebrow("Who’s shooting?") {
-                        SideBadge(side: live.activeSide)
-                    }
+                    Eyebrow("Who’s shooting?")
+                    Text("Either side, any order. Shots land at the same time.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     LazyVGrid(columns: pairColumns, spacing: TMSpace.sm) {
-                        ForEach(friendlies) { unit in
+                        ForEach(shooters) { unit in
                             shooterCard(unit)
                         }
+                    }
+                    if !spentShooters.isEmpty {
+                        Text("Done: " + spentShooters.map { "\(PlayForceMath.shortName($0.name)) (\(unavailableReason($0)?.lowercased() ?? "can’t shoot"))" }.joined(separator: " · "))
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .accessibilityElement(children: .contain)
@@ -196,10 +221,12 @@ struct CombatSolverSheet: View {
                 .accessibilityLabel("Who’s shooting?")
 
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Eyebrow("At which target?") {
-                        SideBadge(side: live.activeSide.other)
-                    }
-                    if defenders.isEmpty {
+                    Eyebrow("At which target?")
+                    if attacker == nil {
+                        Text("Pick a shooter first.")
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                    } else if defenders.isEmpty {
                         Text("No enemy ’Mechs left on the table.")
                             .font(TMFont.detail)
                             .foregroundStyle(.secondary)
@@ -291,6 +318,9 @@ struct CombatSolverSheet: View {
                     rangeControl
                     targetMovedControl(defender)
                     conditions
+                    if live.ruleset.overheatAllowed, attacker.ov > 0 {
+                        overheatControl(attacker)
+                    }
                     if gaugeBesideDice {
                         compactRoll(solve)
                     } else if solve.cannotShootReason == nil {
@@ -417,9 +447,10 @@ struct CombatSolverSheet: View {
                     .accessibilityIdentifier("as.sator.range")
             } else {
                 Picker("Range", selection: rangeBand) {
-                    Text("0–6″").tag(RangeBracket.short)
-                    Text("6–24″").tag(RangeBracket.medium)
-                    Text("24–42″").tag(RangeBracket.long)
+                    // Rulebook bands: up to 6″, over 6″ to 24″, over 24″ to 42″. The old labels overlapped at 6 and 24.
+                    Text("≤6″").tag(RangeBracket.short)
+                    Text(">6–24″").tag(RangeBracket.medium)
+                    Text(">24–42″").tag(RangeBracket.long)
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("as.sator.range")
@@ -546,10 +577,69 @@ struct CombatSolverSheet: View {
                         isOn: behindShooter,
                         hint: "The target is outside the miniature’s front, so this shot is not allowed."
                     )
+                    chipToggle(
+                        "Bases touching",
+                        isOn: $insight.basesTouching,
+                        hint: "’Mechs in base contact can’t make weapon attacks."
+                    )
                 }
                 .padding(.top, TMSpace.sm)
             }
         }
+    }
+
+    /// Overheat: only in missions that turn it on, only for cards with OV. Declared before the roll.
+    private func overheatControl(_ attacker: MatchUnitState) -> some View {
+        let usable = AlphaStrikeHeat.usableOverheat(
+            requested: attacker.ov,
+            attacker: attacker,
+            bracket: insight.rangeBracket,
+            overheatAllowed: true
+        )
+        let chosen = min(insight.overheatUsed, usable)
+        return VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Overheat")
+            if usable == 0 {
+                Text(insight.rangeBracket == .long
+                     ? "Overheat only adds damage at short and medium range."
+                     : "No overheat on this shot.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Picker("Overheat", selection: overheatBinding(max: usable)) {
+                    Text("None").tag(0)
+                    ForEach(1...usable, id: \.self) { points in
+                        Text("+\(points) damage").tag(points)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("as.sator.overheat")
+                Text(overheatExplainer(attacker, points: chosen))
+                    .font(TMFont.detail)
+                    .foregroundStyle(chosen > 0 ? .primary : .secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func overheatBinding(max usable: Int) -> Binding<Int> {
+        Binding(
+            get: { min(insight.overheatUsed, usable) },
+            set: { insight.overheatUsed = Swift.max(0, Swift.min($0, usable)) }
+        )
+    }
+
+    private func overheatExplainer(_ attacker: MatchUnitState, points: Int) -> String {
+        guard points > 0 else {
+            return "Push \(attacker.name) past safe limits for extra damage. Decide before you roll."
+        }
+        let after = Swift.min(AlphaStrikeHeat.shutdownLevel, attacker.heat + points)
+        if after >= AlphaStrikeHeat.shutdownLevel {
+            return "Heat goes to \(after) in the End Phase: \(attacker.name) shuts down next turn. No move, no shot, and it’s easy to hit."
+        }
+        let tmm = after >= 2 ? ", and it’s 1 easier to hit unless it jumps" : ""
+        return "Heat goes to \(after) in the End Phase, hit or miss. Next turn: +\(after) to its shots and \(2 * after)″ less ground move\(tmm). Skip a turn of shooting to cool off."
     }
 
     private var cannotSeeTarget: Binding<Bool> {
@@ -643,7 +733,8 @@ struct CombatSolverSheet: View {
             targetMove: insight.targetMove,
             woods: insight.woods,
             partialCover: insight.partialCover,
-            rearHit: insight.rearHit
+            rearHit: insight.rearHit,
+            overheatUsed: insight.overheatUsed
         ) {
             dismiss()
         } else {
@@ -652,7 +743,7 @@ struct CombatSolverSheet: View {
     }
 
     private func finishShooting() {
-        store.finishCombatSide()
+        store.finishCombat()
         if store.lastError == nil {
             dismiss()
         }
@@ -684,6 +775,7 @@ struct CombatSolverSheet: View {
 
     private func unavailableReason(_ unit: MatchUnitState) -> String? {
         if unit.canAttackThisTurn { return nil }
+        if unit.isShutdown { return "Shut down from heat" }
         if unit.hasAttackedThisTurn { return "Already shot" }
         if unit.movementMode == .sprint { return "Sprinted, can’t shoot" }
         return "Can’t shoot"
@@ -691,6 +783,7 @@ struct CombatSolverSheet: View {
 
     private func targetCaption(_ unit: MatchUnitState) -> String {
         if unit.combatStatus == .destroyedPendingEnd { return "Already wrecked" }
+        if unit.isShutdown { return "Shut down, easy to hit" }
         if unit.isImmobile { return "Can’t move" }
         if unit.hasMovedThisTurn, unit.movementMode != .unset {
             return "Moved: \(unit.movementMode.displayName)"
@@ -752,16 +845,17 @@ struct CombatSolverSheet: View {
     }
 
     private static func openingAttacker(session: MatchSession, initial: UUID?) -> UUID? {
-        let attackers = session.units.filter { $0.side == session.activeSide && $0.canAttackThisTurn }
+        let attackers = session.units.filter(\.canAttackThisTurn)
         if let initial, attackers.contains(where: { $0.id == initial }) {
             return initial
         }
         return attackers.count == 1 ? attackers[0].id : nil
     }
 
-    private static func openingDefender(session: MatchSession) -> UUID? {
+    private static func openingDefender(session: MatchSession, attackerId: UUID?) -> UUID? {
+        guard let attacker = session.units.first(where: { $0.id == attackerId }) else { return nil }
         let defenders = session.units.filter {
-            $0.side != session.activeSide && $0.combatStatus != .removed
+            $0.side != attacker.side && $0.combatStatus != .removed
         }
         return defenders.count == 1 ? defenders[0].id : nil
     }

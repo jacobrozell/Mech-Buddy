@@ -11,6 +11,8 @@ public struct CombatTableInsight: Sendable, Equatable {
     public var canSeeTarget: Bool
     public var targetInFrontArc: Bool
     public var attackerMoveOverride: MovementMode?
+    /// Bases touching: no weapon attack, only physical (rulebook p. 20).
+    public var basesTouching: Bool = false
 
     public init(
         rangeInches: Int = 6,
@@ -106,6 +108,8 @@ public enum CombatSolver {
             cannot = "You can’t shoot a ’Mech you can’t see."
         } else if !insight.targetInFrontArc {
             cannot = "You can only shoot a ’Mech in front of the shooter."
+        } else if attacker.isShutdown {
+            cannot = "\(attacker.name) is shut down from heat, so it can’t shoot this turn."
         } else if !attacker.canAttackThisTurn {
             cannot = attacker.movementMode == .sprint
                 ? "\(attacker.name) sprinted, so it can’t shoot this turn."
@@ -114,6 +118,10 @@ public enum CombatSolver {
             cannot = "Pick an enemy, not a friendly 'Mech."
         } else if defender.combatStatus == .removed {
             cannot = "That 'Mech is already off the table."
+        } else if insight.basesTouching {
+            cannot = "The bases are touching, so there’s no weapon shot. Move apart first."
+        } else if let reason = noDamageReason(attacker: attacker, bracket: bracket) {
+            cannot = reason
         }
 
         var tn: TargetNumber?
@@ -145,7 +153,12 @@ public enum CombatSolver {
                 attacker: attacker,
                 bracket: bracket,
                 rearHit: insight.rearHit,
-                overheatUsed: insight.overheatUsed
+                overheatUsed: AlphaStrikeHeat.usableOverheat(
+                    requested: insight.overheatUsed,
+                    attacker: attacker,
+                    bracket: bracket,
+                    overheatAllowed: overheatAllowed
+                )
             ),
             overheatAllowed: overheatAllowed
         ).delivered
@@ -173,6 +186,22 @@ public enum CombatSolver {
         )
     }
 
+    /// A range where the card does no damage ("—" or 0) has no weapon attack (rulebook p. 20).
+    /// "0*" minimal damage isn't stored on cards yet; every shipped 0 is treated as no damage.
+    public static func noDamageReason(attacker: MatchUnitState, bracket: RangeBracket) -> String? {
+        let damage = attacker.firingDamage
+        let value: Int
+        let name: String
+        switch bracket {
+        case .short: value = damage.s; name = "short"
+        case .medium: value = damage.m; name = "medium"
+        case .long: value = damage.l; name = "long"
+        case .outOfRange: return nil
+        }
+        guard value == 0 else { return nil }
+        return "\(attacker.name) does no damage at \(name) range, so it has no shot there."
+    }
+
     static func satorInput(
         attacker: MatchUnitState,
         defender: MatchUnitState,
@@ -187,7 +216,10 @@ public enum CombatSolver {
             skill: attacker.skill,
             attackerMove: attackerMove,
             targetMove: targetMove,
-            targetTMM: defender.firingTMM,
+            // Heat 2+ costs the target 1 TMM, except when it jumped.
+            targetTMM: targetMove == .jumpedUsesTMMPlus1
+                ? max(0, defender.firingTMM + defender.jumpTMMAdjustment)
+                : max(0, defender.firingTMM - defender.heatTMMPenalty),
             other: OtherModifiers(
                 woods: woods,
                 partialCover: partialCover,

@@ -17,34 +17,24 @@ struct CombatStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
-                title: "\(session.activeSide.displayName) shoots",
-                message: "Measure to the target, then solve a shot. \(otherSideLine)",
-                side: session.activeSide,
+                title: "Both sides shoot",
+                message: "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
                 accessibilityIdentifier: "as.battle.table"
             )
             shotFeed
             if showsUnits {
-                unitGroup(
-                    title: "Shooters — \(session.activeSide.displayName)",
-                    units: visible(session.activeSide),
-                    offersShoot: true
-                )
-                unitGroup(
-                    title: "Targets — \(session.activeSide.other.displayName) · \(otherSuffix)",
-                    units: visible(session.activeSide.other),
-                    offersShoot: false
-                )
+                ForEach(sideOrder, id: \.self) { side in
+                    unitGroup(side: side, units: visible(side))
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var otherSuffix: String {
-        session.initiativeWinner == session.activeSide ? "already fired" : "fires next"
-    }
-
-    private var otherSideLine: String {
-        "\(session.activeSide.other.displayName) \(otherSuffix)."
+    /// The side that lost initiative first, as the rulebook lists it. Either may shoot first.
+    private var sideOrder: [SideId] {
+        let first = session.initiativeWinner?.other ?? session.activeSide
+        return [first, first.other]
     }
 
     private func visible(_ side: SideId) -> [MatchUnitState] {
@@ -53,7 +43,8 @@ struct CombatStep: View {
 
     @ViewBuilder
     private var shotFeed: some View {
-        if !shots.isEmpty {
+        let crits = ShotFeed.crits(in: session)
+        if !shots.isEmpty || !crits.isEmpty {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
                 Eyebrow("Shot feed")
                 let visibleShots = showEarlierShots || shots.count <= 3 ? shots : Array(shots.suffix(3))
@@ -66,6 +57,13 @@ struct CombatStep: View {
                     }
                     .font(TMFont.detail.weight(.semibold))
                     .frame(minHeight: 44)
+                }
+                ForEach(Array(crits.enumerated()), id: \.offset) { _, crit in
+                    Label("Critical: \(crit)", systemImage: "exclamationmark.triangle.fill")
+                        .font(TMFont.detail)
+                        .foregroundStyle(TMColor.warning)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.battle.shot.crit")
                 }
             }
         }
@@ -98,14 +96,21 @@ struct CombatStep: View {
         return "\(row.shooter) missed \(row.shot.targetName)"
     }
 
-    private func unitGroup(title: String, units: [MatchUnitState], offersShoot: Bool) -> some View {
-        VStack(alignment: .leading, spacing: TMSpace.md) {
-            Eyebrow(title)
+    private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {
+        let left = units.filter(\.canAttackThisTurn).count
+        return VStack(alignment: .leading, spacing: TMSpace.md) {
+            Eyebrow(side.displayName) {
+                Text(left == 0 ? "All fired" : "\(left) to fire")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            .accessibilityIdentifier("as.battle.shooters.\(side.rawValue)")
             ForEach(units) { unit in
                 BattleUnitRow(
                     unit: unit,
-                    isActiveSide: unit.side == session.activeSide,
-                    offersShoot: offersShoot && unit.canAttackThisTurn,
+                    isActiveSide: unit.canAttackThisTurn,
+                    offersShoot: unit.canAttackThisTurn,
                     landingUnitID: landingUnitID,
                     onOpenUnit: { onOpenUnit(unit) },
                     onShoot: { onShoot(unit) }

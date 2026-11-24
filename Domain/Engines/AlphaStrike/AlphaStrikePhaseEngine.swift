@@ -81,16 +81,47 @@ public enum AlphaStrikePhaseEngine {
         }
     }
 
-    /// v1 hotseat: after a move, flip to the other side when it still has units to move.
-    public static func nextMovementActiveSide(current: SideId, units: [MatchUnitState]) -> SideId {
+    /// Who moves after this move. Sides alternate, but before each pair of moves a side with at least
+    /// twice as many 'Mechs left to move moves that multiple at once (rulebook p. 14).
+    /// `firstToMove` is the initiative loser. Nil falls back to plain alternation.
+    public static func nextMovementActiveSide(
+        current: SideId,
+        units: [MatchUnitState],
+        firstToMove: SideId? = nil
+    ) -> SideId {
+        if let firstToMove {
+            let sequence = movementSequence(firstToMove: firstToMove, units: units)
+            let moved = units.filter { $0.combatStatus == .active && $0.hasMovedThisTurn }.count
+            if moved < sequence.count { return sequence[moved] }
+            return current
+        }
         let other = current.other
         if !unitsNeedingMove(side: other, units: units).isEmpty {
             return other
         }
-        if !unitsNeedingMove(side: current, units: units).isEmpty {
-            return current
-        }
         return current
+    }
+
+    /// The whole turn's move order by side, from this turn's starting counts.
+    public static func movementSequence(firstToMove: SideId, units: [MatchUnitState]) -> [SideId] {
+        let active = units.filter { $0.combatStatus == .active }
+        var first = active.filter { $0.side == firstToMove }.count
+        var second = active.filter { $0.side != firstToMove }.count
+        var sequence: [SideId] = []
+        func batch(_ mine: Int, _ theirs: Int) -> Int {
+            guard mine > 0 else { return 0 }
+            guard theirs > 0 else { return mine }
+            return mine >= 2 * theirs ? mine / theirs : 1
+        }
+        while first > 0 || second > 0 {
+            let firstBatch = batch(first, second)
+            let secondBatch = batch(second, first)
+            sequence += Array(repeating: firstToMove, count: firstBatch)
+            sequence += Array(repeating: firstToMove.other, count: secondBatch)
+            first -= firstBatch
+            second -= secondBatch
+        }
+        return sequence
     }
 
     public static func hasPendingCriticals(units: [MatchUnitState]) -> Bool {

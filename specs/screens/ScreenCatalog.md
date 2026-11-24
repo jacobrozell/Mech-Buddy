@@ -9,7 +9,7 @@ Root tabs
 ├── Play
 │   ├── Mode picker (if >1 reachable mode)
 │   ├── Mode home
-│   ├── Getting Started
+│   ├── Onboarding (first run, full-screen cover)
 │   ├── Scenario catalog
 │   ├── Guided mission setup
 │   ├── Battle table (+ sheets)
@@ -47,6 +47,7 @@ Root tabs
 | `play.modePicker` | Choose Alpha Strike or Classic | Screen | Pick ruleset | Classic gated |
 | `play.resumeBanner` | Resume in-progress match | `ResumeCard` on Play | Continue | MVP |
 | `play.classicComingSoon` | Classic BattleTech row on Play | Row | Opens the coming-soon sheet | MVP |
+| `play.classicSpotlight` | Classic card above the path when Classic was picked in onboarding | Card | Says it’s coming; points at Alpha Strike; Change game | MVP |
 | `play.matchHistory` | Past matches list | Screen | Review | Planned |
 | `play.matchDetail` | Match summary | Screen | Review | Planned |
 
@@ -57,8 +58,9 @@ Root tabs
 | ID | Screen | Type | Maps from HTML | Spec |
 |----|--------|------|----------------|------|
 | `as.modeHome` | Alpha Strike home | Screen | (new) | ModeHome |
-| `as.gettingStarted` | Pre-game checklist + sample card | Push from Play | Set up | GettingStarted |
-| `as.howToPlay` | Ridge Line app-flow walkthrough | Push from Play | (new) | ModeHome |
+| `onboarding.screen` | First-run flow: welcome, pick a game, what you have, first mission | Full-screen cover from root | Set up | [Onboarding](../features/OnboardingSpec.md) |
+| `as.howToPlay` | Ridge Line app-flow walkthrough plus reading a unit card | Push from Play | (new) | ModeHome |
+| `as.modeHome.missionSheet` | Mission objective, what you’ll learn, tips, forces | Sheet from the path | (new) | GuidedMission |
 | `as.scenarios` | First games catalog | Screen | First games | GuidedMission |
 | `as.mission.setup` | Table setup, first step of the battle cover. Stage id on that step is `as.ridge.tablePrep`. Checks are session-local and do not block Start battle | Step | Mission setup | BattleTable |
 | `as.mission.ridgeLine.setup` | Same step as `as.mission.setup` for Ridge Line | Step | Mission steps 1–2 | GuidedMission |
@@ -131,7 +133,7 @@ Root tabs
 
 | ID | Screen | Type | Spec |
 |----|--------|------|------|
-| `settings.home` | Dice default, haptics, keep screen awake, theme, about, legal, delete | Screen | Settings |
+| `settings.home` | Dice default, haptics, keep screen awake, theme, your game, how to play, about, legal, delete | Screen | Settings |
 | `settings.legal` | Privacy / support / accessibility / disclaimer | Links | Settings |
 | `settings.deleteAll` | Delete saved games, with a confirm dialog | Button | Settings |
 
@@ -154,7 +156,7 @@ Root tabs
 | HTML tab | Mobile destination |
 |----------|-------------------|
 | Mission | `as.mission.*.setup` + `as.battle` |
-| Set up | `as.gettingStarted` |
+| Set up | `onboarding.screen` (kit step) + `as.howToPlay` |
 | The turn | `rules.as.turn` + battle phase dock prompts |
 | Move | `rules.as.movement` + `as.moveCoach` |
 | Shoot | `as.sator` sheet from battle |

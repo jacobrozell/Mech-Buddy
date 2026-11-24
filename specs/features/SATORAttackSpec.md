@@ -49,7 +49,7 @@ Chips, off until tapped: **Woods**, **Partial cover**, **Rear shot**.
 | Can’t see the target | Blocks the shot (no line of sight) |
 | Behind the shooter | Blocks the shot (outside the front arc) |
 
-The helper line under More says to leave them off for a normal shot. Charge/DFA and overheat stay at the resolver defaults (off / 0) on this sheet. Heat, stealth, and fire-control hits are read from the units and show up in the summary chips when they change the TN.
+The helper line under More says to leave them off for a normal shot. Charge/DFA stay off on this sheet. Overheat has its own **Overheat** picker (`as.sator.overheat`) under Conditions, shown only when `ruleset.overheatAllowed` and the attacker has OV (see GuidedMissionSpec, Heat). Heat, stealth, and fire-control hits are read from the units and show up in the summary chips when they change the TN.
 
 ### Range and target move
 
@@ -120,7 +120,7 @@ base = damage for active bracket (S/M/L field)
 delivered = base + (rearHit ? 1 : 0) + overheatUsed
 ```
 
-`overheatUsed` only if `ruleset.overheatAllowed` and bracket is short/medium, or long when card has OVL (`ovlAllowsLong`). Ridge Line: always 0 UI.
+`overheatUsed` only if `ruleset.overheatAllowed` and bracket is short/medium, or long when card has OVL (`ovlAllowsLong`). Ridge Line and Broken Ground: always 0, no picker. The reducer clamps to what is legal (`AlphaStrikeHeat.usableOverheat`) and records it as `overheatThisTurn`; it becomes heat in the End Phase.
 
 ### Apply damage
 

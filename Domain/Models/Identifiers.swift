@@ -11,6 +11,9 @@ public struct ScenarioId: RawRepresentable, Hashable, Codable, Sendable {
     public let rawValue: String
     public init(rawValue: String) { self.rawValue = rawValue }
     public static let ridgeLine = ScenarioId(rawValue: "ridge-line")
+    public static let brokenGround = ScenarioId(rawValue: "broken-ground")
+    public static let runningHot = ScenarioId(rawValue: "running-hot")
+    public static let closeQuarters = ScenarioId(rawValue: "close-quarters")
     public static let fullLances = ScenarioId(rawValue: "full-lances")
 }
 

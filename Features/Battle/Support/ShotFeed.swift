@@ -28,6 +28,13 @@ enum ShotFeed {
         }
     }
 
+    /// Critical hits rolled this turn's combat phase, oldest first ("Weapon hit on Commando COM-2D").
+    static func crits(in session: MatchSession) -> [String] {
+        session.eventLog
+            .filter { $0.turn == session.turn && $0.phase == .combat && $0.message.hasPrefix("Crit ") }
+            .map { String($0.message.dropFirst("Crit ".count)) }
+    }
+
     static func signature(shooter: String, shot: TurnShot) -> String {
         if shot.hit {
             return "\(shooter) hit \(shot.targetName) for \(shot.damage). Rolled \(shot.total), needed \(shot.targetNumber)."

@@ -1,23 +1,85 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "1.2.0",
   "scenarios": [
     {
       "id": "ridge-line",
       "title": "Ridge Line",
       "subtitle": "Beginner · 2 vs 2 · ~40 min",
+      "missionNumber": 1,
+      "introduces": [
+        "Moving",
+        "Shooting",
+        "Woods",
+        "Criticals"
+      ],
       "bundle": "as-ridge-line.json",
       "release": "1.0.0",
-      "gated": false
+      "gated": false,
+      "icon": "scope"
+    },
+    {
+      "id": "broken-ground",
+      "title": "Broken Ground",
+      "subtitle": "Mission 2 · 2 vs 2 · ~50 min",
+      "missionNumber": 2,
+      "introduces": [
+        "Hills",
+        "Partial cover",
+        "Rear shots",
+        "Jumping for position"
+      ],
+      "bundle": "as-broken-ground.json",
+      "release": "1.1.0",
+      "gated": false,
+      "icon": "mountain.2.fill"
+    },
+    {
+      "id": "running-hot",
+      "title": "Running Hot",
+      "subtitle": "Mission 3 · 2 vs 2 · ~50 min",
+      "missionNumber": 3,
+      "introduces": [
+        "Overheat",
+        "Heat scale",
+        "Shutdown"
+      ],
+      "bundle": "as-running-hot.json",
+      "release": "1.2.0",
+      "gated": false,
+      "icon": "flame.fill"
+    },
+    {
+      "id": "close-quarters",
+      "title": "Close Quarters",
+      "subtitle": "Mission 4 · 3 vs 3 · physical attacks",
+      "missionNumber": 4,
+      "introduces": [
+        "Physical attacks",
+        "3 vs 3",
+        "Awesome and BattleMaster"
+      ],
+      "bundle": null,
+      "release": "1.x",
+      "gated": true,
+      "comingSoonSummary": "Punches and kicks at base contact, with the Awesome and BattleMaster joining in. Lands with the physical-attack tools.",
+      "icon": "hand.raised.fill"
     },
     {
       "id": "full-lances",
       "title": "Full Lances",
-      "subtitle": "4 v 4 · ~90 min",
+      "subtitle": "Mission 5 · 4 v 4 · ~90 min",
+      "missionNumber": 5,
+      "introduces": [
+        "All eight box 'Mechs",
+        "Forced Withdrawal",
+        "Every rule on"
+      ],
       "bundle": null,
       "release": "1.x",
       "gated": true,
-      "comingSoonSummary": "Full lances with overheating, physical attacks, and Forced Withdrawal. Content pack lands with the 1.x gate."
+      "comingSoonSummary": "A full Alpha Strike match: every 'Mech in the box, overheating, physical attacks, and Forced Withdrawal. Content pack lands with the 1.x gate.",
+      "icon": "shield.lefthalf.filled"
     }
   ]
 }

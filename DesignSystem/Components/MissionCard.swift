@@ -14,6 +14,8 @@ struct MissionCard: View {
     var facts: [MissionFact]
     var sideANames: [String]
     var sideBNames: [String]
+    /// Rules this mission adds over the one before. Hidden when empty (Ridge Line).
+    var newRules: [String] = []
     var primaryTitle: String
     var primaryIdentifier: String?
     /// Bordered-prominent when true. Bordered when a resume card already owns the screen.
@@ -30,6 +32,17 @@ struct MissionCard: View {
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            if !newRules.isEmpty {
+                Label {
+                    Text("New: \(newRules.joined(separator: ", "))")
+                        .fixedSize(horizontal: false, vertical: true)
+                } icon: {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(TMColor.signal)
+                }
+                .font(TMFont.detail.weight(.semibold))
+                .accessibilityLabel("New in this mission: \(newRules.joined(separator: ", "))")
+            }
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: TMSpace.md) { factRow }
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading, spacing: TMSpace.sm) {
@@ -145,8 +158,7 @@ struct MissionCard: View {
             primaryIdentifier: "as.modeHome.ridgeLine",
             primaryAction: {},
             secondaryLinks: [
-                (title: "How to play", identifier: "as.modeHome.howToPlay", action: {}),
-                (title: "New here?", identifier: "as.modeHome.gettingStarted", action: {})
+                (title: "How to play", identifier: "as.modeHome.howToPlay", action: {})
             ]
         )
     }

@@ -11,9 +11,10 @@ Screen map locked; deep rules engine deferred until Alpha Strike vertical slice 
 
 | Surface | Behavior |
 |---------|----------|
-| Mode picker / Play | Classic row with **Coming soon** badge |
+| Onboarding | Track question offers Classic with a **Coming soon** badge and an honest “start with Alpha Strike” note ([OnboardingSpec](OnboardingSpec.md)) |
+| Mode picker / Play | Classic row with **Coming soon** badge. If Classic was picked in onboarding: a larger spotlight card above the Alpha Strike path instead |
 | Tap | Info sheet — copy in [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md). Does not start Classic. The badge stays one line; the row stacks at large type. |
-| A11y | `play.classicComingSoon`, `classic.comingSoon.sheet`, `classic.comingSoon.playAS` |
+| A11y | `play.classicComingSoon`, `play.classicSpotlight`, `onboarding.track.classic`, `classic.comingSoon.sheet`, `classic.comingSoon.playAS` |
 | Force / Rules Classic | Not shown until tools ungated |
 
 ## Play engine

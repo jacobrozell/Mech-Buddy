@@ -51,9 +51,13 @@ public enum AlphaStrikeCriticals {
 
         switch id {
         case .ammo:
-            if updated.hasAmmoImmunity {
-                // Survives; CASE/ENE
-            } else {
+            switch updated.ammoProtection {
+            case .full:
+                break // CASEII / ENE: no effect.
+            case .caseOne:
+                // CASE: 1 extra damage; if it reaches structure, roll again (rulebook p. 23).
+                updated = AlphaStrikeDamage.apply(to: updated, amount: 1, naturalTwelveHit: false).unit
+            case .none:
                 updated.crits.ammoExploded = true
                 updated.crits.destroyedByCrit = true
                 if updated.combatStatus == .active {
@@ -73,14 +77,18 @@ public enum AlphaStrikeCriticals {
         case .none:
             break
         case .weapon:
-            updated.crits.weaponHits += 1
-        case .mp:
-            if updated.crits.mpHit {
-                // Second MP hit immobilizes (TMM 0, no MV).
-                updated.tmm = 0
-                updated.mv = "0\""
+            let damage = updated.effectiveDamage
+            if damage.s == 0 && damage.m == 0 && damage.l == 0 {
+                updated = extraDamage(updated)
             } else {
-                updated.crits.mpHit = true
+                updated.crits.weaponHits += 1
+            }
+        case .mp:
+            if updated.motiveMV.prefix(while: { $0.isNumber }) == "0" {
+                updated = extraDamage(updated)
+            } else {
+                // Each MP hit halves move and TMM again (MPHitMath); 0″ makes it immobile.
+                updated.crits.mpHits += 1
             }
         case .destroyed:
             updated.crits.destroyedByCrit = true
@@ -90,5 +98,13 @@ public enum AlphaStrikeCriticals {
         }
 
         return CritApplyResult(unit: updated, resultId: id, title: title(for: id))
+    }
+
+    /// A crit whose effect can't apply deals 1 damage instead, with no further crit roll (p. 23).
+    private static func extraDamage(_ unit: MatchUnitState) -> MatchUnitState {
+        let owedBefore = unit.criticalsOwed
+        var hit = AlphaStrikeDamage.apply(to: unit, amount: 1, naturalTwelveHit: false).unit
+        hit.criticalsOwed = owedBefore
+        return hit
     }
 }

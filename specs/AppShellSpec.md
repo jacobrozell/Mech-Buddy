@@ -27,13 +27,14 @@ play.home
   ├─ Resume (if active MatchSession) → fullScreenCover as.battle
   ├─ Play Ridge Line → fullScreenCover as.battle
   ├─ How to play → push (as.howToPlay)
-  ├─ New here? → push (as.gettingStarted)
+  ├─ Mission node / info → sheet (as.modeHome.missionSheet)
+  ├─ Classic spotlight → Change game → fullScreenCover (onboarding)
   └─ Classic BattleTech → sheet (classic.modeHome)
 ```
 
-How to play and Getting Started are `navigationDestination` pushes from Play, so the tab bar stays. Settings repeats both as `NavigationLink` pushes. Classic is `ClassicComingSoonSheet` at a medium detent, identifier `classic.modeHome`, with `classic.comingSoon.playAS` starting Ridge Line after the sheet closes. The Play row is `play.classicComingSoon`.
+How to play is a `navigationDestination` push from Play, so the tab bar stays. Settings repeats it as a `NavigationLink` push. Classic is `ClassicComingSoonSheet` at a medium detent, identifier `classic.modeHome`, with `classic.comingSoon.playAS` starting Ridge Line after the sheet closes. The Play row is `play.classicComingSoon`.
 
-Free Battle hidden in Release (1.1). There is no separate first-launch intro screen. Until a game starts or resumes, Play can subtitle the mission “New here? Start with the 2-minute checklist” (`hasSeenIntro`). Starting or resuming sets the flag.
+Free Battle hidden in Release (1.1). First launch shows the onboarding flow over the tabs ([OnboardingSpec](features/OnboardingSpec.md)).
 
 Appearance follows the system. Settings → Theme overrides it (`AppPreferences.theme`, applied in `MechBuddyApp`).
 
@@ -62,14 +63,16 @@ Apply dismisses the solver first. The battle step then shows the critical, and t
 
 No custom URL scheme is registered. Play, Force, Rules, and Settings are the four tabs.
 
-## Onboarding vs Getting Started
+## Onboarding
+
+One entry for new players: `OnboardingFlowView`, a `fullScreenCover` on `RootTabView` (a separate cover from the battle one).
 
 | Flow | When | Persist |
 |------|------|---------|
-| Play subtitle nudge | `!hasSeenIntro` and the checklist is unfinished | Starting or resuming a game sets `hasSeenIntro` |
-| Getting Started checklist | Push from Play (“New here?”) or Settings (“New here checklist”) | `AppPreferences.gettingStartedChecks` |
+| First run | `!AppPreferences.hasCompletedOnboarding` on first appear | `onboarding.track`, `onboarding.completed` |
+| Change game | Settings → Your game, or Play’s Classic card → Change game (`@Environment(\.openOnboarding)`) | Same keys; Close saves nothing |
 
-The checklist is optional. It never blocks Play Ridge Line.
+Skippable from every screen but the last. Finishing or skipping lands on Play. The old Getting Started checklist and the “New here?” nudge are gone; its card-reading lesson lives in How to play.
 
 ## Verification
 
@@ -78,4 +81,4 @@ The checklist is optional. It never blocks Play Ridge Line.
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `App/RootTabView.swift`, `App/MechBuddyApp.swift`, `App/AppPreferences.swift`, `Features/Play/PlayHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `Steps/CriticalPendingStep.swift`, `CritSheet.swift` |
+| Code paths | `App/RootTabView.swift`, `App/MechBuddyApp.swift`, `App/AppPreferences.swift`, `Features/Onboarding/`, `Features/Play/PlayHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `Steps/CriticalPendingStep.swift`, `CritSheet.swift` |

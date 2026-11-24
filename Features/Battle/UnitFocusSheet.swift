@@ -108,7 +108,7 @@ struct UnitFocusSheet: View {
                     StatusChip(kind: .recordedCrit(title: "Fire control ×\(unit.crits.fireControlHits)", systemImage: "scope"))
                 }
                 if unit.crits.mpHit {
-                    StatusChip(kind: .recordedCrit(title: "Motive", systemImage: "figure.walk"))
+                    StatusChip(kind: .recordedCrit(title: "MP hit", systemImage: "figure.walk"))
                 }
             }
             if !critNotes.isEmpty {
@@ -174,6 +174,7 @@ struct UnitFocusSheet: View {
     private var headerChip: StatusChip.Kind? {
         if unit.criticalsOwed > 0 { return .critOwed(unit.criticalsOwed) }
         if unit.combatStatus == .destroyedPendingEnd { return .wrecked }
+        if unit.isShutdown { return .shutdown }
         if unit.isImmobile { return .immobile }
         if unit.movementMode == .sprint { return .sprinted }
         return nil
@@ -195,7 +196,7 @@ struct UnitFocusSheet: View {
             lines.append("Fire control adds 2 to its shots.")
         }
         if unit.crits.mpHit {
-            lines.append("A motive hit halves move and harder to hit.")
+            lines.append("An MP hit halves move and TMM.")
         }
         if unit.crits.engineHits > 0 {
             lines.append("A second engine hit wrecks it.")
@@ -220,9 +221,11 @@ struct UnitFocusSheet: View {
                 label: "MV",
                 value: marked(unit.effectiveMV, changed: unit.effectiveMV != unit.mv),
                 helpTitle: "Move",
-                helpBody: unit.crits.mpHit
-                    ? "Halved by a motive hit."
-                    : "Inches this ’Mech can walk or jump."
+                helpBody: unit.heat > 0
+                    ? "Heat takes 2″ per level off walking and sprinting. Jumping is not affected."
+                    : unit.crits.mpHit
+                        ? "Halved by an MP hit."
+                        : "Inches this ’Mech can walk or jump."
             ),
             StatCell(
                 id: "tmm",
@@ -230,7 +233,7 @@ struct UnitFocusSheet: View {
                 value: marked("\(unit.effectiveTMM)", changed: unit.effectiveTMM != unit.tmm),
                 helpTitle: "Harder to hit",
                 helpBody: unit.crits.mpHit
-                    ? "Halved by a motive hit."
+                    ? "Halved by an MP hit."
                     : "Added to shots against this ’Mech."
             ),
             StatCell(id: "skl", label: "SKL", value: "\(unit.skill)"),
@@ -243,7 +246,7 @@ struct UnitFocusSheet: View {
                     ? "−\(weaponHits) from \(weaponHits == 1 ? "a weapon hit" : "weapon hits")."
                     : "Short, medium, and long range damage."
             )
-        ]
+        ] + StatCell.heat(for: unit)
     }
 
     private func marked(_ value: String, changed: Bool) -> String {
@@ -262,7 +265,6 @@ struct UnitFocusSheet: View {
         }
         if session.phase == .combat,
            !session.units.contains(where: \.pendingCritical),
-           unit.side == session.activeSide,
            unit.canAttackThisTurn,
            let onResolveAttack {
             return FocusAction(

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.2.0",
+  "scenarioId": "running-hot",
+  "title": "Running Hot",
+  "subtitle": "Mission 3 · 2 vs 2 · about 50 minutes",
+  "missionNumber": 3,
+  "introduces": ["Overheat", "Heat scale", "Shutdown"],
+  "estimatedMinutes": 50,
+  "release": "1.2.0",
+  "ruleset": {
+    "overheatAllowed": true,
+    "physicalAttacksAllowed": false,
+    "forcedWithdrawal": false,
+    "maxTurns": 8,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 8
+    }
+  },
+  "coachNotes": [
+    "Two heavier 'Mechs join: the Catapult (missiles, can jump) and the Thunderbolt (tough brawler). Both have OV 1 on the card.",
+    "Overheat: before you roll, pick +1 damage in the shot. It only adds damage at short and medium range. You take the heat even if you miss.",
+    "Heat goes on the card in the End Phase, so it hurts you next turn: +1 to your shots and 2 inches less walking per heat level. At heat 2 or more you are also 1 easier to hit, unless you jumped.",
+    "Heat 4 is the S box: the 'Mech shuts down. Next turn it can't move or shoot, and shots at it get 4 easier. It restarts at heat 0 in that End Phase.",
+    "Cooling off: a turn where the 'Mech doesn't shoot clears all its heat. Keep shooting and heat stays.",
+    "Overheat on the first turn is free-ish. Overheat every turn and you reach S at the end of turn 4, then sit out turn 5. Pick your moments.",
+    "The Locust and Commando can't overheat. Use them to chase down a 'Mech that runs hot."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Catapult CPLT-C1",
+        "pv": 32,
+        "mv": "8\"j",
+        "tmm": 1,
+        "sz": 3,
+        "s": 2,
+        "m": 3,
+        "l": 2,
+        "ov": 1,
+        "armor": 5,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF1,LRM1/1/1"
+      },
+      {
+        "name": "Locust LCT-1V",
+        "pv": 18,
+        "mv": "16\"",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": ""
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "Thunderbolt TDR-5S",
+        "pv": 36,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 3,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 1,
+        "armor": 7,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF1"
+      },
+      {
+        "name": "Commando COM-2D",
+        "pv": 17,
+        "mv": "12\"",
+        "tmm": 2,
+        "sz": 1,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": "SRM1/1"
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use the same open table, about 3 feet across. Measure in inches and ignore printed hexes.",
+    "Put a hill in the middle and two patches of woods, one on each half. Hills, cover, and woods work like Broken Ground.",
+    "Keep a die or small token next to each 'Mech card to mark heat (0 to 3, then S). The app tracks it too.",
+    "Each side places its two 'Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one 'Mech at a time."
+  ],
+  "winningSummary": "Knock out both enemy 'Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
+}

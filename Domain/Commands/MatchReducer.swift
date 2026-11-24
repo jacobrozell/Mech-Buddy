@@ -6,6 +6,10 @@ public enum MatchCommand: Sendable {
     case setDiceMode(DiceMode)
     case abandonMatch
     case setInitiative(InitiativeRolls)
+    /// Skip the roll: the players agreed which side moves first (casual and learning games).
+    case agreeInitiative(firstToMove: SideId)
+    /// Tag a miniature with a colour so players can match minis to cards. Any phase.
+    case setMini(unitId: UUID, mini: MiniMarker?)
     case setMovementMode(unitId: UUID, mode: MovementMode)
     case markMoved(unitId: UUID)
     /// Change a move already recorded this phase. Does not change whose turn it is.
@@ -14,7 +18,8 @@ public enum MatchCommand: Sendable {
     /// Trade sides before anyone moves or shoots.
     case swapSides
     case advancePhase
-    case finishCombatSide
+    /// Both sides are done shooting. Fire is simultaneous: either side may shoot in any order.
+    case finishCombat
     case acknowledgeDeployment
     case resolveSATOR(SATORAttackCommand)
     case applyCritical(unitId: UUID, roll: DiceRoll2D6)
@@ -95,9 +100,28 @@ public enum MatchReducer {
             next.initiativeWinner = winner
             next.activeSide = AlphaStrikePhaseEngine.initiativeLoser(winner: winner)
             next.phase = .movement
+            next.activeSide = firstMover(next)
             next.appendLog(
                 "Initiative: \(rolls.lanceA.total) to \(rolls.lanceB.total). \(winner.displayName) goes last"
             )
+
+        case .setMini(let unitId, let mini):
+            guard let idx = next.units.firstIndex(where: { $0.id == unitId }) else {
+                throw MatchDomainError.unitNotFound
+            }
+            next.units[idx].mini = mini
+
+        case .agreeInitiative(let first):
+            guard next.phase == .initiative else {
+                throw MatchDomainError.illegalPhaseTransition("Initiative already resolved")
+            }
+            // The side that moves first is the one that "lost" the roll; the other moves last.
+            next.initiativeRolls = nil
+            next.initiativeWinner = first.other
+            next.activeSide = first
+            next.phase = .movement
+            next.activeSide = firstMover(next)
+            next.appendLog("Players chose: \(first.displayName) moves first")
 
         case .setMovementMode(let unitId, let mode):
             guard next.phase == .movement else {
@@ -144,7 +168,8 @@ public enum MatchReducer {
             }
             next.activeSide = AlphaStrikePhaseEngine.nextMovementActiveSide(
                 current: next.activeSide,
-                units: next.units
+                units: next.units,
+                firstToMove: next.initiativeWinner?.other
             )
 
         case .skipRemainingMoves:
@@ -175,21 +200,15 @@ public enum MatchReducer {
         case .advancePhase:
             next = try advance(next)
 
-        case .finishCombatSide:
-            guard next.phase == .combat, let winner = next.initiativeWinner else {
+        case .finishCombat:
+            guard next.phase == .combat else {
                 throw MatchDomainError.illegalPhaseTransition("Not in combat")
             }
             if AlphaStrikePhaseEngine.hasPendingCriticals(units: next.units) {
                 throw MatchDomainError.illegalPhaseTransition("Resolve pending criticals first")
             }
-            let loser = winner.other
-            if next.activeSide == loser {
-                next.activeSide = winner
-                next.appendLog("\(winner.displayName) combat")
-            } else {
-                next.phase = .end
-                next.appendLog("End phase")
-            }
+            next.phase = .end
+            next.appendLog("End phase")
 
         case .acknowledgeDeployment:
             guard next.needsDeploymentAcknowledgement else {
@@ -214,6 +233,9 @@ public enum MatchReducer {
         case .resolveEndPhase:
             guard next.phase == .end else {
                 throw MatchDomainError.illegalPhaseTransition("Not in end phase")
+            }
+            for line in AlphaStrikeHeat.applyEndPhase(&next.units) {
+                next.appendLog(line)
             }
             AlphaStrikePhaseEngine.removeDestroyedAtEnd(&next.units)
             for i in next.units.indices {
@@ -257,9 +279,8 @@ public enum MatchReducer {
         var attacker = next.units[attackerIdx]
         let defender = next.units[defenderIdx]
 
-        guard attacker.side == next.activeSide else {
-            throw MatchDomainError.cannotAttack("Not this side’s combat")
-        }
+        // No side gate: damage and crits land at the end of the phase (combatPhaseCrits),
+        // so the order shots are entered in can't change the result. Players roll together.
         guard attacker.canAttackThisTurn else {
             throw MatchDomainError.cannotAttack("Unit cannot attack")
         }
@@ -272,6 +293,9 @@ public enum MatchReducer {
 
         let move = attack.attackerMove
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
+        if let reason = CombatSolver.noDamageReason(attacker: attacker, bracket: attack.range) {
+            throw MatchDomainError.cannotAttack(reason)
+        }
         let tn = try SATORResolver.resolve(
             CombatSolver.satorInput(
                 attacker: attacker,
@@ -288,6 +312,13 @@ public enum MatchReducer {
         let hit = SATORResolver.isHit(tn: tn, roll: attack.roll)
         var deliveredDamage = 0
         var note = ""
+        // Overheat is declared before the roll, so the heat comes whether the shot hits or not.
+        let overheat = AlphaStrikeHeat.usableOverheat(
+            requested: attack.overheatUsed,
+            attacker: attacker,
+            bracket: attack.range,
+            overheatAllowed: next.ruleset.overheatAllowed
+        )
 
         if hit {
             let delivered = AlphaStrikeDamage.delivered(
@@ -295,7 +326,7 @@ public enum MatchReducer {
                     attacker: attacker,
                     bracket: attack.range,
                     rearHit: attack.rearHit,
-                    overheatUsed: attack.overheatUsed
+                    overheatUsed: overheat
                 ),
                 overheatAllowed: next.ruleset.overheatAllowed
             )
@@ -314,8 +345,11 @@ public enum MatchReducer {
             note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value). No damage."
         }
 
-        // Engine crit: +1 heat per engine hit whenever the unit fires, capped at 4.
-        attacker.heat = min(4, attacker.heat + attacker.firingCrits.engineHits)
+        if overheat > 0 {
+            note += " Overheated \(overheat)."
+        }
+        // Overheat and engine-hit heat land in the End Phase (AlphaStrikeHeat.endPhase).
+        attacker.overheatThisTurn = overheat
         attacker.hasAttackedThisTurn = true
         attacker.turnShot = TurnShot(
             targetName: defender.name,
@@ -331,6 +365,12 @@ public enum MatchReducer {
         next.units[attackerIdx] = attacker
         next.appendLog(note)
         return next
+    }
+
+    /// Usually the initiative loser; the other side if the loser has nothing left to move.
+    private static func firstMover(_ session: MatchSession) -> SideId {
+        let loser = session.initiativeWinner?.other ?? session.activeSide
+        return AlphaStrikePhaseEngine.movementSequence(firstToMove: loser, units: session.units).first ?? loser
     }
 
     private static func validateMovement(_ mode: MovementMode, unit: MatchUnitState) throws {
@@ -360,7 +400,7 @@ public enum MatchReducer {
             }
             next.appendLog("Combat phase")
         case .combat:
-            throw MatchDomainError.illegalPhaseTransition("Use finishCombatSide")
+            throw MatchDomainError.illegalPhaseTransition("Use finishCombat")
         case .end:
             return try reduce(next, .resolveEndPhase)
         }

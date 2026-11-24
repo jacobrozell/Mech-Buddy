@@ -59,7 +59,7 @@ public final class AppDependencies {
             preferences.reset()
         }
         if LaunchArguments.skipOnboarding {
-            preferences.hasSeenIntro = true
+            preferences.hasCompletedOnboarding = true
         }
         self.modelContainer = container
         self.content = content

@@ -22,7 +22,33 @@ TestFlight archive of **0.2.0 (1)** is Xcode Cloud Release build `088bef16-7b2c-
 | P1-1 Dock covers the next control | This commit — the battle dock, the solver need line and Apply bar, and the crit Apply bar are siblings of the scroll view, not safe-area insets |
 | Woods chip opens More… (36) | This commit — chips are 44 pt and More… is a plain button with its own row |
 
-Still open, and not game-breaking for the next table session: simultaneous fire (P1-6), "Motive" vs "MP", clean-up copy when nothing is wrecked, range-band wording, and the victory-screen log.
+Fixed later on `feature/guided-mission-ladder` (2026-11-24):
+
+| Item | Fix |
+|---|---|
+| 77 "Motive" vs "MP" | The unit sheet chip and help text say "MP hit", matching the card and the crit sheet |
+| 65 Wrecks say "still fires" in Clean up | `UnitCard(shootingOver:)`. Clean up passes it, so wrecks read "Wrecked" |
+| 45 Crits hidden on unit rows | Unit rows show one warning line: "Heat 2 · Weapon ×1 · MP hit" (`UnitConditions`) |
+| 49 Do wrecks explode? | Clean up says "Wrecks don’t explode or hurt anything nearby." |
+| 14 Skill not shown at setup | Briefing: "Every ’Mech uses Skill 4. Write it on the card’s blank Skill line." |
+| 81 "Best shot" is meaningless | Victory match stats list killing blows ("Shadow Hawk wrecked the Locust · turn 4"); best shot is only the fallback |
+| 82 No full log after the game | Victory has a **Full battle log** link that opens the match log |
+| Pass-the-phone pill shows the heading through it | The pill is opaque, with a shadow |
+
+Already fixed before that: clean-up copy when nothing is wrecked (33), the picked-up checkbox (63), range-band labels (41), per-sheet dice mode (59), "Moves locked in" (57), and Move this one (15).
+
+Then, same day:
+
+| Item | Fix |
+|---|---|
+| P1-6 Simultaneous fire (50) | Either side shoots in any order; one **Done shooting** (`finishCombat`) ends the phase. The order can't change results, since effects land at the end of the phase. See HotseatSpec |
+| 2, 5 "We agreed who goes first" | Initiative has **Skip the roll — we’ll choose who moves first** (`agreeInitiative`) |
+| 24 Mini colour labels | Briefing **Mark mini** menu per ’Mech; a colour dot on unit cards, the mover card and the shot picker (`MatchUnitState.mini`) |
+| 45 Crits in the shot feed | Feed lists "Critical: Weapon hit on Commando" for this turn |
+| 28 Miss chip truncates | Hit and miss chips use the short name ("Missed Wolverine") |
+| Dock at accessibility text sizes | Buttons stack; "Done shooting" no longer breaks mid-word |
+
+Rules found by the 2026-11-24 rulebook audit are in `docs/game-modes/alpha-strike/rules-audit-2026-11-24.md`.
 
 ## Executive summary
 1. Rules: crit effects apply as soon as the crit is rolled, so a unit's same-phase return fire is penalized (58). A crit is also demanded on a unit that its own damage just destroyed (54). Both are small fixes in `Domain/Engines/AlphaStrike`.

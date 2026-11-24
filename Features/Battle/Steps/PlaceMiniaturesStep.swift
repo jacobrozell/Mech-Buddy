@@ -8,7 +8,7 @@ struct PlaceMiniaturesStep: View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
             CoachPrompt(
                 title: "Place the miniatures",
-                message: "Each side sets its ’Mechs within 6″ of its own short edge. \(session.activeSide.displayName) places first.",
+                message: "Each side sets its ’Mechs within 6″ of its own short edge. \(session.activeSide.other.displayName) won the roll and picks who places first; then take turns, one ’Mech at a time.",
                 side: session.activeSide,
                 accessibilityIdentifier: "as.battle.table"
             )

@@ -18,12 +18,17 @@ A `Form`. Appearance follows the system until Theme is changed. There is no defa
 |-----|----------|
 | Theme | **System** (default) / **Light** / **Dark**. Applied with `preferredColorScheme` in `MechBuddyApp` |
 
+### Learn
+
+| Row | Behavior |
+|-----|----------|
+| Your game | Shows the saved track (Alpha Strike when none). Opens onboarding at the track question (`settings.onboarding`). Stacks the value under the title at large text |
+| How to play Ridge Line | Push |
+
 ### About
 
 | Row | Behavior |
 |-----|----------|
-| How to play Ridge Line | Push |
-| New here checklist | Push |
 | Version | Bundle short version and build. This build is **1.0.0 (1)** |
 
 ### Support & legal
@@ -38,7 +43,7 @@ Footer: unofficial fan-aid disclaimer.
 
 ### Data
 
-Last section. **Delete saved games** (`settings.deleteAll`) confirms, then deletes match sessions and clears the Getting Started checks. Theme, haptics, dice default, and keep-awake stay.
+Last section. **Delete saved games** (`settings.deleteAll`) confirms, then deletes match sessions. Mission progress, onboarding answers, theme, haptics, dice default, and keep-awake stay.
 
 ## AppLinks pattern
 
@@ -55,7 +60,7 @@ Live code: `Support/Navigation/AppLinks.swift` (URLs built with `makeURL`).
 
 ## Accessibility
 
-- `settings.home`, `settings.deleteAll`
+- `settings.home`, `settings.onboarding`, `settings.deleteAll`
 
 ## Verification
 

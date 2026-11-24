@@ -14,8 +14,8 @@ What the app exposes. Specs describe behavior; this file says whether code exist
 | Match session + hotseat | **shipped (code)** | 1.0.0 | `MatchReducer`, `BattleCoach`, SwiftData sessions |
 | SwiftData SchemaV1 | **shipped (code)** | 1.0.0 | `Persistence/SchemaV1/` |
 | App shell | **shipped (code)** | 0.2.0 | Four tabs, sidebar-adaptable, battle `fullScreenCover`. Version 0.2.0 (1) |
-| Play home | **shipped (code)** | 1.0.0 | Resume card, Ridge Line mission card. How to play and Getting Started are pushes |
-| Getting Started | **shipped (code)** | 1.0.0 | Six checks. `roster` is the Play Ridge Line button |
+| Play home | **shipped (code)** | 1.0.0 | Compact in-progress row and the mission path: nodes, Up next card, mission sheet with objectives, skip ahead and replay. How to play is a push |
+| Onboarding | **code** | 1.x | First-run flow: welcome, which BattleTech (Alpha Strike or Classic), what you have, first mission. Replaced Getting Started. See OnboardingSpec |
 | Ridge Line guided mission | **shipped (code)** | 1.0.0 | Table setup through victory |
 | Battle table + phase dock | **shipped (code)** | 1.0.0 | Header, read-only phase track, coach dock. Initiative is inline |
 | SATOR (physical 2D6 primary) | **shipped (code)** | 1.0.0 | Sheet title “Solve a shot”. Crit opens after the sheet dismisses |

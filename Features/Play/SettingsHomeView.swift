@@ -5,6 +5,7 @@ import MechBuddyDomain
 struct SettingsHomeView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Environment(PlayMatchCoordinator.self) private var matches
+    @Environment(\.openOnboarding) private var openOnboarding
     @State private var confirmDelete = false
     @State private var deleteError: String?
 
@@ -48,6 +49,32 @@ struct SettingsHomeView: View {
             }
 
             Section {
+                Button {
+                    openOnboarding(.changeTrack)
+                } label: {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: TMSpace.md) {
+                            yourGameLabel
+                            Spacer(minLength: TMSpace.sm)
+                            Text(trackTitle)
+                                .foregroundStyle(.secondary)
+                            rowChevron
+                        }
+                        HStack(spacing: TMSpace.md) {
+                            VStack(alignment: .leading, spacing: TMSpace.xs) {
+                                yourGameLabel
+                                Text(trackTitle)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer(minLength: 0)
+                            rowChevron
+                        }
+                    }
+                }
+                .accessibilityLabel("Your game, \(trackTitle)")
+                .accessibilityHint("Opens the intro to pick Alpha Strike or Classic")
+                .accessibilityIdentifier("settings.onboarding")
                 NavigationLink {
                     HowToPlayRidgeLineView(onPlay: {
                         matches.requestNew(using: dependencies, prefersZoom: false)
@@ -55,13 +82,13 @@ struct SettingsHomeView: View {
                 } label: {
                     SettingsIconLabel(title: "How to play Ridge Line", systemName: "book", tint: Color.secondary)
                 }
-                NavigationLink {
-                    GettingStartedView(onPlay: {
-                        matches.requestNew(using: dependencies, prefersZoom: false)
-                    })
-                } label: {
-                    SettingsIconLabel(title: "New here checklist", systemName: "checklist", tint: Color.secondary)
-                }
+            } header: {
+                Text("Learn")
+            } footer: {
+                Text("Your game reopens the intro, where you can switch between Alpha Strike and Classic.")
+            }
+
+            Section {
                 HStack(spacing: TMSpace.md) {
                     SettingsIconLabel(title: "Version", systemName: "info.circle", tint: Color.secondary)
                     Spacer(minLength: TMSpace.sm)
@@ -89,11 +116,11 @@ struct SettingsHomeView: View {
                     SettingsIconLabel(title: "Delete saved games", systemName: "trash", tint: TMColor.danger)
                 }
                 .accessibilityIdentifier("settings.deleteAll")
-                .accessibilityHint("Deletes the saved game and your checklist")
+                .accessibilityHint("Deletes the game in progress")
             } header: {
                 Text("Data")
             } footer: {
-                Text("Removes the game in progress and your checklist.")
+                Text("Removes the game in progress. Mission progress and your settings stay.")
             }
         }
         .navigationTitle("Settings")
@@ -108,7 +135,7 @@ struct SettingsHomeView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Removes the game in progress and your checklist.")
+            Text("Removes the game in progress. Mission progress and your settings stay.")
         }
         .alert(
             "Could not delete",
@@ -121,6 +148,22 @@ struct SettingsHomeView: View {
         } message: {
             Text(deleteError ?? "")
         }
+    }
+
+    private var yourGameLabel: some View {
+        SettingsIconLabel(title: "Your game", systemName: "flag.2.crossed", tint: TMColor.signal)
+            .foregroundStyle(.primary)
+    }
+
+    private var rowChevron: some View {
+        Image(systemName: "chevron.right")
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
+    }
+
+    private var trackTitle: String {
+        (dependencies.preferences.learningTrack ?? .alphaStrike).title
     }
 
     private var versionText: String {
@@ -148,7 +191,6 @@ struct SettingsHomeView: View {
     private func deleteSavedGames() {
         do {
             try dependencies.matchSessions.deleteAll()
-            dependencies.preferences.clearGettingStartedChecks()
         } catch {
             deleteError = error.localizedDescription
         }

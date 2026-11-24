@@ -12,7 +12,7 @@ Build wide internally; ship narrow. One module answers “is X reachable?”
 | Ridge Line mission | on | on | |
 | Full Lances scenario | off | on | |
 | Free Battle | **off** | on | **1.1** |
-| Physical / OV / Forced Withdrawal tools | off | on | |
+| Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat) shows that tool inside the mission; the flag gates it everywhere else |
 | Classic mode entry | **on (Coming soon)** | on | Visible teaser — not playable |
 | Classic play / tools | off | on | |
 | MUL network fetch | off | on | Paste import OK |
@@ -24,6 +24,7 @@ Build wide internally; ship narrow. One module answers “is X reachable?”
 - Mode picker / Play shows Classic with badge **Coming soon**
 - Tap → short explanation sheet (record sheets / hex tools planned); **no** Classic battle
 - Not a hidden gate — honest visibility
+- The same flag decides whether onboarding asks Alpha Strike vs Classic and whether Play shows any Classic surface (`PlayTrackLayout`); off means Alpha Strike only
 
 **Copy (locked draft):**  
 Title: Classic BattleTech  
@@ -39,6 +40,7 @@ enum ReleaseFlag: String, CaseIterable, Sendable {
     case fullLancesScenario
     case freeBattle
     case physicalOvWithdrawal
+    case missionLadder         // Broken Ground + ladder list on Play (on)
     case classicComingSoonEntry
     case classicPlayTools
     case mulNetworkFetch

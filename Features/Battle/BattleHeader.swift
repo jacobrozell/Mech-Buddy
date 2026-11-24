@@ -7,7 +7,8 @@ enum BattleChrome {
     }
 
     static func showsActiveSide(_ step: BattleCoach.Step) -> Bool {
-        step == .placeMiniatures || step == .movement || step == .combat
+        // Not combat: both sides shoot, in any order.
+        step == .placeMiniatures || step == .movement
     }
 
     static func dockTint(session: MatchSession, coach: BattleCoach) -> Color {
@@ -15,15 +16,14 @@ enum BattleChrome {
             return TMColor.warning
         }
         switch coach.step {
-        case .placeMiniatures, .combat:
+        case .placeMiniatures:
             return TMColor.side(session.activeSide)
         case .movement:
             if coach.movementComplete {
-                let shooter = session.initiativeWinner?.other ?? session.activeSide
-                return TMColor.side(shooter)
+                return TMColor.signal
             }
             return TMColor.side(session.activeSide)
-        case .initiative, .end, .tableSetup, .victory:
+        case .combat, .initiative, .end, .tableSetup, .victory:
             return TMColor.signal
         }
     }
@@ -37,13 +37,13 @@ enum BattleChrome {
         case .tableSetup:
             return "Set the table."
         case .placeMiniatures:
-            return "Place the miniatures. \(session.activeSide.displayName) places first."
+            return "Place the miniatures. \(session.activeSide.other.displayName) picks who places first."
         case .initiative:
             return "Turn \(session.turn), Roll."
         case .movement:
             return "Turn \(session.turn), Move. \(session.activeSide.displayName) moves."
         case .combat:
-            return "Turn \(session.turn), Shoot. \(session.activeSide.displayName) shoots."
+            return "Turn \(session.turn), Shoot. Both sides shoot, in any order."
         case .end:
             return "Turn \(session.turn), Clean up."
         case .victory:
@@ -142,7 +142,10 @@ struct SidePassBanner: View {
         }
         .padding(.horizontal, TMSpace.lg)
         .padding(.vertical, TMSpace.sm)
+        // Opaque: the pill floats over the step title, which used to show through it.
         .background(TMColor.sideFill(side), in: Capsule())
+        .background(Color(.systemBackground), in: Capsule())
+        .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
         .padding(.horizontal, TMSpace.lg)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)

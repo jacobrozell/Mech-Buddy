@@ -42,8 +42,8 @@ struct RidgeLineSimulationTests {
     private func startedRidgeLine() throws -> MatchSession {
         let catalog = BundleContentCatalogRepository(bundle: Bundle(for: BundleToken.self))
         let scenario = try catalog.ridgeLineScenario()
-        let units = RidgeLineFactory.makeUnits(from: scenario)
-        let ruleset = RidgeLineFactory.mapRuleset(scenario.ruleset)
+        let units = GuidedScenarioFactory.makeUnits(from: scenario)
+        let ruleset = GuidedScenarioFactory.mapRuleset(scenario.ruleset)
         var session = MatchSession(ruleset: ruleset)
         var witness = Witness()
         try play(
@@ -79,10 +79,8 @@ struct RidgeLineSimulationTests {
             witness: &witness
         )
         try moveStandstill(&session, witness: &witness)
-        try shootSide(&session, witness: &witness, shotsHit: shotsHit)
-        try play(&session, .finishCombatSide, witness: &witness)
-        try shootSide(&session, witness: &witness, shotsHit: shotsHit)
-        try play(&session, .finishCombatSide, witness: &witness)
+        try shootAll(&session, witness: &witness, shotsHit: shotsHit)
+        try play(&session, .finishCombat, witness: &witness)
         try play(&session, .resolveEndPhase, witness: &witness)
     }
 
@@ -109,7 +107,8 @@ struct RidgeLineSimulationTests {
         try play(&session, .advancePhase, witness: &witness)
     }
 
-    private func shootSide(_ session: inout MatchSession, witness: inout Witness, shotsHit: Bool) throws {
+    /// Fire is simultaneous: every 'Mech that can still shoot does, Side B first to prove order is free.
+    private func shootAll(_ session: inout MatchSession, witness: inout Witness, shotsHit: Bool) throws {
         let roll = shotsHit ? DiceRoll2D6(die1: 6, die2: 5) : DiceRoll2D6(die1: 1, die2: 1)
         var steps = 0
         while steps < 16 {
@@ -122,9 +121,9 @@ struct RidgeLineSimulationTests {
                 )
                 continue
             }
-            guard let attacker = session.units.first(where: {
-                $0.side == session.activeSide && $0.canAttackThisTurn
-            }), let target = session.units.first(where: {
+            let ready = session.units.filter(\.canAttackThisTurn)
+            guard let attacker = ready.first(where: { $0.side == .lanceB }) ?? ready.first,
+                  let target = session.units.first(where: {
                 $0.side != attacker.side && $0.combatStatus == .active
             }) else {
                 return

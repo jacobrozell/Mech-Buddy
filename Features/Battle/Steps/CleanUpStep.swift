@@ -23,7 +23,7 @@ struct CleanUpStep: View {
                 title: "Clean up",
                 message: wrecks.isEmpty
                     ? "Nothing was wrecked this turn. Tap Next turn."
-                    : "Take wrecked ’Mechs off the table.",
+                    : "Take wrecked ’Mechs off the table. Wrecks don’t explode or hurt anything nearby.",
                 accessibilityIdentifier: "as.battle.table"
             )
             if !wrecks.isEmpty {
@@ -36,6 +36,7 @@ struct CleanUpStep: View {
                                     unit: unit,
                                     isActiveSide: false,
                                     accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
+                                    shootingOver: true,
                                     action: { onOpenUnit(unit) }
                                 )
                             } else {

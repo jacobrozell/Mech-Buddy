@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.1.0",
+  "scenarioId": "broken-ground",
+  "title": "Broken Ground",
+  "subtitle": "Mission 2 · 2 vs 2 · about 50 minutes",
+  "missionNumber": 2,
+  "introduces": ["Hills", "Partial cover", "Rear shots", "Jumping for position"],
+  "estimatedMinutes": 50,
+  "release": "1.1.0",
+  "ruleset": {
+    "overheatAllowed": false,
+    "physicalAttacksAllowed": false,
+    "forcedWithdrawal": false,
+    "maxTurns": 8,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 8
+    }
+  },
+  "coachNotes": [
+    "New lances: each side gets one jumper and one fast 'Mech. Same cards as Ridge Line, new partners.",
+    "Partial cover: if a hill crest or wall hides the bottom half of the target from the shooter, turn on Partial cover in the shot. It makes the shot 1 harder.",
+    "Rear shots: if the shooter is behind the target (in its back half), turn on Rear shot. A hit does 1 extra damage, so keep your back away from enemies.",
+    "Jumping lets a 'Mech hop straight over woods and hills. The jumper is harder to hit, but its own shot is harder too.",
+    "Standing still makes your own shot 1 easier. Behind cover, that can be worth it.",
+    "Still no overheating and no punching. Those come in later missions."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Shadow Hawk SHD-2H",
+        "pv": 30,
+        "mv": "10\"/6\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 1,
+        "ov": 0,
+        "armor": 5,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF0*,JMPW1"
+      },
+      {
+        "name": "Locust LCT-1V",
+        "pv": 18,
+        "mv": "16\"",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": ""
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "Wolverine WVR-6M",
+        "pv": 32,
+        "mv": "10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 1,
+        "armor": 6,
+        "structure": 5,
+        "skill": 4,
+        "abilities": ""
+      },
+      {
+        "name": "Commando COM-2D",
+        "pv": 17,
+        "mv": "12\"",
+        "tmm": 2,
+        "sz": 1,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": "SRM1/1"
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use the same open table, about 3 feet across. Measure in inches and ignore printed hexes.",
+    "Put a hill in the middle third: a book under a cloth, or the hill side of a map. House rule for this mission: climbing costs no extra inches (the full rules charge extra).",
+    "Add a low wall or rock line on each side of the hill. Anything that hides a 'Mech's legs counts as partial cover.",
+    "Add two patches of woods, one on each half of the table. Woods work like Ridge Line.",
+    "Each side places its two 'Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one 'Mech at a time."
+  ],
+  "winningSummary": "Knock out both enemy 'Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
+}

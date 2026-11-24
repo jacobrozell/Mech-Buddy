@@ -75,7 +75,9 @@ enum MatchCommand: Sendable {
     case skipRemainingMoves
     case advancePhase
     case jumpToPhase(PhaseId)                       // with UI confirm if incomplete
-    case finishCombatSide                           // loser→winner or winner→end
+    case agreeInitiative(firstToMove: SideId)       // skip the roll; no dice recorded
+    case setMini(unitId: UUID, mini: MiniMarker?)   // miniature colour tag, any phase
+    case finishCombat                               // both sides done (fire is simultaneous) → End
     case resolveSATOR(ResolveSATORCommand)
     case applyCritical(unitId: UUID, roll: DiceRoll2D6)
     case resolveEndPhase

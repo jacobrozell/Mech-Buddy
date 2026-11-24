@@ -37,7 +37,7 @@
       "sections": [
         {
           "heading": "1. Roll dice (initiative)",
-          "body": "Each side rolls two dice. Highest total wins. The winner goes last when moving and shooting — they get to see what the other side did first. Same totals? Both roll again."
+          "body": "Each side rolls two dice. Highest total wins. The winner moves last, so they get to see where the other side went first. Same totals? Both roll again."
         },
         {
           "heading": "2. Move",
@@ -45,7 +45,7 @@
         },
         {
           "heading": "3. Shoot",
-          "body": "The side that lost the dice roll shoots with all of its ’Mechs first (one shot each), then the winner. Measure range base-edge to base-edge. Damage is applied right away, but wrecked ’Mechs stay until Clean up — they can still shoot this turn."
+          "body": "Every ’Mech gets one shot. Both sides can roll at the same time, in any order: damage and critical effects all land at the end of the phase, so order doesn’t change anything. Measure range base-edge to base-edge. A ’Mech wrecked this turn still shoots until Clean up."
         },
         {
           "heading": "4. Clean up",
@@ -66,7 +66,7 @@
         },
         {
           "heading": "Woods (this first game)",
-          "body": "Trees cost extra inches to walk through, and shots into or through woods are a little harder. Skip hills, water, and buildings in Ridge Line."
+          "body": "Trees cost extra inches to walk through. A shot is 1 harder if the target stands in woods, or if woods between you are more than 2 inches from the shooter. 6 inches or more of woods in the way blocks the shot. Skip hills, water, and buildings in Ridge Line."
         },
         {
           "heading": "Don’t stack",
@@ -87,7 +87,7 @@
         },
         {
           "heading": "Touching bases",
-          "body": "If two ’Mechs are touching, measure the gap as short range. This mission has no punching. You still shoot if you can see them and they are in front."
+          "body": "If two ’Mechs’ bases are touching, neither can shoot the other: that close, only punches and kicks work, and these missions don’t use them yet. Back off first. In the shot screen, More… → Bases touching."
         },
         {
           "heading": "One shot per ’Mech per turn",
@@ -167,7 +167,7 @@
       "sections": [
         {
           "heading": "You can ignore most of these in Ridge Line",
-          "body": "ENE or CASE: ammo explosions don’t destroy you. MV: how many inches you walk. TMM: extra number when someone shoots at you (the app calls this “harder to hit”). S/M/L: damage at short / medium / long range. A/S: Armor / Structure. Skill: usually 4 — the starting number for shots."
+          "body": "ENE or CASE II: an ammo hit does nothing. CASE: an ammo hit does 1 extra damage instead of destroying you. MV: how many inches you walk. TMM: extra number when someone shoots at you (the app calls this “harder to hit”). S/M/L: damage at short / medium / long range. A/S: Armor / Structure. Skill: usually 4 — the starting number for shots."
         }
       ]
     },

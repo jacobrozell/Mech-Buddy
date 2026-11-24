@@ -17,6 +17,9 @@ final class PlayMatchCoordinator {
     var resumeSession: MatchSession?
     var zoomSource = "mission"
     var prefersZoom = true
+    /// The mission the player asked for. Kept across the replace-the-saved-game confirmation.
+    private(set) var pendingScenario: ScenarioId = .ridgeLine
+    private(set) var pendingTitle = "Ridge Line"
 
     func refresh(using dependencies: AppDependencies) {
         do {
@@ -37,10 +40,14 @@ final class PlayMatchCoordinator {
     }
 
     func requestNew(
+        _ scenarioId: ScenarioId = .ridgeLine,
+        title: String = "Ridge Line",
         using dependencies: AppDependencies,
         source: String = "mission",
         prefersZoom: Bool = true
     ) {
+        pendingScenario = scenarioId
+        pendingTitle = title
         zoomSource = source
         self.prefersZoom = prefersZoom
         refresh(using: dependencies)
@@ -64,7 +71,6 @@ final class PlayMatchCoordinator {
                 resumeSession = nil
                 return
             }
-            dependencies.preferences.hasSeenIntro = true
             lastError = nil
             matchStore = store
         } catch {
@@ -75,16 +81,15 @@ final class PlayMatchCoordinator {
 
     private func startNew(using dependencies: AppDependencies, replaceActive: Bool) {
         let store = MatchStore(repository: dependencies.matchSessions)
-        store.startRidgeLine(from: dependencies.content, replaceActive: replaceActive)
+        store.startMission(pendingScenario, from: dependencies.content, replaceActive: replaceActive)
         guard store.session != nil else {
             lastErrorTitle = store.lastErrorTitle
-            lastError = store.lastError ?? "Could not start Ridge Line"
+            lastError = store.lastError ?? "Could not start \(pendingTitle)"
             return
         }
         if dependencies.preferences.defaultDiceMode != .manual {
             store.setDiceMode(dependencies.preferences.defaultDiceMode)
         }
-        dependencies.preferences.hasSeenIntro = true
         lastError = nil
         matchStore = store
     }

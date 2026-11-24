@@ -29,13 +29,19 @@ Play, Force, Rules, Settings:
 play.home
 as.modeHome.resume
 as.modeHome.ridgeLine
-as.modeHome.gettingStarted
 as.modeHome.howToPlay
-as.gettingStarted.screen
-as.gettingStarted.check.{id}
+as.modeHome.ladder.{id}
+as.modeHome.ladder.info.{id}
+as.modeHome.ladder.skipAheadHint
+as.modeHome.missionSheet
+as.modeHome.missionSheet.objective
+as.modeHome.missionSheet.tips
 as.howToPlay.screen
+as.howToPlay.cardLesson
 as.howToPlay.sampleWreck
 play.classicComingSoon
+play.classicSpotlight
+play.changeGame
 classic.modeHome
 classic.comingSoon.playAS
 force.as.list
@@ -45,7 +51,26 @@ rules.home
 rules.as.{topicId}
 rules.as.detail.{topicId}
 settings.home
+settings.onboarding
 settings.deleteAll
+```
+
+Onboarding:
+
+```
+onboarding.screen
+onboarding.back
+onboarding.progress
+onboarding.skip
+onboarding.continue
+onboarding.step.{welcome|track|kit|firstMission}
+onboarding.track.alphaStrike
+onboarding.track.classic
+onboarding.track.classicNote
+onboarding.kit.{id}
+onboarding.kit.cards
+onboarding.kit.link.{id}
+onboarding.firstMission.card
 ```
 
 Battle stage, header, dock:
@@ -139,4 +164,4 @@ No 1.0 with open **critical** a11y failures on Ridge Line path.
 | Target release | 1.0.0 |
 | Last verified | 2026-10-28 |
 | Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `DesignSystem/AccessibilityID.swift`, `Features/Play/PlayHomeView.swift`, `GettingStartedView.swift`, `SettingsHomeView.swift`, `ForceListView.swift`, `RulesHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `CombatSolverSheet.swift`, `CritSheet.swift`, `UnitFocusSheet.swift`, `VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `TNGauge.swift`, `DiceTray.swift` |
+| Code paths | `DesignSystem/AccessibilityID.swift`, `Features/Play/PlayHomeView.swift`, `MissionPath.swift`, `MissionBrief.swift`, `Features/Onboarding/`, `SettingsHomeView.swift`, `ForceListView.swift`, `RulesHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `CombatSolverSheet.swift`, `CritSheet.swift`, `UnitFocusSheet.swift`, `VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `TNGauge.swift`, `DiceTray.swift` |

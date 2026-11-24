@@ -80,10 +80,12 @@ struct BattleCoachTests {
     func legacyDecode() throws {
         let session = MatchSession(ruleset: .ridgeLine, phase: .movement, tableReady: true)
         let data = try JSONEncoder().encode(session)
-        let json = try #require(String(data: data, encoding: .utf8))
-        let stripped = json.replacingOccurrences(of: "\"deploymentAcknowledged\":false,", with: "")
-        #expect(!stripped.contains("deploymentAcknowledged"))
-        let legacy = try JSONDecoder().decode(MatchSession.self, from: Data(stripped.utf8))
+        // Drop the key structurally: a text replace missed it whenever the encoder wrote it last (no comma).
+        var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        object.removeValue(forKey: "deploymentAcknowledged")
+        let stripped = try JSONSerialization.data(withJSONObject: object)
+        #expect(!String(decoding: stripped, as: UTF8.self).contains("deploymentAcknowledged"))
+        let legacy = try JSONDecoder().decode(MatchSession.self, from: stripped)
         #expect(legacy.deploymentAcknowledged == false)
         #expect(BattleCoach(session: legacy).step == .placeMiniatures)
     }

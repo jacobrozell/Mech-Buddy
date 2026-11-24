@@ -4,7 +4,7 @@
 
 | Layer | Covers |
 |-------|--------|
-| Unit | SATOR/crit/damage/phases/hotseat/victory/release surface |
+| Unit | SATOR/crit/damage/phases/hotseat/victory/release surface; onboarding content and model ([OnboardingSpec](features/OnboardingSpec.md) § Tests) |
 | Integration | MatchSession SwiftData round-trip + resume |
 | UI smoke | Phase 6 happy path (after UI exists) |
 | A11y contracts | Phase 6 ID set present |
@@ -31,10 +31,10 @@ Implement cases in [SATORAttackSpec](features/SATORAttackSpec.md) § Golden test
 
 | Arg | Effect |
 |-----|--------|
-| `-skip_onboarding` | Skip intro (`LaunchArguments.skipOnboarding`, Debug only) |
+| `-skip_onboarding` | Mark onboarding complete so the first-run cover doesn't show (`LaunchArguments.skipOnboarding` → `AppPreferences.hasCompletedOnboarding`, Debug only) |
 | `-enable_full_product_surface` | Free Battle, Full Lances, Classic tools, etc. (`ReleaseSurface`) |
 | `-enable_mul_fetch` | Network MUL. Not implemented. |
-| `-reset_state` | Wipe saved games and settings keys (`LaunchArguments.resetState`, Debug only) |
+| `-reset_state` | Wipe saved games and settings keys, onboarding answers included (`LaunchArguments.resetState`, Debug only). Pair with `-skip_onboarding` for UI tests that start on Play |
 | `-ui_testing` | In-memory match store (`LaunchArguments.inMemoryStore`, Debug only). Does not show the volatile-store banner. |
 | `-open_as_battle` | Not implemented (not needed) |
 | `-load_ridge_line` | Not implemented (not needed) |

@@ -8,6 +8,8 @@ struct StatusChip: View {
         /// Wrecked and already fired (or shooting is over): "still fires" no longer applies.
         case wreckedDone
         case immobile
+        /// Heat 4: no move, no shot this turn.
+        case shutdown
         case sprinted
         case moved(MovementMode)
         case hit(target: String, damage: Int)
@@ -17,6 +19,13 @@ struct StatusChip: View {
         case lastTurn
         /// A critical already on the card, such as "Engine ×1".
         case recordedCrit(title: String, systemImage: String)
+
+        /// "Wolverine WVR-6M" → "Wolverine": the chip has no room for the variant.
+        static func short(_ name: String) -> String {
+            let parts = name.split(separator: " ")
+            guard parts.count > 1, let last = parts.last, last.contains(where: \.isNumber) else { return name }
+            return parts.dropLast().joined(separator: " ")
+        }
 
         var text: String {
             switch self {
@@ -28,6 +37,8 @@ struct StatusChip: View {
                 "Wrecked"
             case .immobile:
                 "Can’t move"
+            case .shutdown:
+                "Shut down · heat"
             case .sprinted:
                 "Sprinted · can’t fire"
             case .moved(let mode):
@@ -39,9 +50,9 @@ struct StatusChip: View {
                 case .unset: "Moved"
                 }
             case .hit(let target, let damage):
-                "Hit \(target) · \(damage)"
+                "Hit \(Self.short(target)) · \(damage)"
             case .missed(let target):
-                "Missed \(target)"
+                "Missed \(Self.short(target))"
             case .ready:
                 "Ready to fire"
             case .waiting:
@@ -61,6 +72,8 @@ struct StatusChip: View {
                 "flame.fill"
             case .immobile:
                 "figure.stand"
+            case .shutdown:
+                "thermometer.high"
             case .sprinted:
                 "figure.run"
             case .moved(let mode):
@@ -85,7 +98,7 @@ struct StatusChip: View {
 
         fileprivate var tone: Tone {
             switch self {
-            case .critOwed, .ready, .lastTurn, .recordedCrit:
+            case .critOwed, .ready, .lastTurn, .recordedCrit, .shutdown:
                 .warning
             case .wrecked, .wreckedDone, .missed:
                 .danger

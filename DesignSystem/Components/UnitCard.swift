@@ -10,6 +10,8 @@ struct UnitCard: View {
     var showsChevron: Bool = true
     var isEnabled: Bool = true
     var showsIdleStatus: Bool = true
+    /// Clean up: shooting is over, so a wreck is just "Wrecked".
+    var shootingOver: Bool = false
     var hint: String = "Opens this ’Mech"
     var note: String?
     var action: () -> Void
@@ -21,7 +23,8 @@ struct UnitCard: View {
                 isActiveSide: isActiveSide,
                 showsStats: showsStats,
                 showsChevron: showsChevron,
-                showsIdleStatus: showsIdleStatus
+                showsIdleStatus: showsIdleStatus,
+                shootingOver: shootingOver
             )
         }
         .buttonStyle(.plain)
@@ -49,10 +52,15 @@ struct UnitCard: View {
 
     static func accessibilityLabel(for unit: MatchUnitState) -> String {
         var parts: [String] = [unit.name]
+        if let mini = unit.mini {
+            parts.append("\(mini.displayName) mini")
+        }
         if unit.pendingCritical {
             parts.append(unit.criticalsOwed > 1 ? "\(unit.criticalsOwed) criticals waiting" : "Critical waiting")
         } else if unit.combatStatus == .destroyedPendingEnd {
             parts.append("Wrecked — still shoots")
+        } else if unit.isShutdown {
+            parts.append("Shut down from heat")
         } else if unit.isImmobile {
             parts.append("Can’t move")
         } else if unit.movementMode == .sprint {
@@ -61,9 +69,31 @@ struct UnitCard: View {
             parts.append(shot.rowTitle)
             parts.append(shot.rowDetail)
         }
+        if let conditions = UnitConditions.line(for: unit) {
+            parts.append(conditions)
+        }
         parts.append("Armor \(unit.remainingArmor) of \(unit.armorCap)")
         parts.append("Structure \(unit.remainingStructure) of \(unit.structureCap)")
         return parts.joined(separator: ", ")
+    }
+}
+
+/// One line of lasting damage and heat for a unit row: "Heat 2 · Weapon ×1 · MP hit".
+enum UnitConditions {
+    static func line(for unit: MatchUnitState) -> String? {
+        guard unit.combatStatus != .removed else { return nil }
+        var parts: [String] = []
+        if unit.isShutdown {
+            parts.append("Shut down")
+        } else if unit.heat > 0 {
+            parts.append("Heat \(unit.heat)")
+        }
+        let crits = unit.crits
+        if crits.engineHits > 0 { parts.append("Engine") }
+        if crits.fireControlHits > 0 { parts.append("Fire control ×\(crits.fireControlHits)") }
+        if crits.weaponHits > 0 { parts.append("Weapon ×\(crits.weaponHits)") }
+        if crits.mpHit { parts.append("MP hit") }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 }
 
@@ -122,12 +152,16 @@ private struct UnitCardBody: View {
     var showsChevron: Bool
     var showsAbilities: Bool = false
     var showsIdleStatus: Bool = true
+    var shootingOver: Bool = false
 
     var body: some View {
         TMCard(edgeColor: TMColor.side(unit.side), isRaised: isActiveSide) {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
                 HStack(alignment: .center, spacing: TMSpace.sm) {
                     SideBadge(side: unit.side)
+                    if let mini = unit.mini {
+                        MiniDot(marker: mini)
+                    }
                     Text(unit.name)
                         .font(TMFont.cardTitle)
                         .strikethrough(unit.combatStatus == .removed)
@@ -160,6 +194,13 @@ private struct UnitCardBody: View {
                     structureCapacity: unit.structureCap,
                     size: showsStats ? .regular : .compact
                 )
+                if let conditions = UnitConditions.line(for: unit) {
+                    Label(conditions, systemImage: "exclamationmark.triangle.fill")
+                        .font(TMFont.detail)
+                        .foregroundStyle(TMColor.warning)
+                        .labelStyle(.titleAndIcon)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 if showsStats {
                     StatStrip(cells: statCells)
                         .opacity(isActiveSide ? 1 : 0.85)
@@ -186,10 +227,13 @@ private struct UnitCardBody: View {
             return .critOwed(unit.criticalsOwed)
         }
         if unit.combatStatus == .destroyedPendingEnd {
-            return unit.canAttackThisTurn ? .wrecked : .wreckedDone
+            return unit.canAttackThisTurn && !shootingOver ? .wrecked : .wreckedDone
         }
         if unit.combatStatus == .removed {
             return nil
+        }
+        if unit.isShutdown {
+            return .shutdown
         }
         if unit.isImmobile {
             return .immobile
@@ -227,7 +271,7 @@ private struct UnitCardBody: View {
                 helpTitle: "Damage",
                 helpBody: "Short, medium, and long range damage."
             )
-        ]
+        ] + StatCell.heat(for: unit)
     }
 }
 

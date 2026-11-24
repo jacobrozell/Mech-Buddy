@@ -88,6 +88,9 @@ struct MovementStep: View {
                 }
                 HStack(spacing: TMSpace.sm) {
                     SideBadge(side: unit.side)
+                    if let mini = unit.mini {
+                        MiniDot(marker: mini, size: 18)
+                    }
                     Text(unit.name)
                         .font(TMFont.stepTitle)
                     // Landscape: move stats share the name row so the tiles stay above the fold.
@@ -101,6 +104,11 @@ struct MovementStep: View {
                 }
                 if verticalSizeClass == .compact, !unit.isImmobile {
                     EmptyView()
+                } else if unit.isShutdown {
+                    Text("Shut down from heat. It can’t move or shoot this turn, and restarts in the End Phase.")
+                        .font(TMFont.body)
+                        .fixedSize(horizontal: false, vertical: true)
+                    StatusChip(kind: .shutdown)
                 } else if unit.isImmobile {
                     Text("Can’t move this turn")
                         .font(TMFont.body)
@@ -109,6 +117,15 @@ struct MovementStep: View {
                     Text(move.summary)
                         .font(TMFont.readoutM)
                         .accessibilityLabel(move.spokenSummary)
+                }
+                if unit.heat > 0, !unit.isShutdown {
+                    Label(
+                        "Heat \(unit.heat): \(2 * unit.heat)″ less walking\(unit.heat >= 2 ? ", 1 easier to hit" : ""). Jumping isn’t affected.",
+                        systemImage: "thermometer.medium"
+                    )
+                    .font(TMFont.detail)
+                    .foregroundStyle(TMColor.warning)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
                 LazyVGrid(columns: columns, spacing: TMSpace.sm) {
                     ForEach(unit.legalMovementModes, id: \.self) { mode in
@@ -256,20 +273,15 @@ struct MovementStep: View {
             queue.insert(queue.remove(at: index), at: 0)
             remaining[current.side] = queue
         }
+        // Same order the reducer enforces, including uneven numbers moving in proportion.
         var upcoming: [MatchUnitState] = []
-        var side = session.activeSide
-        while upcoming.count < active.count {
-            let currentQueue = remaining[side] ?? []
-            let other = side.other
-            let otherQueue = remaining[other] ?? []
-            if currentQueue.isEmpty && otherQueue.isEmpty { break }
-            if !currentQueue.isEmpty {
-                upcoming.append(currentQueue[0])
-                remaining[side] = Array(currentQueue.dropFirst())
-            }
-            if !(remaining[other]?.isEmpty ?? true) {
-                side = other
-            }
+        let firstToMove = session.initiativeWinner?.other ?? session.activeSide
+        let sequence = AlphaStrikePhaseEngine.movementSequence(firstToMove: firstToMove, units: session.units)
+        let movedCount = active.filter(\.hasMovedThisTurn).count
+        for side in sequence.dropFirst(movedCount) {
+            guard var queue = remaining[side], !queue.isEmpty else { continue }
+            upcoming.append(queue.removeFirst())
+            remaining[side] = queue
         }
         var entries = upcoming.enumerated().map { index, unit in
             MoveOrderEntry(unit: unit, marker: index == 0 ? .now : index == 1 ? .next : .later)

@@ -113,7 +113,6 @@ struct BattleRoster: View {
     private func offersShoot(_ unit: MatchUnitState) -> Bool {
         coach.pendingCritical == nil
             && coach.step == .combat
-            && unit.side == session.activeSide
             && unit.canAttackThisTurn
     }
 
@@ -127,6 +126,9 @@ struct BattleRoster: View {
                 units: session.units
             ).first
             return unit.id == moving?.id
+        }
+        if coach.step == .combat {
+            return unit.canAttackThisTurn
         }
         if BattleChrome.showsActiveSide(coach.step) {
             return unit.side == session.activeSide

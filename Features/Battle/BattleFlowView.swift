@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import MechBuddyData
 import MechBuddyDomain
 
 struct BattleFlowView: View {
@@ -38,7 +39,7 @@ struct BattleFlowView: View {
 
     var body: some View {
         screen
-            .navigationTitle("Ridge Line")
+            .navigationTitle(store.scenario.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { battleToolbar }
             .onAppear { openMatch() }
@@ -71,7 +72,7 @@ struct BattleFlowView: View {
                 }
                 Button("Keep playing", role: .cancel) {}
             } message: {
-                Text("You’ll lose this game’s progress. You can start Ridge Line again from Play.")
+                Text("You’ll lose this game’s progress. You can start this mission again from Play.")
             }
             .confirmationDialog("Go back a step?", isPresented: $showBackConfirm, titleVisibility: .visible) {
                 Button("Go back", role: .destructive) {
@@ -83,11 +84,11 @@ struct BattleFlowView: View {
             }
             .confirmationDialog("Some ’Mechs have not shot", isPresented: $showDoneShootingConfirm, titleVisibility: .visible) {
                 Button("Done shooting anyway") {
-                    store.finishCombatSide()
+                    store.finishCombat()
                 }
                 Button("Keep shooting", role: .cancel) {}
             } message: {
-                Text("They can still fire. Skipping means this side fires nothing else.")
+                Text("They can still fire. Done shooting ends the phase for both sides.")
             }
             .confirmationDialog(
                 "Some ’Mechs have no move recorded",
@@ -155,19 +156,59 @@ struct BattleFlowView: View {
             if coach.step == .victory {
                 VictoryView(
                     session: session,
+                    progress: missionProgress(for: session),
                     onRematch: { store.rematch(from: dependencies.content) },
+                    onNextMission: nextMissionId(after: session).map { next in
+                        { store.startFresh(next, from: dependencies.content) }
+                    },
+                    onShowLog: { showEventLog = true },
                     onDone: {
                         store.dismissCompleted()
                         dismiss()
                     },
                     onBack: { attemptBack() }
                 )
+                .onAppear {
+                    dependencies.preferences.markMissionCompleted(session.scenarioId ?? .ridgeLine)
+                }
             } else {
                 battle(session, coach: coach)
             }
         } else {
             loadingSkeleton
         }
+    }
+
+    /// Missions on the path, in order. Empty when the ladder is off.
+    private var ladderItems: [ScenarioCatalogItemDTO] {
+        guard dependencies.releaseSurface.isEnabled(.missionLadder),
+              let items = try? dependencies.content.scenarios().scenarios else { return [] }
+        return items.sorted { ($0.missionNumber ?? .max) < ($1.missionNumber ?? .max) }
+    }
+
+    private func missionProgress(for session: MatchSession) -> VictoryView.MissionProgress? {
+        let items = ladderItems
+        let id = (session.scenarioId ?? .ridgeLine).rawValue
+        guard items.count > 1, let index = items.firstIndex(where: { $0.id == id }) else { return nil }
+        let done = dependencies.preferences.completedMissions.union([id])
+        let next = items.indices.contains(index + 1) ? items[index + 1] : nil
+        return VictoryView.MissionProgress(
+            number: items[index].missionNumber ?? index + 1,
+            total: items.count,
+            cleared: items.filter { done.contains($0.id) }.count,
+            nextTitle: next?.title,
+            nextUnlocks: next?.introduces ?? [],
+            nextPlayable: next.map { !$0.gated && $0.bundle != nil } ?? false
+        )
+    }
+
+    private func nextMissionId(after session: MatchSession) -> ScenarioId? {
+        let items = ladderItems
+        let id = (session.scenarioId ?? .ridgeLine).rawValue
+        guard let index = items.firstIndex(where: { $0.id == id }), items.indices.contains(index + 1) else { return nil }
+        let next = items[index + 1]
+        guard !next.gated, next.bundle != nil else { return nil }
+        return ScenarioId(rawValue: next.id)
     }
 
     private func battle(_ session: MatchSession, coach: BattleCoach) -> some View {
@@ -354,7 +395,8 @@ struct BattleFlowView: View {
                 session: session,
                 scenario: store.scenario,
                 canSwap: coach.canSwapSides,
-                onSwap: { store.swapSides() }
+                onSwap: { store.swapSides() },
+                onSetMini: { store.setMini(unitId: $0, mini: $1) }
             )
         } else if let owed = coach.pendingCritical,
                   let unit = session.units.first(where: { $0.id == owed.unitId }) {
@@ -378,7 +420,11 @@ struct BattleFlowView: View {
                     b1: $b1,
                     b2: $b2,
                     diceMode: diceModeBinding,
-                    onClear: clearDice
+                    onClear: clearDice,
+                    onAgree: { side in
+                        clearDice()
+                        store.agreeInitiative(firstToMove: side)
+                    }
                 )
             case .movement:
                 MovementStep(
@@ -601,7 +647,7 @@ struct BattleFlowView: View {
                 title: "Done shooting",
                 identifier: "as.battle.doneShooting",
                 specIdentifier: "as.battle.phaseDock.doneSide",
-                hint: "\(session.activeSide.displayName) is done shooting",
+                hint: "Both sides are done shooting. Ends the phase.",
                 action: { finishShooting(coach) }
             )
         }
@@ -644,7 +690,7 @@ struct BattleFlowView: View {
         if store.session == nil {
             do {
                 if try store.resumeActive() == false {
-                    store.startRidgeLine(from: dependencies.content, replaceActive: false)
+                    store.startMission(.ridgeLine, from: dependencies.content, replaceActive: false)
                 }
             } catch {
                 store.lastErrorTitle = "Couldn’t open the game"
@@ -663,7 +709,8 @@ struct BattleFlowView: View {
         let coach = BattleCoach(session: session)
         let sideChanged = previous?.side != next.side
         let stepChanged = previous?.step != next.step
-        let sideOwned = next.step == .movement || next.step == .combat
+        // Shooting is simultaneous, so only movement hands the phone back and forth.
+        let sideOwned = next.step == .movement
         if let previous, sideChanged, sideOwned, next.criticalID == nil {
             presentPassBanner(next.side)
             if !stepChanged && previous.criticalID == next.criticalID {
@@ -772,7 +819,7 @@ struct BattleFlowView: View {
         if coach.finishCombatNeedsConfirm {
             showDoneShootingConfirm = true
         } else {
-            store.finishCombatSide()
+            store.finishCombat()
         }
     }
 }

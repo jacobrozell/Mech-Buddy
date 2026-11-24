@@ -6,6 +6,10 @@ struct ScenarioPresentation: Equatable, Sendable {
     var subtitle: String?
     var tableSteps: [String]
     var winningSummary: String?
+    /// What this mission adds over the one before. Empty for Ridge Line, which keeps its first-night briefing.
+    var introduces: [String] = []
+    /// Coach tips for the new rules. Shown with `introduces`.
+    var coachNotes: [String] = []
 
     static let fallback = ScenarioPresentation(
         title: "Ridge Line",

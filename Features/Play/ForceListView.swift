@@ -138,7 +138,7 @@ struct ForceListView: View {
             } else {
                 let scenario = try dependencies.content.ridgeLineScenario()
                 loadedSession = nil
-                units = RidgeLineFactory.makeUnits(from: scenario)
+                units = GuidedScenarioFactory.makeUnits(from: scenario)
             }
             loadError = nil
             didLoad = true

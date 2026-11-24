@@ -1,42 +1,32 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "2.0.0",
   "items": [
     {
-      "id": "what",
-      "title": "This app is a helper — the game is on the table",
-      "detail": "You move plastic ’Mechs by hand. The phone tells you whose turn it is, does the shooting math, and tracks damage. It is not a video game."
-    },
-    {
-      "id": "dl_qs",
-      "title": "Optional: download the free Quick-Start PDF",
-      "detail": "You can play Ridge Line with just this app. The official Alpha Strike Quick-Start PDF is extra reading if you want it.",
-      "linkURL": "https://battletech.com/downloads/"
-    },
-    {
       "id": "minis",
-      "title": "Get four miniatures and their cards",
-      "detail": "Ridge Line uses Shadow Hawk + Commando vs Wolverine + Locust. Each model has a card with its numbers (Move, Armor, Structure)."
+      "title": "Miniatures",
+      "detail": "Four ’Mechs for Ridge Line, from a box set or your shelf. No minis yet? Coins work for a first game."
     },
     {
       "id": "dice",
-      "title": "Get two six-sided dice",
-      "detail": "Whenever the app asks, roll the dice on the table, then type what you rolled. (You can also let the app roll if you forgot dice.)"
+      "title": "Two six-sided dice",
+      "detail": "Roll on the table and type what you rolled. No dice? The app can roll for you."
     },
     {
       "id": "tape",
-      "title": "Get a measuring tape that shows inches",
-      "detail": "Measure from the edge of one miniature’s base to the edge of the other — not the centers."
+      "title": "Tape measure",
+      "detail": "One that shows inches. Measure base edge to base edge."
     },
     {
       "id": "maps",
-      "title": "Clear a table about 3 feet across",
-      "detail": "Two box maps side by side is perfect. A kitchen table works too."
+      "title": "A table",
+      "detail": "About 3 feet across. A kitchen table works."
     },
     {
-      "id": "roster",
-      "title": "Then tap Play Ridge Line",
-      "detail": "The app loads both sides for you. One player is Side A, the other is Side B. Sit so you can both see the phone."
+      "id": "dl_qs",
+      "title": "Free Quick-Start rules",
+      "detail": "Optional reading from the publisher. You don’t need it to play Ridge Line.",
+      "linkURL": "https://battletech.com/downloads/"
     }
   ]
 }

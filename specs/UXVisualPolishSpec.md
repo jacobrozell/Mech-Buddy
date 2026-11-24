@@ -35,7 +35,7 @@ Shipped in app **0.2.0** (tag `0.2.0`).
 
 | ID | Improvement | Notes |
 |----|-------------|-------|
-| `ux.pipTrack` | Arm’s-length pip tracks (armor vs structure) with counts | `PipTrack` / `HealthReadout` on battle cards, Unit Focus, and Getting Started |
+| `ux.pipTrack` | Arm’s-length pip tracks (armor vs structure) with counts | `PipTrack` / `HealthReadout` on battle cards, Unit Focus, and How to play (card lesson) |
 | `ux.sideIdentity` | Side A/B: badge color **and** the words “Side A” / “Side B” | Circle + coolant for Side A. Diamond + ember for Side B. Signal amber is the action color |
 
 ### Battle table

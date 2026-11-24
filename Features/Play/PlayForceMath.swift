@@ -1,9 +1,5 @@
 import MechBuddyDomain
 
-enum GettingStartedCatalog {
-    static let playCueID = "roster"
-}
-
 enum PlayForceMath {
     static func structure(of side: SideId, in units: [MatchUnitState]) -> (remaining: Int, capacity: Int) {
         let rows = units.filter { $0.side == side }
