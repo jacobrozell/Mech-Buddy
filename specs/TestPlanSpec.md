@@ -6,12 +6,18 @@
 |-------|--------|
 | Unit | SATOR/crit/damage/phases/hotseat/victory/release surface; onboarding content and model ([OnboardingSpec](features/OnboardingSpec.md) § Tests) |
 | Integration | MatchSession SwiftData round-trip + resume |
-| UI smoke | Phase 6 happy path (after UI exists) |
+| UI smoke | `MechBuddyUITests` target: Play → Ridge Line → victory (`Tests/UI/RidgeLineUITests.swift`) |
 | A11y contracts | Phase 6 ID set present |
 
 ## CI
 
-GitHub Actions `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`. The `CI / unit` job generates the Xcode project, runs SwiftLint, and runs the `MechBuddyCI` scheme (unit tests) on the newest available iPhone simulator. UI smoke stays out of that job until it exists, then runs nightly rather than on every pull request.
+GitHub Actions `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`. The `CI / unit` job generates the Xcode project, runs SwiftLint, and runs the `MechBuddyCI` scheme (unit tests) on the newest available iPhone simulator. UI smoke is not in that job. It has its own `MechBuddyUI` scheme and should run nightly rather than on every pull request.
+
+## UI smoke
+
+Run: `xcodegen generate && xcodebuild -scheme MechBuddyUI -destination 'platform=iOS Simulator,id=<udid>' -derivedDataPath build/DerivedData-ui test`. `MechBuddyCI` stays unit-only.
+
+The test launches with `-ui_testing -reset_state -skip_onboarding`, taps `as.modeHome.ridgeLine`, then loops on whichever control is on screen: `as.ridge.tableReady`, the initiative skip menu (`as.initiative.agree` → Side A moves first), `as.battle.primary` (Miniatures placed, Next turn, See result), `as.battle.skipRemaining`, `as.battle.doneShooting`, and the confirm buttons "Start shooting anyway" / "Done shooting anyway". No shots are solved; the turn cap ends the game. It asserts the victory screen appears: `as.victory.screen` or its container `as.victory` (the 1x1 marker is not reliably exposed to XCUITest).
 
 ## Domain vectors (required)
 
@@ -46,4 +52,4 @@ Implement cases in [SATORAttackSpec](features/SATORAttackSpec.md) § Golden test
 | Target release | 1.0.0 |
 | Last verified | 2026-11-01 |
 | Commit | — |
-| Code paths | `.github/workflows/ci.yml`; `Support/Release/LaunchArguments.swift`; `App/AppDependencies.swift`; `Tests/Unit/RidgeLineSimulationTests.swift` |
+| Code paths | `.github/workflows/ci.yml`; `Support/Release/LaunchArguments.swift`; `App/AppDependencies.swift`; `Tests/Unit/RidgeLineSimulationTests.swift`; `Tests/UI/RidgeLineUITests.swift`; `project.yml` (`MechBuddyUITests`, `MechBuddyUI`) |
