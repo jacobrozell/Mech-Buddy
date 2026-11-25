@@ -36,8 +36,10 @@ struct PhaseTrack: View {
         let index = (PhaseId.allCases.firstIndex(of: current) ?? 0) + 1
         let name = segments.first { $0.id == current }?.title ?? ""
         return VStack(alignment: .leading, spacing: TMSpace.xs) {
-            Text("Step \(index) of 4 · \(name)")
+            // Non-breaking spaces keep "3 of 4 ·" together when it wraps at large text.
+            Text("Step \(index)\u{00A0}of\u{00A0}4\u{00A0}· \(name)")
                 .font(isCompact ? TMFont.detail.weight(.semibold) : TMFont.cardTitle)
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
             HStack(spacing: 0) {
                 ForEach(segments) { segment in

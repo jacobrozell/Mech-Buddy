@@ -71,7 +71,7 @@ struct MissionLayoutView: View {
                 context.fill(Path(ellipseIn: frame), with: .color(hill.opacity(0.35)))
                 context.stroke(Path(ellipseIn: frame.insetBy(dx: frame.width * 0.2, dy: frame.height * 0.2)),
                                with: .color(hill.opacity(0.6)), lineWidth: 1)
-                context.draw(Text("Hill").font(.caption2).foregroundStyle(hill), at: CGPoint(x: frame.midX, y: frame.midY))
+                Self.drawLabel(Text("Hill").font(.caption2).foregroundStyle(hill), at: CGPoint(x: frame.midX, y: frame.midY), in: &context)
             case .woods:
                 context.fill(Path(roundedRect: frame, cornerRadius: min(frame.width, frame.height) / 2),
                              with: .color(woods.opacity(0.4)))
@@ -96,9 +96,10 @@ struct MissionLayoutView: View {
         // Map names, centred at the top of each sheet.
         for sheet in layout.sheets {
             let frame = rect(sheet.area)
-            context.draw(
+            Self.drawLabel(
                 Text(sheet.name).font(.caption2.weight(.semibold)).foregroundStyle(.secondary),
-                at: CGPoint(x: frame.midX, y: frame.minY + 10)
+                at: CGPoint(x: frame.midX, y: frame.minY + 10),
+                in: &context
             )
         }
 
@@ -110,7 +111,22 @@ struct MissionLayoutView: View {
         scalePath.move(to: CGPoint(x: x, y: y))
         scalePath.addLine(to: CGPoint(x: x + bar, y: y))
         context.stroke(scalePath, with: .color(Color.primary.opacity(0.5)), lineWidth: 2)
-        context.draw(Text("6″").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: x + bar / 2, y: y - 7))
+        Self.drawLabel(Text("6″").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: x + bar / 2, y: y - 8), in: &context)
+    }
+
+    /// Draws a label on a small pill so a mapsheet seam or terrain edge never runs through the letters
+    /// (the seam between two maps crossed "Hill" and "6″").
+    private static func drawLabel(_ text: Text, at point: CGPoint, in context: inout GraphicsContext) {
+        let resolved = context.resolve(text)
+        let size = resolved.measure(in: CGSize(width: 200, height: 50))
+        let pill = CGRect(
+            x: point.x - size.width / 2 - 4,
+            y: point.y - size.height / 2 - 1,
+            width: size.width + 8,
+            height: size.height + 2
+        )
+        context.fill(Path(roundedRect: pill, cornerRadius: pill.height / 2), with: .color(Color(.systemBackground).opacity(0.85)))
+        context.draw(resolved, at: point)
     }
 }
 

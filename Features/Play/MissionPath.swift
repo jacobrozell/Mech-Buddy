@@ -57,10 +57,12 @@ struct MissionPathView<UpNext: View>: View {
         VStack(spacing: 52) {
             ForEach(Array(stops.enumerated()), id: \.element.id) { index, stop in
                 VStack(spacing: TMSpace.lg) {
+                    // The exit anchor is taken before the snake's padding: after it, the padded frame's
+                    // bottom-centre is the screen centre, so a line left an off-centre stop from mid-screen.
                     stopView(stop)
+                        .transformAnchorPreference(key: PathNodeKey.self, value: .bottom) { $0[Self.exit(stop.id)] = $1 }
                         .padding(.leading, max(0, shift(index)) * 2)
                         .padding(.trailing, max(0, -shift(index)) * 2)
-                        .transformAnchorPreference(key: PathNodeKey.self, value: .bottom) { $0[Self.exit(stop.id)] = $1 }
                     if stop.state == .next {
                         upNext(stop)
                             .transformAnchorPreference(key: PathNodeKey.self, value: .bottom) { $0[Self.exit(stop.id)] = $1 }

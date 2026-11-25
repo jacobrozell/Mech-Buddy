@@ -170,6 +170,7 @@ struct TableSetupStep: View {
                     VStack(alignment: .leading, spacing: TMSpace.xs) {
                         Text(unit.name)
                             .font(TMFont.cardTitle)
+                            .fixedSize(horizontal: false, vertical: true)
                             .matchedGeometryEffect(id: unit.id, in: sides)
                         if let onSetMini {
                             MiniMarkerMenu(unitName: unit.name, marker: unit.mini) { onSetMini(unit.id, $0) }

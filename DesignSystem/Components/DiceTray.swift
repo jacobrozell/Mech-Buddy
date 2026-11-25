@@ -58,8 +58,11 @@ struct DiceModeLink: View {
     var accessibilityIdentifier: String
 
     var body: some View {
-        Button(mode == .manual ? "Let the app roll" : "Use real dice") {
+        // Kept quiet (real dice come first), but with an icon so it reads as a control, not a caption.
+        Button {
             mode = mode == .manual ? .auto : .manual
+        } label: {
+            Label(mode == .manual ? "Let the app roll" : "Use real dice", systemImage: "dice")
         }
         .font(TMFont.detail)
         .foregroundStyle(.secondary)

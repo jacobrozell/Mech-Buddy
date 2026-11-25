@@ -31,6 +31,20 @@ Done since 1.0.0 (2): Meet and Greet (box scenario), HT heat attacks, PV by skil
 - [x] Shot picker: the ">42″" range option sits alone below the segmented control. Fixed: it is the fourth range option, and the picker becomes a menu at accessibility sizes. Not checked on screen.
 - [ ] Open rules: "0*" minimal damage, water. No shipped card uses 0* (rules audit 2026-11-24); build it with Clash of Steel, the first content that needs it.
 
+**UI pass (2026-11-25, `polish/ui-pass`), checked on the iPhone 17 simulator:**
+- [x] Mission path: the line from an off-centre stop (Close Quarters) now leaves from under that stop, not mid-screen.
+- [x] Victory "Mission cleared" card counts only the section the mission is in ("1 of 5", not "1 of 6" with Meet and Greet).
+- [x] MV prints ″ (`10″/6″j`), not straight quotes. PV balance reads "Side B has 3 more PV."
+- [x] Settings: "Your game" row no longer tinted gold.
+- [x] Mission sheet: forces listed with commas (no line starting "·"). Map diagram labels (map names, Hill, 6″) sit on pills so the seam no longer runs through them.
+- [x] Who's who: names wrap instead of truncating ("Thunderbolt TD…"); pip counts stay on the first row when the pips wrap.
+- [x] Place the miniatures: shows the mission's own map layout, and no "Side B is up" (both sides place in turns).
+- [x] Shot picker: opens scrolled to the targets once a shooter is chosen; no "Moved: Walked" line repeating the chip; Woods / Partial cover / Rear shot are real chips (filled with a check when on); no duplicate >42″ note.
+- [x] "Let the app roll" has a dice icon so it reads as a control.
+- [x] Largest text size: dock buttons shrink instead of truncating ("Done shooti…"), the step label wraps, and "·" never starts a line.
+- [ ] Largest text size: the battle header (TURN, 1 / 8, Step 3 of 4 · Shoot) takes about a third of the screen. Consider a compact header at accessibility sizes.
+- [ ] Not checked on screen in this pass: landscape, dark mode, onboarding.
+
 **Parked (scoped, not built):**
 - Clash of Steel: needs Battlefield Support, formations (Lucky rerolls, Combat Intuition, Command Lance initiative reroll), and buildings. Rules are in `docs/game-modes/alpha-strike/clash-of-steel-rules-intake.md`, and the cards are checked in `docs/game-modes/book-scenarios.md`.
 - Classic Mission 1: movement and facing tracking, the Classic turn loop, and screens (`docs/game-modes/classic/mission-path-scope.md`).

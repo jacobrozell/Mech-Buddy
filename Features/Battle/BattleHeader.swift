@@ -7,8 +7,9 @@ enum BattleChrome {
     }
 
     static func showsActiveSide(_ step: BattleCoach.Step) -> Bool {
-        // Not combat: both sides shoot, in any order.
-        step == .placeMiniatures || step == .movement
+        // Only movement has one side up. Both sides shoot in any order, and both place miniatures in turns
+        // (the roll winner picks who starts), so "Side B is up" there was wrong.
+        step == .movement
     }
 
     static func dockTint(session: MatchSession, coach: BattleCoach) -> Color {
@@ -16,14 +17,12 @@ enum BattleChrome {
             return TMColor.warning
         }
         switch coach.step {
-        case .placeMiniatures:
-            return TMColor.side(session.activeSide)
         case .movement:
             if coach.movementComplete {
                 return TMColor.signal
             }
             return TMColor.side(session.activeSide)
-        case .combat, .initiative, .end, .tableSetup, .victory:
+        case .placeMiniatures, .combat, .initiative, .end, .tableSetup, .victory:
             return TMColor.signal
         }
     }

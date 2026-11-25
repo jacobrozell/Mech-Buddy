@@ -210,10 +210,11 @@ private struct PVBalanceBar: View {
     }
 
     private func caption(gap: Int) -> String {
-        if gap == 0 { return "Even" }
-        if gap <= 5 { return "Gap \(gap) — even" }
+        // Says who is ahead and by how much; "Gap 3 — even" read as jargon.
+        if gap == 0 { return "Even match: both sides have \(sideA) PV." }
         let leader = sideA > sideB ? SideId.lanceA.displayName : SideId.lanceB.displayName
-        return "Gap \(gap) — \(leader) ahead"
+        if gap <= 5 { return "Even match. \(leader) has \(gap) more PV." }
+        return "\(leader) has \(gap) more PV."
     }
 }
 

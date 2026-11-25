@@ -235,7 +235,8 @@ struct MissionBrief: View {
     private func roster(_ side: SideId, names: [String]) -> some View {
         VStack(alignment: .leading, spacing: TMSpace.xs) {
             SideTag(side: side)
-            Text(names.joined(separator: " · "))
+            // Commas wrap cleanly; a " · " list could start its second line with a dot.
+            Text(names.joined(separator: ", "))
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

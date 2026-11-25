@@ -291,7 +291,7 @@ private struct UnitCardBody: View {
     private var statCells: [StatCell] {
         let damage = unit.effectiveDamage
         return [
-            StatCell(id: "mv", label: "MV", value: unit.effectiveMV, helpTitle: "Move", helpBody: "Inches this ’Mech can walk or jump."),
+            StatCell(id: "mv", label: "MV", value: unit.displayMV, helpTitle: "Move", helpBody: "Inches this ’Mech can walk or jump."),
             StatCell(id: "tmm", label: "TMM", value: "\(unit.effectiveTMM)", helpTitle: "Harder to hit", helpBody: "Added to shots against this ’Mech."),
             StatCell(id: "skl", label: "SKL", value: "\(unit.skill)"),
             StatCell(
