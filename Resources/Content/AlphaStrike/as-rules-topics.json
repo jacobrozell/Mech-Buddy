@@ -263,7 +263,7 @@
         },
         {
           "heading": "Skill changes the cost",
-          "body": "The printed PV is for Skill 4. A better pilot (Skill 3 or lower) costs more; a greener one (Skill 5 or higher) costs less. The app adjusts PV with the skill table on p. 33 of the Quick-Start Rulebook when Skill isn’t 4."
+          "body": "The printed PV is for Skill 4. A better pilot (Skill 3 or lower) costs more: the app adds PV using the table on p. 33 of the Quick-Start Rulebook. The Quick-Start has no table for greener pilots (Skill 5 or higher), so the app keeps the printed PV for them."
         }
       ]
     },
