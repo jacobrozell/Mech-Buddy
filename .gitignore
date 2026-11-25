@@ -24,3 +24,6 @@ Secrets.plist
 tmp/
 __pycache__/
 *.py[cod]
+
+# Rulebooks and record sheets are the owner's copies: never commit them.
+ongoing/**/*.pdf

@@ -41,6 +41,7 @@ struct ForceCollectionSection: View {
                         CollectionGroupCard(group: group, copies: copies(of: group, in: collection))
                     }
                 }
+                CollectionMapsCard(collection: collection, boxes: boxes)
             } else {
                 startCard
             }
@@ -137,6 +138,46 @@ private struct CollectionGroupCard: View {
     }
 }
 
+/// Maps from owned boxes, then maps added by hand. Hidden when there are none.
+private struct CollectionMapsCard: View {
+    var collection: OwnedCollection
+    var boxes: [BoxSetDTO]
+
+    private var maps: [OwnedMap] { CollectionMath.ownedMaps(collection, boxes: boxes) }
+
+    /// Owned boxes whose map names aren't listed: "A Game of Armored Combat: 2 map sheets".
+    private var unnamed: [String] {
+        boxes.filter { collection.owns(box: $0.id) && ($0.maps ?? []).isEmpty }.compactMap { box in
+            guard let sheets = box.mapSheets, sheets > 0 else { return nil }
+            return "\(box.title): \(sheets) map \(sheets == 1 ? "sheet" : "sheets"), names not listed yet"
+        }
+    }
+
+    var body: some View {
+        if !maps.isEmpty || !unnamed.isEmpty {
+            TMCard {
+                VStack(alignment: .leading, spacing: TMSpace.xs) {
+                    Text("Maps")
+                        .font(TMFont.cardTitle)
+                    if !maps.isEmpty {
+                        Text(maps.map(\.name).joined(separator: " · "))
+                            .font(TMFont.detail)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    ForEach(unnamed, id: \.self) { line in
+                        Text(line)
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("force.collection.maps")
+        }
+    }
+}
+
 // MARK: - Edit sheet
 
 struct CollectionEditSheet: View {
@@ -212,6 +253,7 @@ struct CollectionEditSheet: View {
                 } footer: {
                     Text("’Mechs you have outside a box. Just the name is fine: “Atlas” covers any Atlas.")
                 }
+                mapsSection
             }
             .navigationTitle("Your collection")
             .navigationBarTitleDisplayMode(.inline)
@@ -230,6 +272,52 @@ struct CollectionEditSheet: View {
             }
         }
         .accessibilityIdentifier("force.collection.sheet")
+    }
+
+    private var boxMaps: [OwnedMap] {
+        CollectionMath.ownedMaps(OwnedCollection(boxes: draft.boxes), boxes: boxes)
+    }
+
+    private var mapsSection: some View {
+        Section {
+            ForEach(boxMaps) { map in
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text(map.name)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let box = map.boxTitle {
+                        Text(box)
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .frame(minHeight: 44, alignment: .leading)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("force.collection.map.\(map.name)")
+            }
+            ForEach(draft.maps, id: \.self) { name in
+                Text(name)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(minHeight: 44, alignment: .leading)
+                    .accessibilityIdentifier("force.collection.map.\(name)")
+            }
+            .onDelete { offsets in
+                for name in offsets.map({ draft.maps[$0] }) {
+                    draft.removeMap(name)
+                }
+            }
+            CollectionAddField(
+                idPrefix: "force.collection.maps",
+                boxed: false,
+                placeholder: "Map name",
+                fieldLabel: "Map name",
+                addLabel: "Add map"
+            ) { draft.addMap($0) }
+        } header: {
+            Text("Maps")
+        } footer: {
+            Text("Maps from your boxes are listed for you. Add any other maps you play on.")
+        }
     }
 
     private func boxRow(_ box: BoxSetDTO) -> some View {
@@ -359,6 +447,9 @@ struct CollectionAddField: View {
     var idPrefix: String
     /// Rounded field background for scroll screens; off inside a Form.
     var boxed: Bool = true
+    var placeholder = "’Mech name, like Atlas"
+    var fieldLabel = "’Mech name"
+    var addLabel = "Add ’Mech"
     var onAdd: (String) -> Void
 
     @State private var text = ""
@@ -372,7 +463,7 @@ struct CollectionAddField: View {
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.sm))
             : AnyLayout(HStackLayout(spacing: TMSpace.sm))
         layout {
-            TextField("’Mech name, like Atlas", text: $text)
+            TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
                 .submitLabel(.done)
@@ -386,7 +477,7 @@ struct CollectionAddField: View {
                             .fill(TMColor.readout)
                     }
                 }
-                .accessibilityLabel("’Mech name")
+                .accessibilityLabel(fieldLabel)
                 .accessibilityIdentifier("\(idPrefix).addField")
             Button(action: add) {
                 Label("Add", systemImage: "plus")
@@ -394,7 +485,7 @@ struct CollectionAddField: View {
             }
             .buttonStyle(.bordered)
             .disabled(trimmed.isEmpty)
-            .accessibilityLabel("Add ’Mech")
+            .accessibilityLabel(addLabel)
             .accessibilityIdentifier("\(idPrefix).addButton")
         }
     }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contentVersion": "1.0.0",
-  "sourceNote": "Box contents for the 'which boxes do you own' question. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
+  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names as printed; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
   "boxes": [
     {
       "id": "agoac",
@@ -20,7 +20,9 @@
         "Wolverine WVR-6M"
       ],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-a-game-of-armored-combat",
-      "contentsConfirmed": true
+      "contentsConfirmed": true,
+      "maps": ["Desert #2", "Grassland #2", "Grassland #3", "Desert #3"],
+      "mapSheets": 2
     },
     {
       "id": "alpha-strike-box",
@@ -57,7 +59,8 @@
         "Kontio"
       ],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-starter-box",
-      "contentsConfirmed": true
+      "contentsConfirmed": true,
+      "mapSheets": 1
     },
     {
       "id": "core-box",

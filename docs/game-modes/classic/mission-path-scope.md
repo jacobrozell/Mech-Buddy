@@ -1,6 +1,6 @@
 # Classic mission path — scope (10 missions)
 
-**Status:** draft for the owner to review, 2026-11-24. Nothing here is built. Rules are from general BattleTech knowledge and **not yet checked** against a rulebook: every rule line has a check in §5. Classic stays Coming soon until Mission 1 ships ([ClassicModeSpec](../../../specs/features/ClassicModeSpec.md)).
+**Status:** draft, 2026-11-24. Nothing here is built. The rules were checked against the owner's rulebooks on 2026-11-24 (§5, full table in [rules-check-2026-11-24.md](rules-check-2026-11-24.md)). The owner decisions are in §6. Classic stays Coming soon until Mission 1 ships ([ClassicModeSpec](../../../specs/features/ClassicModeSpec.md)).
 
 **Box:** *BattleTech: A Game of Armored Combat* (AGOAC). Its eight 'Mechs come with Classic record sheets, and the Alpha Strike path already uses them, so a player who bought the box can play both paths with the same minis. The two paper maps in the box are the table.
 
@@ -29,7 +29,7 @@ Same as the Alpha Strike path:
 - **One new idea per mission, practised in a short game.** Each mission is 3–6 turns and about 20–40 minutes, except the finale.
 - **Players move minis on the paper map.** As with inches in Alpha Strike, the app never tracks hex positions. It asks how far each 'Mech moved and how (walk, run, jump), and the to-hit numbers come from that.
 - **Skip ahead and replay**, like the Alpha Strike path.
-- **Gunnery 4, Piloting 5** for every MechWarrior, the usual starting skills (check C1).
+- **Gunnery 4, Piloting 5** for every MechWarrior, the book's default (AGOAC p. 5).
 
 ## 3. The missions
 
@@ -125,12 +125,28 @@ Forces are AGOAC 'Mechs. Sides should be checked for balance with Battle Value o
 - **App:** a physical-attack picker with damage worked out from tonnage, and the attacker's risk shown.
 - **Turns:** 5.
 
-### 10. Full Lances: the full game
-- **Objective:** destroy or cripple the enemy lance in 10 turns.
-- **Forces:** all eight. Awesome + Thunderbolt + Shadow Hawk + Commando vs BattleMaster + Catapult + Wolverine + Locust, the same sides as Alpha Strike Mission 5.
-- **Learn:** everything together, plus initiative across four units and forced withdrawal if the box has it (C14).
-- **App:** turns off every coach note, keeping only lookups.
-- **Turns:** 10, about 2–3 hours.
+### 10. Final Exam: the book's own test
+- **Source:** AGOAC Scenario 1, pp. 45–46. See [book-scenarios.md](../book-scenarios.md#1-final-exam-pp-4546).
+- **Objective:** cripple or destroy every enemy 'Mech first.
+  - **Crippled** means a leg destroyed, every weapon destroyed, the gyro destroyed, or two engine crits.
+  - Leaving the map counts as destroyed.
+- **Forces:** identical lances, everyone P5/G4: CPLT-C1 Catapult, LCT-1V Locust, COM-2D Commando, SHD-2H Shadow Hawk on each side.
+  - Mirrored sides need no BV balancing.
+  - The second copy of each 'Mech is a stand-in. The app suggests one, such as the Thunderbolt for the second Catapult.
+- **Map:** Desert #2 and Grassland #2.
+- **Learn:** everything together at lance scale, plus the crippled rule. The app turns off every coach note, keeping only lookups.
+- **Turns:** no limit in the book. The app suggests stopping at 10 and scoring by damage if time runs out (to confirm at the table).
+- **Changed from the draft:** this replaces "Full Lances". Forced withdrawal isn't in the A Game of Armored Combat book (C14), and the book's own exam fits the path better.
+
+### After the trophy: From the book
+Trial by Fire, then Divide and Conquer (AGOAC Scenarios 2–3), with the book's campaign link that brings Final Exam survivors in on turn 5. They teach what the path doesn't:
+- starting damage;
+- breakout wins;
+- split forces;
+- mixed skills;
+- initiative penalties.
+
+Details and the rules each needs are in [book-scenarios.md](../book-scenarios.md).
 
 ## 4. What the app needs, by milestone
 
@@ -142,37 +158,35 @@ Classic shares no rules code with Alpha Strike ([ClassicModeSpec § Architecture
 | C1 | 1–3 | MP and facing, to-hit sum, range bands, hit location tables, damage moving inward | Move step, to-hit builder, sheet damage |
 | C2 | 4–6 | Heat scale, terrain modifiers, partial cover, jumping, piloting rolls, falls | Heat track, piloting roll prompt |
 | C3 | 7–9 | Cluster table, ammo, crit determination and effects, physical attacks | Cluster helper, crit slot picker, physical picker |
-| C4 | 10 | Victory and withdrawal, 4v4 pacing | Finale polish |
+| C4 | 10 | Crippled rule and exit-the-map losses, 4v4 pacing | Finale polish |
 
 This replaces the spec's "tools before guided" order: each tool is built when the mission that teaches it needs it.
 
-## 5. Rules to check against the AGOAC rulebook
+## 5. Rules check (done 2026-11-24)
 
-Each needs the rule and a page number, as in the [Alpha Strike intake](../alpha-strike/mission-ladder-rules-intake.md).
+Checked against the A Game of Armored Combat rulebook (printed page = PDF page − 2), the Quick-Start Rules and the Essentials booklet. The full table with pages is [rules-check-2026-11-24.md](rules-check-2026-11-24.md).
 
-| # | Question |
+**What the quick-start books cover:** only Missions 1–3. They have three phases: Initiative, Movement and Weapon Attack. They have no Piloting, heat, criticals, physical attacks, falls, water, elevation, side or rear arcs, minimum range or internal structure. They have one hit location table and one target per turn. Missions 4–10 rely on the A Game of Armored Combat rulebook, so each of those missions should say so.
+
+**How the draft held up:**
+
+| Draft assumption | Result |
 |---|---|
-| C1 | Default Gunnery/Piloting for the box's MechWarriors (4/5?) |
-| C2 | Turning cost, backward walking, running restrictions |
-| C3 | Attacker movement modifiers (0/+1/+2/+3 jump) and the target movement table |
-| C4 | Range modifiers (+0/+2/+4) and minimum-range penalty |
-| C5 | Hit location tables (front, left, right, rear) and which attack directions use each |
-| C6 | Damage transfer order; what destroying a side torso takes with it |
-| C7 | Heat scale thresholds the box uses (movement, to-hit, shutdown, ammo) and heat from movement |
-| C8 | Woods, water and elevation costs and modifiers; partial cover |
-| C9 | Piloting roll triggers and modifiers; fall damage and facing |
-| C10 | Cluster hits table; whether indirect LRM fire is in the box rules |
-| C11 | Crit determination roll, slot rolls, and each component's effect |
-| C12 | Physical attacks in the box: punch, kick, push, charge, DFA, and their damage formulas |
-| C13 | Initiative and unequal-unit movement order |
-| C14 | Forced withdrawal or another end condition in the box rules |
+| Gunnery 4 / Piloting 5 | Confirmed, AGOAC p. 5 |
+| Turning costs 1 MP per hexside | Confirmed in all three books |
+| Range +0 / +2 / +4 | Confirmed. AGOAC adds a minimum-range penalty of minimum − range + 1 (p. 18) |
+| Attacker +1 walk / +2 run / +3 jump | Confirmed. AGOAC adds +2 for firing while prone |
+| Push, charge, death from above | In AGOAC only (pp. 25–29). Push does no damage. A death from above also takes the +3 jump modifier |
+| Indirect LRM fire | In AGOAC only (p. 21): needs a spotter, +1, and +1 more if the spotter fired too. Mission 7 can include it |
+| Forced withdrawal | **Not in any of the books.** It's replaced by the book's crippled rule; see Mission 10 |
+| CASE | Not covered in these books. Mission 8 leaves it out, since none of the eight 'Mechs needs it |
 
-## 6. Owner decisions
+## 6. Owner decisions (answered 2026-11-24)
 
-| # | Decision | Recommendation |
+| # | Decision | Answer |
 |---|---|---|
-| O1 | Where record-sheet numbers come from. The spec prefers "user-entered", but no scans | Type the eight AGOAC 'Mechs' numbers from your record sheet booklet into a bundled JSON, as with the Alpha Strike cards from the MUL. Check each against the MUL's Classic page where it has one |
-| O2 | Reference rulebook | The AGOAC rulebook. Drop a PDF or photos into `ongoing/` (not committed) |
-| O3 | Which box map each mission uses | Choose at the table during the Mission 1–3 playtest |
-| O4 | Ten missions as above, or merge 1 and 2 | Keep ten. Mission 1 is short, and movement is where most new players get stuck |
-| O5 | Does Classic need the same box-ownership stand-ins? | Yes, the same pairs. In Classic too the record sheet sets everything and the mini only marks the hex |
+| O1 | Where record-sheet numbers come from | From the record sheets in the rulebooks and box downloads at battletech.com/downloads, typed into a bundled JSON. The owner's copies are in `ongoing/` and are never committed (`.gitignore`). **Still needed:** none of the files in `ongoing/` has sheets for the eight A Game of Armored Combat 'Mechs. They're in the box's 15-sheet record sheet booklet, which the book says can be downloaded from bg.battletech.com. That PDF, or photos, goes in `ongoing/` before C0 |
+| O2 | Reference rulebook | The owner has the printed *A Game of Armored Combat* rulebook, so every rule cites its page (from `ongoing/cat3500d…rulebook.pdf`). Each rule also notes whether the free **Quick-Start Rules** (battletech.com/downloads) cover it, so a new player knows what's in the short book |
+| O3 | Maps | The collection lists maps by name. A player is assumed to have only the maps from boxes they own, and every mission suggests one of those. Experienced players can pick any map, including ones typed in by hand. Later: a catalog of all known maps |
+| O4 | Mission count | Ten, keeping Missions 1 and 2 separate |
+| O5 | Stand-ins in Classic | Yes, the same pairs as Alpha Strike |

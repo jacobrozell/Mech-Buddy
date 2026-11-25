@@ -39,16 +39,36 @@ public struct OwnedCollection: Codable, Equatable, Sendable {
     public var missing: [String: [String: Int]]
     /// Minis owned outside a box: name as typed → copies.
     public var singles: [String: Int]
+    /// Maps owned outside a box, as typed, in the order added. Box maps are assumed owned with the box.
+    public var maps: [String]
 
-    public init(boxes: [String: Int] = [:], missing: [String: [String: Int]] = [:], singles: [String: Int] = [:]) {
+    public init(
+        boxes: [String: Int] = [:],
+        missing: [String: [String: Int]] = [:],
+        singles: [String: Int] = [:],
+        maps: [String] = []
+    ) {
         self.boxes = boxes
         self.missing = missing
         self.singles = singles
+        self.maps = maps
+    }
+
+    private enum CodingKeys: String, CodingKey { case boxes, missing, singles, maps }
+
+    /// Collections saved before maps existed decode with no extra maps.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        boxes = try c.decodeIfPresent([String: Int].self, forKey: .boxes) ?? [:]
+        missing = try c.decodeIfPresent([String: [String: Int]].self, forKey: .missing) ?? [:]
+        singles = try c.decodeIfPresent([String: Int].self, forKey: .singles) ?? [:]
+        maps = try c.decodeIfPresent([String].self, forKey: .maps) ?? []
     }
 
     /// "None yet": recorded, but nothing owned.
     public static let empty = OwnedCollection()
 
+    /// No boxes or minis. Maps added by hand don't count.
     public var isEmpty: Bool { boxes.isEmpty && singles.isEmpty }
 
     public func copies(ofBox id: String) -> Int { boxes[id] ?? 0 }
@@ -105,6 +125,20 @@ public struct OwnedCollection: Codable, Equatable, Sendable {
     public mutating func setSingle(_ name: String, copies: Int) {
         singles[name] = copies > 0 ? copies : nil
     }
+
+    /// Adds a map by name. Trims spaces; empty or already listed (any case) does nothing.
+    /// Returns the stored name, or `nil` when nothing was added.
+    @discardableResult
+    public mutating func addMap(_ typed: String) -> String? {
+        let name = typed.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        guard !name.isEmpty, !maps.contains(where: { $0.lowercased() == name.lowercased() }) else { return nil }
+        maps.append(name)
+        return name
+    }
+
+    public mutating func removeMap(_ name: String) {
+        maps.removeAll { $0 == name }
+    }
 }
 
 // MARK: - Derived views
@@ -153,6 +187,20 @@ public struct CollectionGroup: Identifiable, Equatable, Sendable {
     public init(source: Source, units: [CollectionUnit]) {
         self.source = source
         self.units = units
+    }
+}
+
+/// A map the player has, from a box or added by hand.
+public struct OwnedMap: Identifiable, Equatable, Sendable {
+    public var name: String
+    /// The box it came with; `nil` when added by hand.
+    public var boxTitle: String?
+
+    public var id: String { name.lowercased() }
+
+    public init(name: String, boxTitle: String?) {
+        self.name = name
+        self.boxTitle = boxTitle
     }
 }
 
@@ -309,6 +357,22 @@ public enum CollectionMath {
             missing: missing,
             standIns: pairOrder.compactMap { pairs[$0] }
         )
+    }
+
+    /// Maps the player has: each owned box's maps (catalog order), then maps added by hand.
+    /// A name already listed by an earlier box is skipped.
+    public static func ownedMaps(_ collection: OwnedCollection, boxes: [BoxSetDTO]) -> [OwnedMap] {
+        var seen = Set<String>()
+        var result: [OwnedMap] = []
+        for box in boxes where collection.owns(box: box.id) {
+            for name in box.maps ?? [] where seen.insert(name.lowercased()).inserted {
+                result.append(OwnedMap(name: name, boxTitle: box.title))
+            }
+        }
+        for name in collection.maps where seen.insert(name.lowercased()).inserted {
+            result.append(OwnedMap(name: name, boxTitle: nil))
+        }
+        return result
     }
 
     /// "A", "A and B", "A, B, and C".

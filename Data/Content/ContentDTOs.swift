@@ -227,11 +227,18 @@ public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {
     public var sourceURL: String
     /// False when the unit list isn't confirmed: `units` is empty and the player adds them by hand.
     public var contentsConfirmed: Bool
+    /// Paper maps in the box, one name per printed side, as printed. `nil` when the names aren't known.
+    public var maps: [String]?
+    /// Map sheets in the box (a double-sided sheet counts once), shown when `maps` is unknown.
+    public var mapSheets: Int?
 
     public init(
         id: String, title: String, subtitle: String, game: Game, miniCount: Int,
-        units: [String], requires: [String]? = nil, sourceURL: String, contentsConfirmed: Bool
+        units: [String], requires: [String]? = nil, sourceURL: String, contentsConfirmed: Bool,
+        maps: [String]? = nil, mapSheets: Int? = nil
     ) {
+        self.maps = maps
+        self.mapSheets = mapSheets
         self.id = id
         self.title = title
         self.subtitle = subtitle

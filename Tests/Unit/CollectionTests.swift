@@ -41,6 +41,13 @@ struct BoxSetsContentTests {
         }
     }
 
+    @Test("A Game of Armored Combat lists the four maps its scenarios use")
+    func agoacMaps() throws {
+        let agoac = try #require(try catalog.boxSets().boxes.first { $0.id == "agoac" })
+        #expect(agoac.maps == ["Desert #2", "Grassland #2", "Grassland #3", "Desert #3"])
+        #expect(agoac.mapSheets == 2)
+    }
+
     @Test("Five boxes with unique ids, in catalog order")
     func ids() throws {
         let boxes = try catalog.boxSets().boxes
@@ -224,6 +231,57 @@ struct CollectionDerivationTests {
     func noneYet() {
         #expect(OwnedCollection.empty.isEmpty)
         #expect(!OwnedCollection(singles: ["Atlas": 1]).isEmpty)
+    }
+}
+
+@Suite("Maps")
+struct CollectionMapsTests {
+    private let boxA = BoxSetDTO(
+        id: "a", title: "Box A", subtitle: "", game: .both, miniCount: 0, units: [],
+        sourceURL: "https://example.com", contentsConfirmed: true, maps: ["Grasslands", "Desert Hills"]
+    )
+    private let boxB = BoxSetDTO(
+        id: "b", title: "Box B", subtitle: "", game: .classic, miniCount: 0, units: [],
+        sourceURL: "https://example.com", contentsConfirmed: true, maps: ["grasslands", "City Ruins"]
+    )
+
+    @Test("Owned boxes' maps come first, then maps added by hand, without repeats")
+    func ownedMaps() {
+        var owned = OwnedCollection(boxes: ["a": 1, "b": 1])
+        owned.addMap("  Lunar   Base ")
+        owned.addMap("city ruins")
+        let maps = CollectionMath.ownedMaps(owned, boxes: [boxA, boxB])
+        #expect(maps.map(\.name) == ["Grasslands", "Desert Hills", "City Ruins", "Lunar Base"])
+        #expect(maps.map(\.boxTitle) == ["Box A", "Box A", "Box B", nil])
+    }
+
+    @Test("Boxes not owned add no maps")
+    func notOwned() {
+        let maps = CollectionMath.ownedMaps(OwnedCollection(boxes: ["b": 1]), boxes: [boxA, boxB])
+        #expect(maps.map(\.name) == ["grasslands", "City Ruins"])
+    }
+
+    @Test("Adding a map trims, skips blanks and repeats; removing drops it")
+    func addRemove() {
+        var owned = OwnedCollection()
+        #expect(owned.addMap("   ") == nil)
+        #expect(owned.addMap("Lunar Base") == "Lunar Base")
+        #expect(owned.addMap("LUNAR BASE") == nil)
+        owned.removeMap("Lunar Base")
+        #expect(owned.maps.isEmpty)
+        #expect(owned.isEmpty)
+    }
+
+    @Test("Collections saved before maps decode with no maps")
+    func legacyDecode() throws {
+        let json = #"{"boxes":{"agoac":1},"missing":{},"singles":{"Atlas":1}}"#
+        let decoded = try JSONDecoder().decode(OwnedCollection.self, from: Data(json.utf8))
+        #expect(decoded.maps.isEmpty)
+        #expect(decoded.boxes == ["agoac": 1])
+        var withMap = decoded
+        withMap.addMap("Grasslands")
+        let round = try JSONDecoder().decode(OwnedCollection.self, from: JSONEncoder().encode(withMap))
+        #expect(round == withMap)
     }
 }
 
