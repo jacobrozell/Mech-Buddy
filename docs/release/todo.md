@@ -1,11 +1,11 @@
 # Mech Buddy — release todo
 
-For all future work in one place, see [../ROADMAP.md](../ROADMAP.md).
+For all future work in one place, see [../ROADMAP.md](../ROADMAP.md) and the checklist [../FUTURE-PLAN.md](../FUTURE-PLAN.md).
 
 Status legend: `[ ]` todo · `[x]` done
 
 - [x] **1.0.0 (2) uploaded to TestFlight** (2026-11-24), from `feature/guided-mission-ladder`. It has all five Alpha Strike missions, onboarding with box ownership, the collection with stand-ins and maps, and the rulebook fixes. Archive: `build/archives/MechBuddy-1.0.0-2.xcarchive`.
-- [ ] **Merge the PR** for `feature/guided-mission-ladder` so `main` matches TestFlight.
+- [x] **Merge the PR** for `feature/guided-mission-ladder` so `main` matches TestFlight. (Merged to `main` 2026-11-25.)
 - [ ] **Publish `docs/` on GitHub Pages** (privacy, support, accessibility).
 - [ ] **App Store Connect:** age rating, and the "Data Not Collected" privacy label.
 - [ ] **Play at the table:** Ridge Line through Full Lances on 1.0.0 (2). Note issues in `ongoing/play-<date>/NOTES.md`.

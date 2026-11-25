@@ -1,12 +1,14 @@
 # Mech Buddy roadmap
 
-The single starting point for future work. Each item links to the doc that holds its details. Last updated 2026-11-24, after TestFlight 1.0.0 (3).
+The single starting point for future work. Each item links to the doc that holds its details. Last updated 2026-11-25.
+
+**Checklist of all known work:** [FUTURE-PLAN.md](FUTURE-PLAN.md), including the compact battle mode findings from the 2026-11-25 UI review.
 
 ## Now: before and after the table test
 
 - [ ] Upload **1.0.0 (3)** from Xcode's Organizer (`build/archives/MechBuddy-1.0.0-3.xcarchive`), then play it at the table. Steps: [release/todo.md](release/todo.md#uploading-a-build).
-- [ ] Merge the `release/1.0.0-build-3` branch (the build-number bump, the mission guide and these docs). Delete the merged `feature/guided-mission-ladder` branch.
-- [ ] Merge `feature/mission-maps` (Maps needed and the table layout diagram for every mission). It builds on `release/1.0.0-build-3`, so merging it brings both in. Build 3 doesn't include the maps; archive **1.0.0 (4)** when you want them on TestFlight.
+- [x] Merge the `release/1.0.0-build-3` branch (the build-number bump, the mission guide and these docs). Delete the merged `feature/guided-mission-ladder` branch. (2026-11-25)
+- [x] Merge `feature/mission-maps` (Maps needed and the table layout diagram for every mission). Merged 2026-11-25 with three UI polish passes. Build 3 doesn't include them; archive **1.0.0 (4)** when you want them on TestFlight.
 - [ ] Note table issues in `ongoing/play-<date>/NOTES.md`, as in earlier playtests.
 - [ ] Alpha Strike polish checklist (on-screen checks and small layout fixes): [release/todo.md § Next session](release/todo.md#next-session-alpha-strike-polish-owners-focus-2026-11-24).
 
