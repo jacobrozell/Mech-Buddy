@@ -6,6 +6,7 @@ The single starting point for future work. Each item links to the doc that holds
 
 - [ ] Upload **1.0.0 (3)** from Xcode's Organizer (`build/archives/MechBuddy-1.0.0-3.xcarchive`), then play it at the table. Steps: [release/todo.md](release/todo.md#uploading-a-build).
 - [ ] Merge the `release/1.0.0-build-3` branch (the build-number bump, the mission guide and these docs). Delete the merged `feature/guided-mission-ladder` branch.
+- [ ] Merge `feature/mission-maps` (Maps needed and the table layout diagram for every mission). It builds on `release/1.0.0-build-3`, so merging it brings both in. Build 3 doesn't include the maps; archive **1.0.0 (4)** when you want them on TestFlight.
 - [ ] Note table issues in `ongoing/play-<date>/NOTES.md`, as in earlier playtests.
 - [ ] Alpha Strike polish checklist (on-screen checks and small layout fixes): [release/todo.md § Next session](release/todo.md#next-session-alpha-strike-polish-owners-focus-2026-11-24).
 
@@ -23,7 +24,7 @@ The single starting point for future work. Each item links to the doc that holds
 | Clash of Steel (box scenario) | Scoped | Needs Battlefield Support, formations (Lucky rerolls, Combat Intuition, Command Lance reroll) and buildings. Rules: [alpha-strike/clash-of-steel-rules-intake.md](game-modes/alpha-strike/clash-of-steel-rules-intake.md). Cards: [book-scenarios.md](game-modes/book-scenarios.md) |
 | Open play with objectives | Planned | 250 PV forces and six objectives (Raid, Hold the Fort and so on): [book-scenarios.md § Open play](game-modes/book-scenarios.md), [PRODUCT_SCOPE.md](game-modes/PRODUCT_SCOPE.md#long-term-roadmap-owner-2026-11-24) |
 | Rules still open | Open | "0*" minimal damage, water, and four printing conflicts marked [OPEN] in the Clash of Steel intake |
-| Mission map suggestions | Planned | Each mission suggests a map from the collection; experienced players can pick any (scope O3) |
+| Mission maps and layout diagram | Built (`feature/mission-maps`) | Each mission lists its maps and draws the table. Still to do: let experienced players swap in any map they own (scope O3), and add layouts for Classic missions using the book's scenario maps |
 
 **How to add a mission:**
 1. Add its JSON pack in `Resources/Content/AlphaStrike/`.
