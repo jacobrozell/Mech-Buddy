@@ -144,6 +144,13 @@ public struct RulesTopicsDTO: Codable, Sendable, ContentSchemaVersioned {
     public var contentVersion: String
     public var disclaimer: String?
     public var topics: [RulesTopicDTO]
+
+    public init(schemaVersion: Int, contentVersion: String, disclaimer: String?, topics: [RulesTopicDTO]) {
+        self.schemaVersion = schemaVersion
+        self.contentVersion = contentVersion
+        self.disclaimer = disclaimer
+        self.topics = topics
+    }
 }
 
 public struct RulesTopicDTO: Codable, Sendable, Identifiable {
@@ -154,12 +161,37 @@ public struct RulesTopicDTO: Codable, Sendable, Identifiable {
     public var summary: String?
     /// `start`, `during`, or `reference`. Omitted by older packs; the rules list maps by topic id.
     public var group: String?
+    /// Which game the topic belongs to. Every bundled topic sets it; the content tests check.
+    public var game: RulesGameTag?
     public var sections: [RulesSectionDTO]
+
+    public init(
+        id: String,
+        title: String,
+        screenId: String? = nil,
+        summary: String? = nil,
+        group: String? = nil,
+        game: RulesGameTag? = nil,
+        sections: [RulesSectionDTO]
+    ) {
+        self.id = id
+        self.title = title
+        self.screenId = screenId
+        self.summary = summary
+        self.group = group
+        self.game = game
+        self.sections = sections
+    }
 }
 
 public struct RulesSectionDTO: Codable, Sendable {
     public var heading: String
     public var body: String
+
+    public init(heading: String, body: String) {
+        self.heading = heading
+        self.body = body
+    }
 }
 
 public struct GettingStartedDTO: Codable, Sendable, ContentSchemaVersioned {

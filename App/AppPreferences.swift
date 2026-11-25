@@ -39,6 +39,8 @@ final class AppPreferences {
     /// Ids from `as-getting-started.json` the player ticked on the onboarding "What do you have?" screen.
     static let gettingStartedChecksKey = "settings.gettingStartedChecks"
     static let completedMissionsKey = "missions.completed"
+    /// The game last picked on the Rules tab's switch. Unset until the player changes it.
+    static let rulesGameKey = "rules.lastGame"
 
     private let defaults: UserDefaults
 
@@ -46,7 +48,7 @@ final class AppPreferences {
 
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey,
-        completedMissionsKey
+        completedMissionsKey, rulesGameKey
     ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys
 
     var hapticsEnabled: Bool {
@@ -72,6 +74,23 @@ final class AppPreferences {
     /// The game picked in onboarding. `nil` until chosen; Play treats that as Alpha Strike.
     var learningTrack: LearningTrack? {
         didSet { persistOnboarding() }
+    }
+
+    /// The game last picked on the Rules tab. `nil` until changed there; the tab then follows `learningTrack`.
+    var rulesGame: LearningTrack? {
+        didSet {
+            guard !isReloading else { return }
+            if let rulesGame {
+                defaults.set(rulesGame.rawValue, forKey: Self.rulesGameKey)
+            } else {
+                defaults.removeObject(forKey: Self.rulesGameKey)
+            }
+        }
+    }
+
+    /// The game the Rules tab shows: the last one picked there, else the onboarding game, else Alpha Strike.
+    var rulesGameToShow: LearningTrack {
+        RulesGameChoice.initial(lastViewed: rulesGame, onboarding: learningTrack)
     }
 
     /// True once the first-run flow was finished or skipped. Until then RootTabView shows it.
@@ -102,6 +121,7 @@ final class AppPreferences {
         defaultDiceMode = .manual
         gettingStartedChecks = []
         learningTrack = nil
+        rulesGame = nil
         hasCompletedOnboarding = false
         completedMissions = []
         collection = nil
@@ -140,6 +160,7 @@ final class AppPreferences {
         gettingStartedChecks = Set(defaults.stringArray(forKey: Self.gettingStartedChecksKey) ?? [])
         let onboarding = OnboardingStore.load(from: defaults)
         learningTrack = onboarding.track
+        rulesGame = defaults.string(forKey: Self.rulesGameKey).flatMap(LearningTrack.init(rawValue:))
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
         collection = CollectionStore.load(from: defaults)

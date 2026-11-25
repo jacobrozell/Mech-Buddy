@@ -11,7 +11,7 @@ enum AppTab: Hashable {
 struct RootTabView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var tab: AppTab = .play
+    @State private var tab: AppTab = LaunchArguments.openRules ? .rules : .play
     @State private var matches = PlayMatchCoordinator()
     @State private var replaceAfterConfirm = false
     /// The onboarding flow, when open. First launch opens it; Settings and Play can reopen it.

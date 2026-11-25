@@ -1,26 +1,27 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
-  "disclaimer": "Unofficial helper in plain language for a first Alpha Strike game. The official free Quick-Start PDF is at battletech.com/downloads. BattleTech and Alpha Strike are trademarks of their respective owners.",
+  "contentVersion": "1.1.0",
+  "disclaimer": "Unofficial helper in plain language for Alpha Strike. Page numbers are from the Alpha Strike Box Set Quick-Start Rulebook (3rd printing); the free Quick-Start PDF is at battletech.com/downloads. BattleTech and Alpha Strike are trademarks of their respective owners.",
   "topics": [
     {
       "id": "how-to-play",
       "title": "If you’ve never played a tabletop wargame",
-      "screenId": "rules.as.howto",
+      "screenId": "rules.as.how-to-play",
       "summary": "What you do at the table, and what the phone does.",
       "group": "start",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "What you actually do",
-          "body": "Two people sit at a table with plastic robots (’Mechs). You take turns moving them with a tape measure and rolling two six-sided dice to shoot. This phone does not move the models — you do. It just tells you whose turn it is and keeps score."
+          "body": "Two people sit at a table with plastic robots (’Mechs). You take turns moving them with a tape measure and rolling two six-sided dice to attack. This phone does not move the models — you do. It tells you whose turn it is, does the attack math, and keeps score."
         },
         {
           "heading": "A lance is a team",
-          "body": "Side A and Side B each control two ’Mechs in Ridge Line. That’s a small “lance.” Sit so you can both see the same phone."
+          "body": "Side A and Side B each control a few ’Mechs: two each in Ridge Line, more in later missions. That’s a small “lance.” Sit so you can both see the same phone."
         },
         {
           "heading": "Armor then Structure",
-          "body": "Armor is the outer layer of hit points. Structure is the inner layer. Damage chips armor first. When Structure hits 0, that ’Mech is wrecked (it may still shoot until you Clean up)."
+          "body": "Armor is the outer layer of hit points. Structure is the inner layer. Damage chips armor first. When Structure hits 0, that ’Mech is wrecked (it still gets its attack this turn, and comes off at Clean up)."
         },
         {
           "heading": "You need to roll this number or higher",
@@ -34,22 +35,27 @@
       "screenId": "rules.as.turn",
       "summary": "Roll, move, shoot, then clean up.",
       "group": "start",
+      "game": "alphaStrike",
       "sections": [
+        {
+          "heading": "Before turn 1: set up",
+          "body": "Roll initiative once to set up. The winner picks which side places a ’Mech first, then the sides take turns placing one at a time (Quick-Start p. 11)."
+        },
         {
           "heading": "1. Roll dice (initiative)",
           "body": "Each side rolls two dice. Highest total wins. The winner moves last, so they get to see where the other side went first. Same totals? Both roll again."
         },
         {
           "heading": "2. Move",
-          "body": "The side that lost the dice roll moves a miniature first. Then the other side. Keep alternating until every ’Mech has moved. Measure in inches from where the base starts to where it ends."
+          "body": "The side that lost the roll moves a ’Mech first. Then the other side. Keep alternating until every ’Mech has moved. If one side has at least twice as many ’Mechs left to move, it moves that many for each one the other side moves (p. 14). Measure in inches from where the base starts to where it ends."
         },
         {
           "heading": "3. Shoot",
-          "body": "Every ’Mech gets one shot. Both sides can roll at the same time, in any order: damage and critical effects all land at the end of the phase, so order doesn’t change anything. Measure range base-edge to base-edge. A ’Mech wrecked this turn still shoots until Clean up."
+          "body": "Each ’Mech makes one attack: a shot, or a punch or kick where the mission allows it. Both sides can attack in any order, because damage and critical effects all land at the end of the phase. When both sides are finished, tap Done shooting once to end the phase. A ’Mech wrecked this turn still gets its attack."
         },
         {
           "heading": "4. Clean up",
-          "body": "Take wrecked ’Mechs off the table. The app checks whether someone won. If not, start a new turn at Roll dice. Ridge Line lasts at most 6 turns."
+          "body": "This is the rulebook’s End Phase. Heat goes on and comes off (see Heat and shutdown). Wrecked ’Mechs come off the table. The app checks whether someone won; if not, a new turn starts at Roll dice. Each mission has a turn limit."
         }
       ]
     },
@@ -59,22 +65,31 @@
       "screenId": "rules.as.movement",
       "summary": "Walk, stand still, sprint, or jump.",
       "group": "during",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "Walk, stand, sprint, or jump",
-          "body": "Walk: up to the Move number on the card (inches). Stand still: less than 1 inch — easier to shoot afterward. Sprint: about 1½× Move, but it cannot shoot this turn. Jump: use the jump number on the card; jumping ignores most terrain but makes shooting harder."
+          "body": "Walk: up to the Move number on the card, in inches. Stand still: less than 1 inch — your own shot gets easier. Sprint: Move × 1.5, rounded up, but it can’t attack this turn. Jump: a Move with a “j” can be used as a jump instead; your shot gets harder and you’re harder to hit."
         },
         {
-          "heading": "Woods (this first game)",
-          "body": "Trees cost extra inches to walk through. A shot is 1 harder if the target stands in woods, or if woods between you are more than 2 inches from the shooter. 6 inches or more of woods in the way blocks the shot. Skip hills, water, and buildings in Ridge Line."
+          "heading": "Jump jets: JMPW and JMPS",
+          "body": "Some cards list weak or strong jump jets. When the ’Mech jumps, its “harder to hit” number goes down by the JMPW number or up by the JMPS number. The Shadow Hawk’s JMPW 1 is why it’s +2 when it jumps, not +3 (pp. 18, 20)."
+        },
+        {
+          "heading": "Heat slows you down",
+          "body": "Each heat level takes 2 inches off a ground move, and at heat 2 or more you’re 1 easier to hit. Jumping ignores both. At heat 4 the ’Mech shuts down and can’t move next turn (p. 24)."
+        },
+        {
+          "heading": "MP hits",
+          "body": "A critical MP hit halves Move and “harder to hit,” cutting at least 2 inches and 1 point. A second hit halves them again. The ’Mech is immobile only when Move reaches 0 (p. 23)."
+        },
+        {
+          "heading": "Woods",
+          "body": "Trees cost extra inches to walk through. A shot is 1 harder if the target stands in woods, or if woods between you are more than 2 inches from the shooter. 6 inches or more of woods in the way blocks the shot (pp. 17, 19)."
         },
         {
           "heading": "Don’t stack",
           "body": "You can walk through your own ’Mechs but not enemies. Two ’Mechs cannot end on top of each other — the whole base needs space."
-        },
-        {
-          "heading": "Forced Withdrawal (Full Lances on)",
-          "body": "A crippled ’Mech must move toward its own table edge every turn. It doesn’t have to sprint, and it can still shoot or punch enemies in range. Crippled means: no armor and Structure at half or less (rounded up), or Medium and Long damage both 0, or it can’t move because of MP hits. Any ’Mech that leaves the table counts as destroyed and can’t come back."
         }
       ]
     },
@@ -82,45 +97,51 @@
       "id": "combat",
       "title": "Can I even shoot?",
       "screenId": "rules.as.combat",
-      "summary": "See it, face it, and stay in range.",
+      "summary": "See it, face it, reach it, and do damage.",
       "group": "during",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "See it, face it, reach it",
-          "body": "You need a mostly-clear view of the target, it should be in front of your ’Mech (not mostly behind it), and it must be within 42 inches. Measure base edge to base edge."
+          "body": "You need a mostly clear view of the target, it should be in front of your ’Mech (not mostly behind it), and it must be within 42 inches. Measure base edge to base edge."
+        },
+        {
+          "heading": "No damage at that range, no shot",
+          "body": "If the card shows 0 damage at that range, the ’Mech can’t shoot that far. The shot screen won’t offer it (p. 20)."
         },
         {
           "heading": "Touching bases",
-          "body": "If two ’Mechs’ bases are touching, neither can shoot the other: that close, only punches and kicks work. In the first three missions, back off first. In the shot screen, More… → Bases touching."
-        },
-        {
-          "heading": "Punch or kick (Close Quarters on)",
-          "body": "An enemy within 1 inch and in front of your ’Mech can be punched or kicked instead of shot. Damage equals your Size, +1 from behind. To-hit is Skill + your move + its move + woods or cover, with no range and no heat. Charge and Death From Above are not in these missions."
+          "body": "If two ’Mechs’ bases are touching, neither can shoot the other: that close, only punches and kicks work. On the shot screen, More… → Bases touching (p. 20)."
         },
         {
           "heading": "One attack per ’Mech per turn",
-          "body": "Each ’Mech shoots or punches once, never both, then it’s done until next turn."
+          "body": "Each ’Mech shoots or punches once, never both, then it’s done until next turn (pp. 18, 22)."
+        },
+        {
+          "heading": "Overheat for more damage",
+          "body": "A card with OV can push its Short and Medium damage up by 1 or more, up to its OV number. Long only with OVL. Pick it before you roll; you take the heat hit or miss (p. 24)."
         }
       ]
     },
     {
       "id": "sator",
       "title": "How the to-hit number is built",
-      "screenId": "rules.as.satorRef",
+      "screenId": "rules.as.sator",
       "summary": "How the number you need is built.",
       "group": "during",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "You don’t have to memorize this",
-          "body": "The Attack screen adds it up. Official name: SATOR — Skill + how you moved + how they moved + extras (woods, cover) + range. Roll two dice; equal or higher hits."
+          "body": "The Attack screen adds it up. Official name: SATOR — Skill + how you moved + how they moved + extras (woods, cover, heat, criticals) + range. Roll two dice; equal or higher hits."
         },
         {
           "heading": "Range in inches",
-          "body": "Up to 6\": easiest. More than 6\" up to 24\": a bit harder. More than 24\" up to 42\": harder still. Farther than 42\": no shot."
+          "body": "Up to 6″: +0. More than 6″ up to 24″: +2. More than 24″ up to 42″: +4. Farther than 42″: no shot (p. 19)."
         },
         {
           "heading": "If the number is 13 or more",
-          "body": "The shot always misses. Rolling two 6s (a 12) is not an automatic hit — but if a 12 does hit, you also roll a critical even if only Armor was damaged."
+          "body": "The shot always misses. Rolling two 6s (a 12) is not an automatic hit — but if a 12 does hit, it also owes a critical roll, even if only Armor was damaged (pp. 21–22)."
         }
       ]
     },
@@ -130,18 +151,119 @@
       "screenId": "rules.as.damage",
       "summary": "Armor, structure, wrecks, and criticals.",
       "group": "during",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "Where damage goes",
-          "body": "Subtract from Armor first. Leftover goes to Structure. If any Structure is marked, roll a critical (two dice) — the app has a screen for that. Structure 0 = wrecked at Clean up."
+          "body": "Use the card’s damage for the range, minus any weapon hits. A hit from behind adds 1. Subtract from Armor first; the rest goes to Structure. Structure 0 means wrecked, removed at Clean up."
         },
         {
-          "heading": "Heat",
-          "body": "Ridge Line does not let you overheat for extra damage. An engine critical still adds heat, up to 4, and later shots get harder."
+          "heading": "When you roll a critical",
+          "body": "Damage that reaches Structure owes one critical roll. A hit on a natural 12 owes one more. A ’Mech the hit destroys owes none. The side that made the hit rolls (pp. 21–23)."
         },
         {
-          "heading": "Criticals in one sentence",
-          "body": "An extra roll that can jam weapons, hurt the engine, or destroy the ’Mech. Follow the app; you don’t need the table memorized."
+          "heading": "What criticals do",
+          "body": "Two dice on the critical table. Results can add heat to the engine, make shots harder (fire control +2 each), cut Move (MP hit), lower damage (weapon hit), or destroy the ’Mech. A second engine hit destroys it. The app has a screen for the roll (p. 23)."
+        },
+        {
+          "heading": "If the effect can’t happen",
+          "body": "A weapon hit when all damage is already 0, or an MP hit on a ’Mech already at 0″, does 1 damage instead, with no further critical roll (p. 23)."
+        },
+        {
+          "heading": "Ammo hits and CASE",
+          "body": "An ammo hit destroys the ’Mech unless the card says otherwise. CASE: it takes 1 extra damage instead, and rolls again if that reaches Structure. CASE II or ENE: nothing happens (pp. 23, 25)."
+        }
+      ]
+    },
+    {
+      "id": "heat",
+      "title": "Heat and shutdown",
+      "screenId": "rules.as.heat",
+      "summary": "Heat 0 to 4, what it costs, and how to cool.",
+      "group": "during",
+      "game": "alphaStrike",
+      "sections": [
+        {
+          "heading": "Where heat comes from",
+          "body": "Overheating (using OV) adds 1 heat per point. An engine critical adds 1 more in any turn the ’Mech fired its weapons. Heat goes on at Clean up (the End Phase), so it affects next turn, not the shot that caused it (pp. 23–24)."
+        },
+        {
+          "heading": "What heat costs",
+          "body": "Each level adds 1 to your weapon shots (not punches) and takes 2 inches off a ground move. At 2 or more you’re 1 easier to hit. At 4 you shut down: next turn you can’t move or attack, and you’re easy to hit (−4) (p. 24)."
+        },
+        {
+          "heading": "Clean up, in order",
+          "body": "1. Add the OV heat used this turn. 2. −1 if standing in water. 3. If the ’Mech made no weapon attack this turn, clear all its heat. 4. If it started the End Phase shut down, clear its heat and restart it. Heat doesn’t drop by 1 a turn — you cool off by not shooting (p. 24)."
+        },
+        {
+          "heading": "HT: heat attacks",
+          "body": "A card with HT heats up its target. A hit at a range where HT has a number adds that much heat at Clean up, after cooling. A target takes at most 2 heat this way a turn."
+        }
+      ]
+    },
+    {
+      "id": "physical",
+      "title": "Punches and kicks",
+      "screenId": "rules.as.physical",
+      "summary": "Size damage, within 1 inch, instead of a shot.",
+      "group": "during",
+      "game": "alphaStrike",
+      "sections": [
+        {
+          "heading": "When you can",
+          "body": "In missions with punches and kicks, an enemy within 1 inch and in front of your ’Mech can be punched or kicked instead of shot. It’s the ’Mech’s one attack for the turn (pp. 20, 22)."
+        },
+        {
+          "heading": "To-hit",
+          "body": "Skill + your move + its move + woods or cover. No range, no heat, no fire-control hits (pp. 20, 22)."
+        },
+        {
+          "heading": "Damage",
+          "body": "Your Size number. +1 if you hit it from behind. Weapon hits don’t lower it, and overheat can’t add to it. Damage that reaches Structure still rolls a critical (pp. 22–23)."
+        },
+        {
+          "heading": "Not in these missions",
+          "body": "Charge and Death From Above need a declaration in the Movement Phase, and the attacker takes damage too. The app leaves them out for now."
+        }
+      ]
+    },
+    {
+      "id": "withdrawal",
+      "title": "Forced Withdrawal",
+      "screenId": "rules.as.withdrawal",
+      "summary": "Crippled ’Mechs head for home.",
+      "group": "during",
+      "game": "alphaStrike",
+      "sections": [
+        {
+          "heading": "When it’s on",
+          "body": "Full Lances uses Forced Withdrawal. A crippled ’Mech must move toward its own table edge every turn. It doesn’t have to sprint, and it can still shoot or punch enemies in range (p. 12)."
+        },
+        {
+          "heading": "Crippled means any one of these",
+          "body": "No armor left and Structure at half or less (rounded up). Medium and Long damage both 0. It can’t move because of MP hits (p. 12)."
+        },
+        {
+          "heading": "Leaving the table",
+          "body": "Any ’Mech that leaves the table, for any reason, counts as destroyed and can’t come back (p. 12)."
+        }
+      ]
+    },
+    {
+      "id": "points",
+      "title": "Point Value and Skill",
+      "screenId": "rules.as.points",
+      "summary": "Better pilots cost more points.",
+      "group": "reference",
+      "game": "alphaStrike",
+      "sections": [
+        {
+          "heading": "What PV is",
+          "body": "Point Value (PV) on the card is what the ’Mech costs when you build a force. Sides with similar totals make a fair fight."
+        },
+        {
+          "heading": "Skill changes the cost",
+          "body": "The printed PV is for Skill 4. A better pilot (Skill 3 or lower) costs more; a greener one (Skill 5 or higher) costs less. The app adjusts PV with the skill table on p. 33 of the Quick-Start Rulebook when Skill isn’t 4."
         }
       ]
     },
@@ -151,18 +273,19 @@
       "screenId": "rules.as.tables",
       "summary": "Move, target, and cover modifiers.",
       "group": "reference",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "If you moved…",
-          "body": "Stood still: −1 to your shot. Walked: no change. Jumped: +2 to your shot. Sprinted: you cannot shoot."
+          "body": "Stood still: −1 to your shot. Walked: no change. Jumped: +2 to your shot. Sprinted: you can’t attack."
         },
         {
           "heading": "If they moved…",
-          "body": "Walked or sprinted: add their “harder to hit” number. Stood still: +0. Jumped: that number +1. Immobile: −4 (much easier)."
+          "body": "Walked or sprinted: add their “harder to hit” number (TMM). Stood still: +0. Jumped: TMM +1, adjusted by JMPW or JMPS. Shut down or immobile: −4 (much easier)."
         },
         {
           "heading": "Common extras",
-          "body": "Woods +1. Partial cover +1. Each fire-control critical +2."
+          "body": "Woods +1. Partial cover +1. Your heat level +1 each. Each fire-control critical +2. None of these extras count for punches and kicks except woods and cover."
         }
       ]
     },
@@ -172,10 +295,19 @@
       "screenId": "rules.as.abbreviations",
       "summary": "The letters on a unit card.",
       "group": "reference",
+      "game": "alphaStrike",
       "sections": [
         {
-          "heading": "You can ignore most of these in Ridge Line",
-          "body": "ENE or CASE II: an ammo hit does nothing. CASE: an ammo hit does 1 extra damage instead of destroying you. MV: how many inches you walk. TMM: extra number when someone shoots at you (the app calls this “harder to hit”). S/M/L: damage at short / medium / long range. A/S: Armor / Structure. Skill: usually 4 — the starting number for shots."
+          "heading": "The basics",
+          "body": "MV: how many inches you walk (a “j” means it can jump). TMM: extra number when someone shoots at you (the app calls this “harder to hit”). S/M/L: damage at short / medium / long range. A/S: Armor / Structure. SZ: Size, which is also punch damage. Skill: usually 4 — the starting number for shots. PV: Point Value."
+        },
+        {
+          "heading": "Heat",
+          "body": "OV: how much extra damage you can overheat for. OVL: you can overheat at Long range too. HT: heat attack (see Heat and shutdown)."
+        },
+        {
+          "heading": "Special abilities",
+          "body": "JMPW / JMPS: weak or strong jump jets. CASE: an ammo hit does 1 extra damage instead of destroying you. CASE II or ENE: an ammo hit does nothing. MEL: punches reach 2 inches and do Size + 1. REAR, IF, LRM, SRM: not used in these missions yet."
         }
       ]
     },
@@ -185,6 +317,7 @@
       "screenId": "rules.as.odds",
       "summary": "The chance two dice hit a target number.",
       "group": "reference",
+      "game": "alphaStrike",
       "sections": [
         {
           "heading": "Chance to roll this number or higher on two dice",

@@ -41,6 +41,7 @@ Implement cases in [SATORAttackSpec](features/SATORAttackSpec.md) § Golden test
 | `-enable_full_product_surface` | Free Battle, Full Lances, Classic tools, etc. (`ReleaseSurface`) |
 | `-enable_mul_fetch` | Network MUL. Not implemented. |
 | `-reset_state` | Wipe saved games and settings keys, onboarding answers included (`LaunchArguments.resetState`, Debug only). Pair with `-skip_onboarding` for UI tests that start on Play |
+| `-open_rules` | Start on the Rules tab (`LaunchArguments.openRules`, Debug only). The game shown follows `rules.lastGame`, else the onboarding game |
 | `-ui_testing` | In-memory match store (`LaunchArguments.inMemoryStore`, Debug only). Does not show the volatile-store banner. |
 | `-open_as_battle` | Not implemented (not needed) |
 | `-load_ridge_line` | Not implemented (not needed) |

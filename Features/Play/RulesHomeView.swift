@@ -5,11 +5,30 @@ import MechBuddyData
 struct RulesHomeView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @State private var topics: [RulesTopicDTO] = []
-    @State private var disclaimer: String?
+    @State private var library: RulesLibrary?
     @State private var query = ""
     @State private var loadError: String?
     @State private var selection: String?
+
+    /// The game whose rules are listed. Follows the onboarding game until the player picks one here.
+    private var game: LearningTrack {
+        dependencies.preferences.rulesGameToShow
+    }
+
+    private var gameBinding: Binding<LearningTrack> {
+        Binding(
+            get: { dependencies.preferences.rulesGameToShow },
+            set: { dependencies.preferences.rulesGame = $0 }
+        )
+    }
+
+    private var topics: [RulesTopicDTO] {
+        library?.topics(for: game) ?? []
+    }
+
+    private var disclaimer: String? {
+        library?.disclaimer(for: game)
+    }
 
     private var usesSplit: Bool {
         UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .regular
@@ -42,7 +61,7 @@ struct RulesHomeView: View {
         List {
             topicSections(split: false)
         }
-        .rulesListChrome(query: $query)
+        .rulesListChrome(query: $query, game: game)
         .task { await load() }
     }
 
@@ -50,10 +69,11 @@ struct RulesHomeView: View {
         List(selection: $selection) {
             topicSections(split: true)
         }
-        .rulesListChrome(query: $query)
+        .rulesListChrome(query: $query, game: game)
         .task { await load() }
         .onChange(of: topics.map(\.id)) { _, ids in
-            if selection == nil {
+            // A new game has different topics; keep the selection only if it is still listed.
+            if selection.map({ !ids.contains($0) }) ?? true {
                 selection = ids.first
             }
         }
@@ -61,6 +81,16 @@ struct RulesHomeView: View {
 
     @ViewBuilder
     private func topicSections(split: Bool) -> some View {
+        Section {
+            RulesGameSwitch(selection: gameBinding)
+            if game == .classic {
+                Label("Classic isn’t playable in Mech Buddy yet. Read its rules here and play Alpha Strike for now.", systemImage: "info.circle")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("rules.classicNote")
+            }
+        }
         if let loadError {
             EmptyState(
                 systemImage: "book.closed",
@@ -83,7 +113,7 @@ struct RulesHomeView: View {
                     if split {
                         topicRow(topic)
                             .tag(topic.id)
-                            .accessibilityIdentifier("rules.as.\(topic.id)")
+                            .accessibilityIdentifier(RulesGroup.identifier(for: topic))
                             .accessibilityHint("Opens this topic")
                     } else {
                         NavigationLink {
@@ -91,7 +121,7 @@ struct RulesHomeView: View {
                         } label: {
                             topicRow(topic)
                         }
-                        .accessibilityIdentifier("rules.as.\(topic.id)")
+                        .accessibilityIdentifier(RulesGroup.identifier(for: topic))
                         .accessibilityHint("Opens this topic")
                     }
                 }
@@ -141,13 +171,11 @@ struct RulesHomeView: View {
 
     private func load() async {
         do {
-            let packed = try dependencies.content.rulesTopics()
-            topics = packed.topics
-            disclaimer = packed.disclaimer
+            library = try dependencies.content.rulesLibrary()
             loadError = nil
         } catch {
             loadError = error.localizedDescription
-            topics = []
+            library = nil
         }
     }
 }
@@ -179,15 +207,29 @@ enum RulesGroup: String, CaseIterable {
         }
     }
 
+    /// `rules.as.{id}`, `rules.classic.{id}`, or `rules.both.{id}`.
+    static func identifier(for topic: RulesTopicDTO) -> String {
+        "rules.\((topic.game ?? .alphaStrike).identifierKey).\(topic.id)"
+    }
+
     static func symbol(for id: String) -> String {
-        switch id {
-        case "how-to-play": "questionmark.circle"
+        let key = id.hasPrefix("classic-") ? String(id.dropFirst("classic-".count)) : id
+        return switch key {
+        case "how-to-play", "about": "questionmark.circle"
+        case "differences": "arrow.left.arrow.right"
         case "turn": "arrow.triangle.2.circlepath"
         case "movement": "figure.walk"
         case "combat": "scope"
-        case "sator": "target"
+        case "sator", "to-hit": "target"
         case "damage": "shield.lefthalf.filled"
-        case "tables": "tablecells"
+        case "heat": "thermometer.medium"
+        case "physical": "hand.raised"
+        case "withdrawal": "arrow.uturn.backward"
+        case "points": "scalemass"
+        case "piloting": "figure.fall"
+        case "criticals": "exclamationmark.triangle"
+        case "quickstart": "book"
+        case "tables", "numbers": "tablecells"
         case "abbreviations": "textformat.abc"
         case "odds": "chart.bar"
         default: "book.closed"
@@ -206,12 +248,72 @@ enum RulesGroup: String, CaseIterable {
     }
 }
 
+/// "Alpha Strike | Classic" at the top of the Rules tab. Segments truncate at accessibility sizes,
+/// so there the two games stack as full-width rows.
+struct RulesGameSwitch: View {
+    @Binding var selection: LearningTrack
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: TMSpace.sm) {
+                    Text("Rules for")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    ForEach(LearningTrack.allCases) { game in
+                        stackedRow(game)
+                    }
+                }
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Rules for")
+            } else {
+                Picker("Rules for", selection: $selection) {
+                    ForEach(LearningTrack.allCases) { game in
+                        Text(RulesGameChoice.shortTitle(game))
+                            .tag(game)
+                            .accessibilityIdentifier("rules.game.\(game.rawValue)")
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityHint("Shows the rules for this game.")
+            }
+        }
+        .accessibilityIdentifier("rules.gamePicker")
+    }
+
+    private func stackedRow(_ game: LearningTrack) -> some View {
+        let isSelected = selection == game
+        return Button {
+            selection = game
+        } label: {
+            HStack(spacing: TMSpace.md) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                    .accessibilityHidden(true)
+                Text(RulesGameChoice.shortTitle(game))
+                    .font(TMFont.body.weight(isSelected ? .semibold : .regular))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(RulesGameChoice.shortTitle(game)) rules")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier("rules.game.\(game.rawValue)")
+    }
+}
+
 private extension View {
-    func rulesListChrome(query: Binding<String>) -> some View {
+    func rulesListChrome(query: Binding<String>, game: LearningTrack) -> some View {
         self
             .navigationTitle("Rules")
             .accessibilityIdentifier("rules.home")
-            .searchable(text: query, prompt: "Search titles and text")
+            .searchable(text: query, prompt: "Search \(RulesGameChoice.shortTitle(game)) rules")
     }
 }
 
