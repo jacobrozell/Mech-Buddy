@@ -68,10 +68,12 @@ struct MissionLadderTests {
             let dto = try catalog.scenario(id: ScenarioId(rawValue: item.id))
             for unit in dto.sides.lanceA + dto.sides.lanceB {
                 let card = try #require(checked[unit.name], "\(item.id): \(unit.name) has no checked card")
-                #expect(unit.pv == card.pv && unit.mv == card.mv && unit.tmm == card.tmm, "\(unit.name)")
+                // Cards print PV at Skill 4; a better pilot costs more (Quick-Start p. 33).
+                let pv = AlphaStrikePointValue.adjusted(base: card.pv, skill: unit.skill)
+                #expect(unit.pv == pv && unit.mv == card.mv && unit.tmm == card.tmm, "\(unit.name)")
                 #expect(unit.sz == card.sz && unit.s == card.s && unit.m == card.m && unit.l == card.l, "\(unit.name)")
                 #expect(unit.ov == card.ov && unit.armor == card.armor && unit.structure == card.structure, "\(unit.name)")
-                #expect(unit.skill == card.skill && unit.abilities == card.abilities, "\(unit.name)")
+                #expect((1...6).contains(unit.skill) && unit.abilities == card.abilities, "\(unit.name)")
             }
         }
     }
@@ -81,7 +83,14 @@ struct MissionLadderTests {
         card("Catapult CPLT-C1", pv: 32, mv: "8\"j", tmm: 1, sz: 3, dmg: (2, 3, 2), ov: 1, armor: 5, structure: 5, abilities: "IF1,LRM1/1/1"),
         card("Thunderbolt TDR-5S", pv: 36, mv: "8\"", tmm: 1, sz: 3, dmg: (3, 3, 1), ov: 1, armor: 7, structure: 5, abilities: "IF1"),
         card("Awesome AWS-8Q", pv: 39, mv: "6\"", tmm: 1, sz: 4, dmg: (3, 3, 3), ov: 0, armor: 8, structure: 6, abilities: "ENE"),
-        card("BattleMaster BLR-1G", pv: 40, mv: "8\"", tmm: 1, sz: 4, dmg: (3, 3, 1), ov: 1, armor: 8, structure: 7, abilities: "REAR1/1/-")
+        card("BattleMaster BLR-1G", pv: 40, mv: "8\"", tmm: 1, sz: 4, dmg: (3, 3, 1), ov: 1, armor: 8, structure: 7, abilities: "REAR1/1/-"),
+        // Alpha Strike Box Set, Meet and Greet (Quick-Start p. 26). MUL unit pages, checked 2026-11-24.
+        card("Blackjack BJ-5", pv: 27, mv: "8\"j", tmm: 1, sz: 2, dmg: (2, 3, 3), ov: 0, armor: 5, structure: 2, abilities: "CASEII"),
+        card("Phoenix Hawk PXH-4M", pv: 31, mv: "12\"j", tmm: 2, sz: 2, dmg: (3, 3, 1), ov: 0, armor: 5, structure: 2, abilities: "ENE"),
+        card("Wasp WSP-5A", pv: 17, mv: "16\"j", tmm: 3, sz: 1, dmg: (1, 1, 0), ov: 0, armor: 2, structure: 1, abilities: "CASEII"),
+        card("Locust LCT-7V", pv: 25, mv: "20\"", tmm: 4, sz: 1, dmg: (2, 2, 0), ov: 0, armor: 2, structure: 1, abilities: ""),
+        card("Nova T", pv: 42, mv: "10\"j", tmm: 2, sz: 2, dmg: (6, 6, 0), ov: 0, armor: 5, structure: 3, abilities: "CASE, OMNI"),
+        card("Pouncer T", pv: 29, mv: "12\"/10\"j", tmm: 2, sz: 2, dmg: (3, 3, 0), ov: 0, armor: 4, structure: 2, abilities: "ENE, HT1/1/-, OMNI")
     ]
 
     private static func card(
@@ -138,7 +147,7 @@ struct MissionLadderTests {
 
     @Test("Every mission on the path is playable, so the finish trophy can be earned")
     func wholePathPlayable() throws {
-        let items = try catalog.scenarios().scenarios
+        let items = try catalog.scenarios().scenarios.filter { $0.stage == nil }
         #expect(items.count == 5)
         for item in items {
             #expect(!item.gated, "\(item.id)")
@@ -225,3 +234,44 @@ struct MissionLadderTests {
 }
 
 private final class LadderBundleToken {}
+
+@Suite("Meet and Greet and box scenarios")
+struct MeetAndGreetTests {
+    private var catalog: BundleContentCatalogRepository {
+        BundleContentCatalogRepository(bundle: Bundle(for: MeetAndGreetBundleToken.self))
+    }
+
+    @Test("Listed after the training path, in the Alpha Strike box section")
+    func catalogEntry() throws {
+        let items = try catalog.scenarios().scenarios
+        let entry = try #require(items.first { $0.id == "meet-and-greet" })
+        #expect(entry.stage == "From the Alpha Strike box")
+        #expect(!entry.gated)
+        let lastTraining = try #require(items.lastIndex { $0.stage == nil })
+        #expect(try #require(items.firstIndex { $0.id == "meet-and-greet" }) > lastTraining)
+    }
+
+    @Test("The book's forces: four Highlanders vs two Jade Falcons, book skills, Forced Withdrawal on")
+    func forces() throws {
+        let dto = try catalog.scenario(id: ScenarioId(rawValue: "meet-and-greet"))
+        #expect(dto.sides.lanceA.map(\.skill) == [3, 3, 4, 4])
+        #expect(dto.sides.lanceB.map(\.skill) == [2, 3])
+        #expect(dto.sides.lanceA.map(\.pv).reduce(0, +) == 111)
+        #expect(dto.sides.lanceB.map(\.pv).reduce(0, +) == 93)
+        let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+        #expect(ruleset.forcedWithdrawal && ruleset.overheatAllowed && ruleset.physicalAttacksAllowed)
+    }
+
+    @Test("Alpha Strike box owners have every mini, exactly, with no stand-ins")
+    func boxCoversIt() throws {
+        let dto = try catalog.scenario(id: ScenarioId(rawValue: "meet-and-greet"))
+        let forces = (dto.sides.lanceA + dto.sides.lanceB).map(\.name)
+        let check = CollectionMath.miniCheck(
+            forces: forces, collection: OwnedCollection(boxes: ["alpha-strike-box": 1]),
+            boxes: try catalog.boxSets().boxes
+        )
+        #expect(check.hasAll && check.standIns.isEmpty, "\(check.summary)")
+    }
+}
+
+private final class MeetAndGreetBundleToken {}

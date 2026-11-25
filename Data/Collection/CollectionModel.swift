@@ -9,13 +9,16 @@ import Foundation
 /// Mission forces name a variant ("Locust LCT-1V"); boxes and singles often don't ("Locust").
 /// Minis match by chassis: the name without its variant code.
 public enum UnitChassis {
-    /// "Locust LCT-1V" → "Locust". Drops the last word when it has a digit. "Mad Cat Mk II" stays whole.
+    /// "Locust LCT-1V" → "Locust", "Nova T" → "Nova", "Timber Wolf Prime" → "Timber Wolf".
+    /// Drops the last word when it has a digit, or is an OmniMech configuration (one capital letter or "Prime").
+    /// "Mad Cat Mk II" stays whole.
     public static func name(_ unit: String) -> String {
         let parts = unit.split(whereSeparator: \.isWhitespace)
-        guard parts.count > 1, let last = parts.last, last.contains(where: \.isNumber) else {
-            return parts.joined(separator: " ")
-        }
-        return parts.dropLast().joined(separator: " ")
+        guard parts.count > 1, let last = parts.last else { return parts.joined(separator: " ") }
+        let isVariant = last.contains(where: \.isNumber)
+            || last == "Prime"
+            || (last.count == 1 && last.first?.isUppercase == true)
+        return isVariant ? parts.dropLast().joined(separator: " ") : parts.joined(separator: " ")
     }
 
     /// Case- and spacing-insensitive chassis, for comparing.

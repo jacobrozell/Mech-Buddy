@@ -20,6 +20,11 @@ struct MissionStop: Identifiable, Equatable {
     var unlocks: [String]
     var comingSoon: String?
     var state: State
+    /// Section after the training path (the catalog's `stage`), shown instead of "Mission N".
+    var stage: String? = nil
+
+    /// "Mission 3", or the section name for book scenarios.
+    var label: String { stage ?? "Mission \(number)" }
 
     var statusText: String {
         switch state {
@@ -35,6 +40,8 @@ struct MissionStop: Identifiable, Equatable {
 /// fills in as missions are cleared. A trophy waits at the end.
 struct MissionPathView<UpNext: View>: View {
     var stops: [MissionStop]
+    /// The trophy at the end. Off for the sections after the training path.
+    var showsFinish = true
     var onSelect: (MissionStop) -> Void
     @ViewBuilder var upNext: (MissionStop) -> UpNext
 
@@ -60,7 +67,9 @@ struct MissionPathView<UpNext: View>: View {
                     }
                 }
             }
-            finish
+            if showsFinish {
+                finish
+            }
         }
         .frame(maxWidth: .infinity)
         .backgroundPreferenceValue(PathNodeKey.self) { anchors in
@@ -127,7 +136,7 @@ struct MissionPathView<UpNext: View>: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(TMColor.signal)
             } else {
-                Text(stop.state == .next ? "Mission \(stop.number)" : stop.statusText)
+                Text(stop.state == .next ? stop.label : stop.statusText)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
@@ -165,7 +174,7 @@ struct MissionPathView<UpNext: View>: View {
     }
 
     private func spokenLabel(_ stop: MissionStop) -> String {
-        var parts = ["Mission \(stop.number), \(stop.title)", stop.statusText]
+        var parts = ["\(stop.label), \(stop.title)", stop.statusText]
         if !stop.unlocks.isEmpty {
             parts.append("Unlocks \(stop.unlocks.joined(separator: ", "))")
         }
@@ -205,7 +214,7 @@ struct MissionPathView<UpNext: View>: View {
     /// solid once the earlier mission is cleared, dotted otherwise.
     @ViewBuilder
     private func connectors(anchors: [String: Anchor<CGPoint>], in proxy: GeometryProxy) -> some View {
-        let ids = stops.map(\.id) + [Self.finishID]
+        let ids = stops.map(\.id) + (showsFinish ? [Self.finishID] : [])
         ForEach(Array(zip(ids, ids.dropFirst())), id: \.0) { from, to in
             if let a = anchors[Self.exit(from)], let b = anchors[Self.entry(to)] {
                 let start = proxy[a].applying(CGAffineTransform(translationX: 0, y: TMSpace.xs))

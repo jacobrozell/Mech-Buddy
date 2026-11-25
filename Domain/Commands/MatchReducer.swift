@@ -416,6 +416,16 @@ public enum MatchReducer {
             if applied.needsCritical {
                 note += " A critical is owed."
             }
+            // HT#/#/#: a hit at that range adds heat to the target in the End Phase, at most 2 a turn (p. 25).
+            let heatAbility = physical ? 0 : attacker.heatAbility(at: bracket)
+            if heatAbility > 0 {
+                let before = next.units[defenderIdx].incomingHeatThisTurn
+                let after = min(MatchUnitState.maxIncomingHeatPerTurn, before + heatAbility)
+                next.units[defenderIdx].incomingHeatThisTurn = after
+                if after > before {
+                    note += " +\(after - before) heat to \(defender.name) in the End Phase (HT)."
+                }
+            }
         } else {
             note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value).\(how) No damage."
         }

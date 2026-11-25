@@ -37,7 +37,8 @@ public enum AlphaStrikeHeat {
     /// 1. add overheat used this turn (and 1 per engine hit if it fired);
     /// 2. (standing in water −1: not tracked by the app);
     /// 3. clear all heat if it made no weapon attack this turn (a punch or kick isn't one);
-    /// 4. clear all heat and restart if it began this End Phase shut down.
+    /// 4. clear all heat and restart if it began this End Phase shut down;
+    /// 5. add external heat: enemy HT hits this turn, at most 2 (p. 24–25).
     public static func endPhase(_ unit: inout MatchUnitState) -> Change? {
         let before = unit.heat
         let beganShutdown = unit.isShutdown
@@ -49,9 +50,11 @@ public enum AlphaStrikeHeat {
         }
         if !fired { heat = 0 }
         if beganShutdown { heat = 0 }
+        heat += min(MatchUnitState.maxIncomingHeatPerTurn, unit.incomingHeatThisTurn)
         heat = min(shutdownLevel, max(0, heat))
         unit.heat = heat
         unit.overheatThisTurn = 0
+        unit.incomingHeatThisTurn = 0
 
         if beganShutdown { return .restarted }
         if heat == before { return nil }

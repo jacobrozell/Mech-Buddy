@@ -27,7 +27,7 @@ struct MissionBrief: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
             VStack(alignment: .leading, spacing: TMSpace.xs) {
-                Eyebrow("Mission \(stop.number) · \(stop.statusText)")
+                Eyebrow("\(stop.label) · \(stop.statusText)")
                 Text(stop.title)
                     .font(TMFont.stepTitle)
                     .accessibilityAddTraits(.isHeader)

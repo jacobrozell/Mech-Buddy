@@ -195,6 +195,9 @@ public struct ScenarioCatalogItemDTO: Codable, Sendable, Identifiable {
     public var comingSoonSummary: String?
     /// SF Symbol for the mission's node on the Play path.
     public var icon: String?
+    /// `nil` for the training path. Otherwise the title of a later section, such as
+    /// "From the Alpha Strike box", shown below the training path's trophy.
+    public var stage: String?
 }
 
 /// `as-box-sets.json`: the boxes a player can say they own. Unit names only, never card numbers.

@@ -129,6 +129,35 @@ For any game: 250 PV per side, and pick or roll one objective. Each objective's 
 | Breakthrough | Score Size per 'Mech that leaves by the enemy edge | 10 |
 | Find the Target | Scan buildings to find a target, then score 5 points per target destroyed | 10 |
 
+## Status (2026-11-24)
+
+- **Meet and Greet: built.** Mission 6, the first stop in a "From the Alpha Strike box" section below the training path's trophy (`as-meet-and-greet.json`, catalog `stage`). Two additions were needed:
+  - Point Value adjusted for skill (`AlphaStrikePointValue`, p. 33);
+  - HT heat attacks: a hit adds heat in the End Phase, at most 2 a turn, after cooling (p. 24–25).
+- **Clash of Steel: scoped, not built.** The cards are already checked (below). It needs three rule systems the app doesn't have yet:
+  1. **Buildings (p. 28):** small and large buildings with a Construction Factor, extra Move cost to go through, no ending a move inside, 1 damage to the building per inch moved through it, climbing and rooftops, a capacity measured in Size, collapse damage, and attacking buildings.
+  2. **Battlefield Support (pp. 29–30):** 5 points per side, chosen secretly. Each type is used once: aerospace strikes and artillery. Misses scatter using the area-of-effect template.
+  3. **Formations (p. 31 on):** the Command Lance (Combat Intuition on two 'Mechs) and Recon Lance for the defender, and the Battle Star for the attacker.
+- Also on the Clash of Steel cards: Stealth and ECM (Atlas), indirect fire IF2 (Archer, Timber Wolf), REAR2/2/- (Archer) and OV 2 (Timber Wolf). The app already handles STL. IF and REAR damage aren't used in its shot math yet.
+
+### Cards checked on the Master Unit List (2026-11-24)
+
+| Unit (book name) | MUL name | PV (Skill 4) | Size | Move | TMM | A/S | S/M/L | OV | Specials |
+|---|---|---|---|---|---|---|---|---|---|
+| BJ-5 Blackjack | Blackjack BJ-5 | 27 | 2 | 8″j | 1 | 5/2 | 2/3/3 | 0 | CASEII |
+| PXH-4M Phoenix Hawk | Phoenix Hawk PXH-4M | 31 | 2 | 12″j | 2 | 5/2 | 3/3/1 | 0 | ENE |
+| WSP-5A Wasp | Wasp WSP-5A | 17 | 1 | 16″j | 3 | 2/1 | 1/1/0 | 0 | CASEII |
+| LCT-7V Locust | Locust LCT-7V | 25 | 1 | 20″ | 4 | 2/1 | 2/2/0 | 0 | — |
+| AS7-S4 Atlas | Atlas AS7-S4 | 55 | 4 | 6″ | 1 | 10/8 | 4/4/4 | 1 | CASEII, ECM, STL |
+| ARC-7C Archer | Archer ARC-7C | 49 | 3 | 10″ | 2 | 7/3 | 5/5/4 | 0 | CASEII, IF2, REAR2/2/- |
+| WHM-8R Warhammer | Warhammer WHM-8R | 40 | 3 | 8″ | 1 | 7/6 | 4/4/2 | 1 | CASEII |
+| TR5 Wraith | Wraith TR5 | 42 | 2 | 16″/14″j | 3 | 5/3 | 3/3/0 | 0 | ENE |
+| Nova T | Black Hawk (Nova) T | 42 | 2 | 10″j | 2 | 5/3 | 6/6/0 | 0 | CASE, OMNI |
+| Pouncer T | Pouncer T | 29 | 2 | 12″/10″j | 2 | 4/2 | 3/3/0 | 0 | ENE, HT1/1/-, OMNI |
+| Warhawk T | Masakari (Warhawk) T | 50 | 4 | 8″ | 1 | 9/5 | 5/5/4 | 1 | ENE, HT1/1/-, OMNI |
+| Timber Wolf T | Mad Cat (Timber Wolf) T | 62 | 3 | 10″ | 2 | 8/4 | 7/7/4 | 2 | CASE, IF2, OMNI |
+| Fire Moth G | Dasher (Fire Moth) G | 35 | 1 | 30″ | 4 | 1/1 | 4/4/0 | 1 | CASE, OMNI |
+
 ## Classic: quick-start duels (QSR p. 11, ESS pp. 9–10)
 - **QSR training duel:** on Desert #1, GRF-1N Griffin (within 3 hexes of the south edge) vs WVR-6R Wolverine (north edge). Gunnery 4. Destroy the enemy; leaving the map counts as destroyed.
 - **ESS training duel:** on The Patchwork (The Reaches), ignoring the hardpacked gravel, CN9-A Centurion vs RFL-3N Rifleman.

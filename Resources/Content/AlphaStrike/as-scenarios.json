@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.4.0",
+  "contentVersion": "1.5.0",
   "scenarios": [
     {
       "id": "ridge-line",
@@ -78,6 +78,22 @@
       "release": "1.4.0",
       "gated": false,
       "icon": "shield.lefthalf.filled"
+    },
+    {
+      "id": "meet-and-greet",
+      "title": "Meet and Greet",
+      "subtitle": "From the Alpha Strike box · 4 vs 2 · ~60 min",
+      "missionNumber": 6,
+      "introduces": [
+        "Clan ’Mechs",
+        "Better pilots",
+        "Heat attacks (HT)"
+      ],
+      "bundle": "as-meet-and-greet.json",
+      "release": "1.5.0",
+      "gated": false,
+      "icon": "person.2.fill",
+      "stage": "From the Alpha Strike box"
     }
   ]
 }

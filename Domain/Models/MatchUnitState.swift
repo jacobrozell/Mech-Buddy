@@ -157,6 +157,8 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var criticalsOwed: Int
     /// Overheat points spent on this turn's shot. Becomes heat in the End Phase, then clears.
     public var overheatThisTurn: Int
+    /// Heat from enemy HT attacks that hit this turn, at most 2. Added last in the End Phase (rulebook p. 24–25).
+    public var incomingHeatThisTurn: Int = 0
     /// Colour the players gave this miniature, if any.
     public var mini: MiniMarker?
     /// It left the play area. It counts as destroyed and can't come back (rulebook p. 12).
@@ -350,6 +352,23 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         abilities.uppercased().contains("STL")
     }
 
+    /// HT#/#/# (rulebook p. 25): heat a hit adds to the target at this range. 0 without HT, or "-" at that range.
+    public func heatAbility(at bracket: RangeBracket) -> Int {
+        guard let tag = abilityTags.first(where: { $0.hasPrefix("HT") }) else { return 0 }
+        let values = tag.dropFirst(2).split(separator: "/", omittingEmptySubsequences: false).map { Int($0) ?? 0 }
+        let index: Int
+        switch bracket {
+        case .short: index = 0
+        case .medium: index = 1
+        case .long: index = 2
+        case .outOfRange: return 0
+        }
+        return index < values.count ? values[index] : 0
+    }
+
+    /// Most heat a ’Mech can take from HT attacks in one turn (rulebook p. 25).
+    public static let maxIncomingHeatPerTurn = 2
+
     public var hasOVL: Bool {
         abilities.uppercased().contains("OVL")
     }
@@ -421,7 +440,7 @@ extension MatchUnitState {
         case id, libraryUnitId, name, side, skill, pv, sz, mv, tmm, s, m, l, ov
         case armorCap, structureCap, armorDamage, structureDamage, heat, abilities, crits, combatPhaseCrits
         case movementMode, hasMovedThisTurn, hasAttackedThisTurn, turnShot, combatStatus
-        case pendingCritical, criticalsOwed, overheatThisTurn, mini
+        case pendingCritical, criticalsOwed, overheatThisTurn, mini, incomingHeatThisTurn
         case leftTable, withdrawalAnnounced
     }
 
@@ -460,6 +479,7 @@ extension MatchUnitState {
             criticalsOwed = flag ? 1 : 0
         }
         overheatThisTurn = try container.decodeIfPresent(Int.self, forKey: .overheatThisTurn) ?? 0
+        incomingHeatThisTurn = try container.decodeIfPresent(Int.self, forKey: .incomingHeatThisTurn) ?? 0
         mini = try container.decodeIfPresent(MiniMarker.self, forKey: .mini)
         leftTable = try container.decodeIfPresent(Bool.self, forKey: .leftTable) ?? false
         withdrawalAnnounced = try container.decodeIfPresent(Bool.self, forKey: .withdrawalAnnounced) ?? false
@@ -496,6 +516,7 @@ extension MatchUnitState {
         try container.encode(criticalsOwed, forKey: .criticalsOwed)
         try container.encode(pendingCritical, forKey: .pendingCritical)
         try container.encode(overheatThisTurn, forKey: .overheatThisTurn)
+        if incomingHeatThisTurn > 0 { try container.encode(incomingHeatThisTurn, forKey: .incomingHeatThisTurn) }
         try container.encodeIfPresent(mini, forKey: .mini)
         try container.encode(leftTable, forKey: .leftTable)
         try container.encode(withdrawalAnnounced, forKey: .withdrawalAnnounced)

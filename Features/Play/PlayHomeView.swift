@@ -254,8 +254,11 @@ struct PlayHomeView: View {
     }
 
     private func missionEyebrow(_ scenario: GuidedScenarioDTO) -> String {
+        if let stage = ladder.first(where: { $0.id == scenario.scenarioId })?.stage {
+            return stage
+        }
         guard let number = scenario.missionNumber, number > 1 else { return "Beginner mission" }
-        return "Mission \(number) of \(max(ladder.count, number))"
+        return "Mission \(number) of \(max(trainingLadder.count, number))"
     }
 
     private func missionSubtitle(_ scenario: GuidedScenarioDTO) -> String {
@@ -266,11 +269,29 @@ struct PlayHomeView: View {
         return scenario.subtitle ?? size
     }
 
-    /// Every mission as a stop on the path, in ladder order.
-    private var stops: [MissionStop] {
+    /// The training path: catalog missions without a stage.
+    private var trainingLadder: [ScenarioCatalogItemDTO] { ladder.filter { $0.stage == nil } }
+
+    /// Later sections (book scenarios), in catalog order of their first mission.
+    private var stagedLadders: [(title: String, items: [ScenarioCatalogItemDTO])] {
+        var order: [String] = []
+        var items: [String: [ScenarioCatalogItemDTO]] = [:]
+        for item in ladder {
+            guard let stage = item.stage else { continue }
+            if items[stage] == nil { order.append(stage) }
+            items[stage, default: []].append(item)
+        }
+        return order.map { ($0, items[$0] ?? []) }
+    }
+
+    /// The training path's missions as stops.
+    private var stops: [MissionStop] { pathStops(for: trainingLadder) }
+
+    /// Missions as stops on a path, in ladder order.
+    private func pathStops(for items: [ScenarioCatalogItemDTO]) -> [MissionStop] {
         let done = dependencies.preferences.completedMissions
         let next = featured?.scenarioId
-        return ladder.enumerated().map { index, item in
+        return items.enumerated().map { index, item in
             let state: MissionStop.State
             if item.gated || missions[item.id] == nil {
                 state = .locked
@@ -286,7 +307,8 @@ struct PlayHomeView: View {
                 icon: item.icon ?? "scope",
                 unlocks: item.introduces ?? [],
                 comingSoon: item.comingSoonSummary,
-                state: state
+                state: state,
+                stage: item.stage
             )
         }
     }
@@ -307,24 +329,55 @@ struct PlayHomeView: View {
             MissionPathView(
                 stops: stops,
                 onSelect: { selectedStop = $0 },
-                upNext: { stop in
-                    UpNextCard {
-                        MissionBrief(
-                            stop: stop,
-                            mission: missions[stop.id],
-                            hasGameInProgress: matches.resumeSession != nil,
-                            onPlay: missions[stop.id].map { mission in
-                                { startMission(mission, source: "mission", prefersZoom: true) }
-                            },
-                            links: stop.number == 1 ? beginnerLinks : []
-                        )
-                    }
-                    .playZoomSource("mission")
-                }
+                upNext: upNextCard
+            )
+            .frame(maxWidth: 560)
+            .frame(maxWidth: .infinity)
+            ForEach(stagedLadders, id: \.title) { stage in
+                stageBlock(title: stage.title, stops: pathStops(for: stage.items))
+            }
+        }
+    }
+
+    /// A section after the training path, such as the box set's own scenarios. No trophy.
+    private func stageBlock(title: String, stops: [MissionStop]) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.lg) {
+            VStack(alignment: .leading, spacing: TMSpace.xs) {
+                Eyebrow(title)
+                Text("The scenarios printed in the box’s rulebook, played with the app. Any time, in any order.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            MissionPathView(
+                stops: stops,
+                showsFinish: false,
+                onSelect: { selectedStop = $0 },
+                upNext: upNextCard
             )
             .frame(maxWidth: 560)
             .frame(maxWidth: .infinity)
         }
+        .padding(.top, TMSpace.xl)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("as.modeHome.stage.\(title)")
+    }
+
+    private func upNextCard(_ stop: MissionStop) -> some View {
+        UpNextCard {
+            MissionBrief(
+                stop: stop,
+                mission: missions[stop.id],
+                hasGameInProgress: matches.resumeSession != nil,
+                onPlay: missions[stop.id].map { mission in
+                    { startMission(mission, source: "mission", prefersZoom: true) }
+                },
+                links: stop.number == 1 ? beginnerLinks : []
+            )
+        }
+        .playZoomSource("mission")
     }
 
     private var beginnerLinks: [MissionBrief.Link] {

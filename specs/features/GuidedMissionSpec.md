@@ -216,3 +216,16 @@ Phase prompts (examples):
 | Last verified | 2026-08-21 |
 | Commit | — |
 | Code paths | *not implemented* |
+
+## Box scenarios (after the training path)
+
+- Catalog entries with a `stage` (e.g. "From the Alpha Strike box") are listed below the training path's trophy, in their own section (`as.modeHome.stage.<stage>`). The section has an eyebrow with the stage name, one line of explanation, and its own path with no trophy.
+- The trophy, the "N of 5 cleared" header and "Mission N of M" count only the training path (catalog entries without a `stage`).
+- A staged mission's node label and sheet eyebrow show the stage name instead of "Mission N" (`MissionStop.label`).
+- Up next: book scenarios become Up next once every training mission is cleared, and can always be started early.
+- **Meet and Greet** (`as-meet-and-greet.json`, Alpha Strike Quick-Start p. 26):
+  - 4 Northwind Highlanders (BJ-5, PXH-4M Skill 3; WSP-5A, LCT-7V Skill 4) vs 2 Jade Falcons (Nova T Skill 2, Pouncer T Skill 3).
+  - PV adjusted for skill (`AlphaStrikePointValue`, p. 33): 111 vs 93.
+  - Forced Withdrawal on. Cripple or destroy all; the app stops at 10 turns (the book has no limit).
+  - Teaches better pilots and HT heat attacks.
+
