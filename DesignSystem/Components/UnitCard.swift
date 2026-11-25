@@ -192,7 +192,8 @@ private struct UnitCardBody: View {
                             .foregroundStyle(.secondary)
                             .accessibilityLabel("Size \(unit.sz)")
                     }
-                    if let chip = chip {
+                    // At accessibility sizes the chip ("Walked …") gets its own line under the name; beside SZ it was cramped.
+                    if let chip = chip, !dynamicTypeSize.isAccessibilitySize {
                         StatusChip(kind: chip)
                     }
                     if showsChevron {
@@ -204,6 +205,9 @@ private struct UnitCardBody: View {
                 }
                 if dynamicTypeSize.isAccessibilitySize {
                     nameText
+                    if let chip = chip {
+                        StatusChip(kind: chip)
+                    }
                 }
                 if unit.combatStatus == .removed {
                     Text(unit.leftTable ? "Left the table" : "Off the table")

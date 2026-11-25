@@ -528,35 +528,46 @@ struct CombatSolverSheet: View {
     private var rangeControl: some View {
         VStack(alignment: .leading, spacing: TMSpace.sm) {
             Eyebrow("Range")
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    // Four segments truncate at accessibility sizes; a menu keeps every label whole.
+                    Picker("Range", selection: rangeBand) {
+                        rangeOptions
+                    }
+                    .pickerStyle(.menu)
+                } else {
+                    Picker("Range", selection: rangeBand) {
+                        rangeOptions
+                    }
+                    .pickerStyle(.segmented)
+                }
+            }
+            .accessibilityIdentifier("as.sator.range")
             if insight.rangeBracket == .outOfRange {
                 Text("Past 42 inches, so the range bands are off.")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("as.sator.range")
-            } else {
-                Picker("Range", selection: rangeBand) {
-                    // Rulebook bands: up to 6″, over 6″ to 24″, over 24″ to 42″. The old labels overlapped at 6 and 24.
-                    Text("≤6″").tag(RangeBracket.short)
-                    Text(">6–24″").tag(RangeBracket.medium)
-                    Text(">24–42″").tag(RangeBracket.long)
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("as.sator.range")
+                    .accessibilityIdentifier("as.sator.range.note")
             }
-            Toggle(isOn: beyondRange) {
-                Text(">42″")
-            }
-            .toggleStyle(.button)
-            .accessibilityLabel("More than 42 inches")
         }
+    }
+
+    /// Rulebook bands: up to 6″, over 6″ to 24″, over 24″ to 42″. The old labels overlapped at 6 and 24.
+    /// Past 42″ is a fourth option rather than a separate toggle, so it no longer sits alone under the bands.
+    @ViewBuilder
+    private var rangeOptions: some View {
+        Text("≤6″").tag(RangeBracket.short)
+        Text(">6–24″").tag(RangeBracket.medium)
+        Text(">24–42″").tag(RangeBracket.long)
+        Text(">42″")
+            .accessibilityLabel("More than 42 inches")
+            .tag(RangeBracket.outOfRange)
     }
 
     private var rangeBand: Binding<RangeBracket> {
         Binding(
-            get: {
-                insight.rangeBracket == .outOfRange ? .long : insight.rangeBracket
-            },
+            get: { insight.rangeBracket },
             set: { newValue in
                 switch newValue {
                 case .short: insight.rangeInches = 6
@@ -564,15 +575,6 @@ struct CombatSolverSheet: View {
                 case .long: insight.rangeInches = 42
                 case .outOfRange: insight.rangeInches = 43
                 }
-            }
-        )
-    }
-
-    private var beyondRange: Binding<Bool> {
-        Binding(
-            get: { insight.rangeBracket == .outOfRange },
-            set: { isBeyond in
-                insight.rangeInches = isBeyond ? 43 : 42
             }
         )
     }
