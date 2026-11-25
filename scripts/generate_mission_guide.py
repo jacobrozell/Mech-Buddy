@@ -60,6 +60,13 @@ def main():
         s += [f"| | **Total PV** | | A {sum(u['pv'] for u in a)} · B {sum(u['pv'] for u in b)} | | | | |", ""]
         on = [n for k, n in (("overheatAllowed", "overheat"), ("physicalAttacksAllowed", "punches and kicks"),
                              ("forcedWithdrawal", "Forced Withdrawal")) if r.get(k)]
+        lay = d.get("layout")
+        if lay:
+            sheets = [x["name"] for x in lay.get("sheets", [])]
+            maps = (" and ".join(sheets) + ", side by side (A Game of Armored Combat)") if sheets else "none"
+            s += [f"**Maps needed:** {maps}. {lay['openTable']}", "",
+                  f"**Table:** {lay['width']:g} × {lay['depth']:g} inches. Side A sets up on the left edge, Side B on the right. "
+                  "The app shows a top-down diagram of the layout on the mission sheet and at table setup.", ""]
         s += ["**Extra rules on:** " + (", ".join(on) if on else "none; just move and shoot") + ".", "",
               "**Set up the table**", ""]
         s += [f"{i}. {step}" for i, step in enumerate(d.get("tableSteps", []), 1)] + [""]

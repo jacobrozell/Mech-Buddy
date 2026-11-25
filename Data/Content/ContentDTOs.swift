@@ -47,6 +47,8 @@ public struct GuidedScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
     public var tableSteps: [String]
     public var winningSummary: String?
     public var coachNotes: [String]?
+    /// Maps needed and a top-down table diagram. Optional in older packs.
+    public var layout: MissionLayoutDTO?
 }
 
 public struct ScenarioRulesetDTO: Codable, Sendable {
@@ -314,4 +316,60 @@ public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {
         self.sourceURL = sourceURL
         self.contentsConfirmed = contentsConfirmed
     }
+}
+
+
+/// A mission's table, drawn top-down like the scenario layouts in A Game of Armored Combat.
+/// Inches, origin top-left. `width` runs from Side A's home edge (left) to Side B's (right).
+public struct MissionLayoutDTO: Codable, Sendable, Equatable {
+    public struct Rect: Codable, Sendable, Equatable {
+        public var x: Double
+        public var y: Double
+        public var width: Double
+        public var depth: Double
+
+        public init(x: Double, y: Double, width: Double, depth: Double) {
+            self.x = x
+            self.y = y
+            self.width = width
+            self.depth = depth
+        }
+
+        public var maxX: Double { x + width }
+        public var maxY: Double { y + depth }
+    }
+
+    /// A printed mapsheet laid on the table, named as printed ("Grassland #2").
+    public struct Sheet: Codable, Sendable, Equatable {
+        public var name: String
+        public var area: Rect
+    }
+
+    /// Where a side sets up. `side` is "A" or "B".
+    public struct Zone: Codable, Sendable, Equatable {
+        public var side: String
+        public var area: Rect
+    }
+
+    public enum FeatureKind: String, Codable, Sendable, CaseIterable {
+        case hill, woods, wall, tree
+    }
+
+    /// Terrain to add on an open table. On printed maps, the map's own terrain is used instead.
+    public struct Feature: Codable, Sendable, Equatable {
+        public var kind: FeatureKind
+        public var area: Rect
+    }
+
+    public var width: Double
+    public var depth: Double
+    /// Suggested mapsheets. Empty when the mission is played on an open table.
+    public var sheets: [Sheet]
+    public var zones: [Zone]
+    public var features: [Feature]
+    /// What to use without the maps, e.g. "Any open table, 36 × 22 inches".
+    public var openTable: String
+
+    /// "Grassland #2 and Desert #2".
+    public var sheetNames: [String] { sheets.map(\.name) }
 }

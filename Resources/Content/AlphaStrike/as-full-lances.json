@@ -166,5 +166,97 @@
     "Each side’s own short table edge is its home edge. A crippled ’Mech must head back toward it.",
     "Each side places its four ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw."
+  "winningSummary": "Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "layout": {
+    "width": 36,
+    "depth": 22,
+    "sheets": [
+      {
+        "name": "Grassland #2",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      },
+      {
+        "name": "Desert #2",
+        "area": {
+          "x": 18,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      }
+    ],
+    "zones": [
+      {
+        "side": "A",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      },
+      {
+        "side": "B",
+        "area": {
+          "x": 30,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      }
+    ],
+    "features": [
+      {
+        "kind": "hill",
+        "area": {
+          "x": 14,
+          "y": 8,
+          "width": 8,
+          "depth": 6
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 7,
+          "y": 3,
+          "width": 5,
+          "depth": 4
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 7,
+          "y": 15,
+          "width": 5,
+          "depth": 4
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 24,
+          "y": 3,
+          "width": 5,
+          "depth": 4
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 24,
+          "y": 15,
+          "width": 5,
+          "depth": 4
+        }
+      }
+    ],
+    "openTable": "No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it."
+  }
 }

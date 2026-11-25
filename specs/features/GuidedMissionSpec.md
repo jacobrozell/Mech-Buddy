@@ -229,3 +229,26 @@ Phase prompts (examples):
   - Forced Withdrawal on. Cripple or destroy all; the app stops at 10 turns (the book has no limit).
   - Teaches better pilots and HT heat attacks.
 
+
+## Maps needed and table layout
+
+- Each mission pack has a `layout` (`MissionLayoutDTO`):
+  - the table in inches (`width` runs from Side A's home edge on the left to Side B's on the right);
+  - suggested mapsheets by printed name;
+  - each side's setup zone;
+  - terrain to add on an open table (`hill`, `woods`, `wall`, `tree`);
+  - an `openTable` fallback sentence.
+- **Mission sheet:** a "Maps needed" section (`mission.maps`) after Your minis:
+  - the mapsheets, "side by side";
+  - once a collection is recorded: "You have these maps." with a check, or "You don’t have …";
+  - the open-table fallback;
+  - the diagram, then a caption: on printed maps use the map's own terrain; the shapes show where to add terrain on an open table.
+- **Table setup (in game):** the same section under a "Table layout" eyebrow, before the Set the table checklist (no ownership line).
+- **Diagram** (`MissionLayoutView`, `mission.layout`):
+  - drawn top-down like the A Game of Armored Combat scenario layouts: dashed mapsheet outlines named at the top, setup zones in side colours with A/B, terrain shapes, and a 6″ scale bar at the bottom centre;
+  - a legend underneath;
+  - VoiceOver reads a description (`MissionLayoutDescription.spoken`).
+- **A Game of Armored Combat missions** use Grassland #2 and Desert #2 side by side (36 × 22 inches), the pair the box's first scenario uses. The box's scenarios pair these maps in a way that means one sheet is desert on both faces and the other grassland on both, so "both maps grassland-side up" isn't possible.
+- **Meet and Greet:** an open 48 × 36 inch table, with home edges 4 feet apart (Alpha Strike Quick-Start p. 7).
+- `MissionLayoutTests` check that every layout fits its table, uses catalog map names, and covers the table exactly with its sheets.
+- The player's guide shows maps and table size for each mission (`scripts/generate_mission_guide.py`).

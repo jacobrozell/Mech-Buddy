@@ -40,11 +40,15 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Locust LCT-1V | 4 | 18 | 16" | 2/2 | 1/1/0 | — |
 | | **Total PV** | | A 47 · B 50 | | | | |
 
+**Maps needed:** Grassland #2 and Desert #2, side by side (A Game of Armored Combat). No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it.
+
+**Table:** 36 × 22 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
+
 **Extra rules on:** none; just move and shoot.
 
 **Set up the table**
 
-1. Put both maps grassland-side up, or use any open table about 3 feet across.
+1. Lay Grassland #2 and Desert #2 from A Game of Armored Combat side by side, long sides touching (the pair the box’s first scenario uses), or use any open table about 36 × 22 inches.
 2. Keep a tape measure in inches handy. Ignore printed hexes — just measure freely.
 3. Woods (trees) are the only terrain that matters: moving through them costs extra inches, and shooting into or past them is a little harder.
 4. Skip hills, water, and buildings for this first game.
@@ -73,6 +77,10 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Wolverine WVR-6M | 4 | 32 | 10"j | 6/5 | 2/2/0 | — |
 | B | Commando COM-2D | 4 | 17 | 12" | 2/2 | 2/2/0 | SRM1/1 |
 | | **Total PV** | | A 48 · B 49 | | | | |
+
+**Maps needed:** Grassland #2 and Desert #2, side by side (A Game of Armored Combat). No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it.
+
+**Table:** 36 × 22 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
 
 **Extra rules on:** none; just move and shoot.
 
@@ -110,6 +118,10 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Thunderbolt TDR-5S | 4 | 36 | 8" | 7/5 | 3/3/1 | IF1 |
 | B | Commando COM-2D | 4 | 17 | 12" | 2/2 | 2/2/0 | SRM1/1 |
 | | **Total PV** | | A 50 · B 53 | | | | |
+
+**Maps needed:** Grassland #2 and Desert #2, side by side (A Game of Armored Combat). No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it.
+
+**Table:** 36 × 22 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
 
 **Extra rules on:** overheat.
 
@@ -149,6 +161,10 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Wolverine WVR-6M | 4 | 32 | 10"j | 6/5 | 2/2/0 | — |
 | B | Shadow Hawk SHD-2H | 4 | 30 | 10"/6"j | 5/5 | 2/2/1 | IF0*,JMPW1 |
 | | **Total PV** | | A 97 · B 98 | | | | |
+
+**Maps needed:** Grassland #2 and Desert #2, side by side (A Game of Armored Combat). No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it.
+
+**Table:** 36 × 22 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
 
 **Extra rules on:** overheat, punches and kicks.
 
@@ -193,6 +209,10 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Locust LCT-1V | 4 | 18 | 16" | 2/2 | 1/1/0 | — |
 | | **Total PV** | | A 122 · B 122 | | | | |
 
+**Maps needed:** Grassland #2 and Desert #2, side by side (A Game of Armored Combat). No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it.
+
+**Table:** 36 × 22 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
+
 **Extra rules on:** overheat, punches and kicks, Forced Withdrawal.
 
 **Set up the table**
@@ -235,13 +255,17 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 | B | Pouncer T | 3 | 35 | 12"/10"j | 4/2 | 3/3/0 | ENE, HT1/1/-, OMNI |
 | | **Total PV** | | A 111 · B 93 | | | | |
 
+**Maps needed:** none. An open table about 4 feet between the two home edges and 3 feet wide. The Alpha Strike box has no maps; a 3 × 4 foot mat or any table works.
+
+**Table:** 48 × 36 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
+
 **Extra rules on:** overheat, punches and kicks, Forced Withdrawal.
 
 **Set up the table**
 
 1. Use an open table about 3 feet across. Measure in inches and ignore printed hexes.
 2. Woods: each player takes four single trees. Side B places first, then take turns, each within 24 inches of the centre of the table. Each player puts three of their trees within 4 inches of each other to make a patch of woods. No other piece goes within 4 inches of another.
-3. Each side’s own long table edge is its home edge. A crippled ’Mech must head back toward it.
+3. The two table edges 4 feet apart are the home edges, one per side. A crippled ’Mech must head back toward its own.
 4. Side A places two ’Mechs, at least 20 inches from the centre toward its edge. Then Side B places one the same way. Repeat, two for one, until all six are down.
 5. Side B’s Nova and Pouncer are Clan OmniMechs. If you own the Alpha Strike box, their cards are in it; the app has the numbers too.
 

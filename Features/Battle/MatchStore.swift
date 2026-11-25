@@ -416,7 +416,8 @@ final class MatchStore: Identifiable {
             tableSteps: steps,
             winningSummary: dto.winningSummary,
             introduces: dto.introduces ?? [],
-            coachNotes: dto.coachNotes ?? []
+            coachNotes: dto.coachNotes ?? [],
+            layout: dto.layout
         )
         scenarioLoaded = true
     }

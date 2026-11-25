@@ -128,9 +128,73 @@
   "tableSteps": [
     "Use an open table about 3 feet across. Measure in inches and ignore printed hexes.",
     "Woods: each player takes four single trees. Side B places first, then take turns, each within 24 inches of the centre of the table. Each player puts three of their trees within 4 inches of each other to make a patch of woods. No other piece goes within 4 inches of another.",
-    "Each side’s own long table edge is its home edge. A crippled ’Mech must head back toward it.",
+    "The two table edges 4 feet apart are the home edges, one per side. A crippled ’Mech must head back toward its own.",
     "Side A places two ’Mechs, at least 20 inches from the centre toward its edge. Then Side B places one the same way. Repeat, two for one, until all six are down.",
     "Side B’s Nova and Pouncer are Clan OmniMechs. If you own the Alpha Strike box, their cards are in it; the app has the numbers too."
   ],
-  "winningSummary": "Cripple or destroy every enemy ’Mech. A ’Mech that leaves the table counts as destroyed. The book has no turn limit; the app stops at 10 turns, and then the side with more Structure left wins."
+  "winningSummary": "Cripple or destroy every enemy ’Mech. A ’Mech that leaves the table counts as destroyed. The book has no turn limit; the app stops at 10 turns, and then the side with more Structure left wins.",
+  "layout": {
+    "width": 48,
+    "depth": 36,
+    "sheets": [],
+    "zones": [
+      {
+        "side": "A",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 4,
+          "depth": 36
+        }
+      },
+      {
+        "side": "B",
+        "area": {
+          "x": 44,
+          "y": 0,
+          "width": 4,
+          "depth": 36
+        }
+      }
+    ],
+    "features": [
+      {
+        "kind": "woods",
+        "area": {
+          "x": 13,
+          "y": 6,
+          "width": 7,
+          "depth": 7
+        }
+      },
+      {
+        "kind": "tree",
+        "area": {
+          "x": 22,
+          "y": 27,
+          "width": 1,
+          "depth": 1
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 28,
+          "y": 22,
+          "width": 7,
+          "depth": 7
+        }
+      },
+      {
+        "kind": "tree",
+        "area": {
+          "x": 26,
+          "y": 8,
+          "width": 1,
+          "depth": 1
+        }
+      }
+    ],
+    "openTable": "An open table about 4 feet between the two home edges and 3 feet wide. The Alpha Strike box has no maps; a 3 × 4 foot mat or any table works."
+  }
 }

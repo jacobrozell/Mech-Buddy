@@ -5,7 +5,12 @@
   "title": "Broken Ground",
   "subtitle": "Mission 2 · 2 vs 2 · about 50 minutes",
   "missionNumber": 2,
-  "introduces": ["Hills", "Partial cover", "Rear shots", "Jumping for position"],
+  "introduces": [
+    "Hills",
+    "Partial cover",
+    "Rear shots",
+    "Jumping for position"
+  ],
   "estimatedMinutes": 50,
   "release": "1.1.0",
   "ruleset": {
@@ -99,5 +104,97 @@
     "Add two patches of woods, one on each half of the table. Woods work like Ridge Line.",
     "Each side places its two ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
+  "winningSummary": "Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "layout": {
+    "width": 36,
+    "depth": 22,
+    "sheets": [
+      {
+        "name": "Grassland #2",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      },
+      {
+        "name": "Desert #2",
+        "area": {
+          "x": 18,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      }
+    ],
+    "zones": [
+      {
+        "side": "A",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      },
+      {
+        "side": "B",
+        "area": {
+          "x": 30,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      }
+    ],
+    "features": [
+      {
+        "kind": "hill",
+        "area": {
+          "x": 13,
+          "y": 7,
+          "width": 10,
+          "depth": 8
+        }
+      },
+      {
+        "kind": "wall",
+        "area": {
+          "x": 11,
+          "y": 7,
+          "width": 0.5,
+          "depth": 8
+        }
+      },
+      {
+        "kind": "wall",
+        "area": {
+          "x": 24.5,
+          "y": 7,
+          "width": 0.5,
+          "depth": 8
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 6,
+          "y": 15,
+          "width": 5,
+          "depth": 5
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 25,
+          "y": 2,
+          "width": 5,
+          "depth": 5
+        }
+      }
+    ],
+    "openTable": "No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it."
+  }
 }

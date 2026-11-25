@@ -1,5 +1,6 @@
 import SwiftUI
 import MechBuddyDomain
+import MechBuddyData
 
 struct TableSetupStep: View {
     var session: MatchSession
@@ -71,6 +72,13 @@ struct TableSetupStep: View {
 
             if !scenario.introduces.isEmpty {
                 newInThisMission
+            }
+
+            if let layout = scenario.layout {
+                VStack(alignment: .leading, spacing: TMSpace.md) {
+                    Eyebrow("Table layout")
+                    MissionMapsSection(layout: layout, ownedMaps: nil)
+                }
             }
 
             VStack(alignment: .leading, spacing: TMSpace.md) {

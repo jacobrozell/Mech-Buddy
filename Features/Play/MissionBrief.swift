@@ -75,6 +75,10 @@ struct MissionBrief: View {
                 if let check = miniCheck(for: mission) {
                     minisLine(check)
                 }
+                if showsDetails, let layout = mission.layout {
+                    sectionTitle("Maps needed")
+                    MissionMapsSection(layout: layout, ownedMaps: ownedMapNames)
+                }
             }
             if stop.state == .locked, let soon = stop.comingSoon {
                 Text(soon)
@@ -114,6 +118,12 @@ struct MissionBrief: View {
         if let minutes = mission.estimatedMinutes { parts.append("about \(minutes) min") }
         if let turns = mission.ruleset.maxTurns { parts.append("\(turns) turns") }
         return parts.joined(separator: " · ")
+    }
+
+    /// Map names the player has, or `nil` before they've recorded a collection.
+    private var ownedMapNames: [String]? {
+        guard let owned = dependencies.preferences.collection else { return nil }
+        return CollectionMath.ownedMaps(owned, boxes: dependencies.boxSets).map(\.name)
     }
 
     /// Only once the player has recorded a collection (onboarding or the Force tab).
