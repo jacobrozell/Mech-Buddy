@@ -158,24 +158,56 @@ public struct CollectionGroup: Identifiable, Equatable, Sendable {
 
 /// A mission's forces checked against the collection.
 public struct MiniCheck: Equatable, Sendable {
+    /// A mini the player owns, suggested for a mission 'Mech they don't have.
+    public struct StandIn: Equatable, Sendable {
+        /// Chassis of the owned mini, e.g. "Atlas".
+        public var use: String
+        /// Chassis it plays, e.g. "Awesome".
+        public var asUnit: String
+        public var count: Int
+
+        public init(use: String, asUnit: String, count: Int = 1) {
+            self.use = use
+            self.asUnit = asUnit
+            self.count = count
+        }
+
+        /// "Atlas as Awesome", "Wasp ×2 as Commando".
+        public var text: String {
+            count > 1 ? "\(use) ×\(count) as \(asUnit)" : "\(use) as \(asUnit)"
+        }
+    }
+
     /// Minis the mission puts on the table.
     public var needed: Int
     /// Chassis names short, in mission order. A chassis short twice reads "Locust ×2".
     public var missing: [String]
+    /// Owned minis suggested for 'Mechs the player doesn't have, in mission order.
+    public var standIns: [StandIn]
 
-    public init(needed: Int, missing: [String]) {
+    public init(needed: Int, missing: [String], standIns: [StandIn] = []) {
         self.needed = needed
         self.missing = missing
+        self.standIns = standIns
     }
 
+    /// Every 'Mech has a mini: the exact one or a suggested stand-in.
     public var hasAll: Bool { missing.isEmpty }
 
-    /// "You have all 4 ’Mechs" or "Missing: Catapult. Use any mini or a coin as a stand-in."
+    /// "You have all 4 ’Mechs", "Stand-ins: Atlas as Awesome.", or
+    /// "Missing: Catapult. Use any mini or a coin as a stand-in."
     public var summary: String {
-        if hasAll {
+        if hasAll && standIns.isEmpty {
             return needed == 1 ? "You have the ’Mech" : "You have all \(needed) ’Mechs"
         }
-        return "Missing: \(CollectionMath.naturalList(missing)). Use any mini or a coin as a stand-in."
+        var parts: [String] = []
+        if !standIns.isEmpty {
+            parts.append("Stand-ins: \(CollectionMath.naturalList(standIns.map(\.text))).")
+        }
+        if !missing.isEmpty {
+            parts.append("Missing: \(CollectionMath.naturalList(missing)). Use any mini or a coin as a stand-in.")
+        }
+        return parts.joined(separator: " ")
     }
 }
 
@@ -226,16 +258,44 @@ public enum CollectionMath {
     }
 
     /// Which of `forces` (unit names, both sides) the player has a mini for, matched by chassis.
-    public static func miniCheck(forces: [String], collection: OwnedCollection, boxes: [BoxSetDTO]) -> MiniCheck {
+    /// Exact minis are matched first. Then each 'Mech still short takes the first owned, unused
+    /// mini from `standIns` (mission chassis → closest minis, best first).
+    public static func miniCheck(
+        forces: [String],
+        collection: OwnedCollection,
+        boxes: [BoxSetDTO],
+        standIns: [String: [String]] = [:]
+    ) -> MiniCheck {
         var available = chassisCounts(collection, boxes: boxes)
-        var shortOrder: [String] = []
-        var short: [String: Int] = [:]
+        var shortUnits: [String] = []
         for unit in forces {
             let key = UnitChassis.key(unit)
             if let count = available[key], count > 0 {
                 available[key] = count - 1
             } else {
-                let name = UnitChassis.name(unit)
+                shortUnits.append(UnitChassis.name(unit))
+            }
+        }
+
+        let options: [String: [String]] = Dictionary(
+            standIns.map { (UnitChassis.key($0.key), $0.value) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var pairOrder: [String] = []
+        var pairs: [String: MiniCheck.StandIn] = [:]
+        var shortOrder: [String] = []
+        var short: [String: Int] = [:]
+        for name in shortUnits {
+            let candidate = options[name.lowercased()]?.first { (available[UnitChassis.key($0)] ?? 0) > 0 }
+            if let candidate {
+                available[UnitChassis.key(candidate)]? -= 1
+                let id = "\(candidate)|\(name)"
+                if pairs[id] == nil {
+                    pairOrder.append(id)
+                    pairs[id] = MiniCheck.StandIn(use: candidate, asUnit: name, count: 0)
+                }
+                pairs[id]?.count += 1
+            } else {
                 if short[name] == nil { shortOrder.append(name) }
                 short[name, default: 0] += 1
             }
@@ -244,7 +304,11 @@ public enum CollectionMath {
             let count = short[name] ?? 1
             return count > 1 ? "\(name) ×\(count)" : name
         }
-        return MiniCheck(needed: forces.count, missing: missing)
+        return MiniCheck(
+            needed: forces.count,
+            missing: missing,
+            standIns: pairOrder.compactMap { pairs[$0] }
+        )
     }
 
     /// "A", "A and B", "A, B, and C".

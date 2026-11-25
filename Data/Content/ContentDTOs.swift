@@ -203,6 +203,8 @@ public struct BoxSetsDTO: Codable, Sendable, ContentSchemaVersioned {
     public var contentVersion: String
     public var sourceNote: String?
     public var boxes: [BoxSetDTO]
+    /// Mission chassis → closest minis from other boxes, best first. Optional in older files.
+    public var standIns: [String: [String]]?
 }
 
 public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {

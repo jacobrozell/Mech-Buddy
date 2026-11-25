@@ -120,7 +120,9 @@ struct MissionBrief: View {
     private func miniCheck(for mission: GuidedScenarioDTO) -> MiniCheck? {
         guard let owned = dependencies.preferences.collection else { return nil }
         let forces = (mission.sides.lanceA + mission.sides.lanceB).map(\.name)
-        return CollectionMath.miniCheck(forces: forces, collection: owned, boxes: dependencies.boxSets)
+        return CollectionMath.miniCheck(
+            forces: forces, collection: owned, boxes: dependencies.boxSets, standIns: dependencies.standIns
+        )
     }
 
     private func minisLine(_ check: MiniCheck) -> some View {

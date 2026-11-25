@@ -17,6 +17,8 @@ public final class AppDependencies {
     let preferences: AppPreferences
     /// `as-box-sets.json`, loaded once. Empty when the file is missing; collection UI then shows singles only.
     let boxSets: [BoxSetDTO]
+    /// Mission chassis → suggested stand-in minis, from the same file.
+    let standIns: [String: [String]]
     /// Bumps when a match is saved or deleted. Play and Force reload from this.
     var sessionRevision = 0
 
@@ -71,10 +73,13 @@ public final class AppDependencies {
         self.isUsingVolatileStore = volatileStore
         self.preferences = preferences
         do {
-            self.boxSets = try content.boxSets().boxes
+            let file = try content.boxSets()
+            self.boxSets = file.boxes
+            self.standIns = file.standIns ?? [:]
         } catch {
             logger.error("box sets: \(error)", category: "content")
             self.boxSets = []
+            self.standIns = [:]
         }
         revising.onMutation = { [weak self] in
             guard let self else { return }

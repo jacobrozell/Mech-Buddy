@@ -91,5 +91,16 @@
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-mercenaries-box-set",
       "contentsConfirmed": false
     }
-  ]
+  ],
+  "standInsNote": "Mission 'Mech chassis to the closest minis in other boxes, best first. Picked by weight class and role (jumpers for jumpers, missile boats for missile boats). Alpha Strike uses the card's stats, so any mini can stand in.",
+  "standIns": {
+    "Awesome": ["Atlas", "Warhawk"],
+    "BattleMaster": ["Warhawk", "Atlas"],
+    "Catapult": ["Archer", "Timber Wolf"],
+    "Thunderbolt": ["Warhammer", "Timber Wolf"],
+    "Wolverine": ["Wraith", "Blackjack"],
+    "Shadow Hawk": ["Phoenix Hawk", "Blackjack"],
+    "Commando": ["Wasp", "Fire Moth"],
+    "Locust": ["Fire Moth", "Wasp"]
+  }
 }

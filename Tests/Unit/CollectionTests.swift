@@ -3,11 +3,42 @@
 import Foundation
 import Testing
 import MechBuddyData
+import MechBuddyDomain
 
 @Suite("Box sets content")
 struct BoxSetsContentTests {
     private var catalog: BundleContentCatalogRepository {
         BundleContentCatalogRepository(bundle: Bundle(for: CollectionBundleToken.self))
+    }
+
+    @Test("Stand-ins name real box chassis, never the 'Mech they stand in for")
+    func standInsAreBoxChassis() throws {
+        let file = try catalog.boxSets()
+        let standIns = try #require(file.standIns)
+        let boxChassis = Set(file.boxes.flatMap(\.units).map(UnitChassis.key))
+        #expect(standIns.count == 8)
+        for (unit, options) in standIns {
+            #expect(boxChassis.contains(UnitChassis.key(unit)), "\(unit)")
+            #expect(!options.isEmpty, "\(unit)")
+            for option in options {
+                #expect(boxChassis.contains(UnitChassis.key(option)), "\(unit) → \(option)")
+                #expect(!UnitChassis.matches(option, unit), "\(unit)")
+            }
+        }
+    }
+
+    @Test("The Alpha Strike box alone covers every mission, with stand-ins")
+    func alphaStrikeBoxCoversEveryMission() throws {
+        let file = try catalog.boxSets()
+        let owned = OwnedCollection(boxes: ["alpha-strike-box": 1])
+        for item in try catalog.scenarios().scenarios where !item.gated {
+            let dto = try catalog.scenario(id: ScenarioId(rawValue: item.id))
+            let forces = (dto.sides.lanceA + dto.sides.lanceB).map(\.name)
+            let check = CollectionMath.miniCheck(
+                forces: forces, collection: owned, boxes: file.boxes, standIns: file.standIns ?? [:]
+            )
+            #expect(check.hasAll, "\(item.id): \(check.summary)")
+        }
     }
 
     @Test("Five boxes with unique ids, in catalog order")
@@ -247,6 +278,58 @@ struct MiniCheckTests {
     func noneYet() {
         let check = CollectionMath.miniCheck(forces: runningHot, collection: .empty, boxes: [agoac])
         #expect(check.missing == ["Catapult", "Locust", "Thunderbolt", "Commando"])
+    }
+
+    private let alphaStrikeBox = BoxSetDTO(
+        id: "alpha-strike-box", title: "Alpha Strike Box Set", subtitle: "", game: .alphaStrike, miniCount: 4,
+        units: ["Archer", "Atlas", "Locust", "Wasp"],
+        sourceURL: "https://example.com", contentsConfirmed: true
+    )
+    private let standIns = [
+        "Catapult": ["Archer", "Timber Wolf"],
+        "Thunderbolt": ["Warhammer", "Timber Wolf"],
+        "Commando": ["Wasp", "Fire Moth"],
+        "Locust": ["Fire Moth", "Wasp"],
+    ]
+
+    @Test("Owned minis stand in for missing ’Mechs; exact matches come first")
+    func standInsFromOtherBox() {
+        let check = CollectionMath.miniCheck(
+            forces: runningHot, collection: OwnedCollection(boxes: ["alpha-strike-box": 1]),
+            boxes: [alphaStrikeBox], standIns: standIns
+        )
+        #expect(check.standIns == [
+            .init(use: "Archer", asUnit: "Catapult"),
+            .init(use: "Wasp", asUnit: "Commando"),
+        ])
+        #expect(check.missing == ["Thunderbolt"])
+        #expect(!check.hasAll)
+        #expect(check.summary
+            == "Stand-ins: Archer as Catapult and Wasp as Commando. Missing: Thunderbolt. Use any mini or a coin as a stand-in.")
+    }
+
+    @Test("A stand-in mini is used once; the next option takes over")
+    func standInUsedOnce() {
+        let owned = OwnedCollection(singles: ["Wasp": 1, "Fire Moth": 1])
+        let check = CollectionMath.miniCheck(
+            forces: ["Commando COM-2D", "Commando COM-2D", "Commando COM-2D"],
+            collection: owned, boxes: [], standIns: standIns
+        )
+        #expect(check.standIns == [
+            .init(use: "Wasp", asUnit: "Commando"),
+            .init(use: "Fire Moth", asUnit: "Commando"),
+        ])
+        #expect(check.missing == ["Commando"])
+    }
+
+    @Test("All covered by stand-ins reads as ready")
+    func allCoveredByStandIns() {
+        let owned = OwnedCollection(singles: ["Wasp": 2])
+        let check = CollectionMath.miniCheck(
+            forces: ["Commando COM-2D", "Commando COM-2D"], collection: owned, boxes: [], standIns: standIns
+        )
+        #expect(check.hasAll)
+        #expect(check.summary == "Stand-ins: Wasp ×2 as Commando.")
     }
 
     @Test("Natural list joins")

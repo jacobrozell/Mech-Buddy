@@ -50,7 +50,7 @@ Which boxes and minis the player owns. Set in onboarding (Boxes and Your ’Mech
 ### Model (`Data/Collection/CollectionModel.swift`)
 
 - `OwnedCollection`: `boxes` (id → copies), `missing` (box id → unit name → copies), `singles` (name → copies). `nil` in `AppPreferences.collection` = not answered.
-- Derived with `CollectionMath`: `groups` (owned boxes, then Singles), `ownedUnits` (merged by name with counts), `chassisCounts`, `miniCheck(forces:)` for missions.
+- Derived with `CollectionMath`: `groups` (owned boxes, then Singles), `ownedUnits` (merged by name with counts), `chassisCounts`, `miniCheck(forces:standIns:)` for missions (exact chassis first, then suggested stand-ins; see [GuidedMissionSpec](GuidedMissionSpec.md)).
 - **Chassis matching:** `UnitChassis.name` drops the last word when it has a digit (“Locust LCT-1V” → “Locust”; “Mad Cat Mk II” stays). Matching is case-insensitive. `PlayForceMath.shortName` uses the same rule.
 - Singles are free text; adding “locust” to an existing “Locust” adds a copy. No stats are stored.
 - Persisted by `CollectionStore` under `collection.owned` (JSON), an `AppPreferences` owned key, so `reset()` / `-reset_state` clears it. Saving the collection also ticks the kit’s Miniatures when anything is owned.
