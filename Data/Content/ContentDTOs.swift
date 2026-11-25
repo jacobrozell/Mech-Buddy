@@ -207,6 +207,36 @@ public struct BoxSetsDTO: Codable, Sendable, ContentSchemaVersioned {
     public var standIns: [String: [String]]?
 }
 
+/// `map-catalog.json`: known mapsheets and BattleMats by product, for map name suggestions.
+public struct MapCatalogDTO: Codable, Sendable, ContentSchemaVersioned {
+    public struct Product: Codable, Sendable, Equatable {
+        public var name: String
+        public var year: Int?
+        public var maps: [String]
+    }
+
+    public var schemaVersion: Int
+    public var contentVersion: String
+    public var sourceNote: String?
+    public var products: [Product]
+
+    /// Every map name once, in catalog order (first spelling wins, compared ignoring case).
+    public var allMaps: [String] {
+        var seen = Set<String>()
+        return products.flatMap(\.maps).filter { seen.insert($0.lowercased()).inserted }
+    }
+
+    /// Up to `limit` names containing `text` (ignoring case), names that start with it first.
+    public func suggestions(for text: String, limit: Int = 5) -> [String] {
+        let query = text.trimmingCharacters(in: .whitespaces).lowercased()
+        guard query.count >= 2 else { return [] }
+        let hits = allMaps.filter { $0.lowercased().contains(query) }
+        let starts = hits.filter { $0.lowercased().hasPrefix(query) }
+        let rest = hits.filter { !$0.lowercased().hasPrefix(query) }
+        return Array((starts + rest).prefix(limit))
+    }
+}
+
 public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {
     public enum Game: String, Codable, Sendable {
         case alphaStrike

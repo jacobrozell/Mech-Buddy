@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "sourceNote": "Mapsheets and BattleMats by product, from sarna.net/wiki/Mapsheet (read 2026-11-24), names as written there. Exceptions: A Game of Armored Combat uses its rulebook's spelling ('Grassland #2', Sarna 'Grasslands #2'). Left out until checked: products Sarna only links to a subpage (the MapPack PDF series, MapPack: Solaris VII), MWDA mapsheets, and entries whose names weren't read verbatim (Fire and Ice, FieldTech, BFM City/Lunar and Volcanic/Glacier, Thunder Rift/Misery, Retail Grinder Kit, BattlePack: Fourth Succession War, And Hell Followed With Him).",
+  "products": [
+    {
+      "name": "Map Set",
+      "year": 1986,
+      "maps": [
+        "Open terrain",
+        "River valley",
+        "Lake area",
+        "CityTech"
+      ]
+    },
+    {
+      "name": "Map Set 2",
+      "year": 1988,
+      "maps": [
+        "Mountain Lake",
+        "River Valley",
+        "Lake Area",
+        "BattleTech",
+        "CityTech",
+        "City Ruins",
+        "Desert Hills",
+        "Scattered Woods"
+      ]
+    },
+    {
+      "name": "Map Set 3",
+      "year": 1991,
+      "maps": [
+        "Desert Mountain #1",
+        "Desert Mountain #2",
+        "Desert Sinkhole #1",
+        "Desert Sinkhole #2",
+        "Rolling Hills #1",
+        "Rolling Hills #2",
+        "City Hills/Residential #1",
+        "City Hills/Residential #2"
+      ]
+    },
+    {
+      "name": "Map Set 4",
+      "year": 1991,
+      "maps": [
+        "Heavy Forest #1",
+        "Heavy Forest #2",
+        "City Street Grid/Park #1",
+        "City Street Grid/Park #2",
+        "Large Lakes #1",
+        "Large Lakes #2",
+        "River Delta/Drainage Basin #1",
+        "River Delta/Drainage Basin #2"
+      ]
+    },
+    {
+      "name": "Map Set 5",
+      "year": 1997,
+      "maps": [
+        "Large Mountain #1",
+        "Large Mountain #2",
+        "Deep Canyon #1",
+        "Deep Canyon #2",
+        "Open Terrain #1",
+        "Open Terrain #2",
+        "Moonscape #1",
+        "Moonscape #2"
+      ]
+    },
+    {
+      "name": "Map Set 6",
+      "year": 2000,
+      "maps": [
+        "City (Downtown)",
+        "City (Residential)",
+        "City (Skyscraper)",
+        "City (Suburbs)",
+        "Wide River",
+        "Woodland",
+        "Box Canyon",
+        "BattleForce 2"
+      ]
+    },
+    {
+      "name": "Map Set 7",
+      "year": 2002,
+      "maps": [
+        "DropPort #1",
+        "DropPort #2",
+        "Archipelago #1",
+        "Archipelago #2",
+        "Military Base #1",
+        "Military Base #2",
+        "Coast #1",
+        "Coast #2",
+        "Seaport"
+      ]
+    },
+    {
+      "name": "Map Set Compilation 2",
+      "year": 2005,
+      "maps": [
+        "Planetary Assault Map 1",
+        "Planetary Assault Map 2",
+        "BattleSpace"
+      ]
+    },
+    {
+      "name": "Solaris VII: The Game World Boxed Set",
+      "year": 1991,
+      "maps": [
+        "Boreal Reach (Davion arena)",
+        "The Factory (Marik arena)",
+        "Ishiyama part I (Kurita arena)",
+        "Ishiyama part II (Kurita arena)",
+        "The Jungle (Liao arena)",
+        "Steiner Coliseum (Steiner arena)"
+      ]
+    },
+    {
+      "name": "Solaris VII: The Reaches Sourcebook",
+      "year": 1993,
+      "maps": [
+        "Hartford Gardens",
+        "King of the Mountain",
+        "The Scrap Yard",
+        "The Pool",
+        "The Mud Pit"
+      ]
+    },
+    {
+      "name": "Touring the Stars: Noisiel",
+      "year": null,
+      "maps": [
+        "Chess",
+        "Baseball",
+        "Hockey",
+        "Soccer",
+        "Football/Rugby",
+        "Basketball"
+      ]
+    },
+    {
+      "name": "HexPack: Lakes and Rivers",
+      "year": 2010,
+      "maps": [
+        "River Valley",
+        "Large Lakes #2"
+      ]
+    },
+    {
+      "name": "HexPack: Cities and Roads",
+      "year": 2011,
+      "maps": [
+        "City (Skyscraper)",
+        "City (Hills/Residential) #1"
+      ]
+    },
+    {
+      "name": "HexPack: Mountains and Canyons",
+      "year": 2012,
+      "maps": [
+        "Large Mountain #1",
+        "Deep Canyon #1"
+      ]
+    },
+    {
+      "name": "Map Pack Worldwide Event 2018 Terrain Set",
+      "year": 2018,
+      "maps": [
+        "WWE 2018 \"BattleTech\"",
+        "WWE 2018 \"LargeLakes2\"",
+        "WWE 2018 \"ScatteredWoods\"",
+        "WWE 2018 \"DigSite\""
+      ]
+    },
+    {
+      "name": "Map Pack Grasslands",
+      "year": null,
+      "maps": [
+        "Grasslands \"Foothills #1\"",
+        "Grasslands \"Foothills #2\"",
+        "Grasslands \"Forward Base\"",
+        "Grasslands \"Lakes\"",
+        "Grasslands \"Open Terrain #2\"",
+        "Grasslands \"Open Terrain #3\"",
+        "Grasslands \"River CommCenter\"",
+        "Grasslands \"Rolling Hills #1\"",
+        "Grasslands \"Rolling Hills #3\"",
+        "Grasslands \"Rolling Hills #4\"",
+        "Grasslands \"Streams\"",
+        "Grasslands \"Woodland\""
+      ]
+    },
+    {
+      "name": "Map Pack Battle of Tukayyid",
+      "year": null,
+      "maps": [
+        "Deployment Zone Map",
+        "Kozice Valley Map",
+        "Lake Losiije Map",
+        "Holth Forest Map",
+        "Racice River Delta Map",
+        "Pozoristu Mountains Map",
+        "Robyn's Crossing Map",
+        "Devil's Bath Map"
+      ]
+    },
+    {
+      "name": "Map Pack Alien Worlds",
+      "year": null,
+      "maps": [
+        "Fungal Crevasse Map",
+        "Caustic Valley Map",
+        "Lunar Base Map",
+        "Crystalline Canyon Map"
+      ]
+    },
+    {
+      "name": "Map Pack Deserts",
+      "year": null,
+      "maps": [
+        "Deserts \"Desert Runway\"",
+        "Deserts \"Oasis\"",
+        "Deserts \"AeroBase #1\"",
+        "Deserts \"AeroBase #2\"",
+        "Deserts \"Mines #1\"",
+        "Deserts \"Mines #2\"",
+        "Deserts \"Sand Drift #1\"",
+        "Deserts \"Sand Drift #2\"",
+        "Deserts \"Badlands #1\"",
+        "Deserts \"Badlands #2\"",
+        "Deserts \"Washout #1\"",
+        "Deserts \"Washout #2\""
+      ]
+    },
+    {
+      "name": "Map Pack Savannah",
+      "year": null,
+      "maps": [
+        "Savannah \"Large Lakes #1\"",
+        "Savannah \"Large Lakes #2\"",
+        "Savannah \"Sinkhole #1\"",
+        "Savannah \"Sinkhole #2\"",
+        "Savannah \"River Delta/Drainage Basin #1\"",
+        "Savannah \"River Delta/Drainage Basin #2\"",
+        "Savannah \"BattleTech\"",
+        "Savannah \"Box Canyon\"",
+        "Savannah \"City Ruins\"",
+        "Savannah \"CityTech\"",
+        "Savannah \"Mountain Lake\"",
+        "Savannah \"Wide River\"",
+        "Savannah \"Terrain 1\"",
+        "Savannah \"Terrain 2\""
+      ]
+    },
+    {
+      "name": "Map Pack City",
+      "year": null,
+      "maps": [
+        "City \"Central Park\"",
+        "City \"Corporate Campus\"",
+        "City \"Family Quarters\"",
+        "City \"HPG Engineering\"",
+        "City \"HPG Heliport\"",
+        "City \"HPG Offices\"",
+        "City \"Business District\"",
+        "City \"Roundabout\"",
+        "City \"Observatory Hill\"",
+        "City \"Park District\"",
+        "City \"Shopping District\"",
+        "City \"Plaza\"",
+        "City \"Terrain 1\"",
+        "City \"Terrain 2\"",
+        "City \"Terrain 3\"",
+        "City \"Terrain 4\"",
+        "City \"Terrain 5\"",
+        "City \"Terrain 6\""
+      ]
+    },
+    {
+      "name": "Map Pack Volcanic",
+      "year": null,
+      "maps": [
+        "Volcanic \"01 Lava Fall\"",
+        "Volcanic \"02 Dome Vent #1\"",
+        "Volcanic \"03 Dome Vent #3\"",
+        "Volcanic \"04 Lava Tubes #1\"",
+        "Volcanic \"05 Lava Flow\"",
+        "Volcanic \"06 Dome Vent #2\"",
+        "Volcanic \"07 Dome Vent #4\"",
+        "Volcanic \"08 Lava Tubes #2\"",
+        "Volcanic \"09 Laze Plumes #1\"",
+        "Volcanic \"10 Volcanic Research Facility\"",
+        "Volcanic \"11 Cinder Core\"",
+        "Volcanic \"12 Pyroclastic Field\"",
+        "Volcanic \"13 Laze Plumes #2\"",
+        "Volcanic \"14 Fissure Vent\"",
+        "Volcanic \"15 Basaltic Field #1\"",
+        "Volcanic \"16 Basaltic Field #2\"",
+        "Volcanic \"Terrain 1\"",
+        "Volcanic \"Terrain 2\""
+      ]
+    },
+    {
+      "name": "Map Pack: Glacier",
+      "year": null,
+      "maps": [
+        "Glacier \"01 Glacial Canyons\"",
+        "Glacier \"02 Ambush Valley\"",
+        "Glacier \"03 Ice Field\"",
+        "Glacier \"04 Frozen Inlet\"",
+        "Glacier \"05 Remote Comm Station\"",
+        "Glacier \"06 Ice Lake #1\"",
+        "Glacier \"07 Ice Lake #2\"",
+        "Glacier \"08 Shoreline Base\"",
+        "Glacier \"09 Ice Rivers #1\"",
+        "Glacier \"10 Ice Rivers #2\"",
+        "Glacier \"11 Fortified Zone\"",
+        "Glacier \"12 Misery 'Mech Bay\"",
+        "Glacier \"13 Hamar Valley #1\"",
+        "Glacier \"14 Hamar Valley #2\"",
+        "Glacier \"15 Misery Repair Bay\"",
+        "Glacier \"16 Misery Headquarters\"",
+        "Glacier \"Terrain 1\"",
+        "Glacier \"Terrain 2\""
+      ]
+    },
+    {
+      "name": "BattleTech: Beginner Box",
+      "year": null,
+      "maps": [
+        "Grasslands #1",
+        "Desert #1"
+      ]
+    },
+    {
+      "name": "BattleTech: A Game of Armored Combat",
+      "year": null,
+      "maps": [
+        "Desert #2",
+        "Grassland #2",
+        "Grassland #3",
+        "Desert #3"
+      ]
+    },
+    {
+      "name": "BattleTech: Clan Invasion",
+      "year": null,
+      "maps": [
+        "Barren Lands #1",
+        "Barren Lands #2",
+        "Grasslands Hilltops #1",
+        "Grasslands Rolling Hills #2"
+      ]
+    },
+    {
+      "name": "Reinforcements: Clan Invasion",
+      "year": null,
+      "maps": [
+        "Twycross \"Plain of Curtains\"",
+        "Twycross \"Great Gash\""
+      ]
+    },
+    {
+      "name": "BattleTech: Essentials Box",
+      "year": null,
+      "maps": [
+        "Steiner Stadium (Solaris City)",
+        "The Patchwork (The Reaches)",
+        "Cardboard Cutouts"
+      ]
+    },
+    {
+      "name": "BattleTech: Mercenaries Box",
+      "year": null,
+      "maps": [
+        "Scattered Woods",
+        "River Valley",
+        "Woodland",
+        "Lake Area"
+      ]
+    },
+    {
+      "name": "BattleTech Starter Box",
+      "year": null,
+      "maps": [
+        "Muddy Grasslands",
+        "Dessicated Badlands"
+      ]
+    },
+    {
+      "name": "BattleTech Core Box",
+      "year": null,
+      "maps": [
+        "Headwater Crossing",
+        "Sodden Hills",
+        "Scorched Oasis",
+        "Arid Canyons"
+      ]
+    },
+    {
+      "name": "BattleMat: Grassland Collection",
+      "year": null,
+      "maps": [
+        "Grassland A BattleMat • Foothills #2 • Rolling Hills #4",
+        "Grassland B BattleMat • Forward Base • Open Terrain #2",
+        "Grassland C BattleMat • Rolling Hills #3 • Foothills #1",
+        "Grassland D BattleMat • Open Terrain #3 • Streams",
+        "Grassland E BattleMat • Lakes • River CommCenter",
+        "Desert BattleMat",
+        "Lunar BattleMat",
+        "Alpine BattleMat",
+        "Savanna BattleMat",
+        "Tundra BattleMat"
+      ]
+    },
+    {
+      "name": "BattleMat: Battle of Tukayyid Collection",
+      "year": null,
+      "maps": [
+        "Racice River Delta BattleMat",
+        "Deployment Zone BattleMat",
+        "Holth Forest BattleMat",
+        "Lake Losiije BattleMat",
+        "Robyn's Crossing BattleMat",
+        "Devil's Bath BattleMat",
+        "Pozoristu Mountains BattleMat",
+        "Kozice Valley BattleMat"
+      ]
+    },
+    {
+      "name": "BattleMat: Strana Mechty",
+      "year": null,
+      "maps": [
+        "Strana Mechty \"Bloody Basin\" BattleMat",
+        "Two Strana Mechty \"Grand Melee\" Circle of Equals BattleMat"
+      ]
+    },
+    {
+      "name": "Aerospace BattleMat",
+      "year": null,
+      "maps": [
+        "Aerospace #1 BattleMat",
+        "Planetary Invasion #1 BattleMat"
+      ]
+    },
+    {
+      "name": "Alpha Strike Hexless BattleMat",
+      "year": null,
+      "maps": [
+        "Lunar BattleMat (hexless version)",
+        "Alpine BattleMat (hexless version)"
+      ]
+    },
+    {
+      "name": "BattleMat: BFM Grasslands/Desert",
+      "year": null,
+      "maps": [
+        "MegaMat Desert Map",
+        "MegaMat Grassland Map"
+      ]
+    },
+    {
+      "name": "Alien Worlds BattleMats",
+      "year": null,
+      "maps": [
+        "Lunar Base BattleMat",
+        "Sand Drift BattleMat",
+        "Fungal Crevasse BattleMat",
+        "Washout BattleMat",
+        "Caustic Valley BattleMat",
+        "Mine BattleMat",
+        "Crystalline Canyon BattleMat",
+        "Badlands BattleMat"
+      ]
+    },
+    {
+      "name": "BattleMat: Savannah - Large Lakes/Box Canyon",
+      "year": null,
+      "maps": [
+        "Large Lakes Map",
+        "Box Canyon Map"
+      ]
+    },
+    {
+      "name": "BattleMat: Savannah - River Delta/City Ruins",
+      "year": null,
+      "maps": [
+        "River Delta Map",
+        "City Ruin Map"
+      ]
+    },
+    {
+      "name": "BattleMat: Savannah - Sinkholes/Mountain Lake",
+      "year": null,
+      "maps": [
+        "Sinkhole Map",
+        "Mountain Lake Map"
+      ]
+    },
+    {
+      "name": "BattleMat: City - HPG Heliport/Plaza",
+      "year": null,
+      "maps": [
+        "HPG Heliport Map",
+        "Plaza Map"
+      ]
+    },
+    {
+      "name": "BattleMat: City - HPG Engineering/Business District",
+      "year": null,
+      "maps": [
+        "HPG Engineering Map",
+        "Business District Map"
+      ]
+    },
+    {
+      "name": "BattleMat: City - Central Park/Shopping District",
+      "year": null,
+      "maps": [
+        "Central Park Map",
+        "Shopping District Map"
+      ]
+    },
+    {
+      "name": "BattleMat: Legendary Battles - Twycross",
+      "year": null,
+      "maps": [
+        "Plain of Curtains Map",
+        "Great Gash Map"
+      ]
+    },
+    {
+      "name": "Luthien scenario pack",
+      "year": 1993,
+      "maps": [
+        "Imperial City",
+        "Kado-guchi Valley"
+      ]
+    },
+    {
+      "name": "Casus Belli magazine",
+      "year": 1994,
+      "maps": [
+        "Casus Belli map"
+      ]
+    },
+    {
+      "name": "Clan Invasion - Promotional Maps",
+      "year": 2019,
+      "maps": [
+        "Promotional Map - Tundra",
+        "Promotional Map - Lunar"
+      ]
+    },
+    {
+      "name": "BattleTech: Gothic",
+      "year": null,
+      "maps": [
+        "Trenches Map",
+        "Palace Map"
+      ]
+    },
+    {
+      "name": "GeoTech",
+      "year": 1990,
+      "maps": [
+        "Mountain Lake",
+        "Scattered Woods",
+        "Desert Hills",
+        "City Ruins"
+      ]
+    },
+    {
+      "name": "BattleTech Kartensets",
+      "year": 2014,
+      "maps": [
+        "Kartenset 1: BattleForce & Scattered Woods",
+        "Kartenset 2: Desert Hills & Rolling Hills 1",
+        "Kartenset 3: Open Terrain 1 & City Ruins",
+        "Kartenset 4: Woodland & Box Canyon",
+        "Kartenset 5: Open Terrain 2 & CityTech Map",
+        "Kartenset 6: River Valley & Rolling Hills 2"
+      ]
+    },
+    {
+      "name": "BattleTech Starterbox",
+      "year": 2017,
+      "maps": [
+        "Country Side 3",
+        "Mine"
+      ]
+    }
+  ]
+}

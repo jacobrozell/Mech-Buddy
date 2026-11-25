@@ -48,6 +48,16 @@ struct BoxSetsContentTests {
         #expect(agoac.mapSheets == 2)
     }
 
+    @Test("Boxes with known maps: Starter, Core and Mercenaries")
+    func otherBoxMaps() throws {
+        let boxes = try catalog.boxSets().boxes
+        let maps = Dictionary(uniqueKeysWithValues: boxes.map { ($0.id, $0.maps ?? []) })
+        #expect(maps["starter-box"]?.count == 2)
+        #expect(maps["core-box"]?.count == 4)
+        #expect(maps["mercenaries-box"]?.count == 4)
+        #expect(maps["alpha-strike-box"]?.isEmpty == true)
+    }
+
     @Test("Five boxes with unique ids, in catalog order")
     func ids() throws {
         let boxes = try catalog.boxSets().boxes
@@ -282,6 +292,35 @@ struct CollectionMapsTests {
         withMap.addMap("Grasslands")
         let round = try JSONDecoder().decode(OwnedCollection.self, from: JSONEncoder().encode(withMap))
         #expect(round == withMap)
+    }
+}
+
+@Suite("Map catalog")
+struct MapCatalogTests {
+    private var catalog: BundleContentCatalogRepository {
+        BundleContentCatalogRepository(bundle: Bundle(for: CollectionBundleToken.self))
+    }
+
+    @Test("Loads, and every box's maps are in it")
+    func boxMapsInCatalog() throws {
+        let maps = try catalog.mapCatalog()
+        #expect(maps.products.count >= 50)
+        let known = Set(maps.allMaps.map { $0.lowercased() })
+        for box in try catalog.boxSets().boxes {
+            for name in box.maps ?? [] {
+                #expect(known.contains(name.lowercased()), "\(box.id): \(name)")
+            }
+        }
+    }
+
+    @Test("Suggestions: two letters minimum, prefix matches first, capped")
+    func suggestions() throws {
+        let maps = try catalog.mapCatalog()
+        #expect(maps.suggestions(for: "d").isEmpty)
+        let desert = maps.suggestions(for: "desert")
+        #expect(desert.count == 5)
+        #expect(desert.allSatisfy { $0.lowercased().hasPrefix("desert") })
+        #expect(maps.suggestions(for: "lunar base").contains("Lunar Base Map"))
     }
 }
 

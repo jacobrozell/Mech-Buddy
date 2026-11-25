@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contentVersion": "1.0.0",
-  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names as printed; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
+  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names from sarna.net/wiki/Mapsheet; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
   "boxes": [
     {
       "id": "agoac",
@@ -21,7 +21,12 @@
       ],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-a-game-of-armored-combat",
       "contentsConfirmed": true,
-      "maps": ["Desert #2", "Grassland #2", "Grassland #3", "Desert #3"],
+      "maps": [
+        "Desert #2",
+        "Grassland #2",
+        "Grassland #3",
+        "Desert #3"
+      ],
       "mapSheets": 2
     },
     {
@@ -60,7 +65,11 @@
       ],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-starter-box",
       "contentsConfirmed": true,
-      "mapSheets": 1
+      "mapSheets": 1,
+      "maps": [
+        "Muddy Grasslands",
+        "Dessicated Badlands"
+      ]
     },
     {
       "id": "core-box",
@@ -79,7 +88,14 @@
         "Eris"
       ],
       "sourceURL": "https://www.catalystgamelabs.com/news/catalyst-game-labs-battletech-refit-redeployment",
-      "contentsConfirmed": true
+      "contentsConfirmed": true,
+      "maps": [
+        "Headwater Crossing",
+        "Sodden Hills",
+        "Scorched Oasis",
+        "Arid Canyons"
+      ],
+      "mapSheets": 2
     },
     {
       "id": "mercenaries-box",
@@ -92,18 +108,49 @@
       ],
       "units": [],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-mercenaries-box-set",
-      "contentsConfirmed": false
+      "contentsConfirmed": false,
+      "maps": [
+        "Scattered Woods",
+        "River Valley",
+        "Woodland",
+        "Lake Area"
+      ],
+      "mapSheets": 2
     }
   ],
   "standInsNote": "Mission 'Mech chassis to the closest minis in other boxes, best first. Picked by weight class and role (jumpers for jumpers, missile boats for missile boats). Alpha Strike uses the card's stats, so any mini can stand in.",
   "standIns": {
-    "Awesome": ["Atlas", "Warhawk"],
-    "BattleMaster": ["Warhawk", "Atlas"],
-    "Catapult": ["Archer", "Timber Wolf"],
-    "Thunderbolt": ["Warhammer", "Timber Wolf"],
-    "Wolverine": ["Wraith", "Blackjack"],
-    "Shadow Hawk": ["Phoenix Hawk", "Blackjack"],
-    "Commando": ["Wasp", "Fire Moth"],
-    "Locust": ["Fire Moth", "Wasp"]
+    "Awesome": [
+      "Atlas",
+      "Warhawk"
+    ],
+    "BattleMaster": [
+      "Warhawk",
+      "Atlas"
+    ],
+    "Catapult": [
+      "Archer",
+      "Timber Wolf"
+    ],
+    "Thunderbolt": [
+      "Warhammer",
+      "Timber Wolf"
+    ],
+    "Wolverine": [
+      "Wraith",
+      "Blackjack"
+    ],
+    "Shadow Hawk": [
+      "Phoenix Hawk",
+      "Blackjack"
+    ],
+    "Commando": [
+      "Wasp",
+      "Fire Moth"
+    ],
+    "Locust": [
+      "Fire Moth",
+      "Wasp"
+    ]
   }
 }

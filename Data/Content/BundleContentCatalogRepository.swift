@@ -73,6 +73,11 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("as-box-roster", subdirectory: "Content/AlphaStrike", as: BoxRosterDTO.self)
     }
 
+    /// Known maps for name suggestions. Not on the protocol: only the collection editor uses it.
+    public func mapCatalog() throws -> MapCatalogDTO {
+        try load("map-catalog", subdirectory: "Content", as: MapCatalogDTO.self)
+    }
+
     public func boxSets() throws -> BoxSetsDTO {
         try load("as-box-sets", subdirectory: "Content/AlphaStrike", as: BoxSetsDTO.self)
     }

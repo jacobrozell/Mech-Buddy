@@ -274,6 +274,9 @@ struct CollectionEditSheet: View {
         .accessibilityIdentifier("force.collection.sheet")
     }
 
+    /// Known map names for suggestions while typing. `nil` when the file didn't load.
+    private static let mapCatalog = try? BundleContentCatalogRepository().mapCatalog()
+
     private var boxMaps: [OwnedMap] {
         CollectionMath.ownedMaps(OwnedCollection(boxes: draft.boxes), boxes: boxes)
     }
@@ -311,12 +314,13 @@ struct CollectionEditSheet: View {
                 boxed: false,
                 placeholder: "Map name",
                 fieldLabel: "Map name",
-                addLabel: "Add map"
+                addLabel: "Add map",
+                suggest: { Self.mapCatalog?.suggestions(for: $0) ?? [] }
             ) { draft.addMap($0) }
         } header: {
             Text("Maps")
         } footer: {
-            Text("Maps from your boxes are listed for you. Add any other maps you play on.")
+            Text("Maps from your boxes are listed for you. Add any other maps or BattleMats you play on.")
         }
     }
 
@@ -450,6 +454,8 @@ struct CollectionAddField: View {
     var placeholder = "’Mech name, like Atlas"
     var fieldLabel = "’Mech name"
     var addLabel = "Add ’Mech"
+    /// Names to offer while typing. Tapping one adds it.
+    var suggest: ((String) -> [String])? = nil
     var onAdd: (String) -> Void
 
     @State private var text = ""
@@ -462,6 +468,7 @@ struct CollectionAddField: View {
         let layout = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.sm))
             : AnyLayout(HStackLayout(spacing: TMSpace.sm))
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
         layout {
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.words)
@@ -487,6 +494,23 @@ struct CollectionAddField: View {
             .disabled(trimmed.isEmpty)
             .accessibilityLabel(addLabel)
             .accessibilityIdentifier("\(idPrefix).addButton")
+        }
+            ForEach(suggest?(text) ?? [], id: \.self) { name in
+                Button {
+                    onAdd(name)
+                    text = ""
+                } label: {
+                    Label(name, systemImage: "plus.circle")
+                        .font(TMFont.detail)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Add \(name)")
+                .accessibilityIdentifier("\(idPrefix).suggestion")
+            }
         }
     }
 

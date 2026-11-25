@@ -104,5 +104,5 @@ Pip buttons: “Armor bubble 3 of 5, filled/empty”.
 ### Maps
 
 - A player is assumed to own every map from the boxes they own (`BoxSetDTO.maps`, one name per printed side). Maps they own outside a box are typed in by name and saved in `OwnedCollection.maps`. Saves from before maps existed decode with no maps.
-- The edit sheet's **Maps** section lists box maps (read-only, with the box name) and hand-added maps (swipe to delete), plus a "Map name" field and an **Add map** button (`force.collection.maps.addField` / `.addButton`).
-- Later: mission sheets suggest a map from the player's maps, and experienced players can pick any map. A catalog of every known map comes after that ([classic mission path](../../docs/game-modes/classic/mission-path-scope.md) O3).
+- The edit sheet's **Maps** section lists box maps (read-only, with the box name) and hand-added maps (swipe to delete), plus a "Map name" field and an **Add map** button (`force.collection.maps.addField` / `.addButton`). Typing two or more letters lists up to 5 matching names from `map-catalog.json` (names starting with the text first); tapping one adds it (`force.collection.maps.suggestion`).
+- Later: mission sheets suggest a map from the player's maps, and experienced players can pick any map. The catalog (`Resources/Content/map-catalog.json`, 52 products and about 280 maps from sarna.net/wiki/Mapsheet) already drives the suggestions ([classic mission path](../../docs/game-modes/classic/mission-path-scope.md) O3).
