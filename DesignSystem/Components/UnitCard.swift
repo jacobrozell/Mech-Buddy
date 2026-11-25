@@ -164,18 +164,27 @@ private struct UnitCardBody: View {
     var shootingOver: Bool = false
 
     @Environment(\.forcedWithdrawal) private var forcedWithdrawal
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var nameText: some View {
+        Text(unit.name)
+            .font(TMFont.cardTitle)
+            .strikethrough(unit.combatStatus == .removed)
+            .fixedSize(horizontal: false, vertical: true)
+    }
 
     var body: some View {
         TMCard(edgeColor: TMColor.side(unit.side), isRaised: isActiveSide) {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
+                // At accessibility sizes the name gets its own full-width line so words never break mid-word.
                 HStack(alignment: .center, spacing: TMSpace.sm) {
                     SideBadge(side: unit.side)
                     if let mini = unit.mini {
                         MiniDot(marker: mini)
                     }
-                    Text(unit.name)
-                        .font(TMFont.cardTitle)
-                        .strikethrough(unit.combatStatus == .removed)
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        nameText
+                    }
                     Spacer(minLength: TMSpace.sm)
                     if showsAbilities {
                         Text("SZ \(unit.sz)")
@@ -192,6 +201,9 @@ private struct UnitCardBody: View {
                             .foregroundStyle(.tertiary)
                             .accessibilityHidden(true)
                     }
+                }
+                if dynamicTypeSize.isAccessibilitySize {
+                    nameText
                 }
                 if unit.combatStatus == .removed {
                     Text(unit.leftTable ? "Left the table" : "Off the table")

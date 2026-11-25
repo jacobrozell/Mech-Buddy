@@ -19,10 +19,10 @@
     }
   },
   "coachNotes": [
-    "New lances: each side gets one jumper and one fast 'Mech. Same cards as Ridge Line, new partners.",
+    "New lances: each side gets one jumper and one fast ’Mech. Same cards as Ridge Line, new partners.",
     "Partial cover: if a hill crest or wall hides the bottom half of the target from the shooter, turn on Partial cover in the shot. It makes the shot 1 harder.",
     "Rear shots: if the shooter is behind the target (in its back half), turn on Rear shot. A hit does 1 extra damage, so keep your back away from enemies.",
-    "Jumping lets a 'Mech hop straight over woods and hills. The jumper is harder to hit, but its own shot is harder too.",
+    "Jumping lets a ’Mech hop straight over woods and hills. The jumper is harder to hit, but its own shot is harder too.",
     "Standing still makes your own shot 1 easier. Behind cover, that can be worth it.",
     "Still no overheating and no punching. Those come in later missions."
   ],
@@ -95,9 +95,9 @@
   "tableSteps": [
     "Use the same open table, about 3 feet across. Measure in inches and ignore printed hexes.",
     "Put a hill in the middle third: a book under a cloth, or the hill side of a map. House rule for this mission: climbing costs no extra inches (the full rules charge extra).",
-    "Add a low wall or rock line on each side of the hill. Anything that hides a 'Mech's legs counts as partial cover.",
+    "Add a low wall or rock line on each side of the hill. Anything that hides a ’Mech's legs counts as partial cover.",
     "Add two patches of woods, one on each half of the table. Woods work like Ridge Line.",
-    "Each side places its two 'Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one 'Mech at a time."
+    "Each side places its two ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out both enemy 'Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
+  "winningSummary": "Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw."
 }

@@ -469,6 +469,27 @@ struct CollectionAddField: View {
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.sm))
             : AnyLayout(HStackLayout(spacing: TMSpace.sm))
         VStack(alignment: .leading, spacing: TMSpace.sm) {
+            // Above the field: iOS keeps the focused field just above the keyboard, so rows below it would be hidden.
+            ForEach(suggest?(text) ?? [], id: \.self) { name in
+                Button {
+                    onAdd(name)
+                    text = ""
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                        Image(systemName: "plus.circle")
+                            .accessibilityHidden(true)
+                        Text(name)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .font(TMFont.detail)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Add \(name)")
+                .accessibilityIdentifier("\(idPrefix).suggestion")
+            }
         layout {
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.words)
@@ -495,22 +516,6 @@ struct CollectionAddField: View {
             .accessibilityLabel(addLabel)
             .accessibilityIdentifier("\(idPrefix).addButton")
         }
-            ForEach(suggest?(text) ?? [], id: \.self) { name in
-                Button {
-                    onAdd(name)
-                    text = ""
-                } label: {
-                    Label(name, systemImage: "plus.circle")
-                        .font(TMFont.detail)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Add \(name)")
-                .accessibilityIdentifier("\(idPrefix).suggestion")
-            }
         }
     }
 
