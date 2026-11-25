@@ -36,6 +36,7 @@ struct DiceTray: View {
                     die2 = Int.random(in: 1...6)
                 } label: {
                     Text(die1 == nil || die2 == nil ? "Roll" : "Roll again")
+                        .foregroundStyle(TMColor.onSignal)
                         .frame(maxWidth: .infinity, minHeight: 50)
                 }
                 .buttonStyle(.borderedProminent)

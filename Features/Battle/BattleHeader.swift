@@ -65,7 +65,11 @@ struct BattleHeader: View {
         Group {
             if verticalSizeClass == .compact {
                 compactHeight
-            } else if dynamicTypeSize.isAccessibilitySize || sizeClass == .compact {
+            } else if dynamicTypeSize.isAccessibilitySize {
+                accessible
+                    // Chrome, not content: past AX2 the header crowded out the step itself.
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            } else if sizeClass == .compact {
                 stacked
             } else {
                 horizontal
@@ -88,6 +92,23 @@ struct BattleHeader: View {
                     .accessibilityLabel("Active side, \(activeSide.displayName)")
                     .accessibilityIdentifier("as.battle.activeSide")
             }
+        }
+    }
+
+    /// Accessibility sizes: "Turn 1 / 8" and the side on one line, the step label under it, both small.
+    private var accessible: some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                TurnCounter(turn: turn, maxTurns: maxTurns, isInline: true)
+                Spacer(minLength: TMSpace.sm)
+                if let activeSide {
+                    SideTag(side: activeSide)
+                        .accessibilityLabel("Active side, \(activeSide.displayName)")
+                        .accessibilityValue(activeSide == .lanceA ? "lanceA" : "lanceB")
+                        .accessibilityIdentifier("as.battle.activeSide")
+                }
+            }
+            PhaseTrack(current: phase, isCompact: true)
         }
     }
 

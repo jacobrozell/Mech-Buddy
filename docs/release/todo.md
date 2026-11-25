@@ -42,8 +42,12 @@ Done since 1.0.0 (2): Meet and Greet (box scenario), HT heat attacks, PV by skil
 - [x] Shot picker: opens scrolled to the targets once a shooter is chosen; no "Moved: Walked" line repeating the chip; Woods / Partial cover / Rear shot are real chips (filled with a check when on); no duplicate >42″ note.
 - [x] "Let the app roll" has a dice icon so it reads as a control.
 - [x] Largest text size: dock buttons shrink instead of truncating ("Done shooti…"), the step label wraps, and "·" never starts a line.
-- [ ] Largest text size: the battle header (TURN, 1 / 8, Step 3 of 4 · Shoot) takes about a third of the screen. Consider a compact header at accessibility sizes.
-- [ ] Not checked on screen in this pass: landscape, dark mode, onboarding.
+- [x] Largest text size: the battle header took about a third of the screen. Now "Turn 1 / 8" on one line with the step under it, capped at AX2 (`polish/open-items`).
+- [x] Dark mode, landscape and onboarding checked on screen (2026-11-25, `polish/open-items`):
+  - Gold buttons (Solve a shot, Continue, Roll, onboarding Continue, on-chips) use the dark `onSignal` label; white on gold was about 2.9:1 light and 1.8:1 dark. Side-coloured buttons go dark-on-colour in dark mode.
+  - Shot picker uses two columns in landscape (and on iPad), one at accessibility sizes.
+  - Onboarding: Change game opens with the current game selected; feature-row icons share one width so the text lines up; dice copy says "tap", not "type".
+  - Settings at the largest text: icons stay in their tiles, and Version stacks instead of breaking as "Ver-sion".
 
 **Parked (scoped, not built):**
 - Clash of Steel: needs Battlefield Support, formations (Lucky rerolls, Combat Intuition, Command Lance initiative reroll), and buildings. Rules are in `docs/game-modes/alpha-strike/clash-of-steel-rules-intake.md`, and the cards are checked in `docs/game-modes/book-scenarios.md`.

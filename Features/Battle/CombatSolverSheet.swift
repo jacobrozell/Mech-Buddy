@@ -111,8 +111,13 @@ struct CombatSolverSheet: View {
     }
 
     /// One full-width card per row: two-up tiles broke names mid-word on phones ("Shad/ow Hawk").
+    /// One column on a portrait phone; two or more when there is room (landscape, iPad), so eight ’Mechs
+    /// don't make a long single column of half-empty cards. Always one column at accessibility sizes.
     private var pairColumns: [GridItem] {
-        [GridItem(.flexible())]
+        if dynamicTypeSize.isAccessibilitySize {
+            return [GridItem(.flexible())]
+        }
+        return [GridItem(.adaptive(minimum: 320), spacing: TMSpace.sm, alignment: .top)]
     }
 
     var body: some View {
@@ -1292,7 +1297,7 @@ struct ChipToggleStyle: ToggleStyle {
             }
             .padding(.horizontal, TMSpace.md)
             .frame(minHeight: 44)
-            .foregroundStyle(isOn ? Color.white : Color.primary)
+            .foregroundStyle(isOn ? TMColor.onSignal : Color.primary)
             .background(Capsule().fill(isOn ? AnyShapeStyle(TMColor.signal) : AnyShapeStyle(.fill.tertiary)))
             .contentShape(Capsule())
         }

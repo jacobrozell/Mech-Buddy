@@ -149,6 +149,8 @@ struct BattleRoster: View {
 }
 
 struct BattleUnitRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     var unit: MatchUnitState
     var isActiveSide: Bool
     var offersShoot: Bool
@@ -175,6 +177,8 @@ struct BattleUnitRow: View {
                 Button(action: onShoot) {
                     Text("Shoot")
                         .font(TMFont.detail.weight(.semibold))
+                        // Dark mode's lighter side colours need a dark label (white was about 2.6:1).
+                        .foregroundStyle(colorScheme == .dark ? TMColor.onSignal : Color.white)
                         .padding(.horizontal, TMSpace.md)
                         .frame(minHeight: 44)
                 }

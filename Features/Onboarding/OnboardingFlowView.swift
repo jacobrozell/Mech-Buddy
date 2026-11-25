@@ -119,6 +119,7 @@ struct OnboardingFlowView: View {
         Button(action: advance) {
             Text(continueTitle)
                 .font(.headline)
+                .foregroundStyle(canContinue ? AnyShapeStyle(TMColor.onSignal) : AnyShapeStyle(.secondary))
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, minHeight: verticalSizeClass == .compact ? 44 : 50)
         }
@@ -262,7 +263,8 @@ struct OnboardingFlowView: View {
         guard !didLoad else { return }
         didLoad = true
         if entry == .changeTrack {
-            track = dependencies.preferences.learningTrack
+            // Same fallback Settings shows ("Your game: Alpha Strike"), so the intro opens on that choice.
+            track = dependencies.preferences.learningTrack ?? .alphaStrike
         }
         if let saved = dependencies.preferences.collection {
             collection = saved
