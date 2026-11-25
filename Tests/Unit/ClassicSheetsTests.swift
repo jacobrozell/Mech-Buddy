@@ -4,6 +4,7 @@
 import Foundation
 import Testing
 import MechBuddyData
+import MechBuddyDomain
 
 @Suite("Classic record sheets")
 struct ClassicSheetsTests {

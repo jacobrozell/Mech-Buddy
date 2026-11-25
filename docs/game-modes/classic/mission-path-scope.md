@@ -160,6 +160,16 @@ Classic shares no rules code with Alpha Strike ([ClassicModeSpec § Architecture
 | C3 | 7–9 | Cluster table, ammo, crit determination and effects, physical attacks | Cluster helper, crit slot picker, physical picker |
 | C4 | 10 | Crippled rule and exit-the-map losses, 4v4 pacing | Finale polish |
 
+**Progress (2026-11-24):**
+- **C0, data:** done. `Content/Classic/classic-agoac-sheets.json` holds all 15 sheets and the weapons table, loaded by `ClassicSheetsDTO`. `ClassicSheetsTests` checks every sheet against the construction rules. The phase loop is not built yet.
+- **C1, engine:** started in `Domain/Engines/ClassicTW/ClassicCombat.swift`, with `ClassicCombatTests`:
+  - movement modes;
+  - the to-hit sum, with each term labelled for the player;
+  - range brackets and minimum range;
+  - all three hit location tables, plus punch and kick;
+  - damage moving inward (armor, then structure, then the next location), with side torsos taking their arm.
+- **Still to do for C1:** MP and facing tracking, the screens, and wiring it all into a match.
+
 This replaces the spec's "tools before guided" order: each tool is built when the mission that teaches it needs it.
 
 ## 5. Rules check (done 2026-11-24)
