@@ -77,7 +77,7 @@ struct MissionBrief: View {
                 }
                 if showsDetails, let layout = mission.layout {
                     sectionTitle("Maps needed")
-                    MissionMapsSection(layout: layout, ownedMaps: ownedMapNames)
+                    MissionMapsSection(layout: layout, ownedMaps: ownedMapNames, missionId: mission.scenarioId)
                 }
             }
             if stop.state == .locked, let soon = stop.comingSoon {

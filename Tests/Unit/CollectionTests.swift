@@ -69,16 +69,22 @@ struct BoxSetsContentTests {
     func countsMatch() throws {
         for box in try catalog.boxSets().boxes where box.contentsConfirmed {
             #expect(box.units.count == box.miniCount, "\(box.id)")
-            #expect(Set(box.units).count == box.units.count, "\(box.id) lists a unit twice")
+            // Mercenaries has two Galleons and two Maxims; every other box lists each mini once.
+            if box.id != "mercenaries-box" {
+                #expect(Set(box.units).count == box.units.count, "\(box.id) lists a unit twice")
+            }
         }
     }
 
-    @Test("Mercenaries isn't confirmed: no units, 12 minis, needs A Game of Armored Combat")
+    @Test("Mercenaries lists its 8 BattleMechs and 4 vehicles, 12 minis, needs A Game of Armored Combat")
     func mercenaries() throws {
         let mercs = try #require(try catalog.boxSets().boxes.first { $0.id == "mercenaries-box" })
-        #expect(!mercs.contentsConfirmed)
-        #expect(mercs.units.isEmpty)
+        #expect(mercs.contentsConfirmed)
+        #expect(mercs.units.count == 12)
         #expect(mercs.miniCount == 12)
+        #expect(mercs.units.filter { $0 == "Galleon Light Tank" }.count == 2)
+        #expect(mercs.units.filter { $0 == "Maxim Hover Tank" }.count == 2)
+        #expect(Set(mercs.units).isSuperset(of: ["Chameleon", "Starslayer", "Caesar", "Devastator", "Flea", "Firefly", "Quickdraw", "Ostsol"]))
         #expect(mercs.requires == ["agoac"])
     }
 
@@ -510,3 +516,115 @@ struct CollectionStoreTests {
 }
 
 private final class CollectionBundleToken {}
+
+
+@Suite("Map catalog content")
+struct MapCatalogContentTests {
+    private var catalog: BundleContentCatalogRepository {
+        BundleContentCatalogRepository(bundle: Bundle(for: CollectionBundleToken.self))
+    }
+
+    @Test("Every product has a name and non-empty map names, none blank")
+    func wellFormed() throws {
+        let file = try catalog.mapCatalog()
+        #expect(file.products.count > 60)
+        for product in file.products {
+            #expect(!product.name.isEmpty)
+            #expect(!product.maps.isEmpty, "\(product.name)")
+            for map in product.maps {
+                #expect(map == map.trimmingCharacters(in: .whitespaces) && !map.isEmpty, "\(product.name): '\(map)'")
+            }
+            #expect(Set(product.maps).count == product.maps.count, "\(product.name) repeats a map")
+        }
+    }
+
+    @Test("Maps added after the first pass are suggested by name")
+    func addedMapsSuggest() throws {
+        let file = try catalog.mapCatalog()
+        #expect(file.suggestions(for: "caldera").contains("Caldera Lake (Volcanic)"))
+        #expect(file.suggestions(for: "thunder rift") == ["Thunder Rift Map"])
+        #expect(file.allMaps.contains("Open Terrain 1"))
+        #expect(file.allMaps.contains("WWE2020 Map #4"))
+    }
+
+    @Test("Every map a mission suggests is in the catalog or a box")
+    func missionMapsAreKnown() throws {
+        let known = Set(try catalog.mapCatalog().allMaps.map { $0.lowercased() })
+            .union(try catalog.boxSets().boxes.flatMap { $0.maps ?? [] }.map { $0.lowercased() })
+        for item in try catalog.scenarios().scenarios where !item.gated {
+            let dto = try catalog.scenario(id: ScenarioId(rawValue: item.id))
+            for name in dto.layout?.sheetNames ?? [] {
+                #expect(known.contains(name.lowercased()), "\(item.id): \(name)")
+            }
+        }
+    }
+}
+
+@Suite("Map swap")
+struct MapSwapTests {
+    private func layout(_ names: [String]) -> MissionLayoutDTO {
+        let sheets = names.enumerated().map { index, name in
+            MissionLayoutDTO.Sheet(name: name, area: .init(x: Double(index) * 18, y: 0, width: 18, depth: 22))
+        }
+        return MissionLayoutDTO(
+            width: 36, depth: 22, sheets: sheets,
+            zones: [.init(side: "A", area: .init(x: 0, y: 0, width: 6, depth: 22))],
+            features: [.init(kind: .hill, area: .init(x: 15, y: 8, width: 6, depth: 6))],
+            openTable: "Any table"
+        )
+    }
+
+    @Test("No choice, or a choice that doesn't fit, keeps the suggested maps")
+    func noChoice() {
+        let base = layout(["Grassland #2", "Desert #2"])
+        #expect(MapSwap.names(for: base, chosen: nil) == ["Grassland #2", "Desert #2"])
+        #expect(MapSwap.names(for: base, chosen: ["Woodland"]) == ["Grassland #2", "Desert #2"])
+    }
+
+    @Test("Swapping relabels the sheets and keeps zones, terrain and areas")
+    func relabel() throws {
+        let base = layout(["Grassland #2", "Desert #2"])
+        let chosen = try #require(MapSwap.setting(nil, index: 1, to: "Woodland", in: base))
+        #expect(chosen == ["Grassland #2", "Woodland"])
+        let shown = MapSwap.applying(chosen, to: base)
+        #expect(shown.sheetNames == ["Grassland #2", "Woodland"])
+        #expect(shown.zones == base.zones)
+        #expect(shown.features == base.features)
+        #expect(shown.sheets.map(\.area) == base.sheets.map(\.area))
+    }
+
+    @Test("Putting every suggested map back stores nothing")
+    func backToSuggested() throws {
+        let base = layout(["Grassland #2", "Desert #2"])
+        let swapped = try #require(MapSwap.setting(nil, index: 0, to: "Mountain Lake", in: base))
+        #expect(MapSwap.setting(swapped, index: 0, to: "grassland #2", in: base) == nil)
+        #expect(MapSwap.setting(nil, index: 5, to: "X", in: base) == nil)
+    }
+
+    @Test("A blank name falls back to the suggestion")
+    func blank() {
+        let base = layout(["Grassland #2", "Desert #2"])
+        #expect(MapSwap.setting(nil, index: 0, to: "   ", in: base) == nil)
+    }
+
+    @Test("Options list owned maps, the suggestion and the current pick once each")
+    func options() {
+        let list = MapSwap.options(owned: ["Woodland", "desert #2"], suggested: "Desert #2", current: "Woodland")
+        #expect(list == ["Woodland", "desert #2"])
+        #expect(MapSwap.options(owned: [], suggested: "A", current: "B") == ["A", "B"])
+    }
+
+    @Test("Swaps persist per mission and survive a reload")
+    func persistence() throws {
+        let suite = "MapSwapTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        #expect(MapSwap.load(from: defaults).isEmpty)
+        MapSwap.save(["as-ridge-line": ["Grassland #2", "Woodland"], "as-broken-ground": ["Lake Area", "Desert #2"]], to: defaults)
+        let loaded = MapSwap.load(from: defaults)
+        #expect(loaded["as-ridge-line"] == ["Grassland #2", "Woodland"])
+        #expect(loaded["as-broken-ground"] == ["Lake Area", "Desert #2"])
+        MapSwap.save([:], to: defaults)
+        #expect(MapSwap.load(from: defaults).isEmpty)
+    }
+}

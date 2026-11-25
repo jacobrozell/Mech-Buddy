@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contentVersion": "1.0.0",
-  "sourceNote": "Mapsheets and BattleMats by product, from sarna.net/wiki/Mapsheet (read 2026-11-24), names as written there. Exceptions: A Game of Armored Combat uses its rulebook's spelling ('Grassland #2', Sarna 'Grasslands #2'). Left out until checked: products Sarna only links to a subpage (the MapPack PDF series, MapPack: Solaris VII), MWDA mapsheets, and entries whose names weren't read verbatim (Fire and Ice, FieldTech, BFM City/Lunar and Volcanic/Glacier, Thunder Rift/Misery, Retail Grinder Kit, BattlePack: Fourth Succession War, And Hell Followed With Him).",
+  "sourceNote": "Mapsheets and BattleMats by product, from sarna.net/wiki/Mapsheet (read 2026-11-24, remaining products added 2026-11-25), names as written there. Exceptions: A Game of Armored Combat uses its rulebook's spelling ('Grassland #2', Sarna 'Grasslands #2'); Fire and Ice maps are written 'Name (Volcanic)' / 'Name (Glacier)' for the two sides Sarna lists under each name; MapPack PDF series names are the product names without the 'MapPack:' prefix (the two terrain sets, Flatlands and Hill, are not maps and are left out); MechWarrior: Dark Age mapsheets carry '(MWDA)' so generic names like Forest or Swamp read clearly. Caldera Lake: Sarna's page header for it reads like a copy of Erupting Canyon's, but the name matches retailer listings ('Fire & Ice 04: Caldera Lake'). Not added: MapPack: Solaris VII (Sarna says it only compiles the Solaris maps already listed under their own products), the MWDA Solaris VII 'Tournament' map (name unclear), BFM Grasslands/Desert names (Sarna lists no individual names), and the Casus Belli map (no name).",
   "products": [
     {
       "name": "Map Set",
@@ -592,6 +592,153 @@
       "maps": [
         "Country Side 3",
         "Mine"
+      ]
+    },
+    {
+      "name": "BattleMat: Fire and Ice",
+      "year": null,
+      "maps": [
+        "Erupting Canyon (Volcanic)",
+        "Erupting Canyon (Glacier)",
+        "Magma Fjords (Volcanic)",
+        "Magma Fjords (Glacier)",
+        "Umber Station (Volcanic)",
+        "Umber Station (Glacier)",
+        "Caldera Lake (Volcanic)",
+        "Caldera Lake (Glacier)",
+        "Fire Rivulets (Volcanic)",
+        "Fire Rivulets (Glacier)",
+        "Burning Station (Volcanic)",
+        "Burning Station (Glacier)",
+        "Acrid (Volcanic)",
+        "Acrid (Glacier)",
+        "Laze Base (Volcanic)",
+        "Laze Base (Glacier)"
+      ]
+    },
+    {
+      "name": "BattleMat: FieldTech - Grasslands/Desert",
+      "year": null,
+      "maps": [
+        "Grasslands Map",
+        "Deserts Map"
+      ]
+    },
+    {
+      "name": "BattleMat: FieldTech - Lunar/City",
+      "year": null,
+      "maps": [
+        "Lunar Base Map",
+        "City Map"
+      ]
+    },
+    {
+      "name": "Alpha Strike Hexless BattleMat: FieldTech - Grasslands/Desert",
+      "year": null,
+      "maps": [
+        "Grasslands Map",
+        "Deserts Map"
+      ]
+    },
+    {
+      "name": "Alpha Strike Hexless BattleMat: FieldTech - Lunar/City",
+      "year": null,
+      "maps": [
+        "Lunar Base Map",
+        "City Map"
+      ]
+    },
+    {
+      "name": "BattleMat: BFM City/Lunar",
+      "year": null,
+      "maps": [
+        "MegaMat City #1 Map",
+        "MegaMat Lunar #1 Map"
+      ]
+    },
+    {
+      "name": "BattleMat: BFM Volcanic/Glacier",
+      "year": null,
+      "maps": [
+        "Volcanic BFM #1 Map",
+        "Glacier BFM #1 Map"
+      ]
+    },
+    {
+      "name": "BattleMat: Legendary Battles - Thunder Rift / Misery",
+      "year": null,
+      "maps": [
+        "Thunder Rift Map",
+        "Misery Map"
+      ]
+    },
+    {
+      "name": "BattleTech: Retail Grinder Kit",
+      "year": null,
+      "maps": [
+        "Grasslands #3 Battlemat",
+        "Desert #2 Battlemat"
+      ]
+    },
+    {
+      "name": "BattlePack: Fourth Succession War",
+      "year": null,
+      "maps": [
+        "Woodland"
+      ]
+    },
+    {
+      "name": "And Hell Followed With Him Worldwide Event",
+      "year": 2020,
+      "maps": [
+        "WWE2020 Map #1",
+        "WWE2020 Map #2",
+        "WWE2020 Map #3",
+        "WWE2020 Map #4"
+      ]
+    },
+    {
+      "name": "MapPack PDF series",
+      "year": null,
+      "maps": [
+        "Open Terrain 1",
+        "Open Terrain 2",
+        "Desert Hills",
+        "City Ruins",
+        "CityTech Map",
+        "Scattered Woods",
+        "Rolling Hills 1",
+        "Rolling Hills 2",
+        "Woodland",
+        "Box Canyon",
+        "BattleForce"
+      ]
+    },
+    {
+      "name": "MechWarrior: Dark Age mapsheets",
+      "year": null,
+      "maps": [
+        "Field Map (MWDA)",
+        "Wasteland Map (MWDA)",
+        "Age of Destruction Starter Set Map (MWDA)",
+        "War College Kit Map #1 (MWDA)",
+        "War College Kit Map #2 (MWDA)",
+        "Abandoned Spaceport (MWDA)",
+        "Arctic Tundra East (MWDA)",
+        "Arctic Tundra West (MWDA)",
+        "Desert Oasis (MWDA)",
+        "Devastated City (MWDA)",
+        "Forest (MWDA)",
+        "Military Complex East (MWDA)",
+        "Military Complex West (MWDA)",
+        "Palace Exterior (MWDA)",
+        "Palace Interior (MWDA)",
+        "Sentinel Stand-Off (MWDA)",
+        "Swamp (MWDA)",
+        "Solaris VII Light-Class Map (MWDA)",
+        "Solaris VII Medium-Class Map (MWDA)",
+        "Solaris VII Heavy-Class Map (MWDA)",
+        "Solaris VII Assault-Class Map (MWDA)"
       ]
     }
   ]
