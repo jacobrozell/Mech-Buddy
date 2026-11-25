@@ -202,7 +202,27 @@ struct CombatSolverSheet: View {
         }
     }
 
+    private static let targetsAnchor = "as.sator.targets"
+
+    /// Once a shooter is chosen (by tapping Shoot on its row, or here), the list jumps to the targets.
+    /// With six or eight ’Mechs the target list used to sit a full screen below the shooter you picked.
     private var pairPicker: some View {
+        ScrollViewReader { proxy in
+            pairPickerContent
+                .onAppear {
+                    guard initialAttackerId != nil, attacker != nil else { return }
+                    proxy.scrollTo(Self.targetsAnchor, anchor: .top)
+                }
+                .onChange(of: attackerId) { _, newValue in
+                    guard newValue != nil else { return }
+                    withAnimation(reduceMotion ? nil : .snappy) {
+                        proxy.scrollTo(Self.targetsAnchor, anchor: .top)
+                    }
+                }
+        }
+    }
+
+    private var pairPickerContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -248,6 +268,7 @@ struct CombatSolverSheet: View {
                 .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("as.sator.target")
                 .accessibilityLabel("At which target?")
+                .id(Self.targetsAnchor)
             }
             .padding(TMSpace.lg)
         }
@@ -291,11 +312,16 @@ struct CombatSolverSheet: View {
                 action: { defenderId = unit.id }
             )
             .opacity(unit.combatStatus == .destroyedPendingEnd ? 0.55 : 1)
-            Text(caption)
-                .font(TMFont.detail)
-                .foregroundStyle(.secondary)
+            // The card's chip already shows how it moved ("Walked"); a "Moved: Walked" line repeated it.
+            if !caption.hasPrefix(Self.movedCaptionPrefix) {
+                Text(caption)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
+
+    private static let movedCaptionPrefix = "Moved: "
 
     private var gaugeBesideDice: Bool { verticalSizeClass == .compact }
 
@@ -543,13 +569,7 @@ struct CombatSolverSheet: View {
                 }
             }
             .accessibilityIdentifier("as.sator.range")
-            if insight.rangeBracket == .outOfRange {
-                Text("Past 42 inches, so the range bands are off.")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("as.sator.range.note")
-            }
+            // No note under >42″: the verdict at the top already says "More than 42 inches — no shot."
         }
     }
 
@@ -650,7 +670,6 @@ struct CombatSolverSheet: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .padding(.top, TMSpace.md)
             .accessibilityHint("Line of sight and front arc")
             if showUnusual {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -755,15 +774,14 @@ struct CombatSolverSheet: View {
 
     @ViewBuilder
     private func chipToggle(_ title: String, isOn: Binding<Bool>, hint: String? = nil) -> some View {
+        // Chips: grey when off, filled with a check when on. Plain button toggles looked like links,
+        // and a bordered tint made "on" hard to tell from "off".
         let toggle = Toggle(isOn: isOn) {
-            Text(title).frame(minHeight: 44)
+            Text(title)
         }
-            .toggleStyle(.button)
-            .font(TMFont.detail)
-            .contentShape(Capsule())
+            .toggleStyle(ChipToggleStyle())
         if let hint {
             toggle
-                .buttonStyle(.borderless)
                 .accessibilityHint(hint)
         } else {
             toggle
@@ -884,7 +902,7 @@ struct CombatSolverSheet: View {
         if unit.isShutdown { return "Shut down, easy to hit" }
         if unit.isImmobile { return "Can’t move" }
         if unit.hasMovedThisTurn, unit.movementMode != .unset {
-            return "Moved: \(unit.movementMode.displayName)"
+            return Self.movedCaptionPrefix + unit.movementMode.displayName
         }
         return "Move not recorded"
     }
@@ -1255,3 +1273,32 @@ private struct DamagePipCompare: View {
     CombatSolverSheet(session: PreviewFixtures.session(), store: BattlePreview.store())
 }
 #endif
+
+/// A capsule chip for on/off conditions (Woods, Partial cover, Rear shot).
+struct ChipToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let isOn = configuration.isOn
+        return Button {
+            configuration.isOn.toggle()
+        } label: {
+            HStack(spacing: TMSpace.xs) {
+                if isOn {
+                    Image(systemName: "checkmark")
+                        .font(TMFont.detail.weight(.bold))
+                        .accessibilityHidden(true)
+                }
+                configuration.label
+                    .font(TMFont.detail.weight(isOn ? .semibold : .regular))
+            }
+            .padding(.horizontal, TMSpace.md)
+            .frame(minHeight: 44)
+            .foregroundStyle(isOn ? Color.white : Color.primary)
+            .background(Capsule().fill(isOn ? AnyShapeStyle(TMColor.signal) : AnyShapeStyle(.fill.tertiary)))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(.isToggle)
+        .accessibilityValue(isOn ? "On" : "Off")
+        .animation(.snappy(duration: 0.15), value: isOn)
+    }
+}

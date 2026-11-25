@@ -184,7 +184,8 @@ struct PlayHomeView: View {
             Text(title(for: session.scenarioId))
                 .font(TMFont.cardTitle)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("\(turns) · \(session.phase.displayName)")
+            // Non-breaking space before the dot: a wrap at large text never starts a line with "·".
+            Text("\(turns)\u{00A0}· \(session.phase.displayName)")
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()

@@ -55,6 +55,7 @@ struct PrimaryActionButton: View {
             }
             Text(title)
                 .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.6)
         }
     }
 }
@@ -89,6 +90,8 @@ struct SecondaryActionButton: View {
                 }
                 Text(title)
                     .multilineTextAlignment(.center)
+                    // Glass buttons keep one line; at accessibility sizes "Done shooting" was cut to "Done shooti…".
+                    .minimumScaleFactor(0.6)
             }
             .frame(maxWidth: .infinity, minHeight: isShort ? 36 : 50)
         }

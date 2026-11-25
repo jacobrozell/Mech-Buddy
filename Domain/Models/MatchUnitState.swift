@@ -282,6 +282,14 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         return "\(reduced)\(rest)"
     }
 
+    /// `effectiveMV` for the screen: card data keeps the Master Unit List's `"`; the app prints ″ everywhere else.
+    public var displayMV: String { Self.inchMarks(effectiveMV) }
+
+    /// Swaps straight `"` inch marks for ″ (`10"/6"j` reads `10″/6″j`).
+    public static func inchMarks(_ move: String) -> String {
+        move.replacingOccurrences(of: "\"", with: "″")
+    }
+
     /// Halves printed MV inches when `mpHit` is set (floor).
     /// Halves every printed inch value. `10"/6"j` becomes `5"/3"j`.
     public var motiveMV: String {

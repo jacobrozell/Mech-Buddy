@@ -100,7 +100,7 @@ struct BattleFlowView: View {
                 }
                 Button("Keep recording moves", role: .cancel) {}
             } message: {
-                Text("Unrecorded moves will count as Walk when they shoot. Prefer recording Stand still / Walk / Sprint / Jump for each ’Mech.")
+                Text("A ’Mech with no move counts as walked when shots are worked out. For the right numbers, tap how each one moved.")
             }
             .sheet(isPresented: $showEventLog) {
                 EventLogSheet(store: store)
@@ -182,14 +182,20 @@ struct BattleFlowView: View {
     }
 
     /// Missions on the path, in order. Empty when the ladder is off.
-    private var ladderItems: [ScenarioCatalogItemDTO] {
+    /// The section this mission belongs to: the training path (no stage) or a later stage such as the box
+    /// scenarios. Counting the whole catalog made victory say "1 of 6" while Play said "1 of 5".
+    private func ladderItems(for session: MatchSession) -> [ScenarioCatalogItemDTO] {
         guard dependencies.releaseSurface.isEnabled(.missionLadder),
               let items = try? dependencies.content.scenarios().scenarios else { return [] }
-        return items.sorted { ($0.missionNumber ?? .max) < ($1.missionNumber ?? .max) }
+        let id = (session.scenarioId ?? .ridgeLine).rawValue
+        let stage = items.first { $0.id == id }?.stage
+        return items
+            .filter { $0.stage == stage }
+            .sorted { ($0.missionNumber ?? .max) < ($1.missionNumber ?? .max) }
     }
 
     private func missionProgress(for session: MatchSession) -> VictoryView.MissionProgress? {
-        let items = ladderItems
+        let items = ladderItems(for: session)
         let id = (session.scenarioId ?? .ridgeLine).rawValue
         guard items.count > 1, let index = items.firstIndex(where: { $0.id == id }) else { return nil }
         let done = dependencies.preferences.completedMissions.union([id])
@@ -205,7 +211,7 @@ struct BattleFlowView: View {
     }
 
     private func nextMissionId(after session: MatchSession) -> ScenarioId? {
-        let items = ladderItems
+        let items = ladderItems(for: session)
         let id = (session.scenarioId ?? .ridgeLine).rawValue
         guard let index = items.firstIndex(where: { $0.id == id }), items.indices.contains(index + 1) else { return nil }
         let next = items[index + 1]
@@ -413,7 +419,7 @@ struct BattleFlowView: View {
         } else {
             switch coach.step {
             case .placeMiniatures:
-                PlaceMiniaturesStep(session: session)
+                PlaceMiniaturesStep(session: session, layout: store.scenario.layout)
             case .initiative:
                 InitiativeStep(
                     preview: autoPreview,

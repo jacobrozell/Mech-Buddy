@@ -72,6 +72,8 @@ struct SettingsHomeView: View {
                         }
                     }
                 }
+                // Buttons in a List take the app tint; this row reads like its NavigationLink neighbours.
+                .tint(.primary)
                 .accessibilityLabel("Your game, \(trackTitle)")
                 .accessibilityHint("Opens the intro to pick Alpha Strike or Classic")
                 .accessibilityIdentifier("settings.onboarding")

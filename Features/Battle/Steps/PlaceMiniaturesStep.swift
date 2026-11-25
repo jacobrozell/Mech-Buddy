@@ -1,18 +1,26 @@
 import SwiftUI
 import MechBuddyDomain
+import MechBuddyData
 
 struct PlaceMiniaturesStep: View {
     var session: MatchSession
+    /// The mission's map and setup zones. Missions without one get the plain two-edge schematic.
+    var layout: MissionLayoutDTO? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
+            // No side badge: both sides place, taking turns.
             CoachPrompt(
                 title: "Place the miniatures",
                 message: "Each side sets its ’Mechs within 6″ of its own short edge. \(session.activeSide.other.displayName) won the roll and picks who places first; then take turns, one ’Mech at a time.",
-                side: session.activeSide,
+                side: nil,
                 accessibilityIdentifier: "as.battle.table"
             )
-            DeploymentSchematic()
+            if let layout {
+                MissionLayoutView(layout: layout)
+            } else {
+                DeploymentSchematic()
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

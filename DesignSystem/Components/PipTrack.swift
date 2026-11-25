@@ -55,18 +55,22 @@ struct PipTrack: View {
 
     var body: some View {
         let shown = clampedRemaining
-        FlowLayout(spacing: TMSpace.xs) {
-            if capacity <= 0 {
-                Text("—")
-                    .font(TMFont.stat)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(0..<capacity, id: \.self) { index in
-                    pip(at: index, remaining: shown)
-                        .animation(
-                            reduceMotion ? nil : TMMotion.drain.delay(Double(index) * TMMotion.pipStagger),
-                            value: remaining
-                        )
+        // The count sits beside the pips rather than inside the flow: in narrow cards the pips wrap and the
+        // count stays on the first row, instead of dropping alone onto a line of its own.
+        HStack(alignment: .center, spacing: TMSpace.xs) {
+            FlowLayout(spacing: TMSpace.xs) {
+                if capacity <= 0 {
+                    Text("—")
+                        .font(TMFont.stat)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(0..<capacity, id: \.self) { index in
+                        pip(at: index, remaining: shown)
+                            .animation(
+                                reduceMotion ? nil : TMMotion.drain.delay(Double(index) * TMMotion.pipStagger),
+                                value: remaining
+                            )
+                    }
                 }
             }
             if showsCount, capacity > 0 {
@@ -75,6 +79,7 @@ struct PipTrack: View {
                     .monospacedDigit()
                     .contentTransition(.numericText())
                     .foregroundStyle(.primary)
+                    .fixedSize()
             }
         }
         .accessibilityElement(children: .ignore)

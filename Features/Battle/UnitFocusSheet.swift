@@ -288,7 +288,7 @@ struct UnitFocusSheet: View {
             StatCell(
                 id: "mv",
                 label: "MV",
-                value: marked(unit.effectiveMV, changed: unit.effectiveMV != unit.mv),
+                value: marked(unit.displayMV, changed: unit.effectiveMV != unit.mv),
                 helpTitle: "Move",
                 helpBody: unit.heat > 0
                     ? "Heat takes 2″ per level off walking and sprinting. Jumping is not affected."
