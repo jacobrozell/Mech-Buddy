@@ -331,7 +331,7 @@ struct CombatSolverSheet: View {
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    if offersPhysical {
+                    if offersPhysical || attacker.hasRearFiring {
                         attackKindControl(attacker)
                     }
                     if !isPhysical {
@@ -339,7 +339,7 @@ struct CombatSolverSheet: View {
                     }
                     targetMovedControl(defender)
                     conditions
-                    if !isPhysical, live.ruleset.overheatAllowed, attacker.ov > 0 {
+                    if !isPhysical, insight.attackKind != .rearFiring, live.ruleset.overheatAllowed, attacker.ov > 0 {
                         overheatControl(attacker)
                     }
                     if gaugeBesideDice {
@@ -469,19 +469,21 @@ struct CombatSolverSheet: View {
                 if dynamicTypeSize.isAccessibilitySize {
                     // Segments truncate at accessibility sizes; a menu keeps both labels whole.
                     Picker("Attack", selection: $insight.attackKind) {
-                        Text("Weapons").tag(AttackKind.weapon)
-                        Text("Punch or kick").tag(AttackKind.physical)
+                        attackKindOptions(attacker)
                     }
                     .pickerStyle(.menu)
                 } else {
                     Picker("Attack", selection: $insight.attackKind) {
-                        Text("Weapons").tag(AttackKind.weapon)
-                        Text("Punch or kick").tag(AttackKind.physical)
+                        attackKindOptions(attacker)
                     }
                     .pickerStyle(.segmented)
                 }
             }
             .accessibilityIdentifier("as.sator.attackKind")
+            // Choosing rear weapons says the target is behind; switching back puts it in front again.
+            .onChange(of: insight.attackKind) { _, kind in
+                insight.targetInFrontArc = kind != .rearFiring
+            }
             Text(attackKindExplainer(attacker))
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
@@ -490,9 +492,32 @@ struct CombatSolverSheet: View {
         }
     }
 
+    @ViewBuilder
+    private func attackKindOptions(_ attacker: MatchUnitState) -> some View {
+        Text("Weapons").tag(AttackKind.weapon)
+        if offersPhysical {
+            Text("Punch or kick").tag(AttackKind.physical)
+        }
+        if attacker.canRearFireThisTurn || insight.attackKind == .rearFiring {
+            Text("Rear weapons").tag(AttackKind.rearFiring)
+        }
+    }
+
     private func attackKindExplainer(_ attacker: MatchUnitState) -> String {
+        if insight.attackKind == .rearFiring {
+            let values = [RangeBracket.short, .medium, .long].map { b -> String in
+                let v = attacker.rearDamage(at: b)
+                return v > 0 ? "\(v)" : "–"
+            }.joined(separator: "/")
+            return "Shoots a ’Mech behind \(attacker.name) with its rear weapons (\(values)), +1 to hit, no overheat. Do this before the forward shot: that shot then does as much less damage as the rear weapons can do at the range used."
+        }
+        if attacker.rearFireReduction > 0, !isPhysical {
+            return "After the rear shot, \(attacker.name)’s forward damage is \(attacker.rearFireReduction) less this turn."
+        }
         guard isPhysical else {
-            return "One attack a turn: shoot or punch, not both."
+            return offersPhysical
+                ? "One attack a turn: shoot or punch, not both."
+                : "Rear weapons are an extra shot at a ’Mech behind you, taken before the forward shot."
         }
         let reach = attacker.hasMEL ? 2 : 1
         let damage = AlphaStrikeDamage.physical(attacker: attacker, rearHit: false).delivered

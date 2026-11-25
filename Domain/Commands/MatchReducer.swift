@@ -345,8 +345,9 @@ public enum MatchReducer {
 
         // No side gate: damage and crits land at the end of the phase (combatPhaseCrits),
         // so the order shots are entered in can't change the result. Players roll together.
-        guard attacker.canAttackThisTurn else {
-            throw MatchDomainError.cannotAttack("Unit cannot attack")
+        let rearFiring = attack.attackKind == .rearFiring
+        guard rearFiring ? attacker.canRearFireThisTurn : attacker.canAttackThisTurn else {
+            throw MatchDomainError.cannotAttack(rearFiring ? "No rear-firing attack available" : "Unit cannot attack")
         }
         guard defender.side != attacker.side else {
             throw MatchDomainError.cannotAttack("Invalid target")
@@ -362,7 +363,7 @@ public enum MatchReducer {
         let bracket = physical ? RangeBracket.short : attack.range
         let move = attack.attackerMove
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
-        if !physical, let reason = CombatSolver.noDamageReason(attacker: attacker, bracket: bracket) {
+        if !physical, let reason = CombatSolver.noDamageReason(attacker: attacker, bracket: bracket, kind: attack.attackKind) {
             throw MatchDomainError.cannotAttack(reason)
         }
         let tn = try SATORResolver.resolve(
@@ -384,14 +385,14 @@ public enum MatchReducer {
         var note = ""
         // Overheat is declared before the roll, so the heat comes whether the shot hits or not.
         // It can't add to a punch or kick (p. 24).
-        let overheat = physical ? 0 : AlphaStrikeHeat.usableOverheat(
+        let overheat = (physical || rearFiring) ? 0 : AlphaStrikeHeat.usableOverheat(
             requested: attack.overheatUsed,
             attacker: attacker,
             bracket: bracket,
             overheatAllowed: next.ruleset.overheatAllowed
         )
         // Keep the "X hit Y for N. Rolled R, needed T." shape: ShotFeed and Victory stats read it.
-        let how = physical ? " Punch or kick." : ""
+        let how = physical ? " Punch or kick." : (rearFiring ? " Rear-firing weapons." : "")
 
         if hit {
             let delivered = physical
@@ -401,7 +402,8 @@ public enum MatchReducer {
                         attacker: attacker,
                         bracket: bracket,
                         rearHit: attack.rearHit,
-                        overheatUsed: overheat
+                        overheatUsed: overheat,
+                        kind: attack.attackKind
                     ),
                     overheatAllowed: next.ruleset.overheatAllowed
                 )
@@ -417,7 +419,7 @@ public enum MatchReducer {
                 note += " A critical is owed."
             }
             // HT#/#/#: a hit at that range adds heat to the target in the End Phase, at most 2 a turn (p. 25).
-            let heatAbility = physical ? 0 : attacker.heatAbility(at: bracket)
+            let heatAbility = (physical || rearFiring) ? 0 : attacker.heatAbility(at: bracket)
             if heatAbility > 0 {
                 let before = next.units[defenderIdx].incomingHeatThisTurn
                 let after = min(MatchUnitState.maxIncomingHeatPerTurn, before + heatAbility)
@@ -434,9 +436,7 @@ public enum MatchReducer {
             note += " Overheated \(overheat)."
         }
         // Overheat and engine-hit heat land in the End Phase (AlphaStrikeHeat.endPhase).
-        attacker.overheatThisTurn = overheat
-        attacker.hasAttackedThisTurn = true
-        attacker.turnShot = TurnShot(
+        let shot = TurnShot(
             targetName: defender.name,
             hit: hit,
             total: attack.roll.total,
@@ -444,6 +444,16 @@ public enum MatchReducer {
             damage: deliveredDamage,
             kind: attack.attackKind
         )
+        if rearFiring {
+            // The forward shot can still follow, with this REAR value taken off its damage (p. 25).
+            attacker.rearShot = shot
+            attacker.rearFireReduction = attacker.rearDamage(at: bracket)
+            note += " Forward damage this turn is \(attacker.rearFireReduction) less."
+        } else {
+            attacker.overheatThisTurn = overheat
+            attacker.hasAttackedThisTurn = true
+            attacker.turnShot = shot
+        }
         // Persist attacker's chosen move if provided (UI may pass sheet move).
         if let attackerMove = attack.attackerMove {
             attacker.movementMode = attackerMove == .unset ? .ground : attackerMove

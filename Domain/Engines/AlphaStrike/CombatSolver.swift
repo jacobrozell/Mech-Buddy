@@ -108,6 +108,7 @@ public enum CombatSolver {
         let move = insight.attackerMoveOverride
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)
         let physical = insight.attackKind == .physical
+        let rearFiring = insight.attackKind == .rearFiring
         // A punch or kick has no range band; .short keeps the range term at +0.
         let bracket = physical ? .short : insight.rangeBracket
         let verb = physical ? "attack" : "shoot"
@@ -117,12 +118,18 @@ public enum CombatSolver {
             cannot = "Punches and kicks aren’t used in this mission."
         } else if !insight.canSeeTarget {
             cannot = physical ? "You can’t hit a ’Mech you can’t see." : "You can’t shoot a ’Mech you can’t see."
-        } else if !insight.targetInFrontArc {
+        } else if rearFiring, !attacker.hasRearFiring {
+            cannot = "\(attacker.name) has no rear-firing weapons."
+        } else if rearFiring, insight.targetInFrontArc {
+            cannot = "Rear-firing weapons only shoot ’Mechs behind \(attacker.name). Use Weapons for this one."
+        } else if !rearFiring, !insight.targetInFrontArc {
             cannot = physical
                 ? "You can only punch or kick a ’Mech in front of you."
                 : "You can only shoot a ’Mech in front of the shooter."
         } else if attacker.isShutdown {
             cannot = "\(attacker.name) is shut down from heat, so it can’t \(verb) this turn."
+        } else if rearFiring, attacker.rearShot != nil {
+            cannot = "\(attacker.name) already fired its rear weapons this turn."
         } else if !attacker.canAttackThisTurn {
             cannot = attacker.movementMode == .sprint
                 ? "\(attacker.name) sprinted, so it can’t \(verb) this turn."
@@ -135,7 +142,7 @@ public enum CombatSolver {
             cannot = physicalAttacksAllowed
                 ? "The bases are touching, so there’s no weapon shot. Punch or kick instead."
                 : "The bases are touching, so there’s no weapon shot. Move apart first."
-        } else if !physical, let reason = noDamageReason(attacker: attacker, bracket: bracket) {
+        } else if !physical, let reason = noDamageReason(attacker: attacker, bracket: bracket, kind: insight.attackKind) {
             cannot = reason
         }
 
@@ -171,12 +178,13 @@ public enum CombatSolver {
                     attacker: attacker,
                     bracket: bracket,
                     rearHit: insight.rearHit,
-                    overheatUsed: AlphaStrikeHeat.usableOverheat(
+                    overheatUsed: rearFiring ? 0 : AlphaStrikeHeat.usableOverheat(
                         requested: insight.overheatUsed,
                         attacker: attacker,
                         bracket: bracket,
                         overheatAllowed: overheatAllowed
-                    )
+                    ),
+                    kind: insight.attackKind
                 ),
                 overheatAllowed: overheatAllowed
             ).delivered
@@ -207,18 +215,43 @@ public enum CombatSolver {
 
     /// A range where the card does no damage ("—" or 0) has no weapon attack (rulebook p. 20).
     /// "0*" minimal damage isn't stored on cards yet; every shipped 0 is treated as no damage.
-    public static func noDamageReason(attacker: MatchUnitState, bracket: RangeBracket) -> String? {
-        let damage = attacker.firingDamage
-        let value: Int
+    /// A REAR shot with no REAR damage at that range has no attack either, and a forward shot can drop to
+    /// nothing after a REAR shot took its damage (p. 25).
+    public static func noDamageReason(
+        attacker: MatchUnitState,
+        bracket: RangeBracket,
+        kind: AttackKind = .weapon
+    ) -> String? {
         let name: String
         switch bracket {
-        case .short: value = damage.s; name = "short"
-        case .medium: value = damage.m; name = "medium"
-        case .long: value = damage.l; name = "long"
+        case .short: name = "short"
+        case .medium: name = "medium"
+        case .long: name = "long"
         case .outOfRange: return nil
         }
+        if kind == .rearFiring {
+            guard attacker.rearDamage(at: bracket) == 0 else { return nil }
+            return "\(attacker.name)’s rear weapons do no damage at \(name) range."
+        }
+        let value = forwardDamage(attacker: attacker, bracket: bracket)
         guard value == 0 else { return nil }
+        if attacker.rearFireReduction > 0 {
+            return "\(attacker.name)’s rear shot used its damage at \(name) range, so it has no forward shot there."
+        }
         return "\(attacker.name) does no damage at \(name) range, so it has no shot there."
+    }
+
+    /// The card's damage at this range, less any REAR damage used this turn.
+    static func forwardDamage(attacker: MatchUnitState, bracket: RangeBracket) -> Int {
+        let damage = attacker.firingDamage
+        let value: Int
+        switch bracket {
+        case .short: value = damage.s
+        case .medium: value = damage.m
+        case .long: value = damage.l
+        case .outOfRange: value = 0
+        }
+        return max(0, value - attacker.rearFireReduction)
     }
 
     static func satorInput(
@@ -245,7 +278,8 @@ public enum CombatSolver {
                 partialCover: partialCover,
                 targetHasSTL: defender.hasStealth,
                 fireControlHits: attacker.firingCrits.fireControlHits,
-                attackerHeat: attacker.heat
+                attackerHeat: attacker.heat,
+                rearFiring: attackKind == .rearFiring
             ),
             rangeInches: rangeInches,
             rangeBracket: bracket,
@@ -257,13 +291,26 @@ public enum CombatSolver {
         attacker: MatchUnitState,
         bracket: RangeBracket,
         rearHit: Bool,
-        overheatUsed: Int
+        overheatUsed: Int,
+        kind: AttackKind = .weapon
     ) -> DamageInput {
-        let damage = attacker.firingDamage
+        if kind == .rearFiring {
+            // REAR values, never boosted by overheat (p. 24).
+            return DamageInput(
+                short: attacker.rearDamage(at: .short),
+                medium: attacker.rearDamage(at: .medium),
+                long: attacker.rearDamage(at: .long),
+                bracket: bracket,
+                rearHit: rearHit,
+                overheatUsed: 0,
+                maxOverheat: 0,
+                ovlAllowsLong: false
+            )
+        }
         return DamageInput(
-            short: damage.s,
-            medium: damage.m,
-            long: damage.l,
+            short: forwardDamage(attacker: attacker, bracket: .short),
+            medium: forwardDamage(attacker: attacker, bracket: .medium),
+            long: forwardDamage(attacker: attacker, bracket: .long),
             bracket: bracket,
             rearHit: rearHit,
             overheatUsed: overheatUsed,

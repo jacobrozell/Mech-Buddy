@@ -157,6 +157,10 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var criticalsOwed: Int
     /// Overheat points spent on this turn's shot. Becomes heat in the End Phase, then clears.
     public var overheatThisTurn: Int
+    /// This turn's REAR attack, if any. Doesn't count as the turn's attack: the forward shot can follow.
+    public var rearShot: TurnShot?
+    /// Forward damage lost this turn to a REAR attack: its REAR value at the range used (p. 25).
+    public var rearFireReduction: Int = 0
     /// Heat from enemy HT attacks that hit this turn, at most 2. Added last in the End Phase (rulebook p. 24–25).
     public var incomingHeatThisTurn: Int = 0
     /// Colour the players gave this miniature, if any.
@@ -379,8 +383,30 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     }
 
     /// Heat cools only on a turn without a weapon attack; a punch or kick doesn't count (p. 24).
+    /// A REAR shot is a weapon attack.
     public var madeWeaponAttackThisTurn: Bool {
-        hasAttackedThisTurn && turnShot?.kind != .physical
+        (hasAttackedThisTurn && turnShot?.kind != .physical) || rearShot != nil
+    }
+
+    /// REAR#/#/# damage at this range (p. 25). 0 without REAR or "-" there.
+    public func rearDamage(at bracket: RangeBracket) -> Int {
+        guard let tag = abilityTags.first(where: { $0.hasPrefix("REAR") }) else { return 0 }
+        let values = tag.dropFirst(4).split(separator: "/", omittingEmptySubsequences: false).map { Int($0) ?? 0 }
+        let index: Int
+        switch bracket {
+        case .short: index = 0
+        case .medium: index = 1
+        case .long: index = 2
+        case .outOfRange: return 0
+        }
+        return index < values.count ? values[index] : 0
+    }
+
+    public var hasRearFiring: Bool { abilityTags.contains { $0.hasPrefix("REAR") } }
+
+    /// A REAR attack is allowed once a turn, before the forward shot or a punch (p. 25).
+    public var canRearFireThisTurn: Bool {
+        hasRearFiring && canAttackThisTurn && rearShot == nil
     }
 
     /// Eligible to open SATOR this combat impulse.
@@ -441,6 +467,7 @@ extension MatchUnitState {
         case armorCap, structureCap, armorDamage, structureDamage, heat, abilities, crits, combatPhaseCrits
         case movementMode, hasMovedThisTurn, hasAttackedThisTurn, turnShot, combatStatus
         case pendingCritical, criticalsOwed, overheatThisTurn, mini, incomingHeatThisTurn
+        case rearShot, rearFireReduction
         case leftTable, withdrawalAnnounced
     }
 
@@ -480,6 +507,8 @@ extension MatchUnitState {
         }
         overheatThisTurn = try container.decodeIfPresent(Int.self, forKey: .overheatThisTurn) ?? 0
         incomingHeatThisTurn = try container.decodeIfPresent(Int.self, forKey: .incomingHeatThisTurn) ?? 0
+        rearShot = try container.decodeIfPresent(TurnShot.self, forKey: .rearShot)
+        rearFireReduction = try container.decodeIfPresent(Int.self, forKey: .rearFireReduction) ?? 0
         mini = try container.decodeIfPresent(MiniMarker.self, forKey: .mini)
         leftTable = try container.decodeIfPresent(Bool.self, forKey: .leftTable) ?? false
         withdrawalAnnounced = try container.decodeIfPresent(Bool.self, forKey: .withdrawalAnnounced) ?? false
@@ -517,6 +546,8 @@ extension MatchUnitState {
         try container.encode(pendingCritical, forKey: .pendingCritical)
         try container.encode(overheatThisTurn, forKey: .overheatThisTurn)
         if incomingHeatThisTurn > 0 { try container.encode(incomingHeatThisTurn, forKey: .incomingHeatThisTurn) }
+        try container.encodeIfPresent(rearShot, forKey: .rearShot)
+        if rearFireReduction > 0 { try container.encode(rearFireReduction, forKey: .rearFireReduction) }
         try container.encodeIfPresent(mini, forKey: .mini)
         try container.encode(leftTable, forKey: .leftTable)
         try container.encode(withdrawalAnnounced, forKey: .withdrawalAnnounced)

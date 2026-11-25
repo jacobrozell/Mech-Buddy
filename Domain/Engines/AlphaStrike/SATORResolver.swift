@@ -13,6 +13,9 @@ public enum AttackKind: String, Sendable, Codable, Equatable, CaseIterable {
     /// Standard physical attack: a punch or kick within 1″ (2″ with MEL), target in the front arc.
     /// No range modifier; heat and fire-control hits don't apply (p. 20). Charge and Death From Above aren't modelled.
     case physical
+    /// REAR#/#/#: a weapon attack on a ’Mech outside the front arc, using the REAR damage, +1 to hit.
+    /// Made before the forward shot; that turn's forward damage drops by the REAR value (p. 25).
+    case rearFiring
 }
 
 public enum RangeBracket: String, Sendable, Codable, Equatable {
@@ -29,6 +32,8 @@ public struct OtherModifiers: Sendable, Equatable {
     public var targetHasSTL: Bool
     public var fireControlHits: Int
     public var attackerHeat: Int
+    /// Rear-firing weapons (REAR), +1 (p. 25).
+    public var rearFiring: Bool
 
     public init(
         woods: Bool = false,
@@ -36,8 +41,10 @@ public struct OtherModifiers: Sendable, Equatable {
         chargeOrDFA: Bool = false,
         targetHasSTL: Bool = false,
         fireControlHits: Int = 0,
-        attackerHeat: Int = 0
+        attackerHeat: Int = 0,
+        rearFiring: Bool = false
     ) {
+        self.rearFiring = rearFiring
         self.woods = woods
         self.partialCover = partialCover
         self.chargeOrDFA = chargeOrDFA
@@ -179,6 +186,7 @@ public enum SATORResolver {
         if other.woods { oDelta += 1 }
         if other.partialCover { oDelta += 1 }
         if other.chargeOrDFA { oDelta += 1 }
+        if other.rearFiring { oDelta += 1 }
         if other.targetHasSTL {
             switch bracket {
             case .medium: oDelta += 1
@@ -261,6 +269,7 @@ public enum SATORResolver {
         if other.woods { lines.append("Trees in the way, +1") }
         if other.partialCover { lines.append("Partial cover, +1") }
         if other.chargeOrDFA { lines.append("Charge or death from above, +1") }
+        if other.rearFiring { lines.append("Rear-firing weapons, +1") }
         if other.targetHasSTL {
             switch bracket {
             case .medium: lines.append("Stealth, +1")
