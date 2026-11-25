@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names from sarna.net/wiki/Mapsheet; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
+  "boxes": [
+    {
+      "id": "agoac",
+      "title": "A Game of Armored Combat",
+      "subtitle": "The 8 ’Mechs every mission uses",
+      "game": "both",
+      "miniCount": 8,
+      "units": [
+        "Awesome AWS-8Q",
+        "BattleMaster BLR-1G",
+        "Catapult CPLT-C1",
+        "Commando COM-2D",
+        "Locust LCT-1V",
+        "Shadow Hawk SHD-2H",
+        "Thunderbolt TDR-5S",
+        "Wolverine WVR-6M"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/products/battletech-a-game-of-armored-combat",
+      "contentsConfirmed": true,
+      "maps": [
+        "Desert #2",
+        "Grassland #2",
+        "Grassland #3",
+        "Desert #3"
+      ],
+      "mapSheets": 2
+    },
+    {
+      "id": "alpha-strike-box",
+      "title": "Alpha Strike Box Set",
+      "subtitle": "Learn Alpha Strike",
+      "game": "alphaStrike",
+      "miniCount": 13,
+      "units": [
+        "Fire Moth",
+        "Nova",
+        "Pouncer",
+        "Timber Wolf",
+        "Warhawk",
+        "Archer",
+        "Atlas",
+        "Blackjack",
+        "Locust",
+        "Phoenix Hawk",
+        "Warhammer",
+        "Wasp",
+        "Wraith"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/products/battletech-alpha-strike-box-set",
+      "contentsConfirmed": true
+    },
+    {
+      "id": "starter-box",
+      "title": "Starter Box",
+      "subtitle": "Classic quick-start",
+      "game": "classic",
+      "miniCount": 2,
+      "units": [
+        "Hammerhead",
+        "Kontio"
+      ],
+      "sourceURL": "https://store.catalystgamelabs.com/products/battletech-starter-box",
+      "contentsConfirmed": true,
+      "mapSheets": 1,
+      "maps": [
+        "Muddy Grasslands",
+        "Dessicated Badlands"
+      ]
+    },
+    {
+      "id": "core-box",
+      "title": "Core Box Set",
+      "subtitle": "The Classic core rules",
+      "game": "classic",
+      "miniCount": 8,
+      "units": [
+        "Hollander",
+        "Rakshasa",
+        "Solitaire",
+        "Uziel",
+        "Mad Cat Mk II",
+        "Vulture Mk IV",
+        "Regent",
+        "Eris"
+      ],
+      "sourceURL": "https://www.catalystgamelabs.com/news/catalyst-game-labs-battletech-refit-redeployment",
+      "contentsConfirmed": true,
+      "maps": [
+        "Headwater Crossing",
+        "Sodden Hills",
+        "Scorched Oasis",
+        "Arid Canyons"
+      ],
+      "mapSheets": 2
+    },
+    {
+      "id": "mercenaries-box",
+      "title": "Mercenaries Box Set",
+      "subtitle": "Needs A Game of Armored Combat",
+      "game": "classic",
+      "miniCount": 12,
+      "requires": [
+        "agoac"
+      ],
+      "units": [],
+      "sourceURL": "https://store.catalystgamelabs.com/products/battletech-mercenaries-box-set",
+      "contentsConfirmed": false,
+      "maps": [
+        "Scattered Woods",
+        "River Valley",
+        "Woodland",
+        "Lake Area"
+      ],
+      "mapSheets": 2
+    }
+  ],
+  "standInsNote": "Mission 'Mech chassis to the closest minis in other boxes, best first. Picked by weight class and role (jumpers for jumpers, missile boats for missile boats). Alpha Strike uses the card's stats, so any mini can stand in.",
+  "standIns": {
+    "Awesome": [
+      "Atlas",
+      "Warhawk"
+    ],
+    "BattleMaster": [
+      "Warhawk",
+      "Atlas"
+    ],
+    "Catapult": [
+      "Archer",
+      "Timber Wolf"
+    ],
+    "Thunderbolt": [
+      "Warhammer",
+      "Timber Wolf"
+    ],
+    "Wolverine": [
+      "Wraith",
+      "Blackjack"
+    ],
+    "Shadow Hawk": [
+      "Phoenix Hawk",
+      "Blackjack"
+    ],
+    "Commando": [
+      "Wasp",
+      "Fire Moth"
+    ],
+    "Locust": [
+      "Fire Moth",
+      "Wasp"
+    ]
+  }
+}

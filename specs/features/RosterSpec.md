@@ -39,6 +39,22 @@ Maps HTML **Roster** tab.
 
 Eight double-sided cards from the walkthrough. Reset restores names + default stats; Ridge Line load upserts the four mission units from bundled stats.
 
+## Your collection
+
+Which boxes and minis the player owns. Set in onboarding (Boxes and Your ’Mechs screens) or here. Shown on the Force tab under the PV balance bar (`ForceCollectionSection`, `force.collection`).
+
+- **Not answered yet:** a card “Which boxes do you own?” with **Add your boxes** (`force.collection.start`), which opens the edit sheet.
+- **Answered:** Eyebrow “Your collection” with **Edit** (`force.collection.edit`). One card per owned box in catalog order (`force.collection.box.<id>`): title, “×N” for more than one copy, the units you have, and “Missing: …” (chassis names) for unticked units. Unconfirmed boxes say “List not confirmed yet. Add its ’Mechs as singles.” Then a **Singles** card (`force.collection.singles`). Then a **Maps** card (`force.collection.maps`): maps from owned boxes, then maps added by hand. A box with only a sheet count says "N map sheets, names not listed yet". It is hidden when there are none. Nothing owned: “No minis yet. Coins or any minis work as stand-ins.” (`force.collection.empty`).
+- **Edit sheet** (`force.collection.sheet`), a Form with Cancel (`force.collection.cancel`) and Done (`force.collection.done`, saves): **Boxes** — a stepper per box, 0–9 copies (`force.collection.sheet.box.<id>`); one section per owned box with a toggle per unit (`force.collection.unit.<boxId>.<name>`), or the unconfirmed note (`force.collection.unconfirmed.<boxId>`); **Singles** — a stepper per single (`force.collection.single.<name>`, 0 removes, swipe to delete) and the add field (`force.collection.addField`, `force.collection.addButton`).
+
+### Model (`Data/Collection/CollectionModel.swift`)
+
+- `OwnedCollection`: `boxes` (id → copies), `missing` (box id → unit name → copies), `singles` (name → copies). `nil` in `AppPreferences.collection` = not answered.
+- Derived with `CollectionMath`: `groups` (owned boxes, then Singles), `ownedUnits` (merged by name with counts), `chassisCounts`, `ownedMaps` (box maps in catalog order, then hand-added, no repeats), `miniCheck(forces:standIns:)` for missions (exact chassis first, then suggested stand-ins; see [GuidedMissionSpec](GuidedMissionSpec.md)).
+- **Chassis matching:** `UnitChassis.name` drops the last word when it has a digit (“Locust LCT-1V” → “Locust”; “Mad Cat Mk II” stays). Matching is case-insensitive. `PlayForceMath.shortName` uses the same rule.
+- Singles are free text; adding “locust” to an existing “Locust” adds a copy. No stats are stored.
+- Persisted by `CollectionStore` under `collection.owned` (JSON), an `AppPreferences` owned key, so `reset()` / `-reset_state` clears it. Saving the collection also ticks the kit’s Miniatures when anything is owned.
+
 ## Import: `force.as.import`
 
 - MUL QuickList URL pattern + paste JSON → upsert
@@ -72,6 +88,7 @@ Match play copies these into `MatchSession.units` — see [MatchSessionSpec](Mat
 ## Accessibility
 
 - `force.as.list`, `force.as.unit.{id}`, `force.as.pips.armor.{id}`, `force.as.import`
+- `force.collection`, `force.collection.start`, `force.collection.edit`, `force.collection.box.{id}`, `force.collection.singles`, `force.collection.empty`, `force.collection.sheet` and its controls (above)
 
 Pip buttons: “Armor bubble 3 of 5, filled/empty”.
 
@@ -80,6 +97,12 @@ Pip buttons: “Armor bubble 3 of 5, filled/empty”.
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-08-21 |
+| Last verified | 2026-11-24 (Your collection) |
 | Commit | — |
-| Code paths | *not implemented* |
+| Code paths | Your collection: `Data/Collection/CollectionModel.swift`, `Features/Play/ForceCollection.swift`, `Features/Play/ForceListView.swift`, `App/AppPreferences.swift`. Unit editing / import: *not implemented* |
+
+### Maps
+
+- A player is assumed to own every map from the boxes they own (`BoxSetDTO.maps`, one name per printed side). Maps they own outside a box are typed in by name and saved in `OwnedCollection.maps`. Saves from before maps existed decode with no maps.
+- The edit sheet's **Maps** section lists box maps (read-only, with the box name) and hand-added maps (swipe to delete), plus a "Map name" field and an **Add map** button (`force.collection.maps.addField` / `.addButton`). Typing two or more letters lists up to 5 matching names from `map-catalog.json` (names starting with the text first); tapping one adds it (`force.collection.maps.suggestion`).
+- Later: mission sheets suggest a map from the player's maps, and experienced players can pick any map. The catalog (`Resources/Content/map-catalog.json`, 52 products and about 280 maps from sarna.net/wiki/Mapsheet) already drives the suggestions ([classic mission path](../../docs/game-modes/classic/mission-path-scope.md) O3).

@@ -14,6 +14,7 @@ struct HowToPlayRidgeLineView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 tabs
+                cardLesson
                 steps
                 winning
                 leaving
@@ -39,6 +40,59 @@ struct HowToPlayRidgeLineView: View {
                 tabTile("Settings", "gearshape", "Dice, haptics, appearance, and legal.")
             }
         }
+    }
+
+    /// Sample card plus a legend. Moved here from the old Getting Started checklist.
+    private var cardLesson: some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Reading a unit card")
+            TMCard(edgeColor: TMColor.sideA) {
+                VStack(alignment: .leading, spacing: TMSpace.md) {
+                    HStack(spacing: TMSpace.sm) {
+                        SideBadge(side: .lanceA)
+                        Text("Shadow Hawk SHD-2H")
+                            .font(TMFont.cardTitle)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    StatStrip(cells: Self.sampleStats)
+                    HealthReadout(
+                        armorRemaining: 5,
+                        armorCapacity: 5,
+                        structureRemaining: 5,
+                        structureCapacity: 5
+                    )
+                }
+            }
+            VStack(alignment: .leading, spacing: TMSpace.sm) {
+                legendRow("①", "MV — How many inches it can walk")
+                legendRow("②", "TMM — Extra “harder to hit” when it moved")
+                legendRow("③", "Armor — Outer hit points")
+                legendRow("④", "Structure — Inner hit points. 0 means wrecked")
+                legendRow("⑤", "Skill — Starting shot difficulty (4)")
+                legendRow("⑥", "S / M / L — Damage at short, medium, and long range")
+            }
+        }
+        .accessibilityIdentifier("as.howToPlay.cardLesson")
+    }
+
+    private static let sampleStats: [StatCell] = [
+        StatCell(id: "mv", label: "MV", value: "10″/6″j", helpTitle: "Move", helpBody: "How many inches it can walk."),
+        StatCell(id: "tmm", label: "TMM", value: "2", helpTitle: "Harder to hit", helpBody: "Added when this ’Mech moved."),
+        StatCell(id: "skl", label: "SKL", value: "4", helpTitle: "Skill", helpBody: "Starting shot difficulty."),
+        StatCell(id: "dmg", label: "DMG", value: "2·2·1", helpTitle: "Damage", helpBody: "Short, medium, and long range damage.")
+    ]
+
+    private func legendRow(_ marker: String, _ text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+            Text(marker)
+                .font(TMFont.cardTitle)
+                .frame(width: 28, alignment: .leading)
+                .accessibilityHidden(true)
+            Text(text)
+                .font(TMFont.body)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private var steps: some View {

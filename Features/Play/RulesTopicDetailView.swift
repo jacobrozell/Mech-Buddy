@@ -7,6 +7,7 @@ struct RulesTopicDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
+                gameBadge
                 if topic.id == "odds" {
                     oddsPicture
                 }
@@ -16,10 +17,7 @@ struct RulesTopicDetailView: View {
                 ForEach(topic.sections, id: \.heading) { section in
                     VStack(alignment: .leading, spacing: TMSpace.sm) {
                         heading(section.heading)
-                        Text(section.body)
-                            .font(.body)
-                            .lineSpacing(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                        sectionBody(section.body)
                     }
                 }
             }
@@ -29,7 +27,51 @@ struct RulesTopicDetailView: View {
             .textSelection(.enabled)
         }
         .navigationTitle(topic.title)
-        .accessibilityIdentifier("rules.as.detail.\(topic.id)")
+        .accessibilityIdentifier("rules.\(tag.identifierKey).detail.\(topic.id)")
+    }
+
+    private var tag: RulesGameTag {
+        topic.game ?? .alphaStrike
+    }
+
+    /// Which game this page belongs to, so a page reached by search or a link still says so.
+    private var gameBadge: some View {
+        Label(tag.badge, systemImage: Self.symbol(for: tag))
+            .font(TMFont.eyebrow)
+            .textCase(.uppercase)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, TMSpace.sm)
+            .padding(.vertical, TMSpace.xs)
+            .background(Color.secondary.opacity(0.12), in: Capsule())
+            .accessibilityIdentifier("rules.topic.game")
+    }
+
+    private static func symbol(for tag: RulesGameTag) -> String {
+        switch tag {
+        case .alphaStrike: LearningTrack.alphaStrike.systemImage
+        case .classic: LearningTrack.classic.systemImage
+        case .both: "arrow.left.arrow.right"
+        }
+    }
+
+    /// Body text. Lines that start "Alpha Strike:" or "Classic:" (the comparison page) get a bold lead-in.
+    private func sectionBody(_ body: String) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            ForEach(Array(body.components(separatedBy: "\n").enumerated()), id: \.offset) { _, line in
+                bodyLine(line)
+                    .font(.body)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func bodyLine(_ line: String) -> Text {
+        for lead in ["Alpha Strike:", "Classic:"] where line.hasPrefix(lead) {
+            let rest = line.dropFirst(lead.count)
+            return Text("\(Text(lead).bold())\(String(rest))")
+        }
+        return Text(line)
     }
 
     private var oddsPicture: some View {

@@ -29,23 +29,76 @@ Play, Force, Rules, Settings:
 play.home
 as.modeHome.resume
 as.modeHome.ridgeLine
-as.modeHome.gettingStarted
 as.modeHome.howToPlay
-as.gettingStarted.screen
-as.gettingStarted.check.{id}
+as.modeHome.ladder.{id}
+as.modeHome.ladder.info.{id}
+as.modeHome.ladder.skipAheadHint
+as.modeHome.missionSheet
+as.modeHome.missionSheet.objective
+as.modeHome.missionSheet.tips
+as.modeHome.minis
 as.howToPlay.screen
+as.howToPlay.cardLesson
 as.howToPlay.sampleWreck
 play.classicComingSoon
+play.classicSpotlight
+play.changeGame
 classic.modeHome
 classic.comingSoon.playAS
 force.as.list
 force.as.unit.{name}
 force.as.unit.{uuid}
+force.collection
+force.collection.start
+force.collection.edit
+force.collection.empty
+force.collection.box.{boxId}
+force.collection.singles
+force.collection.sheet
+force.collection.sheet.box.{boxId}
+force.collection.unit.{boxId}.{unitName}
+force.collection.unconfirmed.{boxId}
+force.collection.single.{name}
+force.collection.addField
+force.collection.addButton
+force.collection.cancel
+force.collection.done
 rules.home
-rules.as.{topicId}
-rules.as.detail.{topicId}
+rules.gamePicker
+rules.game.{alphaStrike|classic}
+rules.classicNote
+rules.{as|classic|both}.{topicId}
+rules.{as|classic|both}.detail.{topicId}
+rules.topic.game
 settings.home
+settings.onboarding
 settings.deleteAll
+```
+
+Onboarding:
+
+```
+onboarding.screen
+onboarding.back
+onboarding.progress
+onboarding.skip
+onboarding.continue
+onboarding.step.{welcome|track|boxes|mechs|kit|firstMission}
+onboarding.track.alphaStrike
+onboarding.track.classic
+onboarding.track.classicNote
+onboarding.box.{boxId}
+onboarding.box.none
+onboarding.mechs.unit.{boxId}.{unitName}
+onboarding.mechs.unconfirmed.{boxId}
+onboarding.mechs.addField
+onboarding.mechs.addButton
+onboarding.mechs.single.{name}
+onboarding.mechs.single.remove.{name}
+onboarding.kit.{id}
+onboarding.kit.cards
+onboarding.kit.link.{id}
+onboarding.firstMission.card
 ```
 
 Battle stage, header, dock:
@@ -126,7 +179,7 @@ as.victory.done
 as.victory.back
 ```
 
-`as.battle.primary` and `as.battle.phaseDock.next` name the same dock primary. `as.battle.doneShooting` and `as.battle.phaseDock.doneSide` name Done shooting. `as.sator.resolve` and `as.sator.apply` name the apply button. `as.sator.tnPreview` and `as.sator.tn` name the gauge. `as.victory` and `as.victory.screen` name victory. `force.as.unit.{name}` is the card; `force.as.unit.{uuid}` is the sibling.
+`as.battle.primary` and `as.battle.phaseDock.next` name the same dock primary. `as.battle.doneShooting` and `as.battle.phaseDock.doneSide` name Done shooting. `as.sator.resolve` and `as.sator.apply` name the apply button. `as.sator.tnPreview` and `as.sator.tn` name the gauge. `as.victory` and `as.victory.screen` name victory. `force.as.unit.{name}` is the card; `force.as.unit.{uuid}` is the sibling. Collection unit ids use the name as listed in the box (“Locust LCT-1V”), spaces included. Box unit rows are buttons with value “Have it” / “Missing”.
 
 ## Release gate
 
@@ -137,6 +190,6 @@ No 1.0 with open **critical** a11y failures on Ridge Line path.
 | Field | Value |
 |-------|-------|
 | Target release | 1.0.0 |
-| Last verified | 2026-10-28 |
-| Commit | `b9acebb` (tag `0.2.0`) |
-| Code paths | `DesignSystem/AccessibilityID.swift`, `Features/Play/PlayHomeView.swift`, `GettingStartedView.swift`, `SettingsHomeView.swift`, `ForceListView.swift`, `RulesHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `CombatSolverSheet.swift`, `CritSheet.swift`, `UnitFocusSheet.swift`, `VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `TNGauge.swift`, `DiceTray.swift` |
+| Last verified | 2026-11-24 |
+| Commit | `b9acebb` (tag `0.2.0`); collection ids on `feature/collection` |
+| Code paths | `DesignSystem/AccessibilityID.swift`, `Features/Play/PlayHomeView.swift`, `MissionPath.swift`, `MissionBrief.swift`, `Features/Onboarding/`, `SettingsHomeView.swift`, `ForceListView.swift`, `ForceCollection.swift`, `RulesHomeView.swift`, `ClassicComingSoonSheet.swift`, `Features/Battle/BattleFlowView.swift`, `BattleHeader.swift`, `BattleDock.swift`, `CombatSolverSheet.swift`, `CritSheet.swift`, `UnitFocusSheet.swift`, `VictoryView.swift`, `EventLogSheet.swift`, `DesignSystem/Components/PhaseTrack.swift`, `TNGauge.swift`, `DiceTray.swift` |

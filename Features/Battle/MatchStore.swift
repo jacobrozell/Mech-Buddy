@@ -58,7 +58,7 @@ final class MatchStore: Identifiable {
         return true
     }
 
-    func startRidgeLine(from catalog: any ContentCatalogRepository, replaceActive: Bool) {
+    func startMission(_ scenarioId: ScenarioId, from catalog: any ContentCatalogRepository, replaceActive: Bool) {
         do {
             let existing = try Self.loadActive(from: repository)
             switch MatchLaunch.decide(existingActive: existing, replaceActive: replaceActive) {
@@ -71,13 +71,13 @@ final class MatchStore: Identifiable {
             case .startFresh:
                 break
             }
-            let dto = try catalog.ridgeLineScenario()
+            let dto = try catalog.scenario(id: scenarioId)
             adoptScenario(dto)
-            let ruleset = RidgeLineFactory.mapRuleset(dto.ruleset)
-            let units = RidgeLineFactory.makeUnits(from: dto)
+            let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+            let units = GuidedScenarioFactory.makeUnits(from: dto)
             session = try MatchReducer.reduce(
                 MatchSession(ruleset: ruleset),
-                .startMission(scenarioId: .ridgeLine, ruleset: ruleset, units: units)
+                .startMission(scenarioId: scenarioId, ruleset: ruleset, units: units)
             )
             undoStack.removeAll()
             lastError = nil
@@ -88,19 +88,26 @@ final class MatchStore: Identifiable {
         }
     }
 
-    /// Resume path. `startRidgeLine` already cached the briefing, so this is a no-op then.
+    /// Resume path. `startMission` already cached the briefing, so this is a no-op then.
+    /// Games saved before the mission ladder have no scenario id. They were all Ridge Line.
     func ensureScenario(from catalog: any ContentCatalogRepository) {
         guard !scenarioLoaded else { return }
         scenarioLoaded = true
-        guard let dto = try? catalog.ridgeLineScenario() else { return }
+        guard let dto = try? catalog.scenario(id: session?.scenarioId ?? .ridgeLine) else { return }
         adoptScenario(dto)
     }
 
+    /// Same mission again, fresh armor and structure.
     func rematch(from catalog: any ContentCatalogRepository) {
+        startFresh(session?.scenarioId ?? .ridgeLine, from: catalog)
+    }
+
+    /// Clears a finished match and starts `scenarioId` (rematch, or the next mission on the path).
+    func startFresh(_ scenarioId: ScenarioId, from catalog: any ContentCatalogRepository) {
         if let session, session.status == .completed {
             try? repository.delete(id: session.id)
         }
-        startRidgeLine(from: catalog, replaceActive: false)
+        startMission(scenarioId, from: catalog, replaceActive: false)
     }
 
     func resume(_ session: MatchSession) {
@@ -189,6 +196,15 @@ final class MatchStore: Identifiable {
         mutate(.setInitiative(InitiativeRolls(lanceA: a, lanceB: b)))
     }
 
+    func setMini(unitId: UUID, mini: MiniMarker?) {
+        mutate(.setMini(unitId: unitId, mini: mini), undoable: false)
+    }
+
+    /// The players agreed who moves first, so no initiative dice.
+    func agreeInitiative(firstToMove side: SideId) {
+        mutate(.agreeInitiative(firstToMove: side), failureTitle: "Couldn’t start the turn")
+    }
+
     /// Rolls both sides without changing the match. The battle screen shows the dice, then calls `setInitiative`.
     func previewAutoInitiative() -> InitiativeDicePreview? {
         for _ in 0..<20 {
@@ -241,8 +257,8 @@ final class MatchStore: Identifiable {
         }
     }
 
-    func finishCombatSide() {
-        mutate(.finishCombatSide, failureTitle: "Couldn’t finish shooting")
+    func finishCombat() {
+        mutate(.finishCombat, failureTitle: "Couldn’t finish shooting")
     }
 
     func resolveEnd() {
@@ -260,7 +276,9 @@ final class MatchStore: Identifiable {
         targetMove: TargetMoveModifier,
         woods: Bool = false,
         partialCover: Bool = false,
-        rearHit: Bool = false
+        rearHit: Bool = false,
+        overheatUsed: Int = 0,
+        attackKind: AttackKind = .weapon
     ) -> Bool {
         guard let roll = DiceRoll2D6.validated(die1: die1, die2: die2) else {
             lastErrorTitle = "Couldn’t save the shot"
@@ -278,10 +296,12 @@ final class MatchStore: Identifiable {
                     targetMove: targetMove,
                     woods: woods,
                     partialCover: partialCover,
-                    rearHit: rearHit
+                    rearHit: rearHit,
+                    overheatUsed: overheatUsed,
+                    attackKind: attackKind
                 )
             ),
-            failureTitle: "Couldn’t save the shot"
+            failureTitle: attackKind == .physical ? "Couldn’t save the attack" : "Couldn’t save the shot"
         )
         return lastError == nil
     }
@@ -297,6 +317,11 @@ final class MatchStore: Identifiable {
         guard session?.units.first(where: { $0.id == unitId })?.pendingCritical == true else { return true }
         mutate(.applyCritical(unitId: unitId, roll: roll), failureTitle: "Couldn’t save the critical")
         return lastError == nil
+    }
+
+    /// Forced Withdrawal: the ’Mech drove off the table. It counts as destroyed. Undo puts it back.
+    func leaveTable(unitId: UUID) {
+        mutate(.leaveTable(unitId: unitId), failureTitle: "Couldn’t record that")
     }
 
     /// Autosave + dismiss — does not abandon.
@@ -383,13 +408,15 @@ final class MatchStore: Identifiable {
         }
     }
 
-    private func adoptScenario(_ dto: RidgeLineScenarioDTO) {
+    private func adoptScenario(_ dto: GuidedScenarioDTO) {
         let steps = dto.tableSteps.isEmpty ? ScenarioPresentation.fallback.tableSteps : dto.tableSteps
         scenario = ScenarioPresentation(
             title: dto.title,
             subtitle: dto.subtitle,
             tableSteps: steps,
-            winningSummary: dto.winningSummary
+            winningSummary: dto.winningSummary,
+            introduces: dto.introduces ?? [],
+            coachNotes: dto.coachNotes ?? []
         )
         scenarioLoaded = true
     }
@@ -399,6 +426,10 @@ final class MatchStore: Identifiable {
         var names: [String] = []
         for unit in session.units {
             guard let before = previous.units.first(where: { $0.id == unit.id }) else { continue }
+            if unit.leftTable, !before.leftTable {
+                names.append("left the table")
+                continue
+            }
             let moveChanged = unit.movementMode != before.movementMode && unit.movementMode != .unset
             let justMoved = unit.hasMovedThisTurn && !before.hasMovedThisTurn && unit.movementMode != .unset
             if moveChanged || justMoved {

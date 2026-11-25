@@ -4,6 +4,7 @@
   "scenarioId": "ridge-line",
   "title": "Ridge Line",
   "subtitle": "Beginner mission · 2 vs 2 · about 40 minutes",
+  "missionNumber": 1,
   "estimatedMinutes": 40,
   "release": "1.0.0",
   "ruleset": {
@@ -17,9 +18,9 @@
     }
   },
   "coachNotes": [
-    "A lance is just a team. Side A has two 'Mechs; Side B has two.",
+    "A lance is just a team. Side A has two ’Mechs; Side B has two.",
     "No overheating and no punching in this mission — only walking (or jumping) and shooting.",
-    "If a 'Mech’s Structure hits 0, it can still shoot this turn. Take it off the table when you Clean up."
+    "If a ’Mech’s Structure hits 0, it can still shoot this turn. Take it off the table when you Clean up."
   ],
   "sides": {
     "lanceA": [
@@ -92,7 +93,7 @@
     "Keep a tape measure in inches handy. Ignore printed hexes — just measure freely.",
     "Woods (trees) are the only terrain that matters: moving through them costs extra inches, and shooting into or past them is a little harder.",
     "Skip hills, water, and buildings for this first game.",
-    "Each side places its two 'Mechs within 6 inches of its own short table edge. You’ll place them after the first dice roll."
+    "Each side places its two ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out both enemy 'Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw."
+  "winningSummary": "Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw."
 }

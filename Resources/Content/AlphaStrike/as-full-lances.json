@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.4.0",
+  "scenarioId": "full-lances",
+  "title": "Full Lances",
+  "subtitle": "Mission 5 · 4 vs 4 · about 90 minutes",
+  "missionNumber": 5,
+  "introduces": ["All eight box ’Mechs", "Forced Withdrawal", "Every rule on"],
+  "estimatedMinutes": 90,
+  "release": "1.4.0",
+  "ruleset": {
+    "overheatAllowed": true,
+    "physicalAttacksAllowed": true,
+    "forcedWithdrawal": true,
+    "maxTurns": 10,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 10
+    }
+  },
+  "coachNotes": [
+    "Every ’Mech in the box, four a side. Each side has one ’Mech of each size, so the lances are even.",
+    "Every rule so far is on: woods, hills, cover, rear shots, overheat, and punch or kick.",
+    "New: Forced Withdrawal. A badly hurt ’Mech is crippled, and a crippled ’Mech heads home instead of fighting on.",
+    "Crippled means any one of: no armor left and Structure down to half or less (round up, so 5 Structure counts at 3); Medium and Long damage both 0 from weapon hits; or MP hits have stopped it moving.",
+    "The app marks a crippled ’Mech Withdrawing. Every turn it must move toward its own table edge. It doesn't have to sprint, and it can still shoot or punch enemies in range.",
+    "A ’Mech that leaves the table, for any reason, counts as destroyed and can't come back. When one drives off, open it and tap Left the table.",
+    "So a crippled ’Mech is worth chasing: catch it before it gets home, or let it go and it still counts as destroyed."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Awesome AWS-8Q",
+        "pv": 39,
+        "mv": "6\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 3,
+        "m": 3,
+        "l": 3,
+        "ov": 0,
+        "armor": 8,
+        "structure": 6,
+        "skill": 4,
+        "abilities": "ENE"
+      },
+      {
+        "name": "Thunderbolt TDR-5S",
+        "pv": 36,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 3,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 1,
+        "armor": 7,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF1"
+      },
+      {
+        "name": "Shadow Hawk SHD-2H",
+        "pv": 30,
+        "mv": "10\"/6\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 1,
+        "ov": 0,
+        "armor": 5,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF0*,JMPW1"
+      },
+      {
+        "name": "Commando COM-2D",
+        "pv": 17,
+        "mv": "12\"",
+        "tmm": 2,
+        "sz": 1,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": "SRM1/1"
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "BattleMaster BLR-1G",
+        "pv": 40,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 1,
+        "armor": 8,
+        "structure": 7,
+        "skill": 4,
+        "abilities": "REAR1/1/-"
+      },
+      {
+        "name": "Catapult CPLT-C1",
+        "pv": 32,
+        "mv": "8\"j",
+        "tmm": 1,
+        "sz": 3,
+        "s": 2,
+        "m": 3,
+        "l": 2,
+        "ov": 1,
+        "armor": 5,
+        "structure": 5,
+        "skill": 4,
+        "abilities": "IF1,LRM1/1/1"
+      },
+      {
+        "name": "Wolverine WVR-6M",
+        "pv": 32,
+        "mv": "10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 1,
+        "armor": 6,
+        "structure": 5,
+        "skill": 4,
+        "abilities": ""
+      },
+      {
+        "name": "Locust LCT-1V",
+        "pv": 18,
+        "mv": "16\"",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 2,
+        "skill": 4,
+        "abilities": ""
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use both maps side by side, or any open table about 3 feet across. Measure in inches and ignore printed hexes.",
+    "Put a hill near the middle and four patches of woods spread around it. Hills, cover, and woods work like Broken Ground.",
+    "The Awesome and BattleMaster share one card, front and back, and they're on opposite sides. Give the card to one player; the other reads their ’Mech's numbers in the app.",
+    "Keep a die or small token next to each ’Mech card to mark heat (0 to 3, then S). The app tracks it too.",
+    "Each side's own short table edge is its home edge. A crippled ’Mech must head back toward it.",
+    "Each side places its four ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
+  ],
+  "winningSummary": "Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw."
+}

@@ -16,13 +16,14 @@ Inspired by Tabletome Unit Focus — **tableside job**, not a buried edit form.
 4. Movement mode (this turn) — standstill / ground / sprint / jump  
    - **Optional** to set before attacking (defaults to ground in SATOR if unset)  
    - Configurable anytime on the sheet  
-   - Required only when scenario/rules force that unit to move (document when Forced Withdrawal ships)
+   - Forced Withdrawal doesn't force a move mode: a crippled ’Mech picks any mode, but heads for its own edge
 5. Heat + crit chips
 6. Abilities line
 7. Actions:
    - **Resolve attack** (active side) → dismiss + open SATOR with attacker prefills
    - **Set as target** → SATOR target prefill
    - **Roll critical** if owed
+   - **Left the table** (Forced Withdrawal missions, any ’Mech still on the table): a **Forced Withdrawal** section with a note ("Crippled: move toward your own edge…" when crippled), a bordered destructive button, then a confirmation. It counts as destroyed; only Undo puts it back. Disabled with a reason line when the reducer would refuse it
    - **Edit stats** → push `force.as.unitEdit` (setup / correction)
 
 ### Entry points
@@ -39,6 +40,7 @@ Inspired by Tabletome Unit Focus — **tableside job**, not a buried edit form.
 - `as.unitFocus.wounds.{unitId}`
 - `as.unitFocus.resolve.{unitId}`
 - `as.unitFocus.setTarget.{unitId}`
+- `as.unitFocus.leftTable`
 
 ## Verification
 

@@ -3,6 +3,8 @@ import Foundation
 public enum ReleaseFlag: String, CaseIterable, Sendable {
     case alphaStrikePlay
     case ridgeLineMission
+    /// Missions after Ridge Line (Broken Ground on) and the ladder list on Play.
+    case missionLadder
     case fullLancesScenario
     case freeBattle
     case physicalOvWithdrawal
@@ -27,7 +29,7 @@ public struct ReleaseSurface: ReleaseSurfaceProviding, Sendable {
 
     public func isEnabled(_ flag: ReleaseFlag) -> Bool {
         switch flag {
-        case .alphaStrikePlay, .ridgeLineMission:
+        case .alphaStrikePlay, .ridgeLineMission, .missionLadder:
             return true
         case .classicComingSoonEntry:
             return true

@@ -1,4 +1,5 @@
 import SwiftUI
+import MechBuddyData
 
 enum AppTab: Hashable {
     case play
@@ -10,12 +11,29 @@ enum AppTab: Hashable {
 struct RootTabView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var tab: AppTab = .play
+    @State private var tab: AppTab = LaunchArguments.openRules ? .rules : .play
     @State private var matches = PlayMatchCoordinator()
     @State private var replaceAfterConfirm = false
+    /// The onboarding flow, when open. First launch opens it; Settings and Play can reopen it.
+    @State private var onboarding: OnboardingEntry?
     @Namespace private var playZoom
 
     var body: some View {
+        // Onboarding gets its own container: two fullScreenCovers on one view, and presenting
+        // from onAppear before the first frame, both kept it from opening on first launch.
+        ZStack {
+            tabs
+        }
+        .task {
+            await Task.yield()
+            showOnboardingIfNeeded()
+        }
+        .fullScreenCover(item: $onboarding) { entry in
+            OnboardingFlowView(entry: entry, onFinish: { tab = .play })
+        }
+    }
+
+    private var tabs: some View {
         TabView(selection: $tab) {
             Tab("Play", systemImage: "flag.checkered", value: AppTab.play) {
                 NavigationStack {
@@ -38,6 +56,9 @@ struct RootTabView: View {
         }
         .environment(matches)
         .environment(\.playZoomNamespace, playZoom)
+        .environment(\.openOnboarding, OpenOnboardingAction { entry in
+            onboarding = entry
+        })
         .tabViewStyle(.sidebarAdaptable)
         .tabBarMinimizeBehavior(.onScrollDown)
         .task(id: dependencies.sessionRevision) {
@@ -66,7 +87,7 @@ struct RootTabView: View {
             }
             Button("Keep current game", role: .cancel) {}
         } message: {
-            Text("You already have a match saved. Starting Ridge Line will throw that progress away.")
+            Text("You already have a match saved. Starting \(matches.pendingTitle) will throw that progress away.")
         }
         .onChange(of: matches.showReplaceConfirm) { _, showing in
             guard !showing, replaceAfterConfirm else { return }
@@ -83,6 +104,16 @@ struct RootTabView: View {
             Button("OK", role: .cancel) { matches.lastError = nil }
         } message: {
             Text(matches.lastError ?? "")
+        }
+    }
+
+    /// First launch: cover the tabs with onboarding straight away, without a slide-up.
+    private func showOnboardingIfNeeded() {
+        guard !dependencies.preferences.hasCompletedOnboarding, onboarding == nil else { return }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            onboarding = .firstRun
         }
     }
 }

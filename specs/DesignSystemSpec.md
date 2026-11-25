@@ -116,6 +116,7 @@ Type, spacing, radius, motion, and haptics: `TMFont`, `TMSpace`, `TMRadius`, `TM
 | `MissionCard` | `DesignSystem/Components/MissionCard.swift` |
 | `ResumeCard` | `DesignSystem/Components/ResumeCard.swift` |
 | `ChecklistRow` | `DesignSystem/Components/ChecklistRow.swift` |
+| `ChoiceTile` | `DesignSystem/Components/ChoiceTile.swift` (onboarding answer cards: single or multiple choice, selection shown by border + check, stacks at accessibility sizes) |
 | `EmptyState` | `DesignSystem/Components/EmptyState.swift` |
 | `ErrorBanner` | `DesignSystem/Components/ErrorBanner.swift` |
 | `InfoButton` / `InfoContent` | `DesignSystem/InfoButton.swift`, `DesignSystem/Components/InfoContent.swift` |

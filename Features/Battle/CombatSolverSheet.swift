@@ -29,7 +29,7 @@ struct CombatSolverSheet: View {
         self.store = store
         self.initialAttackerId = initialAttackerId
         let attacker = Self.openingAttacker(session: session, initial: initialAttackerId)
-        let defender = Self.openingDefender(session: session)
+        let defender = Self.openingDefender(session: session, attackerId: attacker)
         _attackerId = State(initialValue: attacker)
         _defenderId = State(initialValue: defender)
         _insight = State(initialValue: Self.openingInsight(session: session, defenderId: defender))
@@ -42,16 +42,26 @@ struct CombatSolverSheet: View {
 
     private var live: MatchSession { store.session ?? session }
 
+    /// Fire is simultaneous, so shooters come from both sides: the side that lost initiative first,
+    /// as the rulebook orders it, but nothing enforces that order.
     private var friendlies: [MatchUnitState] {
-        live.units.filter { $0.side == live.activeSide && $0.combatStatus != .removed }
+        let first = live.initiativeWinner?.other ?? live.activeSide
+        let onTable = live.units.filter { $0.combatStatus != .removed }
+        return onTable.filter { $0.side == first } + onTable.filter { $0.side != first }
     }
 
     private var shooters: [MatchUnitState] {
         friendlies.filter(\.canAttackThisTurn)
     }
 
+    /// Units on the table that can't fire right now, for the one-line "Done" note.
+    private var spentShooters: [MatchUnitState] {
+        friendlies.filter { !$0.canAttackThisTurn }
+    }
+
     private var defenders: [MatchUnitState] {
-        live.units.filter { $0.side != live.activeSide && $0.combatStatus != .removed }
+        guard let attacker else { return [] }
+        return live.units.filter { $0.side != attacker.side && $0.combatStatus != .removed }
     }
 
     private var attacker: MatchUnitState? {
@@ -86,9 +96,15 @@ struct CombatSolverSheet: View {
             defender: defender,
             insight: insight,
             overheatAllowed: live.ruleset.overheatAllowed,
+            physicalAttacksAllowed: live.ruleset.physicalAttacksAllowed,
             roll: roll
         )
     }
+
+    /// Close Quarters and later: the sheet offers a punch or kick instead of weapon fire.
+    private var offersPhysical: Bool { live.ruleset.physicalAttacksAllowed }
+
+    private var isPhysical: Bool { insight.attackKind == .physical }
 
     private var pairToken: String {
         "\(attackerId?.uuidString ?? "")|\(defenderId?.uuidString ?? "")"
@@ -117,6 +133,14 @@ struct CombatSolverSheet: View {
                     d1 = nil
                     d2 = nil
                     selectedLetter = nil
+                    insight.overheatUsed = 0
+                    insight.attackKind = .weapon
+                    // A shooter from the other side can't keep a target on its own side.
+                    if let attacker, let defender, defender.side == attacker.side {
+                        defenderId = nil
+                    } else if defenderId == nil, let only = Self.openingDefender(session: live, attackerId: attackerId) {
+                        defenderId = only
+                    }
                     restoreRange()
                 }
                 .onChange(of: insight.rangeInches) { _, inches in
@@ -162,7 +186,7 @@ struct CombatSolverSheet: View {
             Spacer()
             EmptyState(
                 systemImage: "checkmark.circle",
-                title: "\(live.activeSide.displayName) has fired everything",
+                title: "Every ’Mech has fired",
                 message: "Nothing left to shoot this turn.",
                 actionTitle: "Done shooting",
                 action: finishShooting
@@ -182,13 +206,21 @@ struct CombatSolverSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Eyebrow("Who’s shooting?") {
-                        SideBadge(side: live.activeSide)
-                    }
+                    Eyebrow("Who’s shooting?")
+                    Text("Either side, any order. Shots land at the same time.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     LazyVGrid(columns: pairColumns, spacing: TMSpace.sm) {
-                        ForEach(friendlies) { unit in
+                        ForEach(shooters) { unit in
                             shooterCard(unit)
                         }
+                    }
+                    if !spentShooters.isEmpty {
+                        Text("Done: " + spentShooters.map { "\(PlayForceMath.shortName($0.name)) (\(unavailableReason($0)?.lowercased() ?? "can’t shoot"))" }.joined(separator: " · "))
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .accessibilityElement(children: .contain)
@@ -196,10 +228,12 @@ struct CombatSolverSheet: View {
                 .accessibilityLabel("Who’s shooting?")
 
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Eyebrow("At which target?") {
-                        SideBadge(side: live.activeSide.other)
-                    }
-                    if defenders.isEmpty {
+                    Eyebrow("At which target?")
+                    if attacker == nil {
+                        Text("Pick a shooter first.")
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                    } else if defenders.isEmpty {
                         Text("No enemy ’Mechs left on the table.")
                             .font(TMFont.detail)
                             .foregroundStyle(.secondary)
@@ -272,8 +306,15 @@ struct CombatSolverSheet: View {
                 Text("\(attacker.name) → \(defender.name)")
                     .font(TMFont.cardTitle)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityLabel("\(attacker.name) shooting \(defender.name)")
+                    .accessibilityLabel("\(attacker.name) \(isPhysical ? "attacking" : "shooting") \(defender.name)")
                 needLine(solve)
+                if let reason = solve.cannotShootReason {
+                    Text(reason)
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.sator.blocked")
+                }
             }
             .padding(.horizontal, TMSpace.lg)
             .padding(.top, TMSpace.sm)
@@ -283,14 +324,24 @@ struct CombatSolverSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: TMSpace.lg) {
                     if defender.combatStatus == .destroyedPendingEnd {
-                        Text("\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
+                        Text(isPhysical
+                             ? "\(defender.name) is already wrecked. This attack changes nothing, but it still uses \(attacker.name)’s attack."
+                             : "\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
                             .font(TMFont.detail)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    rangeControl
+                    if offersPhysical || attacker.hasRearFiring {
+                        attackKindControl(attacker)
+                    }
+                    if !isPhysical {
+                        rangeControl
+                    }
                     targetMovedControl(defender)
                     conditions
+                    if !isPhysical, insight.attackKind != .rearFiring, live.ruleset.overheatAllowed, attacker.ov > 0 {
+                        overheatControl(attacker)
+                    }
                     if gaugeBesideDice {
                         compactRoll(solve)
                     } else if solve.cannotShootReason == nil {
@@ -304,7 +355,11 @@ struct CombatSolverSheet: View {
                     }
                     if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
                        defender.combatStatus != .destroyedPendingEnd {
-                        DamagePreviewCard(solve: solve, defender: defender)
+                        DamagePreviewCard(
+                            solve: solve,
+                            defender: defender,
+                            physicalBase: AlphaStrikeDamage.physical(attacker: attacker, rearHit: false).delivered
+                        )
                     }
                 }
                 .padding(TMSpace.lg)
@@ -340,7 +395,7 @@ struct CombatSolverSheet: View {
     @ViewBuilder
     private func gauge(for solve: CombatSolve) -> some View {
         if let reason = solve.cannotShootReason {
-            TNGauge(targetNumber: 13, reason: reason, blockedTitle: "Can’t shoot")
+            TNGauge(targetNumber: 13, reason: reason, blockedTitle: solve.isPhysical ? "Can’t attack" : "Can’t shoot")
         } else if let tn = solve.targetNumber {
             TNGauge(
                 targetNumber: tn.value,
@@ -406,6 +461,70 @@ struct CombatSolverSheet: View {
         }
     }
 
+    /// Weapons or punch/kick. Only in missions that allow physical attacks. One attack a turn either way.
+    private func attackKindControl(_ attacker: MatchUnitState) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Attack")
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    // Segments truncate at accessibility sizes; a menu keeps both labels whole.
+                    Picker("Attack", selection: $insight.attackKind) {
+                        attackKindOptions(attacker)
+                    }
+                    .pickerStyle(.menu)
+                } else {
+                    Picker("Attack", selection: $insight.attackKind) {
+                        attackKindOptions(attacker)
+                    }
+                    .pickerStyle(.segmented)
+                }
+            }
+            .accessibilityIdentifier("as.sator.attackKind")
+            // Choosing rear weapons says the target is behind; switching back puts it in front again.
+            .onChange(of: insight.attackKind) { _, kind in
+                insight.targetInFrontArc = kind != .rearFiring
+            }
+            Text(attackKindExplainer(attacker))
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("as.sator.attackKind.note")
+        }
+    }
+
+    @ViewBuilder
+    private func attackKindOptions(_ attacker: MatchUnitState) -> some View {
+        Text("Weapons").tag(AttackKind.weapon)
+        if offersPhysical {
+            Text("Punch or kick").tag(AttackKind.physical)
+        }
+        if attacker.canRearFireThisTurn || insight.attackKind == .rearFiring {
+            Text("Rear weapons").tag(AttackKind.rearFiring)
+        }
+    }
+
+    private func attackKindExplainer(_ attacker: MatchUnitState) -> String {
+        if insight.attackKind == .rearFiring {
+            let values = [RangeBracket.short, .medium, .long].map { b -> String in
+                let v = attacker.rearDamage(at: b)
+                return v > 0 ? "\(v)" : "–"
+            }.joined(separator: "/")
+            return "Shoots a ’Mech behind \(attacker.name) with its rear weapons (\(values)), +1 to hit, no overheat. Do this before the forward shot: that shot then does as much less damage as the rear weapons can do at the range used."
+        }
+        if attacker.rearFireReduction > 0, !isPhysical {
+            return "After the rear shot, \(attacker.name)’s forward damage is \(attacker.rearFireReduction) less this turn."
+        }
+        guard isPhysical else {
+            return offersPhysical
+                ? "One attack a turn: shoot or punch, not both."
+                : "Rear weapons are an extra shot at a ’Mech behind you, taken before the forward shot."
+        }
+        let reach = attacker.hasMEL ? 2 : 1
+        let damage = AlphaStrikeDamage.physical(attacker: attacker, rearHit: false).delivered
+        let from = attacker.hasMEL ? "Size + 1, MEL" : "its Size"
+        return "Within \(reach)″ and in front. \(damage) damage (\(from)). No range or heat. Charge and Death From Above are not in this mission."
+    }
+
     private var rangeControl: some View {
         VStack(alignment: .leading, spacing: TMSpace.sm) {
             Eyebrow("Range")
@@ -417,9 +536,10 @@ struct CombatSolverSheet: View {
                     .accessibilityIdentifier("as.sator.range")
             } else {
                 Picker("Range", selection: rangeBand) {
-                    Text("0–6″").tag(RangeBracket.short)
-                    Text("6–24″").tag(RangeBracket.medium)
-                    Text("24–42″").tag(RangeBracket.long)
+                    // Rulebook bands: up to 6″, over 6″ to 24″, over 24″ to 42″. The old labels overlapped at 6 and 24.
+                    Text("≤6″").tag(RangeBracket.short)
+                    Text(">6–24″").tag(RangeBracket.medium)
+                    Text(">24–42″").tag(RangeBracket.long)
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("as.sator.range")
@@ -512,7 +632,7 @@ struct CombatSolverSheet: View {
             FlowLayout(spacing: TMSpace.sm) {
                 chipToggle("Woods", isOn: $insight.woods)
                 chipToggle("Partial cover", isOn: $insight.partialCover)
-                chipToggle("Rear shot", isOn: $insight.rearHit)
+                chipToggle(isPhysical ? "Rear attack" : "Rear shot", isOn: $insight.rearHit)
             }
             Button {
                 showUnusual.toggle()
@@ -532,24 +652,89 @@ struct CombatSolverSheet: View {
             .accessibilityHint("Line of sight and front arc")
             if showUnusual {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Text("Leave these off for a normal shot. Turn one on only when that shot is not allowed.")
+                    Text(isPhysical
+                         ? "Leave these off for a normal attack. Turn one on only when that attack is not allowed."
+                         : "Leave these off for a normal shot. Turn one on only when that shot is not allowed.")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     chipToggle(
                         "Can’t see the target",
                         isOn: cannotSeeTarget,
-                        hint: "Something blocks line of sight, so this ’Mech cannot shoot that target."
+                        hint: "Something blocks line of sight, so this ’Mech cannot attack that target."
                     )
                     chipToggle(
-                        "Behind the shooter",
+                        isPhysical ? "Behind the attacker" : "Behind the shooter",
                         isOn: behindShooter,
-                        hint: "The target is outside the miniature’s front, so this shot is not allowed."
+                        hint: "The target is outside the miniature’s front, so this attack is not allowed."
                     )
+                    if !isPhysical {
+                        chipToggle(
+                            "Bases touching",
+                            isOn: $insight.basesTouching,
+                            hint: offersPhysical
+                                ? "’Mechs in base contact can’t make weapon attacks. Punch or kick instead."
+                                : "’Mechs in base contact can’t make weapon attacks."
+                        )
+                    }
                 }
                 .padding(.top, TMSpace.sm)
             }
         }
+    }
+
+    /// Overheat: only in missions that turn it on, only for cards with OV. Declared before the roll.
+    private func overheatControl(_ attacker: MatchUnitState) -> some View {
+        let usable = AlphaStrikeHeat.usableOverheat(
+            requested: attacker.ov,
+            attacker: attacker,
+            bracket: insight.rangeBracket,
+            overheatAllowed: true
+        )
+        let chosen = min(insight.overheatUsed, usable)
+        return VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Overheat")
+            if usable == 0 {
+                Text(insight.rangeBracket == .long
+                     ? "Overheat only adds damage at short and medium range."
+                     : "No overheat on this shot.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Picker("Overheat", selection: overheatBinding(max: usable)) {
+                    Text("None").tag(0)
+                    ForEach(1...usable, id: \.self) { points in
+                        Text("+\(points) damage").tag(points)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("as.sator.overheat")
+                Text(overheatExplainer(attacker, points: chosen))
+                    .font(TMFont.detail)
+                    .foregroundStyle(chosen > 0 ? .primary : .secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func overheatBinding(max usable: Int) -> Binding<Int> {
+        Binding(
+            get: { min(insight.overheatUsed, usable) },
+            set: { insight.overheatUsed = Swift.max(0, Swift.min($0, usable)) }
+        )
+    }
+
+    private func overheatExplainer(_ attacker: MatchUnitState, points: Int) -> String {
+        guard points > 0 else {
+            return "Push \(attacker.name) past safe limits for extra damage. Decide before you roll."
+        }
+        let after = Swift.min(AlphaStrikeHeat.shutdownLevel, attacker.heat + points)
+        if after >= AlphaStrikeHeat.shutdownLevel {
+            return "Heat goes to \(after) in the End Phase: \(attacker.name) shuts down next turn. No move, no shot, and it’s easy to hit."
+        }
+        let tmm = after >= 2 ? ", and it’s 1 easier to hit unless it jumps" : ""
+        return "Heat goes to \(after) in the End Phase, hit or miss. Next turn: +\(after) to its shots and \(2 * after)″ less ground move\(tmm). Skip a turn of shooting to cool off."
     }
 
     private var cannotSeeTarget: Binding<Bool> {
@@ -636,14 +821,16 @@ struct CombatSolverSheet: View {
         if store.applyAttack(
             attackerId: attackerId,
             defenderId: defenderId,
-            range: insight.rangeBracket,
+            range: isPhysical ? .short : insight.rangeBracket,
             die1: faces.0,
             die2: faces.1,
             attackerMove: move,
             targetMove: insight.targetMove,
             woods: insight.woods,
             partialCover: insight.partialCover,
-            rearHit: insight.rearHit
+            rearHit: insight.rearHit,
+            overheatUsed: isPhysical ? 0 : insight.overheatUsed,
+            attackKind: insight.attackKind
         ) {
             dismiss()
         } else {
@@ -652,7 +839,7 @@ struct CombatSolverSheet: View {
     }
 
     private func finishShooting() {
-        store.finishCombatSide()
+        store.finishCombat()
         if store.lastError == nil {
             dismiss()
         }
@@ -684,13 +871,15 @@ struct CombatSolverSheet: View {
 
     private func unavailableReason(_ unit: MatchUnitState) -> String? {
         if unit.canAttackThisTurn { return nil }
-        if unit.hasAttackedThisTurn { return "Already shot" }
+        if unit.isShutdown { return "Shut down from heat" }
+        if unit.hasAttackedThisTurn { return unit.turnShot?.isPhysical == true ? "Already attacked" : "Already shot" }
         if unit.movementMode == .sprint { return "Sprinted, can’t shoot" }
         return "Can’t shoot"
     }
 
     private func targetCaption(_ unit: MatchUnitState) -> String {
         if unit.combatStatus == .destroyedPendingEnd { return "Already wrecked" }
+        if unit.isShutdown { return "Shut down, easy to hit" }
         if unit.isImmobile { return "Can’t move" }
         if unit.hasMovedThisTurn, unit.movementMode != .unset {
             return "Moved: \(unit.movementMode.displayName)"
@@ -733,7 +922,7 @@ struct CombatSolverSheet: View {
     private func needLine(_ solve: CombatSolve) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
             if solve.cannotShootReason != nil {
-                Text("Can’t shoot")
+                Text(solve.isPhysical ? "Can’t attack" : "Can’t shoot")
                     .font(TMFont.readoutM)
             } else if let tn = solve.targetNumber {
                 Text(tn.autoMiss ? "Always misses" : "Need \(tn.value)+")
@@ -752,16 +941,17 @@ struct CombatSolverSheet: View {
     }
 
     private static func openingAttacker(session: MatchSession, initial: UUID?) -> UUID? {
-        let attackers = session.units.filter { $0.side == session.activeSide && $0.canAttackThisTurn }
+        let attackers = session.units.filter(\.canAttackThisTurn)
         if let initial, attackers.contains(where: { $0.id == initial }) {
             return initial
         }
         return attackers.count == 1 ? attackers[0].id : nil
     }
 
-    private static func openingDefender(session: MatchSession) -> UUID? {
+    private static func openingDefender(session: MatchSession, attackerId: UUID?) -> UUID? {
+        guard let attacker = session.units.first(where: { $0.id == attackerId }) else { return nil }
         let defenders = session.units.filter {
-            $0.side != session.activeSide && $0.combatStatus != .removed
+            $0.side != attacker.side && $0.combatStatus != .removed
         }
         return defenders.count == 1 ? defenders[0].id : nil
     }
@@ -867,7 +1057,7 @@ private enum SATORTerms {
         case "S":
             return reasons.first { $0.hasPrefix("Skill") } ?? "Skill"
         case "A":
-            return reasons.first { $0.hasPrefix("Shooter") } ?? "Shooter"
+            return reasons.first { $0.hasPrefix("Shooter") || $0.hasPrefix("Attacker") } ?? "Shooter"
         case "T":
             return reasons.first { $0.hasPrefix("Target") } ?? "Target"
         case "R":
@@ -876,6 +1066,7 @@ private enum SATORTerms {
             let others = reasons.filter { reason in
                 !reason.hasPrefix("Skill")
                     && !reason.hasPrefix("Shooter")
+                    && !reason.hasPrefix("Attacker")
                     && !reason.hasPrefix("Target")
                     && !reason.hasPrefix("Need")
                     && !reason.contains("range")
@@ -889,6 +1080,14 @@ private enum SATORTerms {
 private struct DamagePreviewCard: View {
     var solve: CombatSolve
     var defender: MatchUnitState
+    /// A punch or kick's damage before the rear bonus: Size, or Size + 1 with MEL.
+    var physicalBase: Int = 0
+
+    private var physicalDamageLine: String {
+        solve.ifHit.delivered > physicalBase
+            ? "Punch or kick: \(physicalBase) for Size, +1 from behind."
+            : "Punch or kick: damage equals Size."
+    }
 
     private var missed: Bool { solve.isHit == false }
     private var landedHit: Bool { solve.isHit == true }
@@ -955,13 +1154,21 @@ private struct DamagePreviewCard: View {
             VStack(alignment: .leading, spacing: TMSpace.md) {
                 Eyebrow(cardEyebrow)
                 if hit.zeroDamage {
-                    Text("0 damage at this range. Applying it still uses this ’Mech’s shot.")
+                    Text(solve.isPhysical
+                         ? "0 damage. Applying it still uses this ’Mech’s attack."
+                         : "0 damage at this range. Applying it still uses this ’Mech’s shot.")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     Text("\(hit.delivered) damage to \(solve.defenderName)")
                         .font(TMFont.cardTitle)
+                    if solve.isPhysical {
+                        Text(physicalDamageLine)
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     DamagePipCompare(
                         title: "Armor",
                         kind: .armor,

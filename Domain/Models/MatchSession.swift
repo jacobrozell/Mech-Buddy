@@ -241,6 +241,33 @@ extension MatchSession {
         }
     }
 
+    /// Forced Withdrawal is on and this ’Mech is crippled and still on the table:
+    /// it must move toward its own edge, and it can still attack (rulebook p. 12).
+    public func mustWithdraw(_ unit: MatchUnitState) -> Bool {
+        ruleset.forcedWithdrawal && unit.combatStatus == .active && unit.isCrippled
+    }
+
+    /// Crippled this turn and not yet announced. The End Phase logs them, then they drop off this list.
+    public var newlyCrippled: [MatchUnitState] {
+        units.filter { mustWithdraw($0) && !$0.withdrawalAnnounced }
+    }
+
+    /// Why this ’Mech can't be recorded as leaving the table right now, or nil when it can.
+    /// During Movement it leaves on its own move, so the move order stays right.
+    public func leaveTableBlockReason(_ unit: MatchUnitState) -> String? {
+        guard status == .active else { return "The game is over." }
+        guard unit.combatStatus == .active else {
+            return unit.combatStatus == .removed ? "It’s already off the table." : "It’s wrecked."
+        }
+        if units.contains(where: \.pendingCritical) {
+            return "Roll the critical first."
+        }
+        if phase == .movement, !unit.hasMovedThisTurn, unit.side != activeSide {
+            return "Record this on its move."
+        }
+        return nil
+    }
+
     /// First movement of turn 1, before anyone has moved and before the players confirm placement.
     public var needsDeploymentAcknowledgement: Bool {
         phase == .movement

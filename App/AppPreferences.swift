@@ -1,4 +1,5 @@
 import Foundation
+import MechBuddyData
 import Observation
 import SwiftUI
 import MechBuddyDomain
@@ -35,16 +36,20 @@ final class AppPreferences {
     static let themeKey = "settings.theme"
     static let keepScreenAwakeKey = "settings.keepScreenAwake"
     static let defaultDiceModeKey = "settings.defaultDiceMode"
+    /// Ids from `as-getting-started.json` the player ticked on the onboarding "What do you have?" screen.
     static let gettingStartedChecksKey = "settings.gettingStartedChecks"
-    static let hasSeenIntroKey = "settings.hasSeenIntro"
+    static let completedMissionsKey = "missions.completed"
+    /// The game last picked on the Rules tab's switch. Unset until the player changes it.
+    static let rulesGameKey = "rules.lastGame"
 
     private let defaults: UserDefaults
 
     private var isReloading = false
 
     private static let ownedKeys = [
-        hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey, hasSeenIntroKey
-    ]
+        hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey,
+        completedMissionsKey, rulesGameKey
+    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys
 
     var hapticsEnabled: Bool {
         didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
@@ -66,8 +71,45 @@ final class AppPreferences {
         didSet { persist(Array(gettingStartedChecks).sorted(), forKey: Self.gettingStartedChecksKey) }
     }
 
-    var hasSeenIntro: Bool {
-        didSet { persist(hasSeenIntro, forKey: Self.hasSeenIntroKey) }
+    /// The game picked in onboarding. `nil` until chosen; Play treats that as Alpha Strike.
+    var learningTrack: LearningTrack? {
+        didSet { persistOnboarding() }
+    }
+
+    /// The game last picked on the Rules tab. `nil` until changed there; the tab then follows `learningTrack`.
+    var rulesGame: LearningTrack? {
+        didSet {
+            guard !isReloading else { return }
+            if let rulesGame {
+                defaults.set(rulesGame.rawValue, forKey: Self.rulesGameKey)
+            } else {
+                defaults.removeObject(forKey: Self.rulesGameKey)
+            }
+        }
+    }
+
+    /// The game the Rules tab shows: the last one picked there, else the onboarding game, else Alpha Strike.
+    var rulesGameToShow: LearningTrack {
+        RulesGameChoice.initial(lastViewed: rulesGame, onboarding: learningTrack)
+    }
+
+    /// True once the first-run flow was finished or skipped. Until then RootTabView shows it.
+    var hasCompletedOnboarding: Bool {
+        didSet { persistOnboarding() }
+    }
+
+    /// Scenario ids of missions played to the end (win, loss, or draw). Drives the "next mission" on Play.
+    var completedMissions: Set<String> {
+        didSet { persist(Array(completedMissions).sorted(), forKey: Self.completedMissionsKey) }
+    }
+
+    /// Boxes and minis the player owns. `nil` until they answer (onboarding or the Force tab);
+    /// missions only show "Your minis" once it is set. "None yet" saves an empty collection.
+    var collection: OwnedCollection? {
+        didSet {
+            guard !isReloading else { return }
+            CollectionStore.save(collection, to: defaults)
+        }
     }
 
     init(defaults: UserDefaults = .standard) {
@@ -78,7 +120,11 @@ final class AppPreferences {
         keepScreenAwake = true
         defaultDiceMode = .manual
         gettingStartedChecks = []
-        hasSeenIntro = false
+        learningTrack = nil
+        rulesGame = nil
+        hasCompletedOnboarding = false
+        completedMissions = []
+        collection = nil
         isReloading = false
         reload()
     }
@@ -112,7 +158,33 @@ final class AppPreferences {
         }
         defaultDiceMode = DiceMode(rawValue: defaults.string(forKey: Self.defaultDiceModeKey) ?? "") ?? .manual
         gettingStartedChecks = Set(defaults.stringArray(forKey: Self.gettingStartedChecksKey) ?? [])
-        hasSeenIntro = defaults.bool(forKey: Self.hasSeenIntroKey)
+        let onboarding = OnboardingStore.load(from: defaults)
+        learningTrack = onboarding.track
+        rulesGame = defaults.string(forKey: Self.rulesGameKey).flatMap(LearningTrack.init(rawValue:))
+        hasCompletedOnboarding = onboarding.isComplete
+        completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
+        collection = CollectionStore.load(from: defaults)
+    }
+
+    private func persistOnboarding() {
+        guard !isReloading else { return }
+        OnboardingStore.save(
+            OnboardingRecord(track: learningTrack, isComplete: hasCompletedOnboarding),
+            to: defaults
+        )
+    }
+
+    /// Finish (or skip) the flow. A `nil` track keeps whatever was chosen before.
+    func completeOnboarding(track: LearningTrack?) {
+        if let track {
+            learningTrack = track
+        }
+        hasCompletedOnboarding = true
+    }
+
+    func markMissionCompleted(_ id: ScenarioId) {
+        guard !completedMissions.contains(id.rawValue) else { return }
+        completedMissions.insert(id.rawValue)
     }
 
     func toggleGettingStarted(_ id: String) {
@@ -125,8 +197,10 @@ final class AppPreferences {
         gettingStartedChecks = next
     }
 
-    func clearGettingStartedChecks() {
-        gettingStartedChecks = []
+    /// Saves the collection and ticks "minis" on the kit screen when anything is owned.
+    func recordCollection(_ owned: OwnedCollection) {
+        collection = owned
+        gettingStartedChecks = OnboardingCollection.kitChecks(gettingStartedChecks, after: owned)
     }
 
     func applyKeepScreenAwake() {

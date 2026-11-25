@@ -16,9 +16,9 @@ The words on screen are **Side A** and **Side B**. `SideId` cases remain `lanceA
 
 | Phase | Hotseat |
 |-------|---------|
-| Initiative | Both sides enter 2D6 on the battle step (Side A fields + Side B fields). Identifiers: `as.initiative.lanceA.die1` … `lanceB.die2`. Winner acts **last**. Tie → inline hint and clear (`as.initiative.tieHint`). Confirm is the dock primary (`as.initiative.confirm`). |
+| Initiative | Both sides enter 2D6 on the battle step (Side A fields + Side B fields). Identifiers: `as.initiative.lanceA.die1` … `lanceB.die2`. Winner acts **last**. Tie → inline hint and clear (`as.initiative.tieHint`). Confirm is the dock primary (`as.initiative.confirm`). **Skip the roll** (`as.initiative.agree`): players pick which side moves first (`agreeInitiative(firstToMove:)`); no dice are recorded and the log says "Players chose: Side B moves first". |
 | Movement | `activeSide = initiativeLoser` first. After that side finishes its **batch** for the current alternating step, flip. See algorithm below. |
-| Combat | `activeSide = initiativeLoser` until **Done shooting**; then `initiativeWinner`; then End. |
+| Combat | **Simultaneous.** Either side may shoot, in any order. One **Done shooting** (`finishCombat`) ends the phase for both. No pass-the-phone banner and no active-side badge in combat. |
 | End | No side ownership; shared checklist. |
 
 ### Opening a unit
@@ -52,9 +52,13 @@ Let `needMove(side)` = active units on side with `hasMovedThisTurn == false`.
 
 ## Combat hotseat
 
-1. `activeSide = initiativeLoser`.  
-2. That side may open SATOR for any unit with `canAttackThisTurn` (sprint cannot).  
-3. **Done shooting** → if active was loser, switch to winner; if winner, `AdvancePhase` to End.  
+Owner decision 2026-11-24, from playtest note 50: players at the table roll at the same time.
+
+The rulebook lists the initiative loser's shots first, but damage and critical effects all apply at the end of the phase (`combatPhaseCrits`, heat in the End Phase), so entry order cannot change the result.
+
+1. Shoot step lists both sides (`as.battle.shooters.lanceA` / `lanceB`), initiative loser first, each with "N to fire". Every unit with `canAttackThisTurn` has **Shoot**.
+2. Solve a shot: "Who's shooting?" lists every unit that can still fire, from both sides, plus a one-line "Done:" note for the rest. Targets are the chosen shooter's enemies.
+3. **Done shooting** → `finishCombat` → End. It asks first if any unit on either side can still fire.
 4. Units with `destroyedPendingEnd` remain eligible until End.
 
 ---

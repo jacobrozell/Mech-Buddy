@@ -73,7 +73,7 @@ public struct BattleCoach: Equatable, Sendable {
 
         finishCombatNeedsConfirm = step == .combat
             && pendingCritical == nil
-            && session.units.contains { $0.side == session.activeSide && $0.canAttackThisTurn }
+            && session.units.contains(where: \.canAttackThisTurn)
 
         if let maxTurns = session.ruleset.maxTurns {
             isLastTurn = session.turn >= maxTurns

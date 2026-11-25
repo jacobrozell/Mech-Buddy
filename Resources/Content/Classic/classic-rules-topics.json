@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "disclaimer": "Unofficial helper in plain language for Classic BattleTech, which isn’t playable in Mech Buddy yet. Page numbers are the printed pages of the A Game of Armored Combat rulebook unless another book is named. BattleTech is a trademark of its respective owners.",
+  "topics": [
+    {
+      "id": "classic-about",
+      "title": "Classic in Mech Buddy",
+      "screenId": "rules.classic.classic-about",
+      "summary": "Read the rules now. Playing Classic in the app is coming.",
+      "group": "start",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Not playable in the app yet",
+          "body": "Classic BattleTech isn’t playable in Mech Buddy yet — it’s marked Coming soon on Play. These pages are for reading, so you can learn the full game alongside Alpha Strike."
+        },
+        {
+          "heading": "Which book these pages follow",
+          "body": "Everything here follows the A Game of Armored Combat rulebook (the AGOAC box). Page numbers are its printed pages. The free Quick-Start Rules teach less; see What the Quick-Start leaves out."
+        },
+        {
+          "heading": "Your MechWarrior",
+          "body": "Each ’Mech has a Gunnery skill for shooting and a Piloting skill for staying upright and for punches and kicks. Lower is better. An average pilot is Gunnery 4, Piloting 5 unless a scenario says otherwise (A Game of Armored Combat p. 5)."
+        }
+      ]
+    },
+    {
+      "id": "classic-turn",
+      "title": "The Classic turn",
+      "screenId": "rules.classic.classic-turn",
+      "summary": "Initiative, move, shoot, physical, heat, end.",
+      "group": "start",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "1. Initiative",
+          "body": "Each side rolls two dice; ties roll again. The loser moves first (A Game of Armored Combat p. 6)."
+        },
+        {
+          "heading": "2. Movement",
+          "body": "Sides take turns moving one ’Mech at a time, loser first. Standing still still uses up your pick. If one side has twice as many ’Mechs left, it moves two per pick; three times, three (A Game of Armored Combat p. 7)."
+        },
+        {
+          "heading": "3. Weapon Attack",
+          "body": "Sides take turns declaring fire the same way. Every weapon rolls on its own. Damage is marked as you roll but only takes effect at the end of the phase, so a ’Mech destroyed now still fires (A Game of Armored Combat pp. 6, 30)."
+        },
+        {
+          "heading": "4. Physical Attack",
+          "body": "Punches, kicks, pushes, and other close-in attacks happen now, after all the shooting (see Physical attacks) (A Game of Armored Combat p. 24)."
+        },
+        {
+          "heading": "5. Heat",
+          "body": "Add up the heat each ’Mech made this turn, take off what its heat sinks remove, and apply the effects (see Heat) (A Game of Armored Combat p. 37)."
+        },
+        {
+          "heading": "6. End",
+          "body": "Clean up, and check for a winner. By default the last side with ’Mechs left wins; if both are wiped out at once it’s a draw (A Game of Armored Combat p. 7)."
+        }
+      ]
+    },
+    {
+      "id": "classic-movement",
+      "title": "Movement and facing",
+      "screenId": "rules.classic.classic-movement",
+      "summary": "Hexes, MP, and which way you face.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Pick one way to move",
+          "body": "Each ’Mech stands still, walks, runs, or jumps — one per turn. Unused MP is lost. Standing still means no MP at all, not even to turn (A Game of Armored Combat pp. 8–9)."
+        },
+        {
+          "heading": "MP per hex",
+          "body": "Entering a hex costs 1 MP plus the terrain: light woods +1, heavy woods +2, rough +1, each level up or down +1 (at most 2 levels a hex) (A Game of Armored Combat pp. 9–10)."
+        },
+        {
+          "heading": "Facing",
+          "body": "A ’Mech always faces a hexside. Turning one hexside costs 1 MP, so turning around costs 3. It can only move into the hex straight ahead or straight behind (A Game of Armored Combat p. 9)."
+        },
+        {
+          "heading": "Walk, run, jump",
+          "body": "Walking lets you back up. Running is Walking MP × 1.5, rounded up, with no backing up. Jumping moves 1 hex per Jumping MP, ignores terrain and ’Mechs on the way, and you pick your facing when you land (A Game of Armored Combat pp. 8–12)."
+        },
+        {
+          "heading": "Movement makes heat",
+          "body": "Walking adds 1 heat, running 2, and jumping 1 per hex (at least 3) (A Game of Armored Combat p. 37)."
+        },
+        {
+          "heading": "Stacking and edges",
+          "body": "You can pass through friendly ’Mechs but not enemies, and two ’Mechs never end in one hex. Leaving the map counts as destroyed (A Game of Armored Combat pp. 10–12)."
+        }
+      ]
+    },
+    {
+      "id": "classic-to-hit",
+      "title": "The to-hit number",
+      "screenId": "rules.classic.classic-to-hit",
+      "summary": "Gunnery plus movement, range, and terrain.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Add it up",
+          "body": "Gunnery + how you moved + how the target moved + range + terrain and other modifiers. Roll two dice per weapon; equal or higher hits (A Game of Armored Combat pp. 15–20)."
+        },
+        {
+          "heading": "How you moved",
+          "body": "Stood still +0, walked +1, ran +2, jumped +3. Firing while prone adds +2 (A Game of Armored Combat pp. 16, 19)."
+        },
+        {
+          "heading": "How the target moved",
+          "body": "Counted in hexes it moved, not MP: 0–2 hexes +0, 3–4 +1, 5–6 +2, 7–9 +3, 10–17 +4, 18–24 +5, 25 or more +6. +1 more if it jumped. Immobile: −4 (A Game of Armored Combat pp. 16, 19)."
+        },
+        {
+          "heading": "Range",
+          "body": "Each weapon has its own short, medium, and long range in hexes: +0, +2, +4. Some weapons are worse up close: inside their minimum range, add (minimum − range + 1) (A Game of Armored Combat pp. 18–20)."
+        },
+        {
+          "heading": "Terrain and the rest",
+          "body": "Target in light woods +1, heavy +2, plus each woods hex in between. Partial cover +1. A second target +1 (or +2 outside your front arc). Heat adds its own modifier (A Game of Armored Combat pp. 17, 19–20)."
+        },
+        {
+          "heading": "Limits",
+          "body": "Above 12 can’t hit. 2 or less always hits (A Game of Armored Combat p. 15)."
+        }
+      ]
+    },
+    {
+      "id": "classic-damage",
+      "title": "Hit locations and damage",
+      "screenId": "rules.classic.classic-damage",
+      "summary": "Where a hit lands and how damage moves inward.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Which side was hit",
+          "body": "Trace a line from the attacker’s hex to the target. The hexside it crosses gives the front, left, right, or rear table. Rear hits go on the torso’s rear armor (A Game of Armored Combat p. 22)."
+        },
+        {
+          "heading": "Roll the location",
+          "body": "Each hit rolls two dice on the hit location table: arms, legs, the three torsos, or the head on a 12. A 2 hits a torso and also checks for a critical, even through armor (A Game of Armored Combat pp. 22–23)."
+        },
+        {
+          "heading": "Missiles",
+          "body": "Roll on the cluster table to see how many missiles hit. SRMs do 2 damage each, each with its own location. LRMs do 1 each, grouped in 5s, one location per group (A Game of Armored Combat pp. 23–24)."
+        },
+        {
+          "heading": "Armor, then structure",
+          "body": "Damage takes armor first, then internal structure. Structure damage that doesn’t destroy the location checks for a critical (A Game of Armored Combat pp. 30–31)."
+        },
+        {
+          "heading": "Damage moves inward",
+          "body": "Once a location is destroyed, more damage moves in: arm or leg to the torso on that side, side torso to the center torso. The head and center torso never pass damage on. Losing a side torso takes its arm with it (A Game of Armored Combat pp. 30, 34)."
+        },
+        {
+          "heading": "Destroyed",
+          "body": "A ’Mech is destroyed when the head or center torso is destroyed, the engine takes its third critical, the cockpit is hit, or the pilot takes 6 wounds (A Game of Armored Combat pp. 32–35)."
+        }
+      ]
+    },
+    {
+      "id": "classic-heat",
+      "title": "Heat",
+      "screenId": "rules.classic.classic-heat",
+      "summary": "A 30-point scale, heat sinks, and shutdown.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Making heat",
+          "body": "Every weapon you fire adds the heat on its line of the record sheet. Moving adds heat too (see Movement and facing). Engine criticals add +5 a turn for the first and +10 for the second (A Game of Armored Combat pp. 8, 37)."
+        },
+        {
+          "heading": "Losing heat",
+          "body": "In the Heat Phase each working heat sink removes 1. Heat sinks under water remove more. Heat never drops below 0 (A Game of Armored Combat pp. 7, 37)."
+        },
+        {
+          "heading": "What it costs",
+          "body": "Move: −1 MP at 5, rising to −5 at 25 (jumping isn’t slowed). Weapons: +1 to hit at 8, +2 at 13, +3 at 17, +4 at 24. Only the highest threshold you’ve reached counts (A Game of Armored Combat pp. 20, 38)."
+        },
+        {
+          "heading": "Shutdown",
+          "body": "From 14 heat you roll to stay running, needing more as heat climbs; at 30 you shut down automatically. A shut-down ’Mech is immobile and makes a Piloting roll or falls. It tries to restart in later Heat Phases (A Game of Armored Combat p. 38)."
+        },
+        {
+          "heading": "Ammo",
+          "body": "At 19 heat or more you also roll to keep your ammo from exploding (A Game of Armored Combat pp. 38–39)."
+        }
+      ]
+    },
+    {
+      "id": "classic-piloting",
+      "title": "Piloting rolls and falling",
+      "screenId": "rules.classic.classic-piloting",
+      "summary": "Roll to stay upright, or fall over.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "The roll",
+          "body": "A Piloting Skill Roll is two dice against Piloting plus modifiers. Fail and the ’Mech falls. Rolls from movement happen right away; rolls from attacks wait until the end of that phase (A Game of Armored Combat p. 40)."
+        },
+        {
+          "heading": "What forces one",
+          "body": "Taking 20 or more damage in a phase, being kicked, pushed, or charged, a gyro or leg critical, a destroyed leg, shutting down, entering water or rubble, and standing up. Damage to legs, hips, and the gyro makes every later roll harder (A Game of Armored Combat p. 41)."
+        },
+        {
+          "heading": "Falling",
+          "body": "A fall does damage based on the ’Mech’s tonnage, in 5-point groups, to a side you roll for. The ’Mech ends prone. The pilot rolls again or takes a wound (A Game of Armored Combat pp. 42–44)."
+        },
+        {
+          "heading": "Standing up",
+          "body": "Costs 2 MP and a Piloting roll per try. On a success you pick any facing and can keep moving (A Game of Armored Combat p. 12)."
+        },
+        {
+          "heading": "Pilot wounds",
+          "body": "Head hits, failed fall rolls, and ammo explosions wound the pilot. Each wound means a roll to stay conscious; 6 wounds kill the pilot (A Game of Armored Combat pp. 7, 44)."
+        }
+      ]
+    },
+    {
+      "id": "classic-criticals",
+      "title": "Critical hits",
+      "screenId": "rules.classic.classic-criticals",
+      "summary": "Engine, gyro, actuators, and ammo.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "When to check",
+          "body": "Roll two dice when a location takes structure damage and survives, or on a hit-location 2. On 2–7 nothing, 8–9 one critical, 10–11 two, 12 blows off a head or limb, or three criticals on a torso (A Game of Armored Combat pp. 30–31)."
+        },
+        {
+          "heading": "Which slot",
+          "body": "Roll for a slot in that location on the record sheet. Empty or already-hit slots roll again (A Game of Armored Combat pp. 31–32)."
+        },
+        {
+          "heading": "Engine and gyro",
+          "body": "Engine: each hit adds heat every turn, and the third destroys the ’Mech. Gyro: the first hit makes Piloting rolls harder, the second knocks the ’Mech down for good (A Game of Armored Combat p. 32)."
+        },
+        {
+          "heading": "Arms and legs",
+          "body": "Arm actuator hits make that arm’s weapons and punches worse. Leg and hip hits cut MP, make Piloting rolls harder, and weaken kicks (A Game of Armored Combat pp. 32–34)."
+        },
+        {
+          "heading": "Ammo",
+          "body": "A critical on an ammo slot explodes the shots left in it, straight into structure, and wounds the pilot twice. CASE isn’t in this book (A Game of Armored Combat pp. 32, 35)."
+        }
+      ]
+    },
+    {
+      "id": "classic-physical",
+      "title": "Physical attacks",
+      "screenId": "rules.classic.classic-physical",
+      "summary": "Punch, kick, push, charge, and jump on them.",
+      "group": "during",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "The basics",
+          "body": "Physical attacks come after weapon fire. The target must be in the next hex. To-hit uses Piloting plus the usual modifiers, but not heat. One kind of physical attack per ’Mech a turn, and prone ’Mechs can’t make one (A Game of Armored Combat pp. 24–25)."
+        },
+        {
+          "heading": "Punch",
+          "body": "An arm that didn’t fire this turn can punch. Damage is the ’Mech’s tons ÷ 10, rounded up, on the 1D6 punch table (A Game of Armored Combat p. 28)."
+        },
+        {
+          "heading": "Kick",
+          "body": "−2 to hit. Damage is tons ÷ 5 to a leg. The target always makes a Piloting roll; a kicker who misses makes one too (A Game of Armored Combat p. 28)."
+        },
+        {
+          "heading": "Push",
+          "body": "−1 to hit, no damage. The target is shoved one hex and makes a Piloting roll (A Game of Armored Combat p. 29)."
+        },
+        {
+          "heading": "Charge",
+          "body": "Declared while moving. Damage grows with hexes moved, the attacker takes damage too, and both make Piloting rolls. No weapon fire that turn (A Game of Armored Combat pp. 25–26)."
+        },
+        {
+          "heading": "Death from above",
+          "body": "Jump onto the target. Big damage to it, damage to you, and a miss means you fall. No weapon fire that turn (A Game of Armored Combat pp. 26–28)."
+        }
+      ]
+    },
+    {
+      "id": "classic-quickstart",
+      "title": "What the Quick-Start leaves out",
+      "screenId": "rules.classic.classic-quickstart",
+      "summary": "The free rules stop after shooting.",
+      "group": "reference",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "Three phases only",
+          "body": "The free Quick-Start Rules have Initiative, Movement, and Weapon Attack. No Physical Attack, Heat, or End phase (Quick-Start p. 1)."
+        },
+        {
+          "heading": "Left out entirely",
+          "body": "Piloting rolls and falls, heat, critical hits, physical attacks, water, hills, and minimum range. The Essentials booklet says these are in A Game of Armored Combat (Essentials p. 11)."
+        },
+        {
+          "heading": "Simpler damage",
+          "body": "One hit location table, no rear armor, and no internal structure: a location is gone when its armor is gone. Only losing the head or center torso destroys a ’Mech. Lose a leg and it can’t move for the rest of the game (Quick-Start pp. 6, 10)."
+        },
+        {
+          "heading": "Simpler shooting",
+          "body": "One target per turn and only a front arc. Target movement stops at +4 for 10 or more hexes (Quick-Start pp. 8, 11)."
+        }
+      ]
+    },
+    {
+      "id": "classic-numbers",
+      "title": "Quick numbers (optional)",
+      "screenId": "rules.classic.classic-numbers",
+      "summary": "Movement, range, and heat at a glance.",
+      "group": "reference",
+      "game": "classic",
+      "sections": [
+        {
+          "heading": "You moved",
+          "body": "Stood +0. Walked +1. Ran +2. Jumped +3 (A Game of Armored Combat p. 16)."
+        },
+        {
+          "heading": "They moved (hexes)",
+          "body": "0–2: +0. 3–4: +1. 5–6: +2. 7–9: +3. 10–17: +4. 18–24: +5. 25+: +6. Jumped: +1 more (A Game of Armored Combat p. 16)."
+        },
+        {
+          "heading": "Range",
+          "body": "Short +0. Medium +2. Long +4 (A Game of Armored Combat p. 18)."
+        },
+        {
+          "heading": "Heat thresholds",
+          "body": "−1 MP at 5, 10, 15, 20, 25 (up to −5). +1 to hit at 8, 13, 17, 24 (up to +4). Shutdown rolls from 14. Ammo rolls from 19. Automatic shutdown at 30 (A Game of Armored Combat p. 38)."
+        }
+      ]
+    }
+  ]
+}

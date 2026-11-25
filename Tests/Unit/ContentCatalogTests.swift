@@ -13,7 +13,7 @@ struct ContentCatalogTests {
     func ridgeLine() throws {
         let scenario = try catalog.ridgeLineScenario()
         #expect(scenario.scenarioId == "ridge-line")
-        let units = RidgeLineFactory.makeUnits(from: scenario)
+        let units = GuidedScenarioFactory.makeUnits(from: scenario)
         #expect(units.count == 4)
         #expect(units.filter { $0.side == .lanceA }.count == 2)
         let hawk = try #require(units.first { $0.name.contains("Shadow Hawk") })

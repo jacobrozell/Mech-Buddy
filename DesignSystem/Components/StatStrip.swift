@@ -1,4 +1,5 @@
 import SwiftUI
+import MechBuddyDomain
 
 struct StatCell: Identifiable, Sendable {
     var id: String
@@ -6,6 +7,24 @@ struct StatCell: Identifiable, Sendable {
     var value: String
     var helpTitle: String?
     var helpBody: String?
+}
+
+extension StatCell {
+    /// HEAT cell for ’Mechs that can overheat or already carry heat. Empty otherwise, so Ridge Line cards stay as they were.
+    static func heat(for unit: MatchUnitState) -> [StatCell] {
+        guard unit.ov > 0 || unit.heat > 0 else { return [] }
+        let value = unit.isShutdown ? "S" : "\(unit.heat)"
+        let body: String
+        switch unit.heat {
+        case 0:
+            body = "Heat scale 0–3, then S (shut down). Overheating adds heat in the End Phase. A turn without shooting clears it."
+        case AlphaStrikeHeat.shutdownLevel...:
+            body = "Shut down: no move and no shot this turn, and shots at it get −4. It restarts at heat 0 in the End Phase."
+        default:
+            body = "+\(unit.heat) to its shots, \(2 * unit.heat)″ less ground move\(unit.heat >= 2 ? ", 1 less TMM" : ""). A turn without shooting clears it."
+        }
+        return [StatCell(id: "heat", label: "HEAT", value: value, helpTitle: "Heat", helpBody: body)]
+    }
 }
 
 struct StatStrip: View {

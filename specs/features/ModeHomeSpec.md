@@ -17,14 +17,16 @@ As a player opening Mech Buddy, I land on Play, see resume if needed, and get cl
 1. Title: Alpha Strike  
 2. **Resume** card if `MatchSession` active for AS — primary  
 3. Actions:
-   - **Getting Started** → `as.gettingStarted`
+   - First-run onboarding replaces Getting Started ([OnboardingSpec](OnboardingSpec.md))
    - **How to play Ridge Line** → `as.howToPlay` (app flow: tabs, setup, four steps, win, resume)
    - **Play Ridge Line** → guided mission setup
    - **Scenarios** → `as.scenarios` (Ridge Line only in 1.0; Full Lances gated)
    - **Free battle** → **1.1** (hidden in Release; full surface only)
 4. Secondary: Force, Rules  
 
-Also show **Classic — Coming soon** row (teaser).
+Also show **Classic — Coming soon** row (teaser). If the player picked Classic in onboarding, the row is replaced by the **Classic spotlight** card above the path (`play.classicSpotlight`, see OnboardingSpec § Play by track).
+
+The compact **In progress** row stacks at accessibility text sizes: text, then a full-width Continue.
 
 ## Mode switcher / Classic teaser
 
@@ -42,7 +44,7 @@ Also show **Classic — Coming soon** row (teaser).
 
 ## Accessibility
 
-- `play.home`, `as.modeHome.resume`, `as.modeHome.gettingStarted`, `as.modeHome.howToPlay`, `as.modeHome.ridgeLine`, `play.classicComingSoon`
+- `play.home`, `as.modeHome.resume`, `as.modeHome.howToPlay`, `as.modeHome.ridgeLine`, `play.classicComingSoon`, `play.classicSpotlight`, `play.changeGame`, `as.modeHome.ladder.info.<id>`, `as.modeHome.ladder.skipAheadHint`
 
 ## Verification
 

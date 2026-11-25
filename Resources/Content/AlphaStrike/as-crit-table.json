@@ -6,13 +6,13 @@
       "roll": 2,
       "id": "ammo",
       "title": "Ammo hit",
-      "effect": "Destroyed unless the card shows ENE, CASE, or CASEII."
+      "effect": "Destroyed, unless the card shows CASE (1 extra damage instead) or ENE / CASEII (no effect)."
     },
     {
       "roll": 3,
       "id": "engine",
       "title": "Engine hit",
-      "effect": "Gains 1 heat whenever it fires. A second engine hit destroys it."
+      "effect": "Gains 1 heat in the End Phase of any turn it fires. A second engine hit destroys it."
     },
     {
       "roll": 4,
@@ -30,19 +30,19 @@
       "roll": 6,
       "id": "weapon",
       "title": "Weapon hit",
-      "effect": "All damage values (S/M/L) drop by 1 (floor 0)."
+      "effect": "All damage values (S/M/L) drop by 1 (floor 0). If they are all 0 already, take 1 damage instead."
     },
     {
       "roll": 7,
       "id": "mp",
       "title": "MP hit",
-      "effect": "Halve MV and TMM, rounding down."
+      "effect": "Halve MV and TMM, rounding down, at least −2″ and −1 TMM. Each further MP hit halves again. At 0″ it is immobile."
     },
     {
       "roll": 8,
       "id": "weapon",
       "title": "Weapon hit",
-      "effect": "All damage values (S/M/L) drop by 1 (floor 0)."
+      "effect": "All damage values (S/M/L) drop by 1 (floor 0). If they are all 0 already, take 1 damage instead."
     },
     {
       "roll": 9,
@@ -60,7 +60,7 @@
       "roll": 11,
       "id": "engine",
       "title": "Engine hit",
-      "effect": "Gains 1 heat whenever it fires. A second engine hit destroys it."
+      "effect": "Gains 1 heat in the End Phase of any turn it fires. A second engine hit destroys it."
     },
     {
       "roll": 12,

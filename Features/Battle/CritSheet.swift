@@ -76,7 +76,7 @@ struct CritSheet: View {
                     StatusChip(kind: .critOwed(unit.criticalsOwed))
                 }
             }
-            Text("\(unit.side.displayName) rolls for their \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
+            Text("\(unit.side.other.displayName) rolls, as the side that hit the \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -190,14 +190,16 @@ struct CritSheet: View {
     private func explanation(for id: CritResultId) -> String {
         switch id {
         case .ammo:
-            unit.hasAmmoImmunity
-                ? "Ammo hit. This ’Mech has CASE or ENE, so it is not wrecked."
-                : "Ammo hit. Without CASE or ENE, this ’Mech is wrecked."
+            switch unit.ammoProtection {
+            case .full: "Ammo hit. This ’Mech has ENE or CASE II, so nothing happens."
+            case .caseOne: "Ammo hit. CASE saves it: it takes 1 extra damage instead."
+            case .none: "Ammo hit. Without CASE or ENE, this ’Mech is wrecked."
+            }
         case .engine: "Engine hit. A second one wrecks it, and later shots are harder."
         case .fireControl: "Fire control hit. Its shots get harder."
         case .none: "No critical."
-        case .weapon: "Weapon hit. Its damage goes down."
-        case .mp: "MP hit. It moves half as far. A second one stops it."
+        case .weapon: "Weapon hit. Its damage goes down by 1. If it already does no damage, it takes 1 damage instead."
+        case .mp: "MP hit. Move and TMM are halved. Each further MP hit halves them again. At 0″ it can’t move."
         case .destroyed: "Destroyed. It is wrecked, and it can still shoot this turn."
         }
     }

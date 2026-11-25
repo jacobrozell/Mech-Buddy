@@ -14,8 +14,8 @@ What the app exposes. Specs describe behavior; this file says whether code exist
 | Match session + hotseat | **shipped (code)** | 1.0.0 | `MatchReducer`, `BattleCoach`, SwiftData sessions |
 | SwiftData SchemaV1 | **shipped (code)** | 1.0.0 | `Persistence/SchemaV1/` |
 | App shell | **shipped (code)** | 0.2.0 | Four tabs, sidebar-adaptable, battle `fullScreenCover`. Version 0.2.0 (1) |
-| Play home | **shipped (code)** | 1.0.0 | Resume card, Ridge Line mission card. How to play and Getting Started are pushes |
-| Getting Started | **shipped (code)** | 1.0.0 | Six checks. `roster` is the Play Ridge Line button |
+| Play home | **shipped (code)** | 1.0.0 | Compact in-progress row and the mission path: nodes, Up next card, mission sheet with objectives, skip ahead and replay. How to play is a push |
+| Onboarding | **code** | 1.x | First-run flow: welcome, which BattleTech (Alpha Strike or Classic), what you have, first mission. Replaced Getting Started. See OnboardingSpec |
 | Ridge Line guided mission | **shipped (code)** | 1.0.0 | Table setup through victory |
 | Battle table + phase dock | **shipped (code)** | 1.0.0 | Header, read-only phase track, coach dock. Initiative is inline |
 | SATOR (physical 2D6 primary) | **shipped (code)** | 1.0.0 | Sheet title “Solve a shot”. Crit opens after the sheet dismisses |
@@ -25,8 +25,8 @@ What the app exposes. Specs describe behavior; this file says whether code exist
 | Settings + legal | **shipped (code)** | 1.0.0 | Dice default, haptics, keep screen awake, theme, delete at the bottom. No skill default. No tip jar |
 | Classic coming soon | **shipped (code)** | 1.0.0 | Sheet `classic.modeHome`. Not playable |
 | Free Battle | planned | **1.1** | Gated in 1.0 Release |
-| Full Lances | planned | 1.x | Gated |
-| Physical / OV / withdrawal | planned | 1.x | Resolver flags exist; Ridge Line leaves them off. No sheet controls |
+| Full Lances | **shipped (code)** | 1.4.0 | Mission 5 on the path. 4 vs 4, all eight box cards, Forced Withdrawal |
+| Physical / OV / withdrawal | partial | 1.x | Overheat picker in Running Hot; Punch or kick in Close Quarters; Withdrawing chip and Left the table in Full Lances. Off outside those missions |
 | Classic tools / guided | planned | post-1.0 | After the coming-soon sheet |
 | MUL network fetch | stub | dogfood | No paste UI in this build |
 | Match history | planned | 1.x | |

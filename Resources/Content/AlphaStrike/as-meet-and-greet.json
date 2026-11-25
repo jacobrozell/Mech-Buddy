@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "scenarioId": "meet-and-greet",
+  "title": "Meet and Greet",
+  "subtitle": "From the Alpha Strike box · 4 vs 2 · about 60 minutes",
+  "missionNumber": 6,
+  "introduces": [
+    "Clan ’Mechs",
+    "Better pilots",
+    "Heat attacks (HT)"
+  ],
+  "estimatedMinutes": 60,
+  "release": "1.5.0",
+  "ruleset": {
+    "overheatAllowed": true,
+    "physicalAttacksAllowed": true,
+    "forcedWithdrawal": true,
+    "maxTurns": 10,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 10
+    }
+  },
+  "coachNotes": [
+    "The Alpha Strike box’s own first scenario (Quick-Start Rulebook p. 26). A lance of Northwind Highlanders meets two Clan Jade Falcon scouts.",
+    "Side A has four Inner Sphere ’Mechs. Side B has two Clan OmniMechs with better pilots, so it is outnumbered but not outgunned.",
+    "New: better pilots. Skill is the base to-hit number, so a Skill 2 pilot hits on 2 less than a Skill 4 one. Better pilots cost more Point Value, which is why the two sides’ totals look uneven.",
+    "New: heat attacks (HT). The Pouncer’s HT1/1/- means a hit at short or medium range also gives the target 1 heat in the End Phase. A ’Mech takes at most 2 heat a turn this way, and it lands even if the target didn’t fire.",
+    "Forced Withdrawal is on, as in Full Lances: crippled ’Mechs head home, and leaving the table counts as destroyed."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Blackjack BJ-5",
+        "pv": 32,
+        "mv": "8\"j",
+        "tmm": 1,
+        "sz": 2,
+        "s": 2,
+        "m": 3,
+        "l": 3,
+        "ov": 0,
+        "armor": 5,
+        "structure": 2,
+        "skill": 3,
+        "abilities": "CASEII"
+      },
+      {
+        "name": "Phoenix Hawk PXH-4M",
+        "pv": 37,
+        "mv": "12\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 0,
+        "armor": 5,
+        "structure": 2,
+        "skill": 3,
+        "abilities": "ENE"
+      },
+      {
+        "name": "Wasp WSP-5A",
+        "pv": 17,
+        "mv": "16\"j",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 1,
+        "skill": 4,
+        "abilities": "CASEII"
+      },
+      {
+        "name": "Locust LCT-7V",
+        "pv": 25,
+        "mv": "20\"",
+        "tmm": 4,
+        "sz": 1,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 1,
+        "skill": 4,
+        "abilities": ""
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "Nova T",
+        "pv": 58,
+        "mv": "10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 6,
+        "m": 6,
+        "l": 0,
+        "ov": 0,
+        "armor": 5,
+        "structure": 3,
+        "skill": 2,
+        "abilities": "CASE, OMNI"
+      },
+      {
+        "name": "Pouncer T",
+        "pv": 35,
+        "mv": "12\"/10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 3,
+        "m": 3,
+        "l": 0,
+        "ov": 0,
+        "armor": 4,
+        "structure": 2,
+        "skill": 3,
+        "abilities": "ENE, HT1/1/-, OMNI"
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use an open table about 3 feet across. Measure in inches and ignore printed hexes.",
+    "Woods: each player takes four single trees. Side B places first, then take turns, each within 24 inches of the centre of the table. Each player puts three of their trees within 4 inches of each other to make a patch of woods. No other piece goes within 4 inches of another.",
+    "Each side’s own long table edge is its home edge. A crippled ’Mech must head back toward it.",
+    "Side A places two ’Mechs, at least 20 inches from the centre toward its edge. Then Side B places one the same way. Repeat, two for one, until all six are down.",
+    "Side B’s Nova and Pouncer are Clan OmniMechs. If you own the Alpha Strike box, their cards are in it; the app has the numbers too."
+  ],
+  "winningSummary": "Cripple or destroy every enemy ’Mech. A ’Mech that leaves the table counts as destroyed. The book has no turn limit; the app stops at 10 turns, and then the side with more Structure left wins."
+}

@@ -24,12 +24,23 @@ public protocol ContentSchemaVersioned {
 
 public protocol ContentCatalogRepository: Sendable {
     func gameModesManifest() throws -> GameModesManifestDTO
-    func ridgeLineScenario() throws -> RidgeLineScenarioDTO
+    /// The playable mission with this id. Throws when the catalog has no bundle for it (gated or unknown).
+    func scenario(id: ScenarioId) throws -> GuidedScenarioDTO
     func boxRoster() throws -> BoxRosterDTO
+    /// Boxes a player can own, for onboarding and the Force tab collection.
+    func boxSets() throws -> BoxSetsDTO
     func critTable() throws -> CritTableDTO
     func rulesTopics() throws -> RulesTopicsDTO
+    /// Alpha Strike, Classic, and the shared "how the games differ" pack, for the Rules tab.
+    func rulesLibrary() throws -> RulesLibrary
     func gettingStarted() throws -> GettingStartedDTO
     func scenarios() throws -> ScenariosCatalogDTO
+}
+
+public extension ContentCatalogRepository {
+    func ridgeLineScenario() throws -> GuidedScenarioDTO {
+        try scenario(id: .ridgeLine)
+    }
 }
 
 public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable {
@@ -47,12 +58,35 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("game-modes-manifest", subdirectory: "Content", as: GameModesManifestDTO.self)
     }
 
-    public func ridgeLineScenario() throws -> RidgeLineScenarioDTO {
-        try load("as-ridge-line", subdirectory: "Content/AlphaStrike", as: RidgeLineScenarioDTO.self)
+    public func scenario(id: ScenarioId) throws -> GuidedScenarioDTO {
+        let entry = try scenarios().scenarios.first { $0.id == id.rawValue }
+        guard let entry, !entry.gated, let bundleFile = entry.bundle else {
+            throw ContentLoadError.missingResource(id.rawValue)
+        }
+        let name = bundleFile.hasSuffix(".json") ? String(bundleFile.dropLast(5)) : bundleFile
+        let dto = try load(name, subdirectory: "Content/AlphaStrike", as: GuidedScenarioDTO.self)
+        guard dto.scenarioId == id.rawValue else {
+            throw ContentLoadError.decodingFailed("\(name): scenarioId \(dto.scenarioId) does not match \(id.rawValue)")
+        }
+        return dto
     }
 
     public func boxRoster() throws -> BoxRosterDTO {
         try load("as-box-roster", subdirectory: "Content/AlphaStrike", as: BoxRosterDTO.self)
+    }
+
+    /// Classic record sheets for the A Game of Armored Combat booklet. Not on the protocol until Classic ships.
+    public func classicSheets() throws -> ClassicSheetsDTO {
+        try load("classic-agoac-sheets", subdirectory: "Content/Classic", as: ClassicSheetsDTO.self)
+    }
+
+    /// Known maps for name suggestions. Not on the protocol: only the collection editor uses it.
+    public func mapCatalog() throws -> MapCatalogDTO {
+        try load("map-catalog", subdirectory: "Content", as: MapCatalogDTO.self)
+    }
+
+    public func boxSets() throws -> BoxSetsDTO {
+        try load("as-box-sets", subdirectory: "Content/AlphaStrike", as: BoxSetsDTO.self)
     }
 
     public func critTable() throws -> CritTableDTO {
@@ -61,6 +95,20 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
 
     public func rulesTopics() throws -> RulesTopicsDTO {
         try load("as-rules-topics", subdirectory: "Content/AlphaStrike", as: RulesTopicsDTO.self)
+    }
+
+    /// Classic BattleTech rules topics. Reading only: Classic isn't playable in the app yet.
+    public func classicRulesTopics() throws -> RulesTopicsDTO {
+        try load("classic-rules-topics", subdirectory: "Content/Classic", as: RulesTopicsDTO.self)
+    }
+
+    /// Pages tagged `both`, such as how the two games differ.
+    public func sharedRulesTopics() throws -> RulesTopicsDTO {
+        try load("rules-both-games", subdirectory: "Content", as: RulesTopicsDTO.self)
+    }
+
+    public func rulesLibrary() throws -> RulesLibrary {
+        RulesLibrary(packs: [try rulesTopics(), try classicRulesTopics(), try sharedRulesTopics()])
     }
 
     public func gettingStarted() throws -> GettingStartedDTO {
@@ -105,15 +153,15 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
     }
 }
 
-public enum RidgeLineFactory {
-    public static func makeUnits(from scenario: RidgeLineScenarioDTO) -> [MatchUnitState] {
+public enum GuidedScenarioFactory {
+    public static func makeUnits(from scenario: GuidedScenarioDTO) -> [MatchUnitState] {
         var units: [MatchUnitState] = []
         units += scenario.sides.lanceA.map { mapUnit($0, side: .lanceA) }
         units += scenario.sides.lanceB.map { mapUnit($0, side: .lanceB) }
         return units
     }
 
-    public static func mapRuleset(_ dto: RidgeRulesetDTO) -> ScenarioRuleset {
+    public static func mapRuleset(_ dto: ScenarioRulesetDTO) -> ScenarioRuleset {
         let victory: VictoryRule
         if dto.victory.type == "destroyAllEnemiesOrStructureAfterTurn",
            let maxTurn = dto.victory.maxTurn {
@@ -130,7 +178,7 @@ public enum RidgeLineFactory {
         )
     }
 
-    private static func mapUnit(_ dto: RidgeUnitDTO, side: SideId) -> MatchUnitState {
+    private static func mapUnit(_ dto: ScenarioUnitDTO, side: SideId) -> MatchUnitState {
         MatchUnitState(
             name: dto.name,
             side: side,

@@ -54,8 +54,9 @@ struct CriticalPendingStep: View {
 
     private var message: String {
         // Name the roller and say it is not a shot: players read "Roll two dice" as their attack.
-        let who = unit.side.displayName
-        return "\(unit.name) took structure damage. \(who) rolls two dice for its critical check — this is not a shot."
+        // The attacker rolls the critical (rulebook p. 23), so the other side picks up the dice.
+        let who = unit.side.other.displayName
+        return "\(unit.name) took a critical hit. \(who), the side that hit it, rolls two dice for the critical check — this is not a shot."
     }
 }
 

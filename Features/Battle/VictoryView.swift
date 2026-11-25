@@ -3,8 +3,21 @@ import UIKit
 import MechBuddyDomain
 
 struct VictoryView: View {
+    /// Where this match sits on the mission path, for the "Mission cleared" card.
+    struct MissionProgress: Equatable {
+        var number: Int
+        var total: Int
+        var cleared: Int
+        var nextTitle: String?
+        var nextUnlocks: [String]
+        var nextPlayable: Bool
+    }
+
     let session: MatchSession
+    var progress: MissionProgress? = nil
     let onRematch: () -> Void
+    var onNextMission: (() -> Void)? = nil
+    var onShowLog: (() -> Void)? = nil
     let onDone: () -> Void
     let onBack: () -> Void
 
@@ -18,6 +31,9 @@ struct VictoryView: View {
         ScrollView {
             VStack(spacing: TMSpace.xl) {
                 hero
+                if let progress {
+                    clearedCard(progress)
+                }
                 tally
                 if shotStats.shots > 0 {
                     statsCard
@@ -140,15 +156,16 @@ struct VictoryView: View {
                     accessibilityName: "\(unit.name) structure"
                 )
             } else {
+                // Left the table counts as destroyed (Forced Withdrawal), but say what happened.
                 HStack(spacing: TMSpace.xs) {
-                    Image(systemName: "flame.fill")
+                    Image(systemName: unit.leftTable ? "figure.walk.departure" : "flame.fill")
                         .accessibilityHidden(true)
-                    Text("Wrecked")
+                    Text(unit.leftTable ? "Left the table" : "Wrecked")
                         .font(TMFont.detail)
                 }
                 .foregroundStyle(.secondary)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(unit.name), wrecked")
+                .accessibilityLabel("\(unit.name), \(unit.leftTable ? "left the table" : "wrecked")")
             }
         }
     }
@@ -162,24 +179,105 @@ struct VictoryView: View {
                 Text("Shots \(stats.shots) · Hits \(stats.hits) (\(percent)%) · Crits \(stats.crits)")
                     .font(TMFont.body)
                     .monospacedDigit()
-                if let attacker = stats.bestAttacker, let target = stats.bestTarget, stats.bestDamage > 0 {
+                if !stats.killingBlows.isEmpty {
+                    ForEach(Array(stats.killingBlows.enumerated()), id: \.offset) { _, blow in
+                        Label(
+                            "\(short(blow.attacker)) wrecked the \(short(blow.target)) · turn \(blow.turn)",
+                            systemImage: "flame.fill"
+                        )
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                } else if let attacker = stats.bestAttacker, let target = stats.bestTarget, stats.bestDamage > 0 {
                     Text("Best shot: \(attacker) → \(target), \(stats.bestDamage) damage")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                if let onShowLog {
+                    Button(action: onShowLog) {
+                        HStack(spacing: TMSpace.xs) {
+                            Text("Full battle log")
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .accessibilityHidden(true)
+                        }
+                        .frame(minHeight: 44)
+                    }
+                    .font(TMFont.detail.weight(.semibold))
+                    .buttonStyle(.borderless)
+                    .accessibilityIdentifier("as.victory.log")
+                }
             }
         }
     }
 
+    private func clearedCard(_ progress: MissionProgress) -> some View {
+        TMCard {
+            VStack(alignment: .leading, spacing: TMSpace.md) {
+                HStack(spacing: TMSpace.sm) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.title2)
+                        .foregroundStyle(TMColor.signal)
+                        .tmSymbolBounce(value: didCelebrate)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                        Text("Mission \(progress.number) cleared")
+                            .font(TMFont.cardTitle)
+                        Text("\(progress.cleared) of \(progress.total) on the mission path")
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                HStack(spacing: TMSpace.xs) {
+                    ForEach(0..<max(progress.total, 1), id: \.self) { index in
+                        Capsule()
+                            .fill(index < progress.cleared ? TMColor.signal : TMColor.readout)
+                            .frame(height: 8)
+                    }
+                }
+                .accessibilityHidden(true)
+                if let next = progress.nextTitle {
+                    VStack(alignment: .leading, spacing: TMSpace.xs) {
+                        Text(progress.nextPlayable ? "Up next: \(next)" : "Coming soon: \(next)")
+                            .font(TMFont.detail.weight(.semibold))
+                        if !progress.nextUnlocks.isEmpty {
+                            UnlockChips(rules: progress.nextUnlocks)
+                        }
+                    }
+                } else {
+                    Text("That was the last mission. You’re a trained pilot.")
+                        .font(TMFont.detail.weight(.semibold))
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("as.victory.missionCleared")
+    }
+
     private var actions: some View {
         VStack(spacing: TMSpace.md) {
-            PrimaryActionButton(
-                title: "Play again",
-                tint: playAgainTint,
-                accessibilityIdentifier: "as.victory.rematch",
-                action: { confirmRematch = true }
-            )
+            if let onNextMission, let next = progress?.nextTitle, progress?.nextPlayable == true {
+                PrimaryActionButton(
+                    title: "Next: \(next)",
+                    tint: TMColor.signal,
+                    accessibilityIdentifier: "as.victory.nextMission",
+                    action: onNextMission
+                )
+                SecondaryActionButton(
+                    title: "Play again",
+                    accessibilityIdentifier: "as.victory.rematch",
+                    action: { confirmRematch = true }
+                )
+            } else {
+                PrimaryActionButton(
+                    title: "Play again",
+                    tint: playAgainTint,
+                    accessibilityIdentifier: "as.victory.rematch",
+                    action: { confirmRematch = true }
+                )
+            }
             SecondaryActionButton(
                 title: "Back to Play",
                 accessibilityIdentifier: "as.victory.done",
@@ -226,6 +324,9 @@ struct VictoryView: View {
             let enemies = session.units.filter { $0.side != side }
             let allDown = !enemies.isEmpty && enemies.allSatisfy { $0.combatStatus != .active }
             if allDown {
+                if enemies.contains(where: \.leftTable) {
+                    return "Every enemy ’Mech wrecked or withdrawn · \(turnPhrase)"
+                }
                 if enemies.count == 2 {
                     return "Both enemy ’Mechs destroyed · \(turnPhrase)"
                 }
@@ -247,9 +348,20 @@ struct VictoryView: View {
         return "Turn \(session.turn)"
     }
 
+    /// "Shadow Hawk SHD-2H" → "Shadow Hawk".
+    private func short(_ name: String) -> String {
+        PlayForceMath.shortName(name)
+    }
+
     /// Counts shots from the sentences MatchReducer already writes. No event-kind field.
     private var shotStats: ShotStats {
         var stats = ShotStats()
+        // Damage so far per target, to find the hit that wrecked each one.
+        var taken: [String: Int] = [:]
+        let toughness = Dictionary(
+            session.units.map { ($0.name, $0.armorCap + $0.structureCap) },
+            uniquingKeysWith: { first, _ in first }
+        )
         for event in session.eventLog {
             if event.message.hasPrefix("Crit ") {
                 stats.crits += 1
@@ -270,6 +382,11 @@ struct VictoryView: View {
             let target = afterHit.split(separator: " for ", maxSplits: 1).first.map(String.init) ?? ""
             let digits = event.message[damageRange.upperBound...].prefix(while: \.isNumber)
             let damage = Int(digits) ?? 0
+            let before = taken[target, default: 0]
+            taken[target] = before + damage
+            if let total = toughness[target], before < total, before + damage >= total {
+                stats.killingBlows.append(KillingBlow(attacker: attacker, target: target, turn: event.turn))
+            }
             if damage > stats.bestDamage {
                 stats.bestDamage = damage
                 stats.bestAttacker = attacker
@@ -280,7 +397,14 @@ struct VictoryView: View {
     }
 }
 
+private struct KillingBlow {
+    var attacker: String
+    var target: String
+    var turn: Int
+}
+
 private struct ShotStats {
+    var killingBlows: [KillingBlow] = []
     var shots = 0
     var hits = 0
     var crits = 0

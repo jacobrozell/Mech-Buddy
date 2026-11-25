@@ -9,6 +9,8 @@ struct InitiativeStep: View {
     @Binding var b2: Int?
     var diceMode: Binding<DiceMode>
     var onClear: () -> Void
+    /// Skip the roll: players pick who moves first.
+    var onAgree: ((SideId) -> Void)?
 
     private var manual: Bool { diceMode.wrappedValue == .manual }
 
@@ -32,6 +34,21 @@ struct InitiativeStep: View {
             }
             result
             DiceModeLink(mode: diceMode, accessibilityIdentifier: "as.battle.rollInit")
+            if let onAgree {
+                Menu {
+                    Section("Moving first gives the other side the advantage") {
+                        Button("Side A moves first") { onAgree(.lanceA) }
+                        Button("Side B moves first") { onAgree(.lanceB) }
+                    }
+                } label: {
+                    Label("Skip the roll — we’ll choose who moves first", systemImage: "hand.raised")
+                        .font(TMFont.detail.weight(.semibold))
+                        .multilineTextAlignment(.leading)
+                        .frame(minHeight: 44, alignment: .leading)
+                }
+                .accessibilityIdentifier("as.initiative.agree")
+                .accessibilityHint("For learning games. Pick which side moves first without rolling.")
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

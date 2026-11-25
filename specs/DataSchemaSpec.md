@@ -8,6 +8,7 @@ Persistence: **SwiftData** + `SchemaV1`… Content: versioned JSON bundles.
 Resources/Content/game-modes-manifest.json
 Resources/Content/AlphaStrike/as-ridge-line.json
 Resources/Content/AlphaStrike/as-box-roster.json
+Resources/Content/AlphaStrike/as-box-sets.json
 Resources/Content/AlphaStrike/as-crit-table.json
 Resources/Content/AlphaStrike/as-rules-topics.json
 Resources/Content/AlphaStrike/as-getting-started.json
@@ -110,6 +111,10 @@ Unknown `schemaVersion` → fail soft (empty content + error banner); do not cra
 ### `as-box-roster.json`
 
 Array of card seeds: `name`, `back`, `sz`, `defaultSide`, optional stats (nullable → user fills). Ridge Line four should match ridge-line stats when present.
+
+### `as-box-sets.json`
+
+Boxes a player can own (`BoxSetsDTO`, `ContentCatalogRepository.boxSets()`). Each box: `id`, `title`, `subtitle`, `game` (`alphaStrike` / `classic` / `both`), `miniCount`, `units` (names only, never card numbers), optional `requires` (box ids), `sourceURL`, `contentsConfirmed`. See [ContentPackSpec](ContentPackSpec.md#box-sets).
 
 ### `as-crit-table.json`
 

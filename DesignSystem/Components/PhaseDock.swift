@@ -22,10 +22,20 @@ struct PhaseDock: View {
     var containerIdentifier: String = "as.battle.phaseDock"
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Accessibility text sizes stack the buttons: side by side, "Done shooting" broke mid-word.
+    /// Landscape keeps the row, where height is scarcer than width.
+    private var stacks: Bool {
+        dynamicTypeSize.isAccessibilitySize && verticalSizeClass != .compact
+    }
 
     var body: some View {
         GlassEffectContainer(spacing: TMSpace.md) {
-            HStack(spacing: TMSpace.md) {
+            let layout = stacks
+                ? AnyLayout(VStackLayout(spacing: TMSpace.sm))
+                : AnyLayout(HStackLayout(spacing: TMSpace.md))
+            layout {
                 if let leadingTitle, let leadingAction {
                     SecondaryActionButton(
                         title: leadingTitle,

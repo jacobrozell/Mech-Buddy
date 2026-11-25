@@ -4,7 +4,7 @@ Types: [DomainModelSpec](../DomainModelSpec.md).
 
 ## User story
 
-Mid-Combat, pick attacker/target, build TN with SATOR, **enter physical 2D6**, apply damage, roll crit if owed.
+Mid-Combat, pick attacker/target, build TN with SATOR, **enter physical 2D6**, apply damage, roll crit if owed. In missions with `physicalAttacksAllowed` (Close Quarters), the same sheet solves a punch or kick.
 
 ### Damage resolver
 
@@ -24,9 +24,10 @@ Title **Solve a shot**. Large detent only, drag indicator visible. Presented fro
 ### Layout
 
 1. Pair picker when the attacker or target is still open (`as.sator.attacker`, `as.sator.target`). One legal shooter or one remaining target is preselected.
-2. Sticky header: “{attacker} → {target}” and `TNGauge`.
+2. Sticky header: “{attacker} → {target}” and the need line. A blocked attack shows its reason under it (`as.sator.blocked`).
+2a. **Attack** (`as.sator.attackKind`), only when `ruleset.physicalAttacksAllowed`: **Weapons** / **Punch or kick**, segmented; a menu at accessibility text sizes. A note under it (`as.sator.attackKind.note`): "One attack a turn: shoot or punch, not both." or, for a punch, reach, Size damage, "No range or heat", and "Charge and Death From Above are not in this mission." Changing the attacker resets it to Weapons.
 3. **Summary** chips from `TargetNumber.breakdown` (`S 4`, `A +0`, …). Tapping a chip shows that letter’s explanation and an equation line.
-4. Range control and **Target moved**.
+4. Range control (hidden for a punch or kick) and **Target moved**.
 5. **Conditions** chips.
 6. `DiceTray`, then `OutcomeBanner` once both faces are set.
 7. Damage preview card when the shot can hit. Before the dice, a wreck or critical is worded as what a hit would do. After a hit, the card states that result, including a critical on two 6s through armor. After a miss, the pips stay hypothetical and the card does not say a critical is owed or that the target is wrecked.
@@ -40,7 +41,7 @@ Attacker: `canAttackThisTurn` (not removed, not already shot, not sprint). Targe
 
 ### Conditions
 
-Chips, off until tapped: **Woods**, **Partial cover**, **Rear shot**.
+Chips, off until tapped: **Woods**, **Partial cover**, **Rear shot** (**Rear attack** for a punch). **Bases touching** (under More…) blocks weapon shots only and is hidden for a punch; when the mission allows punches the blocked shot reads "…Punch or kick instead."
 
 **More…** reveals two more chips, both **off by default** (`canSeeTarget` and `targetInFrontArc` start true):
 
@@ -49,7 +50,7 @@ Chips, off until tapped: **Woods**, **Partial cover**, **Rear shot**.
 | Can’t see the target | Blocks the shot (no line of sight) |
 | Behind the shooter | Blocks the shot (outside the front arc) |
 
-The helper line under More says to leave them off for a normal shot. Charge/DFA and overheat stay at the resolver defaults (off / 0) on this sheet. Heat, stealth, and fire-control hits are read from the units and show up in the summary chips when they change the TN.
+The helper line under More says to leave them off for a normal shot. Charge/DFA stay off on this sheet. Overheat has its own **Overheat** picker (`as.sator.overheat`) under Conditions, shown only when `ruleset.overheatAllowed` and the attacker has OV (see GuidedMissionSpec, Heat). Heat, stealth, and fire-control hits are read from the units and show up in the summary chips when they change the TN.
 
 ### Range and target move
 
@@ -113,6 +114,17 @@ Natural 12 is **not** auto-hit. If the entered roll is 12 **and** it hits (12 �
 
 Hit if `total >= tn && !autoMiss`. An auto-miss can be applied without faces (the reducer records 1 and 1).
 
+### Physical attack (punch or kick)
+
+`attackKind: .physical` on `CombatTableInsight` and `SATORAttackCommand` (`SATORAttackCommand.physical(...)`). Rulebook pp. 20–24:
+
+```
+tn = S + A + T + O(woods, partial cover)      // no R, no heat, no fire-control hits
+delivered = Size (+1 with MEL) + (rearHit ? 1 : 0)   // weapon hits and overheat don't change it
+```
+
+Blocked when the mission keeps physical attacks off ("Punches and kicks aren’t used in this mission."), when it can't see the target, the target is behind the attacker, or the attacker sprinted or is shut down. The card's no-damage range bands don't apply. Overheat is hidden and the reducer records 0. Damage, crits and the log follow the weapon path (see GuidedMissionSpec, Physical attacks).
+
 ### Damage
 
 ```
@@ -120,14 +132,14 @@ base = damage for active bracket (S/M/L field)
 delivered = base + (rearHit ? 1 : 0) + overheatUsed
 ```
 
-`overheatUsed` only if `ruleset.overheatAllowed` and bracket is short/medium, or long when card has OVL (`ovlAllowsLong`). Ridge Line: always 0 UI.
+`overheatUsed` only if `ruleset.overheatAllowed` and bracket is short/medium, or long when card has OVL (`ovlAllowsLong`). Ridge Line and Broken Ground: always 0, no picker. The reducer clamps to what is legal (`AlphaStrikeHeat.usableOverheat`) and records it as `overheatThisTurn`; it becomes heat in the End Phase.
 
 ### Apply damage
 
 1. Subtract from armor until 0, remainder to structure  
 2. `needsCritical` if any structure increased **or** (hit && natural12)  
 3. If structure full → `combatStatus = .destroyedPendingEnd`  
-4. Mark attacker `hasAttackedThisTurn = true`  
+4. Mark attacker `hasAttackedThisTurn = true` (weapon or punch: one attack a turn)  
 5. If `needsCritical`, dismiss this sheet. The battle step becomes the critical-pending coach, and **Roll critical** presents `as.critRoll`. Closing the crit sheet leaves the crit owed
 
 ---
@@ -172,7 +184,7 @@ More vectors welcome; these are the CI floor.
 
 ## Accessibility
 
-- `as.sator.sheet`, `.attacker`, `.target`, `.range`, `.tgtMove`
+- `as.sator.sheet`, `.attacker`, `.target`, `.attackKind`, `.attackKind.note`, `.blocked`, `.range`, `.tgtMove`
 - `as.sator.tnPreview`, `.tn`, `.outcome`
 - `as.sator.die1`, `.die2`, `.diceMode`, `.autoRoll`, `.resolve`, `.apply`
 - Pair cards: `as.sator.pick.attacker.{uuid}`, `as.sator.pick.target.{uuid}`

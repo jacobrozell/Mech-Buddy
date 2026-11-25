@@ -6,6 +6,8 @@ struct TableSetupStep: View {
     var scenario: ScenarioPresentation
     var canSwap: Bool
     var onSwap: () -> Void
+    /// Tag a miniature's colour. Nil hides the control (previews).
+    var onSetMini: ((UUID, MiniMarker?) -> Void)?
 
     @State private var checked: Set<Int> = []
     @Namespace private var sides
@@ -57,6 +59,18 @@ struct TableSetupStep: View {
                         sideCard(.lanceB)
                     }
                 }
+                if let skill = sharedSkill {
+                    // Printed cards leave Skill blank; players asked what to write there.
+                    Label("Every ’Mech uses Skill \(skill). Write it on the card’s blank Skill line.", systemImage: "pencil")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.mission.skill")
+                }
+            }
+
+            if !scenario.introduces.isEmpty {
+                newInThisMission
             }
 
             VStack(alignment: .leading, spacing: TMSpace.md) {
@@ -98,6 +112,42 @@ struct TableSetupStep: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// Missions after Ridge Line: what is new, plus the coach's tips for it.
+    private var newInThisMission: some View {
+        VStack(alignment: .leading, spacing: TMSpace.md) {
+            Eyebrow("New in this mission")
+            TMCard {
+                VStack(alignment: .leading, spacing: TMSpace.md) {
+                    Label {
+                        Text(scenario.introduces.joined(separator: " · "))
+                            .font(TMFont.cardTitle)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(TMColor.signal)
+                    }
+                    ForEach(Array(scenario.coachNotes.enumerated()), id: \.offset) { _, note in
+                        HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                            Image(systemName: "lightbulb")
+                                .font(TMFont.detail)
+                                .foregroundStyle(.secondary)
+                                .accessibilityHidden(true)
+                            Text(note)
+                                .font(TMFont.body)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
+        }
+        .accessibilityIdentifier("as.mission.newRules")
+    }
+
+    private var sharedSkill: Int? {
+        let skills = Set(session.units.map(\.skill))
+        return skills.count == 1 ? skills.first : nil
+    }
+
     private func sideCard(_ side: SideId) -> some View {
         let units = session.units.filter { $0.side == side }
         return TMCard(edgeColor: TMColor.side(side), isRaised: true) {
@@ -113,6 +163,9 @@ struct TableSetupStep: View {
                         Text(unit.name)
                             .font(TMFont.cardTitle)
                             .matchedGeometryEffect(id: unit.id, in: sides)
+                        if let onSetMini {
+                            MiniMarkerMenu(unitName: unit.name, marker: unit.mini) { onSetMini(unit.id, $0) }
+                        }
                         HealthReadout(
                             armorRemaining: unit.remainingArmor,
                             armorCapacity: unit.armorCap,
@@ -124,7 +177,8 @@ struct TableSetupStep: View {
                 }
             }
         }
-        .accessibilityElement(children: .combine)
+        // Contain, not combine, once the mini menus are there: VoiceOver must reach them.
+        .accessibilityElement(children: onSetMini == nil ? .combine : .contain)
         .accessibilityLabel(sideLabel(side, units: units))
     }
 

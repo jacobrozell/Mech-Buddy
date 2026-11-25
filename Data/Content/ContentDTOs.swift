@@ -30,21 +30,26 @@ public struct CapabilitiesDTO: Codable, Sendable {
     public var allowsMULPasteImport: Bool
 }
 
-public struct RidgeLineScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
+/// One ready-made guided mission (Ridge Line and the missions after it).
+public struct GuidedScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
     public var schemaVersion: Int
     public var contentVersion: String
     public var scenarioId: String
     public var title: String
     public var subtitle: String?
+    /// Place in the mission ladder, starting at 1. Omitted by older packs.
+    public var missionNumber: Int?
+    /// Short names of what this mission adds over the one before it. Empty for the first mission.
+    public var introduces: [String]?
     public var estimatedMinutes: Int?
-    public var ruleset: RidgeRulesetDTO
-    public var sides: RidgeSidesDTO
+    public var ruleset: ScenarioRulesetDTO
+    public var sides: ScenarioSidesDTO
     public var tableSteps: [String]
     public var winningSummary: String?
     public var coachNotes: [String]?
 }
 
-public struct RidgeRulesetDTO: Codable, Sendable {
+public struct ScenarioRulesetDTO: Codable, Sendable {
     public var overheatAllowed: Bool
     public var physicalAttacksAllowed: Bool
     public var forcedWithdrawal: Bool
@@ -57,12 +62,12 @@ public struct VictoryDTO: Codable, Sendable {
     public var maxTurn: Int?
 }
 
-public struct RidgeSidesDTO: Codable, Sendable {
-    public var lanceA: [RidgeUnitDTO]
-    public var lanceB: [RidgeUnitDTO]
+public struct ScenarioSidesDTO: Codable, Sendable {
+    public var lanceA: [ScenarioUnitDTO]
+    public var lanceB: [ScenarioUnitDTO]
 }
 
-public struct RidgeUnitDTO: Codable, Sendable {
+public struct ScenarioUnitDTO: Codable, Sendable {
     public var name: String
     public var pv: Int
     public var mv: String
@@ -76,6 +81,25 @@ public struct RidgeUnitDTO: Codable, Sendable {
     public var structure: Int
     public var skill: Int
     public var abilities: String
+
+    public init(
+        name: String, pv: Int, mv: String, tmm: Int, sz: Int, s: Int, m: Int, l: Int,
+        ov: Int, armor: Int, structure: Int, skill: Int, abilities: String
+    ) {
+        self.name = name
+        self.pv = pv
+        self.mv = mv
+        self.tmm = tmm
+        self.sz = sz
+        self.s = s
+        self.m = m
+        self.l = l
+        self.ov = ov
+        self.armor = armor
+        self.structure = structure
+        self.skill = skill
+        self.abilities = abilities
+    }
 }
 
 public struct BoxRosterDTO: Codable, Sendable, ContentSchemaVersioned {
@@ -120,6 +144,13 @@ public struct RulesTopicsDTO: Codable, Sendable, ContentSchemaVersioned {
     public var contentVersion: String
     public var disclaimer: String?
     public var topics: [RulesTopicDTO]
+
+    public init(schemaVersion: Int, contentVersion: String, disclaimer: String?, topics: [RulesTopicDTO]) {
+        self.schemaVersion = schemaVersion
+        self.contentVersion = contentVersion
+        self.disclaimer = disclaimer
+        self.topics = topics
+    }
 }
 
 public struct RulesTopicDTO: Codable, Sendable, Identifiable {
@@ -130,12 +161,37 @@ public struct RulesTopicDTO: Codable, Sendable, Identifiable {
     public var summary: String?
     /// `start`, `during`, or `reference`. Omitted by older packs; the rules list maps by topic id.
     public var group: String?
+    /// Which game the topic belongs to. Every bundled topic sets it; the content tests check.
+    public var game: RulesGameTag?
     public var sections: [RulesSectionDTO]
+
+    public init(
+        id: String,
+        title: String,
+        screenId: String? = nil,
+        summary: String? = nil,
+        group: String? = nil,
+        game: RulesGameTag? = nil,
+        sections: [RulesSectionDTO]
+    ) {
+        self.id = id
+        self.title = title
+        self.screenId = screenId
+        self.summary = summary
+        self.group = group
+        self.game = game
+        self.sections = sections
+    }
 }
 
 public struct RulesSectionDTO: Codable, Sendable {
     public var heading: String
     public var body: String
+
+    public init(heading: String, body: String) {
+        self.heading = heading
+        self.body = body
+    }
 }
 
 public struct GettingStartedDTO: Codable, Sendable, ContentSchemaVersioned {
@@ -161,8 +217,101 @@ public struct ScenarioCatalogItemDTO: Codable, Sendable, Identifiable {
     public var id: String
     public var title: String
     public var subtitle: String?
+    /// Place in the mission ladder, starting at 1.
+    public var missionNumber: Int?
+    /// What this mission adds over the one before it.
+    public var introduces: [String]?
     public var bundle: String?
     public var release: String?
     public var gated: Bool
     public var comingSoonSummary: String?
+    /// SF Symbol for the mission's node on the Play path.
+    public var icon: String?
+    /// `nil` for the training path. Otherwise the title of a later section, such as
+    /// "From the Alpha Strike box", shown below the training path's trophy.
+    public var stage: String?
+}
+
+/// `as-box-sets.json`: the boxes a player can say they own. Unit names only, never card numbers.
+public struct BoxSetsDTO: Codable, Sendable, ContentSchemaVersioned {
+    public var schemaVersion: Int
+    public var contentVersion: String
+    public var sourceNote: String?
+    public var boxes: [BoxSetDTO]
+    /// Mission chassis → closest minis from other boxes, best first. Optional in older files.
+    public var standIns: [String: [String]]?
+}
+
+/// `map-catalog.json`: known mapsheets and BattleMats by product, for map name suggestions.
+public struct MapCatalogDTO: Codable, Sendable, ContentSchemaVersioned {
+    public struct Product: Codable, Sendable, Equatable {
+        public var name: String
+        public var year: Int?
+        public var maps: [String]
+    }
+
+    public var schemaVersion: Int
+    public var contentVersion: String
+    public var sourceNote: String?
+    public var products: [Product]
+
+    /// Every map name once, in catalog order (first spelling wins, compared ignoring case).
+    public var allMaps: [String] {
+        var seen = Set<String>()
+        return products.flatMap(\.maps).filter { seen.insert($0.lowercased()).inserted }
+    }
+
+    /// Up to `limit` names containing `text` (ignoring case), names that start with it first.
+    public func suggestions(for text: String, limit: Int = 5) -> [String] {
+        let query = text.trimmingCharacters(in: .whitespaces).lowercased()
+        guard query.count >= 2 else { return [] }
+        let hits = allMaps.filter { $0.lowercased().contains(query) }
+        let starts = hits.filter { $0.lowercased().hasPrefix(query) }
+        let rest = hits.filter { !$0.lowercased().hasPrefix(query) }
+        return Array((starts + rest).prefix(limit))
+    }
+}
+
+public struct BoxSetDTO: Codable, Sendable, Identifiable, Equatable {
+    public enum Game: String, Codable, Sendable {
+        case alphaStrike
+        case classic
+        case both
+    }
+
+    public var id: String
+    public var title: String
+    public var subtitle: String
+    public var game: Game
+    /// Miniatures in the box, vehicles included. Can be more than `units` when the list isn't confirmed.
+    public var miniCount: Int
+    /// Unit names as printed. A variant code is kept when the publisher states it.
+    public var units: [String]
+    /// Box ids this one needs to play (Mercenaries needs A Game of Armored Combat).
+    public var requires: [String]?
+    public var sourceURL: String
+    /// False when the unit list isn't confirmed: `units` is empty and the player adds them by hand.
+    public var contentsConfirmed: Bool
+    /// Paper maps in the box, one name per printed side, as printed. `nil` when the names aren't known.
+    public var maps: [String]?
+    /// Map sheets in the box (a double-sided sheet counts once), shown when `maps` is unknown.
+    public var mapSheets: Int?
+
+    public init(
+        id: String, title: String, subtitle: String, game: Game, miniCount: Int,
+        units: [String], requires: [String]? = nil, sourceURL: String, contentsConfirmed: Bool,
+        maps: [String]? = nil, mapSheets: Int? = nil
+    ) {
+        self.maps = maps
+        self.mapSheets = mapSheets
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.game = game
+        self.miniCount = miniCount
+        self.units = units
+        self.requires = requires
+        self.sourceURL = sourceURL
+        self.contentsConfirmed = contentsConfirmed
+    }
 }

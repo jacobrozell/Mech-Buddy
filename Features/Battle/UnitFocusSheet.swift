@@ -7,8 +7,23 @@ struct UnitFocusSheet: View {
     var isReadOnly: Bool = false
     var onResolveAttack: (() -> Void)?
     var onRollCrit: (() -> Void)?
+    /// Forced Withdrawal missions: record that this ’Mech drove off the table.
+    var onLeftTable: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
+    @State private var confirmLeave = false
+
+    /// `unit` is the snapshot the sheet opened with; the session is live.
+    private var live: MatchUnitState {
+        session.units.first { $0.id == unit.id } ?? unit
+    }
+
+    private var offersLeaveTable: Bool {
+        !isReadOnly
+            && onLeftTable != nil
+            && session.ruleset.forcedWithdrawal
+            && live.combatStatus == .active
+    }
 
     var body: some View {
         NavigationStack {
@@ -46,6 +61,9 @@ struct UnitFocusSheet: View {
                 }
                 if !isReadOnly {
                     thisTurn
+                }
+                if offersLeaveTable {
+                    leaveTable
                 }
                 if !abilitiesLine.isEmpty {
                     VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -108,7 +126,7 @@ struct UnitFocusSheet: View {
                     StatusChip(kind: .recordedCrit(title: "Fire control ×\(unit.crits.fireControlHits)", systemImage: "scope"))
                 }
                 if unit.crits.mpHit {
-                    StatusChip(kind: .recordedCrit(title: "Motive", systemImage: "figure.walk"))
+                    StatusChip(kind: .recordedCrit(title: "MP hit", systemImage: "figure.walk"))
                 }
             }
             if !critNotes.isEmpty {
@@ -153,6 +171,56 @@ struct UnitFocusSheet: View {
         }
     }
 
+    private var withdrawalNote: String {
+        guard session.mustWithdraw(live) else {
+            return "A ’Mech that leaves the table counts as destroyed and can’t come back."
+        }
+        if live.isImmobile {
+            return "Crippled, but it can’t move. You can still shoot."
+        }
+        return "Crippled: move toward your own edge. You can still shoot. Off the table, it counts as destroyed."
+    }
+
+    private var leaveTable: some View {
+        let blocked = session.leaveTableBlockReason(live)
+        return VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Eyebrow("Forced Withdrawal")
+            Text(withdrawalNote)
+                .font(TMFont.body)
+                .fixedSize(horizontal: false, vertical: true)
+            Button(role: .destructive) {
+                confirmLeave = true
+            } label: {
+                Label("Left the table", systemImage: "figure.walk.departure")
+                    .font(TMFont.body.weight(.semibold))
+                    .frame(minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .disabled(blocked != nil)
+            .accessibilityIdentifier("as.unitFocus.leftTable")
+            .accessibilityHint("Asks first. It then counts as destroyed.")
+            if let blocked {
+                Text(blocked)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .confirmationDialog(
+            "Did \(unit.name) leave the table?",
+            isPresented: $confirmLeave,
+            titleVisibility: .visible
+        ) {
+            Button("Left the table", role: .destructive) {
+                onLeftTable?()
+                dismiss()
+            }
+            Button("Keep it on the table", role: .cancel) {}
+        } message: {
+            Text("It counts as destroyed and can’t come back. Only Undo puts it back.")
+        }
+    }
+
     private func actionBar(_ action: FocusAction) -> some View {
         GlassEffectContainer(spacing: TMSpace.md) {
             PrimaryActionButton(
@@ -174,7 +242,9 @@ struct UnitFocusSheet: View {
     private var headerChip: StatusChip.Kind? {
         if unit.criticalsOwed > 0 { return .critOwed(unit.criticalsOwed) }
         if unit.combatStatus == .destroyedPendingEnd { return .wrecked }
+        if unit.isShutdown { return .shutdown }
         if unit.isImmobile { return .immobile }
+        if session.mustWithdraw(live) { return .withdrawing }
         if unit.movementMode == .sprint { return .sprinted }
         return nil
     }
@@ -195,7 +265,7 @@ struct UnitFocusSheet: View {
             lines.append("Fire control adds 2 to its shots.")
         }
         if unit.crits.mpHit {
-            lines.append("A motive hit halves move and harder to hit.")
+            lines.append("An MP hit halves move and TMM.")
         }
         if unit.crits.engineHits > 0 {
             lines.append("A second engine hit wrecks it.")
@@ -220,9 +290,11 @@ struct UnitFocusSheet: View {
                 label: "MV",
                 value: marked(unit.effectiveMV, changed: unit.effectiveMV != unit.mv),
                 helpTitle: "Move",
-                helpBody: unit.crits.mpHit
-                    ? "Halved by a motive hit."
-                    : "Inches this ’Mech can walk or jump."
+                helpBody: unit.heat > 0
+                    ? "Heat takes 2″ per level off walking and sprinting. Jumping is not affected."
+                    : unit.crits.mpHit
+                        ? "Halved by an MP hit."
+                        : "Inches this ’Mech can walk or jump."
             ),
             StatCell(
                 id: "tmm",
@@ -230,7 +302,7 @@ struct UnitFocusSheet: View {
                 value: marked("\(unit.effectiveTMM)", changed: unit.effectiveTMM != unit.tmm),
                 helpTitle: "Harder to hit",
                 helpBody: unit.crits.mpHit
-                    ? "Halved by a motive hit."
+                    ? "Halved by an MP hit."
                     : "Added to shots against this ’Mech."
             ),
             StatCell(id: "skl", label: "SKL", value: "\(unit.skill)"),
@@ -243,7 +315,7 @@ struct UnitFocusSheet: View {
                     ? "−\(weaponHits) from \(weaponHits == 1 ? "a weapon hit" : "weapon hits")."
                     : "Short, medium, and long range damage."
             )
-        ]
+        ] + StatCell.heat(for: unit)
     }
 
     private func marked(_ value: String, changed: Bool) -> String {
@@ -262,7 +334,6 @@ struct UnitFocusSheet: View {
         }
         if session.phase == .combat,
            !session.units.contains(where: \.pendingCritical),
-           unit.side == session.activeSide,
            unit.canAttackThisTurn,
            let onResolveAttack {
             return FocusAction(
@@ -290,7 +361,8 @@ private struct FocusAction {
         session: PreviewFixtures.session(),
         isReadOnly: false,
         onResolveAttack: {},
-        onRollCrit: {}
+        onRollCrit: {},
+        onLeftTable: {}
     )
 }
 #endif

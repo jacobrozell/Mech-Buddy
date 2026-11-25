@@ -15,6 +15,10 @@ Skill default: **4** for all unless edited.
 | Lance B | Wolverine WVR-6M | 32 | 10"j | 2 | 2 | 2 | 2 | 0 | 1 | 6 | 5 | — |
 | Lance B | Locust LCT-1V | 18 | 16" | 3 | 1 | 1 | 1 | 0 | 0 | 2 | 2 | — |
 
+## Broken Ground forces (mission 2)
+
+Same four checked cards, new pairings: Lance A Shadow Hawk SHD-2H + Locust LCT-1V; Lance B Wolverine WVR-6M + Commando COM-2D. Numbers are copied from Ridge Line and a test keeps them equal.
+
 ## Box roster seed (names / sides / size)
 
 | Name (front) | Back variant | SZ | Default side |
