@@ -20,7 +20,7 @@ Status legend: `[ ]` todo · `[x]` done
 Done since 1.0.0 (2): Meet and Greet (box scenario), HT heat attacks, PV by skill, REAR rear-firing weapons (BattleMaster, Archer), Rules tab split by game, Classic record sheets and engine start.
 
 **Polish first (existing Alpha Strike features):**
-- [ ] Play Ridge Line through Full Lances at the table on a new TestFlight build (bump `CURRENT_PROJECT_VERSION` to 3). Note issues in `ongoing/play-<date>/NOTES.md`.
+- [ ] Play Ridge Line through Full Lances at the table on TestFlight 1.0.0 (3) (archived 2026-11-24). Note issues in `ongoing/play-<date>/NOTES.md`.
 - [ ] Rear weapons in the shot picker: check on screen in portrait, landscape and the largest text size (Missions 4–5 BattleMaster). Not checked yet.
 - [ ] Victory screen: never seen on screen. Finish a short match and check it.
 - [ ] Mission 5 withdrawal screens and the Close Quarters punch control in landscape: check on screen.
