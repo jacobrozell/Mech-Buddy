@@ -64,8 +64,12 @@ force.collection.addButton
 force.collection.cancel
 force.collection.done
 rules.home
-rules.as.{topicId}
-rules.as.detail.{topicId}
+rules.gamePicker
+rules.game.{alphaStrike|classic}
+rules.classicNote
+rules.{as|classic|both}.{topicId}
+rules.{as|classic|both}.detail.{topicId}
+rules.topic.game
 settings.home
 settings.onboarding
 settings.deleteAll

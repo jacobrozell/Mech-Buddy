@@ -31,6 +31,8 @@ public protocol ContentCatalogRepository: Sendable {
     func boxSets() throws -> BoxSetsDTO
     func critTable() throws -> CritTableDTO
     func rulesTopics() throws -> RulesTopicsDTO
+    /// Alpha Strike, Classic, and the shared "how the games differ" pack, for the Rules tab.
+    func rulesLibrary() throws -> RulesLibrary
     func gettingStarted() throws -> GettingStartedDTO
     func scenarios() throws -> ScenariosCatalogDTO
 }
@@ -93,6 +95,20 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
 
     public func rulesTopics() throws -> RulesTopicsDTO {
         try load("as-rules-topics", subdirectory: "Content/AlphaStrike", as: RulesTopicsDTO.self)
+    }
+
+    /// Classic BattleTech rules topics. Reading only: Classic isn't playable in the app yet.
+    public func classicRulesTopics() throws -> RulesTopicsDTO {
+        try load("classic-rules-topics", subdirectory: "Content/Classic", as: RulesTopicsDTO.self)
+    }
+
+    /// Pages tagged `both`, such as how the two games differ.
+    public func sharedRulesTopics() throws -> RulesTopicsDTO {
+        try load("rules-both-games", subdirectory: "Content", as: RulesTopicsDTO.self)
+    }
+
+    public func rulesLibrary() throws -> RulesLibrary {
+        RulesLibrary(packs: [try rulesTopics(), try classicRulesTopics(), try sharedRulesTopics()])
     }
 
     public func gettingStarted() throws -> GettingStartedDTO {

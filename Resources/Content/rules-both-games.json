@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "topics": [
+    {
+      "id": "differences",
+      "title": "How the two games differ",
+      "screenId": "rules.both.differences",
+      "summary": "Cards or record sheets, inches or hexes.",
+      "group": "start",
+      "game": "both",
+      "sections": [
+        {
+          "heading": "The same at heart",
+          "body": "Both games roll two dice against a target number, move the initiative loser first, land damage at the end of the phase, and chip armor before structure. Learning one helps with the other."
+        },
+        {
+          "heading": "Cards or record sheets",
+          "body": "Alpha Strike: one card per ’Mech with Move, damage, Armor, and Structure.\nClassic: a full record sheet — every weapon, armor for each body location, critical slots, a heat scale, and pilot wounds."
+        },
+        {
+          "heading": "Inches or hexes",
+          "body": "Alpha Strike: a tape measure on any table. Range is 6, 24, and 42 inches.\nClassic: a hex map. Each hex costs MP, turning costs MP, and each weapon has its own range in hexes."
+        },
+        {
+          "heading": "One damage number or every weapon",
+          "body": "Alpha Strike: one roll per ’Mech, and the card gives the damage at that range.\nClassic: each weapon rolls to hit, each hit rolls a location, and missiles roll how many hit."
+        },
+        {
+          "heading": "Moving and shooting",
+          "body": "Alpha Strike: standing still makes your shot easier (−1), jumping +2, and the target’s “harder to hit” number is on its card.\nClassic: standing still +0, walking +1, running +2, jumping +3, and the target’s modifier comes from how many hexes it moved."
+        },
+        {
+          "heading": "Heat 0–4 or a 30-point scale",
+          "body": "Alpha Strike: heat only comes from overheating and engine hits, from 0 to 4. At 4 you shut down.\nClassic: every weapon and every move makes heat, heat sinks take it off, and a 30-point scale slows you, spoils your aim, and can shut you down or blow your ammo."
+        },
+        {
+          "heading": "Criticals and falling",
+          "body": "Alpha Strike: one roll on one critical table, and ’Mechs never fall over.\nClassic: criticals hit specific slots — engine, gyro, actuators, ammo — and Piloting rolls decide whether a ’Mech falls."
+        },
+        {
+          "heading": "Punches and kicks",
+          "body": "Alpha Strike: one punch or kick for your Size in damage.\nClassic: punch, kick, push, charge, and death from above, with damage from the ’Mech’s tonnage."
+        },
+        {
+          "heading": "Time at the table",
+          "body": "Alpha Strike: about an hour for 4 vs 4.\nClassic: a few hours a game."
+        },
+        {
+          "heading": "In Mech Buddy",
+          "body": "Alpha Strike is playable now, mission by mission. Classic isn’t playable yet; its rules are here to read."
+        }
+      ]
+    }
+  ]
+}
