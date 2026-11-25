@@ -1,0 +1,3128 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "sourceNote": "Per-location data (armor per location incl. rear, internal structure, weapon locations/rear mounts, ammo bins, crit slots, heat sinks, MP, BV) transcribed from the official free record sheet booklet 'BattleTech Record Sheets: A Game of Armored Combat' (battletech.com/downloads, 'RS AGoAC Epub 1-26-19a'; 15 sheets, PDF pp. 2-16). Head internal structure is not printed on the sheets and comes from the AGOAC p. 50 Internal Structure Table. Engine ratings and chassis descriptions from Sarna chassis pages (fetched 2026-11-24); MUL was unreachable. Weapons table from AGOAC rulebook p. 55. Extra fields vs. schema: rulesLevel, engine, armorTons, armorTotalPoints (sum of sheet armor), maxArmor. Crit 'Roll Again' = empty slot as printed on the sheet.",
+  "weapons": [
+    {
+      "name": "Large Laser",
+      "heat": 8,
+      "damage": 8,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 0,
+      "short": 5,
+      "medium": 10,
+      "long": 15,
+      "ammoPerTon": null,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "Medium Laser",
+      "heat": 3,
+      "damage": 5,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 0,
+      "short": 3,
+      "medium": 6,
+      "long": 9,
+      "ammoPerTon": null,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "Small Laser",
+      "heat": 1,
+      "damage": 3,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 0,
+      "short": 1,
+      "medium": 2,
+      "long": 3,
+      "ammoPerTon": null,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "Flamer",
+      "heat": 3,
+      "damage": 2,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 0,
+      "short": 1,
+      "medium": 2,
+      "long": 3,
+      "ammoPerTon": null,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "PPC",
+      "heat": 10,
+      "damage": 10,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 3,
+      "short": 6,
+      "medium": 12,
+      "long": 18,
+      "ammoPerTon": null,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "AC/5",
+      "heat": 1,
+      "damage": 5,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 3,
+      "short": 6,
+      "medium": 12,
+      "long": 18,
+      "ammoPerTon": 20,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "Machine Gun",
+      "heat": 0,
+      "damage": 2,
+      "damagePerMissile": null,
+      "rackSize": null,
+      "minRange": 0,
+      "short": 1,
+      "medium": 2,
+      "long": 3,
+      "ammoPerTon": 200,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "LRM 5",
+      "heat": 2,
+      "damage": null,
+      "damagePerMissile": 1,
+      "rackSize": 5,
+      "minRange": 6,
+      "short": 7,
+      "medium": 14,
+      "long": 21,
+      "ammoPerTon": 24,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "LRM 10",
+      "heat": 4,
+      "damage": null,
+      "damagePerMissile": 1,
+      "rackSize": 10,
+      "minRange": 6,
+      "short": 7,
+      "medium": 14,
+      "long": 21,
+      "ammoPerTon": 12,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "LRM 15",
+      "heat": 5,
+      "damage": null,
+      "damagePerMissile": 1,
+      "rackSize": 15,
+      "minRange": 6,
+      "short": 7,
+      "medium": 14,
+      "long": 21,
+      "ammoPerTon": 8,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "SRM 2",
+      "heat": 2,
+      "damage": null,
+      "damagePerMissile": 2,
+      "rackSize": 2,
+      "minRange": 0,
+      "short": 3,
+      "medium": 6,
+      "long": 9,
+      "ammoPerTon": 50,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "SRM 4",
+      "heat": 3,
+      "damage": null,
+      "damagePerMissile": 2,
+      "rackSize": 4,
+      "minRange": 0,
+      "short": 3,
+      "medium": 6,
+      "long": 9,
+      "ammoPerTon": 25,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    },
+    {
+      "name": "SRM 6",
+      "heat": 4,
+      "damage": null,
+      "damagePerMissile": 2,
+      "rackSize": 6,
+      "minRange": 0,
+      "short": 3,
+      "medium": 6,
+      "long": 9,
+      "ammoPerTon": 15,
+      "source": "AGOAC p. 55 (Weapons and Equipment Table; PDF p. 57)"
+    }
+  ],
+  "units": [
+    {
+      "id": "LCT-1V",
+      "chassis": "Locust",
+      "model": "LCT-1V",
+      "tonnage": 20,
+      "techBase": "Inner Sphere",
+      "bv": 432,
+      "walk": 8,
+      "run": 12,
+      "jump": 0,
+      "heatSinks": {
+        "count": 10,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 160,
+        "type": "Fusion"
+      },
+      "armorTons": 4,
+      "armorTotalPoints": 64,
+      "maxArmor": 69,
+      "armor": {
+        "HD": 8,
+        "CT": 10,
+        "CTR": 2,
+        "LT": 8,
+        "LTR": 2,
+        "RT": 8,
+        "RTR": 2,
+        "LA": 4,
+        "RA": 4,
+        "LL": 8,
+        "RL": 8
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 6,
+        "LT": 5,
+        "RT": 5,
+        "LA": 3,
+        "RA": 3,
+        "LL": 4,
+        "RL": 4
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "CT",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "Machine Gun",
+          "location": "CT",
+          "shots": 200
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Medium Laser",
+          "Ammo (Machine Gun) 200"
+        ],
+        "LT": [
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Machine Gun",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Machine Gun",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Locust",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 3"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet resolves Sarna ambiguity: MGs are arm-mounted (RA, LA); ML in CT; MG ammo (200) in CT",
+        "arms have no lower arm/hand actuators on the sheet (Shoulder + Upper Arm only)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 3"
+      ]
+    },
+    {
+      "id": "LCT-1E",
+      "chassis": "Locust",
+      "model": "LCT-1E",
+      "tonnage": 20,
+      "techBase": "Inner Sphere",
+      "bv": 553,
+      "walk": 8,
+      "run": 12,
+      "jump": 0,
+      "heatSinks": {
+        "count": 10,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 160,
+        "type": "Fusion"
+      },
+      "armorTons": 4,
+      "armorTotalPoints": 64,
+      "maxArmor": 69,
+      "armor": {
+        "HD": 8,
+        "CT": 10,
+        "CTR": 2,
+        "LT": 8,
+        "LTR": 2,
+        "RT": 8,
+        "RTR": 2,
+        "LA": 4,
+        "RA": 4,
+        "LL": 8,
+        "RL": 8
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 6,
+        "LT": 5,
+        "RT": 5,
+        "LA": 3,
+        "RA": 3,
+        "LL": 4,
+        "RL": 4
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Small Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LA",
+          "rear": false
+        },
+        {
+          "name": "Small Laser",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LT": [
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Medium Laser",
+          "Small Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Medium Laser",
+          "Small Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Locust",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 2"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet resolves laser split: ML + SL in each arm; heat sinks 10 confirmed (2 per leg)",
+        "arms have no lower arm/hand actuators on the sheet (Shoulder + Upper Arm only)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 2"
+      ]
+    },
+    {
+      "id": "COM-2D",
+      "chassis": "Commando",
+      "model": "COM-2D",
+      "tonnage": 25,
+      "techBase": "Inner Sphere",
+      "bv": 541,
+      "walk": 6,
+      "run": 9,
+      "jump": 0,
+      "heatSinks": {
+        "count": 10,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 150,
+        "type": "Fusion"
+      },
+      "armorTons": 4,
+      "armorTotalPoints": 64,
+      "maxArmor": 89,
+      "armor": {
+        "HD": 6,
+        "CT": 8,
+        "CTR": 4,
+        "LT": 6,
+        "LTR": 3,
+        "RT": 6,
+        "RTR": 3,
+        "LA": 6,
+        "RA": 6,
+        "LL": 8,
+        "RL": 8
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 8,
+        "LT": 6,
+        "RT": 6,
+        "LA": 4,
+        "RA": 4,
+        "LL": 6,
+        "RL": 6
+      },
+      "weapons": [
+        {
+          "name": "SRM 6",
+          "location": "CT",
+          "rear": false
+        },
+        {
+          "name": "SRM 4",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "SRM 6",
+          "location": "LT",
+          "shots": 15
+        },
+        {
+          "weapon": "SRM 4",
+          "location": "RT",
+          "shots": 25
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "SRM 6",
+          "SRM 6"
+        ],
+        "LT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Ammo (SRM 6) 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Ammo (SRM 4) 25",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "SRM 4",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Commando",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 4"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet confirms 1 t SRM 6 (15, LT) + 1 t SRM 4 (25, RT)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 4"
+      ]
+    },
+    {
+      "id": "COM-3A",
+      "chassis": "Commando",
+      "model": "COM-3A",
+      "tonnage": 25,
+      "techBase": "Inner Sphere",
+      "bv": 540,
+      "walk": 6,
+      "run": 9,
+      "jump": 0,
+      "heatSinks": {
+        "count": 10,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 150,
+        "type": "Fusion"
+      },
+      "armorTons": 3,
+      "armorTotalPoints": 48,
+      "maxArmor": 89,
+      "armor": {
+        "HD": 4,
+        "CT": 6,
+        "CTR": 4,
+        "LT": 4,
+        "LTR": 3,
+        "RT": 4,
+        "RTR": 3,
+        "LA": 4,
+        "RA": 4,
+        "LL": 6,
+        "RL": 6
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 8,
+        "LT": 6,
+        "RT": 6,
+        "LA": 4,
+        "RA": 4,
+        "LL": 6,
+        "RL": 6
+      },
+      "weapons": [
+        {
+          "name": "SRM 6",
+          "location": "CT",
+          "rear": false
+        },
+        {
+          "name": "Flamer",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "SRM 6",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "SRM 6",
+          "location": "RT",
+          "shots": 15
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "SRM 6",
+          "SRM 6"
+        ],
+        "LT": [
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Ammo (SRM 6) 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "SRM 6",
+          "SRM 6",
+          "Flamer",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Commando",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 5"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "correction vs draft: sheet has 1 ammo bin, SRM 6 15 shots in RT (draft listed no ammo); heat sinks 10 confirmed",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 5"
+      ]
+    },
+    {
+      "id": "GRF-1N",
+      "chassis": "Griffin",
+      "model": "GRF-1N",
+      "tonnage": 55,
+      "techBase": "Inner Sphere",
+      "bv": 1272,
+      "walk": 5,
+      "run": 8,
+      "jump": 5,
+      "heatSinks": {
+        "count": 12,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 275,
+        "type": "Fusion"
+      },
+      "armorTons": 9.5,
+      "armorTotalPoints": 152,
+      "maxArmor": 185,
+      "armor": {
+        "HD": 9,
+        "CT": 20,
+        "CTR": 7,
+        "LT": 20,
+        "LTR": 6,
+        "RT": 20,
+        "RTR": 6,
+        "LA": 14,
+        "RA": 14,
+        "LL": 18,
+        "RL": 18
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 18,
+        "LT": 13,
+        "RT": 13,
+        "LA": 9,
+        "RA": 9,
+        "LL": 13,
+        "RL": 13
+      },
+      "weapons": [
+        {
+          "name": "LRM 10",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "LRM 10",
+          "location": "RT",
+          "shots": 12
+        },
+        {
+          "weapon": "LRM 10",
+          "location": "RT",
+          "shots": 12
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "CT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Heat Sink",
+          "Jump Jet"
+        ],
+        "LT": [
+          "Jump Jet",
+          "Jump Jet",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Jump Jet",
+          "Jump Jet",
+          "LRM 10",
+          "LRM 10",
+          "Ammo (LRM 10) 12",
+          "Ammo (LRM 10) 12",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Griffin",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 6"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet confirms 2 t LRM 10 ammo in RT; PPC in RA",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 6"
+      ]
+    },
+    {
+      "id": "GRF-1S",
+      "chassis": "Griffin",
+      "model": "GRF-1S",
+      "tonnage": 55,
+      "techBase": "Inner Sphere",
+      "bv": 1253,
+      "walk": 5,
+      "run": 8,
+      "jump": 5,
+      "heatSinks": {
+        "count": 16,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 275,
+        "type": "Fusion"
+      },
+      "armorTons": 9.5,
+      "armorTotalPoints": 152,
+      "maxArmor": 185,
+      "armor": {
+        "HD": 9,
+        "CT": 20,
+        "CTR": 7,
+        "LT": 20,
+        "LTR": 6,
+        "RT": 20,
+        "RTR": 6,
+        "LA": 14,
+        "RA": 14,
+        "LL": 18,
+        "RL": 18
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 18,
+        "LT": 13,
+        "RT": 13,
+        "LA": 9,
+        "RA": 9,
+        "LL": 13,
+        "RL": 13
+      },
+      "weapons": [
+        {
+          "name": "LRM 5",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Large Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "LRM 5",
+          "location": "RT",
+          "shots": 24
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "CT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Heat Sink",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Jump Jet",
+          "Roll Again"
+        ],
+        "LT": [
+          "Jump Jet",
+          "Jump Jet",
+          "LRM 5",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Jump Jet",
+          "Jump Jet",
+          "Ammo (LRM 5) 24",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Large Laser",
+          "Large Laser",
+          "Medium Laser",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Griffin",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 7"
+      ],
+      "flags": [
+        "variant: +4 heat sinks over -1N (=16) per Sarna",
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 7"
+      ]
+    },
+    {
+      "id": "SHD-2H",
+      "chassis": "Shadow Hawk",
+      "model": "SHD-2H",
+      "tonnage": 55,
+      "techBase": "Inner Sphere",
+      "bv": 1064,
+      "walk": 5,
+      "run": 8,
+      "jump": 3,
+      "heatSinks": {
+        "count": 12,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 275,
+        "type": "Fusion"
+      },
+      "armorTons": 9.5,
+      "armorTotalPoints": 152,
+      "maxArmor": 185,
+      "armor": {
+        "HD": 9,
+        "CT": 23,
+        "CTR": 8,
+        "LT": 18,
+        "LTR": 6,
+        "RT": 18,
+        "RTR": 6,
+        "LA": 16,
+        "RA": 16,
+        "LL": 16,
+        "RL": 16
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 18,
+        "LT": 13,
+        "RT": 13,
+        "LA": 9,
+        "RA": 9,
+        "LL": 13,
+        "RL": 13
+      },
+      "weapons": [
+        {
+          "name": "SRM 2",
+          "location": "HD",
+          "rear": false
+        },
+        {
+          "name": "LRM 5",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "AC/5",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "SRM 2",
+          "location": "CT",
+          "shots": 50
+        },
+        {
+          "weapon": "AC/5",
+          "location": "LT",
+          "shots": 20
+        },
+        {
+          "weapon": "LRM 5",
+          "location": "RT",
+          "shots": 24
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "CT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "SRM 2",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Jump Jet",
+          "Ammo (SRM 2) 50"
+        ],
+        "LT": [
+          "Jump Jet",
+          "AC/5",
+          "AC/5",
+          "AC/5",
+          "AC/5",
+          "Ammo (AC/5) 20",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Jump Jet",
+          "LRM 5",
+          "Ammo (LRM 5) 24",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Roll Again",
+          "Roll Again"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Shadow_Hawk",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 8"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 8"
+      ]
+    },
+    {
+      "id": "WVR-6R",
+      "chassis": "Wolverine",
+      "model": "WVR-6R",
+      "tonnage": 55,
+      "techBase": "Inner Sphere",
+      "bv": 1101,
+      "walk": 5,
+      "run": 8,
+      "jump": 5,
+      "heatSinks": {
+        "count": 12,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 275,
+        "type": "Fusion"
+      },
+      "armorTons": 9.5,
+      "armorTotalPoints": 152,
+      "maxArmor": 185,
+      "armor": {
+        "HD": 8,
+        "CT": 20,
+        "CTR": 8,
+        "LT": 20,
+        "LTR": 6,
+        "RT": 20,
+        "RTR": 6,
+        "LA": 16,
+        "RA": 16,
+        "LL": 16,
+        "RL": 16
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 18,
+        "LT": 13,
+        "RT": 13,
+        "LA": 9,
+        "RA": 9,
+        "LL": 13,
+        "RL": 13
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "HD",
+          "rear": false
+        },
+        {
+          "name": "SRM 6",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "AC/5",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "SRM 6",
+          "location": "LT",
+          "shots": 15
+        },
+        {
+          "weapon": "AC/5",
+          "location": "RA",
+          "shots": 20
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "CT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LL"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RL"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Medium Laser",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Jump Jet",
+          "Roll Again"
+        ],
+        "LT": [
+          "SRM 6",
+          "SRM 6",
+          "Ammo (SRM 6) 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "AC/5",
+          "AC/5",
+          "AC/5",
+          "AC/5",
+          "Ammo (AC/5) 20",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Jump Jet",
+          "Jump Jet"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Jump Jet",
+          "Jump Jet"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Wolverine_(BattleMech)",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 10"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet: ML in HD; 4 of 5 jump jets are in the legs, 1 in CT",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 10"
+      ]
+    },
+    {
+      "id": "WVR-6M",
+      "chassis": "Wolverine",
+      "model": "WVR-6M",
+      "tonnage": 55,
+      "techBase": "Inner Sphere",
+      "bv": 1291,
+      "walk": 5,
+      "run": 8,
+      "jump": 5,
+      "heatSinks": {
+        "count": 14,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 275,
+        "type": "Fusion"
+      },
+      "armorTons": 10.5,
+      "armorTotalPoints": 168,
+      "maxArmor": 185,
+      "armor": {
+        "HD": 9,
+        "CT": 25,
+        "CTR": 8,
+        "LT": 20,
+        "LTR": 6,
+        "RT": 20,
+        "RTR": 6,
+        "LA": 18,
+        "RA": 18,
+        "LL": 19,
+        "RL": 19
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 18,
+        "LT": 13,
+        "RT": 13,
+        "LA": 9,
+        "RA": 9,
+        "LL": 13,
+        "RL": 13
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "HD",
+          "rear": false
+        },
+        {
+          "name": "SRM 6",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Large Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "SRM 6",
+          "location": "RT",
+          "shots": 15
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 1,
+          "location": "CT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Medium Laser",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Jump Jet",
+          "Roll Again"
+        ],
+        "LT": [
+          "Jump Jet",
+          "Jump Jet",
+          "SRM 6",
+          "SRM 6",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Jump Jet",
+          "Jump Jet",
+          "Ammo (SRM 6) 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Large Laser",
+          "Large Laser",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Roll Again"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Roll Again"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Wolverine_(BattleMech)",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 9"
+      ],
+      "flags": [
+        "variant: LL replaces AC/5 in arm mount, +1 ML in RA, +2 heat sinks, +1 t armor per Sarna",
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet: first ML is in HD (draft had RA for one ML, null for the other); 1 t SRM 6 ammo confirmed (RT)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 9"
+      ]
+    },
+    {
+      "id": "CPLT-C1",
+      "chassis": "Catapult",
+      "model": "CPLT-C1",
+      "tonnage": 65,
+      "techBase": "Inner Sphere",
+      "bv": 1399,
+      "walk": 4,
+      "run": 6,
+      "jump": 4,
+      "heatSinks": {
+        "count": 15,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 260,
+        "type": "Fusion"
+      },
+      "armorTons": 10,
+      "armorTotalPoints": 160,
+      "maxArmor": 211,
+      "armor": {
+        "HD": 9,
+        "CT": 24,
+        "CTR": 11,
+        "LT": 19,
+        "LTR": 8,
+        "RT": 19,
+        "RTR": 8,
+        "LA": 13,
+        "RA": 13,
+        "LL": 18,
+        "RL": 18
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 21,
+        "LT": 15,
+        "RT": 15,
+        "LA": 10,
+        "RA": 10,
+        "LL": 15,
+        "RL": 15
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "CT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "CT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "LRM 15",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "LRM 15",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "LRM 15",
+          "location": "LT",
+          "shots": 8
+        },
+        {
+          "weapon": "LRM 15",
+          "location": "RT",
+          "shots": 8
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Heat Sink",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Medium Laser",
+          "Medium Laser"
+        ],
+        "LT": [
+          "Jump Jet",
+          "Jump Jet",
+          "Medium Laser",
+          "Ammo (LRM 15) 8",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Jump Jet",
+          "Jump Jet",
+          "Medium Laser",
+          "Ammo (LRM 15) 8",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "LRM 15",
+          "LRM 15",
+          "LRM 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "LRM 15",
+          "LRM 15",
+          "LRM 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Catapult",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 11"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet: no rear-mounted MLs (2 CT, 1 LT, 1 RT, all forward); LRM 15s in arms; JJs 2 LT + 2 RT",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 11"
+      ]
+    },
+    {
+      "id": "CPLT-K2",
+      "chassis": "Catapult",
+      "model": "CPLT-K2",
+      "tonnage": 65,
+      "techBase": "Inner Sphere",
+      "bv": 1319,
+      "walk": 4,
+      "run": 6,
+      "jump": 0,
+      "heatSinks": {
+        "count": 20,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 260,
+        "type": "Fusion"
+      },
+      "armorTons": 11,
+      "armorTotalPoints": 176,
+      "maxArmor": 211,
+      "armor": {
+        "HD": 9,
+        "CT": 24,
+        "CTR": 11,
+        "LT": 20,
+        "LTR": 8,
+        "RT": 20,
+        "RTR": 8,
+        "LA": 18,
+        "RA": 18,
+        "LL": 20,
+        "RL": 20
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 21,
+        "LT": 15,
+        "RT": 15,
+        "LA": 10,
+        "RA": 10,
+        "LL": 15,
+        "RL": 15
+      },
+      "weapons": [
+        {
+          "name": "Machine Gun",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "Machine Gun",
+          "location": "CT",
+          "shots": 200
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Heat Sink",
+          "Ammo (Machine Gun) 200"
+        ],
+        "LT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Medium Laser",
+          "Machine Gun",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Medium Laser",
+          "Machine Gun",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Catapult",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 12"
+      ],
+      "flags": [
+        "variant: 2 PPC replace LRMs, +5 heat sinks, +2 MG, no JJ, -2 ML per Sarna",
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "armorTons/armorTotalPoints filled from the sheet's armor diagram sum (176 pts = 11 t); MG ammo 1 bin (200) in CT",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 12"
+      ]
+    },
+    {
+      "id": "TDR-5S",
+      "chassis": "Thunderbolt",
+      "model": "TDR-5S",
+      "tonnage": 65,
+      "techBase": "Inner Sphere",
+      "bv": 1335,
+      "walk": 4,
+      "run": 6,
+      "jump": 0,
+      "heatSinks": {
+        "count": 15,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 260,
+        "type": "Fusion"
+      },
+      "armorTons": 13,
+      "armorTotalPoints": 208,
+      "maxArmor": 211,
+      "armor": {
+        "HD": 9,
+        "CT": 30,
+        "CTR": 11,
+        "LT": 24,
+        "LTR": 6,
+        "RT": 24,
+        "RTR": 6,
+        "LA": 20,
+        "RA": 20,
+        "LL": 29,
+        "RL": 29
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 21,
+        "LT": 15,
+        "RT": 15,
+        "LA": 10,
+        "RA": 10,
+        "LL": 15,
+        "RL": 15
+      },
+      "weapons": [
+        {
+          "name": "LRM 15",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "SRM 2",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Large Laser",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LA",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "LRM 15",
+          "location": "CT",
+          "shots": 8
+        },
+        {
+          "weapon": "LRM 15",
+          "location": "CT",
+          "shots": 8
+        },
+        {
+          "weapon": "SRM 2",
+          "location": "RT",
+          "shots": 50
+        },
+        {
+          "weapon": "Machine Gun",
+          "location": "LA",
+          "shots": 200
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Heat Sink",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Ammo (LRM 15) 8",
+          "Ammo (LRM 15) 8"
+        ],
+        "LT": [
+          "Medium Laser",
+          "Medium Laser",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "LRM 15",
+          "LRM 15",
+          "LRM 15",
+          "SRM 2",
+          "Ammo (SRM 2) 50",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Machine Gun",
+          "Machine Gun",
+          "Ammo (Machine Gun) 200",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Large Laser",
+          "Large Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Thunderbolt",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 13"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "correction vs draft flag: SRM 2 ammo is one 50-shot bin (Sarna '45 reloads' was wrong); LRM 15 ammo 2 x 8 in CT; MG ammo 200 in LA",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 13"
+      ]
+    },
+    {
+      "id": "TDR-5SE",
+      "chassis": "Thunderbolt",
+      "model": "TDR-5SE",
+      "tonnage": 65,
+      "techBase": "Inner Sphere",
+      "bv": 1414,
+      "walk": 4,
+      "run": 6,
+      "jump": 4,
+      "heatSinks": {
+        "count": 17,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 260,
+        "type": "Fusion"
+      },
+      "armorTons": 13,
+      "armorTotalPoints": 208,
+      "maxArmor": 211,
+      "armor": {
+        "HD": 9,
+        "CT": 30,
+        "CTR": 11,
+        "LT": 24,
+        "LTR": 6,
+        "RT": 24,
+        "RTR": 6,
+        "LA": 20,
+        "RA": 20,
+        "LL": 29,
+        "RL": 29
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 21,
+        "LT": 15,
+        "RT": 15,
+        "LA": 10,
+        "RA": 10,
+        "LL": 15,
+        "RL": 15
+      },
+      "weapons": [
+        {
+          "name": "LRM 10",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Large Laser",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "LRM 10",
+          "location": "CT",
+          "shots": 12
+        },
+        {
+          "weapon": "LRM 10",
+          "location": "CT",
+          "shots": 12
+        }
+      ],
+      "equipment": [
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "LT"
+        },
+        {
+          "name": "Jump Jet",
+          "count": 2,
+          "location": "RT"
+        }
+      ],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Ammo (LRM 10) 12",
+          "Ammo (LRM 10) 12"
+        ],
+        "LT": [
+          "Jump Jet",
+          "Jump Jet",
+          "LRM 10",
+          "LRM 10",
+          "Medium Laser",
+          "Medium Laser",
+          "Medium Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Jump Jet",
+          "Jump Jet",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Large Laser",
+          "Large Laser",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Thunderbolt",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 14"
+      ],
+      "flags": [
+        "variant: -SRM2, -2 MG, LRM15->LRM10, +4 JJ, +2 HS per Sarna",
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "armorTons/armorTotalPoints filled from the sheet's armor diagram sum (208 pts = 13 t); LRM 10 ammo 2 x 12 in CT",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 14"
+      ]
+    },
+    {
+      "id": "AWS-8Q",
+      "chassis": "Awesome",
+      "model": "AWS-8Q",
+      "tonnage": 80,
+      "techBase": "Inner Sphere",
+      "bv": 1605,
+      "walk": 3,
+      "run": 5,
+      "jump": 0,
+      "heatSinks": {
+        "count": 28,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 240,
+        "type": "Fusion"
+      },
+      "armorTons": 15,
+      "armorTotalPoints": 240,
+      "maxArmor": 247,
+      "armor": {
+        "HD": 9,
+        "CT": 30,
+        "CTR": 19,
+        "LT": 24,
+        "LTR": 10,
+        "RT": 24,
+        "RTR": 10,
+        "LA": 24,
+        "RA": 24,
+        "LL": 33,
+        "RL": 33
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 25,
+        "LT": 17,
+        "RT": 17,
+        "LA": 13,
+        "RA": 13,
+        "LL": 17,
+        "RL": 17
+      },
+      "weapons": [
+        {
+          "name": "Small Laser",
+          "location": "HD",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "RA",
+          "rear": false
+        }
+      ],
+      "ammo": [],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Small Laser",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "LT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "Heat Sink",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/Awesome",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 15"
+      ],
+      "flags": [
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "bv matches record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 15"
+      ]
+    },
+    {
+      "id": "BLR-1G",
+      "chassis": "BattleMaster",
+      "model": "BLR-1G",
+      "tonnage": 85,
+      "techBase": "Inner Sphere",
+      "bv": 1519,
+      "walk": 4,
+      "run": 6,
+      "jump": 0,
+      "heatSinks": {
+        "count": 18,
+        "type": "single"
+      },
+      "engine": {
+        "rating": 340,
+        "type": "Fusion"
+      },
+      "armorTons": 14.5,
+      "armorTotalPoints": 232,
+      "maxArmor": 263,
+      "armor": {
+        "HD": 9,
+        "CT": 40,
+        "CTR": 11,
+        "LT": 28,
+        "LTR": 8,
+        "RT": 28,
+        "RTR": 8,
+        "LA": 24,
+        "RA": 24,
+        "LL": 26,
+        "RL": 26
+      },
+      "structure": {
+        "HD": 3,
+        "CT": 27,
+        "LT": 18,
+        "RT": 18,
+        "LA": 14,
+        "RA": 14,
+        "LL": 18,
+        "RL": 18
+      },
+      "weapons": [
+        {
+          "name": "Medium Laser",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "RT",
+          "rear": true
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "Medium Laser",
+          "location": "LT",
+          "rear": true
+        },
+        {
+          "name": "SRM 6",
+          "location": "LT",
+          "rear": false
+        },
+        {
+          "name": "PPC",
+          "location": "RA",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LA",
+          "rear": false
+        },
+        {
+          "name": "Machine Gun",
+          "location": "LA",
+          "rear": false
+        }
+      ],
+      "ammo": [
+        {
+          "weapon": "Machine Gun",
+          "location": "LT",
+          "shots": 200
+        },
+        {
+          "weapon": "SRM 6",
+          "location": "LT",
+          "shots": 15
+        },
+        {
+          "weapon": "SRM 6",
+          "location": "LT",
+          "shots": 15
+        }
+      ],
+      "equipment": [],
+      "crits": {
+        "HD": [
+          "Life Support",
+          "Sensors",
+          "Cockpit",
+          "Roll Again",
+          "Sensors",
+          "Life Support"
+        ],
+        "CT": [
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Gyro",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Fusion Engine",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LT": [
+          "SRM 6",
+          "SRM 6",
+          "Medium Laser",
+          "Medium Laser",
+          "Medium Laser (R)",
+          "Ammo (Machine Gun) 200",
+          "Ammo (SRM 6) 15",
+          "Ammo (SRM 6) 15",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RT": [
+          "Heat Sink",
+          "Medium Laser",
+          "Medium Laser",
+          "Medium Laser (R)",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "Machine Gun",
+          "Machine Gun",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "RA": [
+          "Shoulder",
+          "Upper Arm Actuator",
+          "Lower Arm Actuator",
+          "Hand Actuator",
+          "PPC",
+          "PPC",
+          "PPC",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again",
+          "Roll Again"
+        ],
+        "LL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ],
+        "RL": [
+          "Hip",
+          "Upper Leg Actuator",
+          "Lower Leg Actuator",
+          "Foot Actuator",
+          "Heat Sink",
+          "Heat Sink"
+        ]
+      },
+      "sources": [
+        "https://www.sarna.net/wiki/BattleMaster",
+        "AGOAC record sheet booklet (RS AGoAC Epub 1-26-19a), PDF p. 16"
+      ],
+      "flags": [
+        "AGOAC rulebook p. 32 (PDF 34) example says BLR right torso mounts three medium lasers, consistent with TRO",
+        "rulesLevel not on Sarna; MUL unreachable",
+        "structure from AGOAC p. 50 Internal Structure Table (PDF p. 52)",
+        "sheet: RT = 2 ML + 1 ML (R), LT = 2 ML + 1 ML (R) + SRM 6, PPC RA, 2 MG LA",
+        "correction: bv 1494 -> 1519 per record sheet",
+        "bv per record sheet",
+        "head internal structure (3) is not printed on the sheet; kept from AGOAC p. 50",
+        "source: AGOAC record sheet booklet p. 16"
+      ]
+    }
+  ]
+}

@@ -73,6 +73,11 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("as-box-roster", subdirectory: "Content/AlphaStrike", as: BoxRosterDTO.self)
     }
 
+    /// Classic record sheets for the A Game of Armored Combat booklet. Not on the protocol until Classic ships.
+    public func classicSheets() throws -> ClassicSheetsDTO {
+        try load("classic-agoac-sheets", subdirectory: "Content/Classic", as: ClassicSheetsDTO.self)
+    }
+
     /// Known maps for name suggestions. Not on the protocol: only the collection editor uses it.
     public func mapCatalog() throws -> MapCatalogDTO {
         try load("map-catalog", subdirectory: "Content", as: MapCatalogDTO.self)
