@@ -89,11 +89,85 @@
     ]
   },
   "tableSteps": [
-    "Put both maps grassland-side up, or use any open table about 3 feet across.",
+    "Lay Grassland #2 and Desert #2 from A Game of Armored Combat side by side, long sides touching (the pair the box’s first scenario uses), or use any open table about 36 × 22 inches.",
     "Keep a tape measure in inches handy. Ignore printed hexes — just measure freely.",
     "Woods (trees) are the only terrain that matters: moving through them costs extra inches, and shooting into or past them is a little harder.",
     "Skip hills, water, and buildings for this first game.",
     "Each side places its two ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw."
+  "winningSummary": "Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "layout": {
+    "width": 36,
+    "depth": 22,
+    "sheets": [
+      {
+        "name": "Grassland #2",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      },
+      {
+        "name": "Desert #2",
+        "area": {
+          "x": 18,
+          "y": 0,
+          "width": 18,
+          "depth": 22
+        }
+      }
+    ],
+    "zones": [
+      {
+        "side": "A",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      },
+      {
+        "side": "B",
+        "area": {
+          "x": 30,
+          "y": 0,
+          "width": 6,
+          "depth": 22
+        }
+      }
+    ],
+    "features": [
+      {
+        "kind": "woods",
+        "area": {
+          "x": 9,
+          "y": 13,
+          "width": 6,
+          "depth": 5
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 15,
+          "y": 3,
+          "width": 5,
+          "depth": 5
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 23,
+          "y": 12,
+          "width": 6,
+          "depth": 6
+        }
+      }
+    ],
+    "openTable": "No maps? Any open table about 36 × 22 inches works. Add the terrain where the diagram shows it."
+  }
 }

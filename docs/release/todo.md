@@ -1,5 +1,7 @@
 # Mech Buddy — release todo
 
+For all future work in one place, see [../ROADMAP.md](../ROADMAP.md).
+
 Status legend: `[ ]` todo · `[x]` done
 
 - [x] **1.0.0 (2) uploaded to TestFlight** (2026-11-24), from `feature/guided-mission-ladder`. It has all five Alpha Strike missions, onboarding with box ownership, the collection with stand-ins and maps, and the rulebook fixes. Archive: `build/archives/MechBuddy-1.0.0-2.xcarchive`.
@@ -20,14 +22,14 @@ Status legend: `[ ]` todo · `[x]` done
 Done since 1.0.0 (2): Meet and Greet (box scenario), HT heat attacks, PV by skill, REAR rear-firing weapons (BattleMaster, Archer), Rules tab split by game, Classic record sheets and engine start.
 
 **Polish first (existing Alpha Strike features):**
-- [ ] Play Ridge Line through Full Lances at the table on a new TestFlight build (bump `CURRENT_PROJECT_VERSION` to 3). Note issues in `ongoing/play-<date>/NOTES.md`.
+- [ ] Play Ridge Line through Full Lances at the table on TestFlight 1.0.0 (3) (archived 2026-11-24). Note issues in `ongoing/play-<date>/NOTES.md`.
 - [ ] Rear weapons in the shot picker: check on screen in portrait, landscape and the largest text size (Missions 4–5 BattleMaster). Not checked yet.
-- [ ] Victory screen: never seen on screen. Finish a short match and check it.
+- [x] Victory screen: seen on screen (portrait) via the Ridge Line UI test, 2026-11-25. A draw also shows "Mission 1 cleared"; decide whether a draw should clear a mission.
 - [ ] Mission 5 withdrawal screens and the Close Quarters punch control in landscape: check on screen.
-- [ ] At the largest text size, the status chip on unit cards ("Walked …") is cramped next to SZ.
-- [ ] Rules tab: at the largest text size, the Classic note fills the first screen. Consider a shorter note.
-- [ ] Shot picker: the ">42″" range option sits alone below the segmented control.
-- [ ] Open rules: "0*" minimal damage, water.
+- [x] At the largest text size, the status chip on unit cards ("Walked …") is cramped next to SZ. Fixed: the chip moves to its own line under the name. Not checked on screen.
+- [x] Rules tab: at the largest text size, the Classic note fills the first screen. Now "Rules only. Classic isn’t playable yet."
+- [x] Shot picker: the ">42″" range option sits alone below the segmented control. Fixed: it is the fourth range option, and the picker becomes a menu at accessibility sizes. Not checked on screen.
+- [ ] Open rules: "0*" minimal damage, water. No shipped card uses 0* (rules audit 2026-11-24); build it with Clash of Steel, the first content that needs it.
 
 **Parked (scoped, not built):**
 - Clash of Steel: needs Battlefield Support, formations (Lucky rerolls, Combat Intuition, Command Lance initiative reroll), and buildings. Rules are in `docs/game-modes/alpha-strike/clash-of-steel-rules-intake.md`, and the cards are checked in `docs/game-modes/book-scenarios.md`.

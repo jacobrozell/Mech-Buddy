@@ -275,3 +275,45 @@ struct MeetAndGreetTests {
 }
 
 private final class MeetAndGreetBundleToken {}
+
+@Suite("Mission layouts (maps needed)")
+struct MissionLayoutTests {
+    private var catalog: BundleContentCatalogRepository {
+        BundleContentCatalogRepository(bundle: Bundle(for: MeetAndGreetBundleToken.self))
+    }
+
+    private func inside(_ r: MissionLayoutDTO.Rect, _ layout: MissionLayoutDTO) -> Bool {
+        r.x >= 0 && r.y >= 0 && r.maxX <= layout.width && r.maxY <= layout.depth && r.width >= 0 && r.depth >= 0
+    }
+
+    @Test("Every playable mission has a layout that fits its table")
+    func layoutsFit() throws {
+        let mapNames = Set(try catalog.mapCatalog().allMaps.map { $0.lowercased() })
+        for item in try catalog.scenarios().scenarios where !item.gated {
+            let dto = try catalog.scenario(id: ScenarioId(rawValue: item.id))
+            let layout = try #require(dto.layout, "\(item.id) has no layout")
+            #expect(!layout.openTable.isEmpty, "\(item.id)")
+            #expect(Set(layout.zones.map(\.side)) == ["A", "B"], "\(item.id) zones")
+            for zone in layout.zones { #expect(inside(zone.area, layout), "\(item.id) zone \(zone.side)") }
+            for feature in layout.features { #expect(inside(feature.area, layout), "\(item.id) \(feature.kind)") }
+            for sheet in layout.sheets {
+                #expect(inside(sheet.area, layout), "\(item.id) \(sheet.name)")
+                #expect(mapNames.contains(sheet.name.lowercased()), "\(item.id): \(sheet.name) not in the map catalog")
+            }
+            if !layout.sheets.isEmpty {
+                let area = layout.sheets.reduce(0.0) { $0 + $1.area.width * $1.area.depth }
+                #expect(area == layout.width * layout.depth, "\(item.id): sheets should cover the table exactly")
+            }
+        }
+    }
+
+    @Test("Side A sets up on the left edge, Side B on the right")
+    func zonesOnHomeEdges() throws {
+        for item in try catalog.scenarios().scenarios where !item.gated {
+            let layout = try #require(try catalog.scenario(id: ScenarioId(rawValue: item.id)).layout)
+            let a = try #require(layout.zones.first { $0.side == "A" })
+            let b = try #require(layout.zones.first { $0.side == "B" })
+            #expect(a.area.x == 0 && b.area.maxX == layout.width, "\(item.id)")
+        }
+    }
+}

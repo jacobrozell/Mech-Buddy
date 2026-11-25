@@ -84,7 +84,8 @@ struct RulesHomeView: View {
         Section {
             RulesGameSwitch(selection: gameBinding)
             if game == .classic {
-                Label("Classic isn’t playable in Mech Buddy yet. Read its rules here and play Alpha Strike for now.", systemImage: "info.circle")
+                // Kept to one short line: at the largest text size the longer note filled the first screen.
+                Label("Rules only. Classic isn’t playable yet.", systemImage: "info.circle")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
