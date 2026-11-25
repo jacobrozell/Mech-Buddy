@@ -5,7 +5,11 @@
   "title": "Close Quarters",
   "subtitle": "Mission 4 · 3 vs 3 · about 60 minutes",
   "missionNumber": 4,
-  "introduces": ["Physical attacks", "3 vs 3", "Awesome and BattleMaster"],
+  "introduces": [
+    "Physical attacks",
+    "3 vs 3",
+    "Awesome and BattleMaster"
+  ],
   "estimatedMinutes": 60,
   "release": "1.3.0",
   "ruleset": {
@@ -21,11 +25,12 @@
   "coachNotes": [
     "Three ’Mechs a side. Side A brings the two biggest ’Mechs in the box, the Awesome and the BattleMaster. Side B is quicker and has more jump jets.",
     "New: punch or kick. If an enemy is within 1 inch and in front of your ’Mech, you can hit it instead of shooting. In the shot screen, pick Punch or kick.",
-    "A punch or kick does damage equal to the attacker's Size: 4 for the Awesome and BattleMaster, 3 for the Thunderbolt, 2 for the Shadow Hawk and Wolverine, 1 for the Locust.",
-    "The to-hit number is a shot without the range: Skill, your move, the target's move, woods and cover. Heat doesn't make it harder.",
+    "A punch or kick does damage equal to the attacker’s Size: 4 for the Awesome and BattleMaster, 3 for the Thunderbolt, 2 for the Shadow Hawk and Wolverine, 1 for the Locust.",
+    "The to-hit number is a shot without the range: Skill, your move, the target’s move, woods and cover. Heat doesn’t make it harder.",
     "One attack a turn: shoot or punch, never both.",
-    "Bases touching? Those two can't shoot each other, but they can still punch or kick. Weapon hits don't weaken a punch, and overheat can't add to it. From behind it's +1, like a rear shot.",
-    "A punch isn't a weapon attack, so a ’Mech that only punches still cools off in the End Phase. Charge and Death From Above are not in this mission."
+    "The BattleMaster also has rear weapons (REAR1/1/- on its card). If an enemy gets behind it, pick Rear weapons in the shot screen before its normal shot: +1 to hit and 1 damage, and its forward shot that turn does 1 less.",
+    "Bases touching? Those two can’t shoot each other, but they can still punch or kick. Weapon hits don’t weaken a punch, and overheat can’t add to it. From behind it’s +1, like a rear shot.",
+    "A punch isn’t a weapon attack, so a ’Mech that only punches still cools off at Clean up (the End Phase). Charge and Death From Above are not in this mission."
   ],
   "sides": {
     "lanceA": [
@@ -126,7 +131,7 @@
   "tableSteps": [
     "Use the same open table, about 3 feet across. Measure in inches and ignore printed hexes.",
     "Put a hill in the middle and three patches of woods close around it. Tight terrain pulls the fight in close. Hills, cover, and woods work like Broken Ground.",
-    "The Awesome and BattleMaster share one card, front and back. Put that card by one of them and read the other's numbers in the app.",
+    "The Awesome and BattleMaster share one card, front and back. Put that card by one of them and read the other’s numbers in the app.",
     "Keep a die or small token next to each ’Mech card to mark heat (0 to 3, then S). The app tracks it too.",
     "Each side places its three ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],

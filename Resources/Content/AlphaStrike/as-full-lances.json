@@ -5,7 +5,11 @@
   "title": "Full Lances",
   "subtitle": "Mission 5 · 4 vs 4 · about 90 minutes",
   "missionNumber": 5,
-  "introduces": ["All eight box ’Mechs", "Forced Withdrawal", "Every rule on"],
+  "introduces": [
+    "All eight box ’Mechs",
+    "Forced Withdrawal",
+    "Every rule on"
+  ],
   "estimatedMinutes": 90,
   "release": "1.4.0",
   "ruleset": {
@@ -21,10 +25,11 @@
   "coachNotes": [
     "Every ’Mech in the box, four a side. Each side has one ’Mech of each size, so the lances are even.",
     "Every rule so far is on: woods, hills, cover, rear shots, overheat, and punch or kick.",
+    "Rear weapons: the BattleMaster can still shoot a ’Mech behind it, as in Close Quarters. Pick Rear weapons before its forward shot.",
     "New: Forced Withdrawal. A badly hurt ’Mech is crippled, and a crippled ’Mech heads home instead of fighting on.",
     "Crippled means any one of: no armor left and Structure down to half or less (round up, so 5 Structure counts at 3); Medium and Long damage both 0 from weapon hits; or MP hits have stopped it moving.",
-    "The app marks a crippled ’Mech Withdrawing. Every turn it must move toward its own table edge. It doesn't have to sprint, and it can still shoot or punch enemies in range.",
-    "A ’Mech that leaves the table, for any reason, counts as destroyed and can't come back. When one drives off, open it and tap Left the table.",
+    "The app marks a crippled ’Mech Withdrawing. Every turn it must move toward its own table edge. It doesn’t have to sprint, and it can still shoot or punch enemies in range.",
+    "A ’Mech that leaves the table, for any reason, counts as destroyed and can’t come back. When one drives off, open it and tap Left the table.",
     "So a crippled ’Mech is worth chasing: catch it before it gets home, or let it go and it still counts as destroyed."
   ],
   "sides": {
@@ -156,9 +161,9 @@
   "tableSteps": [
     "Use both maps side by side, or any open table about 3 feet across. Measure in inches and ignore printed hexes.",
     "Put a hill near the middle and four patches of woods spread around it. Hills, cover, and woods work like Broken Ground.",
-    "The Awesome and BattleMaster share one card, front and back, and they're on opposite sides. Give the card to one player; the other reads their ’Mech's numbers in the app.",
+    "The Awesome and BattleMaster share one card, front and back, and they’re on opposite sides. Give the card to one player; the other reads their ’Mech’s numbers in the app.",
     "Keep a die or small token next to each ’Mech card to mark heat (0 to 3, then S). The app tracks it too.",
-    "Each side's own short table edge is its home edge. A crippled ’Mech must head back toward it.",
+    "Each side’s own short table edge is its home edge. A crippled ’Mech must head back toward it.",
     "Each side places its four ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
   "winningSummary": "Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw."

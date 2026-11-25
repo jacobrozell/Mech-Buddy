@@ -21,11 +21,11 @@
   "coachNotes": [
     "Two heavier ’Mechs join: the Catapult (missiles, can jump) and the Thunderbolt (tough brawler). Both have OV 1 on the card.",
     "Overheat: before you roll, pick +1 damage in the shot. It only adds damage at short and medium range. You take the heat even if you miss.",
-    "Heat goes on the card in the End Phase, so it hurts you next turn: +1 to your shots and 2 inches less walking per heat level. At heat 2 or more you are also 1 easier to hit, unless you jumped.",
-    "Heat 4 is the S box: the ’Mech shuts down. Next turn it can't move or shoot, and shots at it get 4 easier. It restarts at heat 0 in that End Phase.",
-    "Cooling off: a turn where the ’Mech doesn't shoot clears all its heat. Keep shooting and heat stays.",
+    "Heat goes on the card at Clean up (the End Phase), so it hurts you next turn: +1 to your shots and 2 inches less walking per heat level. At heat 2 or more you are also 1 easier to hit, unless you jumped.",
+    "Heat 4 is the S box: the ’Mech shuts down. Next turn it can’t move or shoot, and shots at it get 4 easier. It restarts at heat 0 at that Clean up.",
+    "Cooling off: a turn where the ’Mech doesn’t shoot clears all its heat. Keep shooting and heat stays.",
     "Overheat on the first turn is free-ish. Overheat every turn and you reach S at the end of turn 4, then sit out turn 5. Pick your moments.",
-    "The Locust and Commando can't overheat. Use them to chase down a ’Mech that runs hot."
+    "The Locust and Commando can’t overheat. Use them to chase down a ’Mech that runs hot."
   ],
   "sides": {
     "lanceA": [

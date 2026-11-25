@@ -26,7 +26,7 @@
     "The Alpha Strike box’s own first scenario (Quick-Start Rulebook p. 26). A lance of Northwind Highlanders meets two Clan Jade Falcon scouts.",
     "Side A has four Inner Sphere ’Mechs. Side B has two Clan OmniMechs with better pilots, so it is outnumbered but not outgunned.",
     "New: better pilots. Skill is the base to-hit number, so a Skill 2 pilot hits on 2 less than a Skill 4 one. Better pilots cost more Point Value, which is why the two sides’ totals look uneven.",
-    "New: heat attacks (HT). The Pouncer’s HT1/1/- means a hit at short or medium range also gives the target 1 heat in the End Phase. A ’Mech takes at most 2 heat a turn this way, and it lands even if the target didn’t fire.",
+    "New: heat attacks (HT). The Pouncer’s HT1/1/- means a hit at short or medium range also gives the target 1 heat at Clean up (the End Phase). A ’Mech takes at most 2 heat a turn this way, and it lands even if the target didn’t fire.",
     "Forced Withdrawal is on, as in Full Lances: crippled ’Mechs head home, and leaving the table counts as destroyed."
   ],
   "sides": {

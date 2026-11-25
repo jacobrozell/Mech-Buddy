@@ -1,5 +1,7 @@
 # Mech Buddy — release todo
 
+For all future work in one place, see [../ROADMAP.md](../ROADMAP.md).
+
 Status legend: `[ ]` todo · `[x]` done
 
 - [x] **1.0.0 (2) uploaded to TestFlight** (2026-11-24), from `feature/guided-mission-ladder`. It has all five Alpha Strike missions, onboarding with box ownership, the collection with stand-ins and maps, and the rulebook fixes. Archive: `build/archives/MechBuddy-1.0.0-2.xcarchive`.
