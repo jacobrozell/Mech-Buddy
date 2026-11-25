@@ -411,6 +411,7 @@ final class MatchStore: Identifiable {
     private func adoptScenario(_ dto: GuidedScenarioDTO) {
         let steps = dto.tableSteps.isEmpty ? ScenarioPresentation.fallback.tableSteps : dto.tableSteps
         scenario = ScenarioPresentation(
+            id: dto.scenarioId,
             title: dto.title,
             subtitle: dto.subtitle,
             tableSteps: steps,

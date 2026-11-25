@@ -165,15 +165,33 @@ enum MissionLayoutDescription {
 
 /// "Maps needed": which mapsheets to lay out, whether the player has them, the open-table fallback,
 /// and the diagram. Used by the mission sheet and the table setup step.
+/// With a `missionId`, an experienced player can swap any sheet for a map they own; the choice is kept per mission.
 struct MissionMapsSection: View {
     var layout: MissionLayoutDTO
     /// The player's maps; `nil` when they haven't told the app what they own.
     var ownedMaps: [String]?
+    /// Scenario id. `nil` hides the swap controls (previews).
+    var missionId: String? = nil
+
+    @Environment(AppDependencies.self) private var dependencies
+    @State private var swapping = false
+    @State private var typingIndex: Int?
+    @State private var typedName = ""
+
+    private var chosen: [String]? { missionId.flatMap { dependencies.preferences.mapSwaps[$0] } }
+    private var shown: MissionLayoutDTO { MapSwap.applying(chosen, to: layout) }
+    private var isSwapped: Bool { shown.sheetNames != layout.sheetNames }
 
     private var missing: [String] {
         guard let ownedMaps else { return [] }
         let owned = Set(ownedMaps.map { $0.lowercased() })
-        return layout.sheetNames.filter { !owned.contains($0.lowercased()) }
+        return shown.sheetNames.filter { !owned.contains($0.lowercased()) }
+    }
+
+    /// Maps the player has: from owned boxes and ones added by hand.
+    private var collectionMaps: [String] {
+        guard let owned = dependencies.preferences.collection else { return [] }
+        return CollectionMath.ownedMaps(owned, boxes: dependencies.boxSets).map(\.name)
     }
 
     var body: some View {
@@ -183,9 +201,16 @@ struct MissionMapsSection: View {
                     .font(TMFont.detail)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text("\(CollectionMath.naturalList(layout.sheetNames)), side by side.")
+                Text("\(CollectionMath.naturalList(shown.sheetNames)), side by side.")
                     .font(TMFont.detail.weight(.semibold))
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("mission.maps.names")
+                if isSwapped {
+                    Text("Suggested: \(CollectionMath.naturalList(layout.sheetNames)).")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 if ownedMaps != nil {
                     Label(
                         missing.isEmpty ? "You have these maps." : "You don’t have \(CollectionMath.naturalList(missing)).",
@@ -199,16 +224,106 @@ struct MissionMapsSection: View {
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if missionId != nil {
+                    swapControls
+                }
             }
-            MissionLayoutView(layout: layout)
-            Text(layout.sheets.isEmpty
-                 ? "Terrain spots are a guide. Place pieces as the setup steps say."
-                 : "On printed maps, use the map’s own woods and hills. The shapes show where to add terrain on an open table.")
+            MissionLayoutView(layout: shown)
+            Text(footnote)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mission.maps")
+        .alert("Map name", isPresented: Binding(get: { typingIndex != nil }, set: { if !$0 { typingIndex = nil } })) {
+            TextField("Map name", text: $typedName)
+            Button("Use map") {
+                if let index = typingIndex { choose(typedName, at: index) }
+                typingIndex = nil
+            }
+            Button("Cancel", role: .cancel) { typingIndex = nil }
+        }
+    }
+
+    private var footnote: String {
+        if layout.sheets.isEmpty {
+            return "Terrain spots are a guide. Place pieces as the setup steps say."
+        }
+        if isSwapped {
+            return "The zones and terrain spots are a guide for the suggested maps. On your own maps, use their woods and hills and keep the setup zones."
+        }
+        return "On printed maps, use the map’s own woods and hills. The shapes show where to add terrain on an open table."
+    }
+
+    @ViewBuilder
+    private var swapControls: some View {
+        Button {
+            swapping.toggle()
+        } label: {
+            Label(swapping ? "Done swapping" : "Swap a map", systemImage: "arrow.triangle.swap")
+                .font(TMFont.detail.weight(.semibold))
+                .frame(minHeight: 44, alignment: .leading)
+        }
+        .buttonStyle(.borderless)
+        .accessibilityHint("Use a map you own instead of a suggested one")
+        .accessibilityIdentifier("mission.maps.swap")
+        if swapping {
+            ForEach(Array(shown.sheets.enumerated()), id: \.offset) { index, sheet in
+                Menu {
+                    ForEach(MapSwap.options(owned: collectionMaps, suggested: layout.sheets[index].name, current: sheet.name), id: \.self) { name in
+                        Button {
+                            choose(name, at: index)
+                        } label: {
+                            if name.lowercased() == sheet.name.lowercased() {
+                                Label(name, systemImage: "checkmark")
+                            } else {
+                                Text(name)
+                            }
+                        }
+                    }
+                    Button("Another map…") {
+                        typedName = ""
+                        typingIndex = index
+                    }
+                } label: {
+                    HStack {
+                        Text("\(Self.position(index, of: shown.sheets.count)): \(sheet.name)")
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: TMSpace.sm)
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption)
+                            .accessibilityHidden(true)
+                    }
+                    .font(TMFont.detail)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .accessibilityLabel("\(Self.position(index, of: shown.sheets.count)) map, \(sheet.name)")
+                .accessibilityHint("Choose a different map")
+                .accessibilityIdentifier("mission.maps.sheet.\(index)")
+            }
+            if isSwapped, let missionId {
+                Button("Use the suggested maps") {
+                    dependencies.preferences.useSuggestedMaps(mission: missionId)
+                    dependencies.logger.info("map swap reset mission=\(missionId)", category: "maps")
+                }
+                .font(TMFont.detail.weight(.semibold))
+                .buttonStyle(.borderless)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("mission.maps.reset")
+            }
+        }
+    }
+
+    private func choose(_ name: String, at index: Int) {
+        guard let missionId else { return }
+        dependencies.preferences.swapMap(mission: missionId, index: index, to: name, layout: layout)
+        dependencies.logger.info("map swap mission=\(missionId) sheet=\(index)", category: "maps")
+    }
+
+    private static func position(_ index: Int, of count: Int) -> String {
+        if count == 2 { return index == 0 ? "Left" : "Right" }
+        return "Map \(index + 1)"
     }
 }

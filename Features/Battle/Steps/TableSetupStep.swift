@@ -77,7 +77,7 @@ struct TableSetupStep: View {
             if let layout = scenario.layout {
                 VStack(alignment: .leading, spacing: TMSpace.md) {
                     Eyebrow("Table layout")
-                    MissionMapsSection(layout: layout, ownedMaps: nil)
+                    MissionMapsSection(layout: layout, ownedMaps: nil, missionId: scenario.id.isEmpty ? nil : scenario.id)
                 }
             }
 

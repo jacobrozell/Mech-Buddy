@@ -343,12 +343,22 @@ public struct MissionLayoutDTO: Codable, Sendable, Equatable {
     public struct Sheet: Codable, Sendable, Equatable {
         public var name: String
         public var area: Rect
+
+        public init(name: String, area: Rect) {
+            self.name = name
+            self.area = area
+        }
     }
 
     /// Where a side sets up. `side` is "A" or "B".
     public struct Zone: Codable, Sendable, Equatable {
         public var side: String
         public var area: Rect
+
+        public init(side: String, area: Rect) {
+            self.side = side
+            self.area = area
+        }
     }
 
     public enum FeatureKind: String, Codable, Sendable, CaseIterable {
@@ -359,6 +369,11 @@ public struct MissionLayoutDTO: Codable, Sendable, Equatable {
     public struct Feature: Codable, Sendable, Equatable {
         public var kind: FeatureKind
         public var area: Rect
+
+        public init(kind: FeatureKind, area: Rect) {
+            self.kind = kind
+            self.area = area
+        }
     }
 
     public var width: Double
@@ -369,6 +384,15 @@ public struct MissionLayoutDTO: Codable, Sendable, Equatable {
     public var features: [Feature]
     /// What to use without the maps, e.g. "Any open table, 36 × 22 inches".
     public var openTable: String
+
+    public init(width: Double, depth: Double, sheets: [Sheet], zones: [Zone], features: [Feature], openTable: String) {
+        self.width = width
+        self.depth = depth
+        self.sheets = sheets
+        self.zones = zones
+        self.features = features
+        self.openTable = openTable
+    }
 
     /// "Grassland #2 and Desert #2".
     public var sheetNames: [String] { sheets.map(\.name) }

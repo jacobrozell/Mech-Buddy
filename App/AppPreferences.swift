@@ -49,7 +49,7 @@ final class AppPreferences {
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey,
         completedMissionsKey, rulesGameKey
-    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys
+    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key]
 
     var hapticsEnabled: Bool {
         didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
@@ -112,6 +112,15 @@ final class AppPreferences {
         }
     }
 
+    /// Maps the player lays down instead of a mission's suggested ones: mission id → one name per sheet.
+    /// A mission with no entry uses the suggested maps.
+    var mapSwaps: [String: [String]] {
+        didSet {
+            guard !isReloading else { return }
+            MapSwap.save(mapSwaps, to: defaults)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isReloading = true
@@ -125,6 +134,7 @@ final class AppPreferences {
         hasCompletedOnboarding = false
         completedMissions = []
         collection = nil
+        mapSwaps = [:]
         isReloading = false
         reload()
     }
@@ -164,6 +174,7 @@ final class AppPreferences {
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
         collection = CollectionStore.load(from: defaults)
+        mapSwaps = MapSwap.load(from: defaults)
     }
 
     private func persistOnboarding() {
@@ -201,6 +212,16 @@ final class AppPreferences {
     func recordCollection(_ owned: OwnedCollection) {
         collection = owned
         gettingStartedChecks = OnboardingCollection.kitChecks(gettingStartedChecks, after: owned)
+    }
+
+    /// Lays `name` on sheet `index` of a mission instead of the suggested map.
+    func swapMap(mission id: String, index: Int, to name: String, layout: MissionLayoutDTO) {
+        mapSwaps[id] = MapSwap.setting(mapSwaps[id], index: index, to: name, in: layout)
+    }
+
+    /// "Use the suggested maps."
+    func useSuggestedMaps(mission id: String) {
+        mapSwaps[id] = nil
     }
 
     func applyKeepScreenAwake() {

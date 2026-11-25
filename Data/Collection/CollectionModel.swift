@@ -436,3 +436,61 @@ public enum OnboardingCollection {
         return checks.union(["minis"])
     }
 }
+
+// MARK: - Map swaps
+
+/// Per-mission map choices. A mission suggests mapsheets; an experienced player can lay down any map they
+/// own instead. The diagram keeps its zones and terrain and only relabels the sheets.
+/// Spec: specs/features/GuidedMissionSpec.md § Maps.
+public enum MapSwap {
+    /// `UserDefaults` key: mission id → chosen map names, one per sheet, left to right.
+    public static let key = "missions.mapSwaps"
+
+    public static func load(from defaults: UserDefaults) -> [String: [String]] {
+        defaults.dictionary(forKey: key) as? [String: [String]] ?? [:]
+    }
+
+    public static func save(_ swaps: [String: [String]], to defaults: UserDefaults) {
+        if swaps.isEmpty {
+            defaults.removeObject(forKey: key)
+        } else {
+            defaults.set(swaps, forKey: key)
+        }
+    }
+
+    /// The names to show: the chosen ones when they fit this layout's sheet count, else the suggested ones.
+    public static func names(for layout: MissionLayoutDTO, chosen: [String]?) -> [String] {
+        guard let chosen, chosen.count == layout.sheets.count else { return layout.sheetNames }
+        return zip(chosen, layout.sheetNames).map { pick, suggested in
+            let trimmed = pick.trimmingCharacters(in: .whitespaces)
+            return trimmed.isEmpty ? suggested : trimmed
+        }
+    }
+
+    /// The layout with its sheets relabelled. Zones, terrain and sheet areas stay as they are.
+    public static func applying(_ chosen: [String]?, to layout: MissionLayoutDTO) -> MissionLayoutDTO {
+        var result = layout
+        let names = names(for: layout, chosen: chosen)
+        for index in result.sheets.indices {
+            result.sheets[index].name = names[index]
+        }
+        return result
+    }
+
+    /// The choices after sheet `index` becomes `name`. `nil` when every sheet is back to the suggestion,
+    /// so nothing is stored for a mission that uses its suggested maps.
+    public static func setting(_ chosen: [String]?, index: Int, to name: String, in layout: MissionLayoutDTO) -> [String]? {
+        guard layout.sheets.indices.contains(index) else { return chosen }
+        var next = names(for: layout, chosen: chosen)
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        next[index] = trimmed.isEmpty ? layout.sheets[index].name : trimmed
+        let same = zip(next, layout.sheetNames).allSatisfy { $0.lowercased() == $1.lowercased() }
+        return same ? nil : next
+    }
+
+    /// Maps offered for a sheet: what the player owns, then the suggestion, then the current pick, each once.
+    public static func options(owned: [String], suggested: String, current: String) -> [String] {
+        var seen = Set<String>()
+        return (owned + [suggested, current]).filter { !$0.isEmpty && seen.insert($0.lowercased()).inserted }
+    }
+}

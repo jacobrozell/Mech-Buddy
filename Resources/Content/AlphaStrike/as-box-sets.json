@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contentVersion": "1.0.0",
-  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names from sarna.net/wiki/Mapsheet; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand.",
+  "sourceNote": "Box contents for the 'which boxes do you own' question. Map names from sarna.net/wiki/Mapsheet; A Game of Armored Combat's four are the map names its rulebook scenarios use (two double-sided sheets, pp. 45-48). mapSheets alone means the store lists the sheets but not their names. Unit names only: card numbers come from the Master Unit List, never from this file. A box with contentsConfirmed false ships no units; the player adds them by hand. Mercenaries Box Set contents (8 BattleMechs, 4 vehicles, 12 minis; map names) are from the Contents section of sarna.net/wiki/BattleTech:_Mercenaries, which matches retailer listings of the same box; no variant codes are listed, so names are chassis only. The vehicles appear twice each. The Alpha Strike Box Set lists no mapsheets in retailer listings, so none are recorded.",
   "boxes": [
     {
       "id": "agoac",
@@ -106,9 +106,22 @@
       "requires": [
         "agoac"
       ],
-      "units": [],
+      "units": [
+        "Chameleon",
+        "Starslayer",
+        "Caesar",
+        "Devastator",
+        "Flea",
+        "Firefly",
+        "Quickdraw",
+        "Ostsol",
+        "Galleon Light Tank",
+        "Galleon Light Tank",
+        "Maxim Hover Tank",
+        "Maxim Hover Tank"
+      ],
       "sourceURL": "https://store.catalystgamelabs.com/products/battletech-mercenaries-box-set",
-      "contentsConfirmed": false,
+      "contentsConfirmed": true,
       "maps": [
         "Scattered Woods",
         "River Valley",

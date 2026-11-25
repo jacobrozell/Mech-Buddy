@@ -3,6 +3,8 @@ import MechBuddyData
 
 /// Briefing copy for the open mission. Cached on `MatchStore` so the battle screen does not decode JSON in `body`.
 struct ScenarioPresentation: Equatable, Sendable {
+    /// Scenario id, for per-mission choices such as swapped maps. Empty for the fallback.
+    var id: String = ""
     var title: String
     var subtitle: String?
     var tableSteps: [String]
