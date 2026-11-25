@@ -18,6 +18,7 @@ struct PrimaryActionButton: View {
     var spokenLabel: String?
     var action: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isShort: Bool { verticalSizeClass == .compact }
 
@@ -25,10 +26,22 @@ struct PrimaryActionButton: View {
         styled(button)
     }
 
+    /// Gold buttons take the dark `onSignal` label: white on the gold was about 2.9:1 in light mode and
+    /// 1.8:1 on the brighter dark-mode gold. Side-coloured buttons keep the system's white label.
+    private var labelStyle: AnyShapeStyle? {
+        guard role != .destructive else { return nil }
+        // Side colours are dark in light mode (white reads) and light in dark mode (white didn't).
+        if tint == nil || tint == TMColor.signal || colorScheme == .dark {
+            return AnyShapeStyle(TMColor.onSignal)
+        }
+        return nil
+    }
+
     private var button: some View {
         Button(role: role, action: action) {
             label
                 .frame(maxWidth: .infinity, minHeight: isShort ? 36 : 50)
+                .modifier(OptionalForeground(style: isDisabled ? nil : labelStyle))
         }
         .controlSize(isShort ? .regular : .large)
         .disabled(isDisabled)
@@ -149,3 +162,15 @@ private struct OptionalSpokenLabel: ViewModifier {
     }
 }
 #endif
+
+private struct OptionalForeground: ViewModifier {
+    var style: AnyShapeStyle?
+
+    func body(content: Content) -> some View {
+        if let style {
+            content.foregroundStyle(style)
+        } else {
+            content
+        }
+    }
+}

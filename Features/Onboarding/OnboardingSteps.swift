@@ -56,6 +56,8 @@ struct OnboardingWelcomeStep: View {
 // MARK: - Track
 
 struct OnboardingTrackStep: View {
+    @ScaledMetric(relativeTo: .body) private var commitmentIconWidth: CGFloat = 26
+
     @Binding var selection: LearningTrack?
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -117,8 +119,10 @@ struct OnboardingTrackStep: View {
                                 .foregroundStyle(.primary)
                                 .fixedSize(horizontal: false, vertical: true)
                         } icon: {
+                            // One width for every icon, so each line's text starts at the same place.
                             Image(systemName: item.systemImage)
                                 .foregroundStyle(.secondary)
+                                .frame(width: commitmentIconWidth)
                         }
                     }
                 }

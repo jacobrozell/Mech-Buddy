@@ -91,12 +91,23 @@ struct SettingsHomeView: View {
             }
 
             Section {
-                HStack(spacing: TMSpace.md) {
-                    SettingsIconLabel(title: "Version", systemName: "info.circle", tint: Color.secondary)
-                    Spacer(minLength: TMSpace.sm)
-                    Text(versionText)
-                        .foregroundStyle(.secondary)
+                // Side by side when it fits; stacked at large text, where "Version" broke as "Ver-sion".
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: TMSpace.md) {
+                        SettingsIconLabel(title: "Version", systemName: "info.circle", tint: Color.secondary)
+                            .fixedSize()
+                        Spacer(minLength: TMSpace.sm)
+                        Text(versionText)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+                    VStack(alignment: .leading, spacing: TMSpace.xs) {
+                        SettingsIconLabel(title: "Version", systemName: "info.circle", tint: Color.secondary)
+                        Text(versionText)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+                .accessibilityElement(children: .combine)
             } header: {
                 Text("About")
             }
@@ -204,12 +215,17 @@ private struct SettingsIconLabel: View {
     var systemName: String
     var tint: Color
 
+    /// The tile grows a little with text size; the glyph stops at xxxLarge so it stays inside the tile.
+    /// At accessibility sizes the glyph used to spill out of a fixed 28pt tile and over the title.
+    @ScaledMetric(relativeTo: .body) private var tile: CGFloat = 28
+
     var body: some View {
         HStack(spacing: TMSpace.md) {
             Image(systemName: systemName)
                 .font(.body.weight(.semibold))
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 .foregroundStyle(tint)
-                .frame(width: 28, height: 28)
+                .frame(width: min(tile, 40), height: min(tile, 40))
                 .background(tint.opacity(0.15), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                 .accessibilityHidden(true)
             Text(title)

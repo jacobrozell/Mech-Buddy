@@ -3,8 +3,13 @@ import SwiftUI
 struct TurnCounter: View {
     var turn: Int
     var maxTurns: Int?
+    /// "Turn 1 / 8" on one line, no eyebrow. Landscape phones always use it; the battle header asks for it
+    /// at accessibility sizes, where the stacked eyebrow and big numeral took a third of the screen.
+    var isInline = false
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var inline: Bool { isInline || verticalSizeClass == .compact }
 
     private var isLastTurn: Bool {
         guard let maxTurns else { return false }
@@ -14,17 +19,17 @@ struct TurnCounter: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xs) {
             // Landscape phones: drop the eyebrow line so the counter fits on one row.
-            if verticalSizeClass != .compact {
+            if !inline {
                 Eyebrow("Turn")
             }
             HStack(alignment: .firstTextBaseline, spacing: TMSpace.xs) {
-                if verticalSizeClass == .compact {
+                if inline {
                     Text("Turn")
                         .font(TMFont.detail.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
                 Text("\(turn)")
-                    .font(TMFont.readoutM)
+                    .font(isInline ? TMFont.cardTitle : TMFont.readoutM)
                     .monospacedDigit()
                     .contentTransition(.numericText())
                 if let maxTurns {

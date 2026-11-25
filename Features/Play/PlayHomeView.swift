@@ -213,6 +213,7 @@ struct PlayHomeView: View {
             matches.resume(using: dependencies)
         } label: {
             Text("Continue")
+                .foregroundStyle(TMColor.onSignal)
                 .frame(maxWidth: fullWidth ? .infinity : nil, minHeight: 44)
         }
         .buttonStyle(.borderedProminent)
