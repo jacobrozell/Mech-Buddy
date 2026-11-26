@@ -287,3 +287,27 @@ Attacker heat +heat level. Fire-control hit +2 each. Rear hit = +1 damage.
 | Forced Withdrawal / crippled check | State | **Implement** a crippled flag (armor 0 and structure ≤ half, or M and L = 0, or immobile) plus a retreat reminder |
 | Unequal alternation (8 v 5) | Move order | **Implement** if the app sequences activations; otherwise coach note |
 | Deployment / terrain picks / victory | None | Checklist / coach notes |
+
+---
+
+## Owner calls (2026-11-26)
+
+Built with Clash of Steel (`Domain/Engines/AlphaStrike/Buildings.swift`, `BattlefieldSupport.swift`, `Formations.swift`, `Domain/Commands/BoxRulesReducer.swift`; tests in `Tests/Unit/ClashOfSteelRulesTests.swift`). Each [OPEN] item was settled by the printed table or example; please review.
+
+| # | Open item | Call | Why |
+|---|---|---|---|
+| 1 | Light building collapse "0*" (p. 28) | **Minimal damage**: each 'Mech rolls 1D6, 4+ takes 1 (+1 on the roof as usual). No height multiplier. | The table prints 0*, and the book defines 0* as minimal damage (p. 21). Clash of Steel uses only Medium and Heavy buildings, so it doesn't come up there. |
+| 2 | Weight capacity: Medium 4 (table) vs 2 (example) | **Table: Medium holds Size 4.** | The table is the rule; the worked example's "weight capacity 2" is the Light value. |
+| 3 | Level change +2″ (table) vs +1″ per inch (paragraph), p. 15 | **+1″ per inch** (`MovementCost.levelChangePerInch`, one constant to flip). | The table cell's text is jumbled with its "max 2″ elevation per 2″ moved" note; the Level Change paragraph states the cost plainly. Only the movement reference in the app shows it. |
+| 4a | Where support goes in the Combat Phase | **Any time in the Combat Phase**, from Scenario rules. | p. 29 says only "declared during the Combat Phase"; the app already lets both sides fire in any order because damage lands at the end of the phase. |
+| 4b | Front/rear for support damage | **No rear +1.** | The support rules give a flat damage value; nothing adds to it. |
+| 4c | Timing of support damage effects | **Same as weapon damage**: marked now, a 'Mech it destroys leaves at the End Phase; structure damage owes a critical roll as for any damage (p. 21). | p. 13 general rule. |
+| 4d | Thumper/Sniper costs: p. 29 example says Thumper 3, Sniper 2 | **Table: Thumper 2, Sniper 3.** | The example's total (12) is the same either way; the table is the rule. |
+| 4e | Template friendly fire | **Every base touched, friend or foe.** | The text exempts no one. The players tick the 'Mechs under the template. |
+| 5 | Command Lance reroll: once per turn (p. 32) vs once every two turns (p. 38) | **Once per turn, while the Atlas is not destroyed** (scenario text). A reroll that ties sends both sides back to roll. | The scenario's own Formation box is the specific rule for Clash of Steel. |
+| 6 | Combat Intuition target that hasn't moved | **Uses its TMM as if it made a ground move** (the shot sheet's default). | Same logic as p. 18's rule for jump-capable targets attacked in the Movement Phase. |
+| 6b | Combat Intuition timing | After the 'Mech's move is recorded, while its side won Initiative; once per 'Mech every 3 turns (turn 2, then turn 5). A 'Mech it destroys is removed at once, including by a critical from that attack. | p. 32: "applying all damage effects immediately". |
+| 7 | Formation bonus below three 'Mechs | **Lost** while fewer than three of its 'Mechs are not destroyed (crippled 'Mechs still count until they leave). Applies to the reroll, Combat Intuition, Maneuvering Ace and Lucky. | p. 37 general rule; the scenario box doesn't override it. |
+| 8 | Lucky scope | Only a Battle Star 'Mech's own Attack Roll (weapon, REAR or physical), seven uses shared. Not criticals, Initiative or Battlefield Support. | p. 38 "allows a 'Mech in the Formation to reroll an Attack Roll". |
+| 9 | REAR vs one attack | Already built 2026-11-24 (separate rolls; forward damage clamps at 0). | — |
+| 10 | Attacking a building | Immobile (−4), no TMM; the shooter's damage at that range comes off CF; no rear bonus, no overheat in the helper; it is the shooter's attack for the turn. | p. 28. |
