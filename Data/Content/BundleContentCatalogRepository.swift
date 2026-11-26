@@ -27,6 +27,8 @@ public protocol ContentCatalogRepository: Sendable {
     /// The playable mission with this id. Throws when the catalog has no bundle for it (gated or unknown).
     func scenario(id: ScenarioId) throws -> GuidedScenarioDTO
     func boxRoster() throws -> BoxRosterDTO
+    /// Every Alpha Strike card face from the owner's boxes (PlayModeSpec §10).
+    func cardLibrary() throws -> CardLibraryDTO
     /// Boxes a player can own, for onboarding and the Force tab collection.
     func boxSets() throws -> BoxSetsDTO
     func critTable() throws -> CritTableDTO
@@ -73,6 +75,10 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
 
     public func boxRoster() throws -> BoxRosterDTO {
         try load("as-box-roster", subdirectory: "Content/AlphaStrike", as: BoxRosterDTO.self)
+    }
+
+    public func cardLibrary() throws -> CardLibraryDTO {
+        try load("as-card-library", subdirectory: "Content/AlphaStrike", as: CardLibraryDTO.self)
     }
 
     /// Classic record sheets for the A Game of Armored Combat booklet. Not on the protocol until Classic ships.

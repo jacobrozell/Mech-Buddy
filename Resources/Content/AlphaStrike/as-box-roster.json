@@ -4,6 +4,7 @@
   "sourceNote": "Starter box Alpha Strike card fronts/backs. Stats for Ridge Line four are golden fixtures; other cards ship without filled AS numbers until authored or user-entered.",
   "cards": [
     {
+      "cardId": "locust-lct-1v",
       "name": "Locust LCT-1V",
       "back": "Locust LCT-1E",
       "sz": 1,
@@ -21,6 +22,7 @@
       "abilities": ""
     },
     {
+      "cardId": "commando-com-2d",
       "name": "Commando COM-2D",
       "back": "Commando COM-3A",
       "sz": 1,
@@ -38,6 +40,7 @@
       "abilities": "SRM1/1"
     },
     {
+      "cardId": "shadow-hawk-shd-2h",
       "name": "Shadow Hawk SHD-2H",
       "back": "Shadow Hawk, Durant Carlyle",
       "sz": 2,
@@ -55,6 +58,7 @@
       "abilities": "IF0*,JMPW1"
     },
     {
+      "cardId": "wolverine-wvr-6m",
       "name": "Wolverine WVR-6M",
       "back": "Wolverine WVR-6R",
       "sz": 2,
@@ -72,6 +76,7 @@
       "abilities": ""
     },
     {
+      "cardId": "catapult-cplt-c1",
       "name": "Catapult CPLT-C1",
       "back": "Catapult CPLT-K2",
       "sz": 3,
@@ -89,6 +94,7 @@
       "abilities": null
     },
     {
+      "cardId": "thunderbolt-tdr-5s",
       "name": "Thunderbolt TDR-5S",
       "back": "Thunderbolt TDR-5SE",
       "sz": 3,
@@ -106,6 +112,7 @@
       "abilities": null
     },
     {
+      "cardId": "awesome-aws-8q",
       "name": "Awesome AWS-8Q",
       "back": "BattleMaster BLR-1G",
       "sz": 4,
@@ -124,6 +131,7 @@
       "notes": "Shares a physical card with BattleMaster — track one on Force if both are fielded."
     },
     {
+      "cardId": "battlemaster-blr-1g",
       "name": "BattleMaster BLR-1G",
       "back": "Awesome AWS-8Q",
       "sz": 4,

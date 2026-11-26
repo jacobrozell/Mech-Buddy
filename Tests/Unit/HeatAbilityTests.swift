@@ -1,4 +1,4 @@
-// HT#/#/# heat attacks (Alpha Strike Quick-Start p. 24–25), Point Value by skill (p. 33),
+// HT#/#/# heat attacks (Alpha Strike Quick-Start p. 24–25), Point Value by skill (p. 35),
 // and OmniMech configuration names matching box minis.
 import Foundation
 import Testing
@@ -84,7 +84,7 @@ struct HeatAbilityTests {
 
 @Suite("Point Value by skill")
 struct PointValueTests {
-    @Test("Improved Skill PV Increase Table bands (p. 33)")
+    @Test("Improved Skill PV Increase Table bands (p. 35)")
     func table() {
         let bands: [(Int, Int)] = [(5, 1), (7, 1), (8, 2), (12, 2), (13, 3), (27, 5), (31, 6), (42, 8), (52, 10), (53, 11), (57, 11), (58, 12)]
         for (base, increase) in bands {
