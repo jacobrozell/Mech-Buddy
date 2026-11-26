@@ -193,7 +193,8 @@ public enum GuidedScenarioFactory {
             ov: dto.ov,
             armorCap: dto.armor,
             structureCap: dto.structure,
-            abilities: dto.abilities
+            abilities: dto.abilities,
+            minimalDamage: dto.minimalDamage
         )
     }
 }

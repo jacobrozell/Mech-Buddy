@@ -38,9 +38,22 @@
 
 **Simultaneous fire** (owner decision, playtest note 50): with the fixes above, the order shots are entered in can't change the result. Damage and crit effects land at the end of the phase. The one order-dependent effect, the second-MP-hit rewrite, is gone.
 
+## Update 2026-11-25: 0* minimal damage and water (domain done, UI wiring pending)
+
+Page numbers are the printed ones in the Quick-Start Rulebook, 3rd printing (PDF page minus 1).
+
+- **0\* minimal damage (p. 4, p. 21).** A card prints "0\*" at a range where it can still use Minimal Damage; a dash means no shot. Rule text, paraphrased: every successful attack at a "0\*" band makes its player roll 1D6. On 4 or higher it delivers a single point of standard damage. Otherwise it still hits but delivers none, and a minimal attack that delivers no damage may not resolve any Critical Hit checks.
+  - Data: `MatchUnitState.minimalDamage` (`MinimalDamageBands`, per band). The card Int stays 0 at that band. `ScenarioUnitDTO` and `BoxCardDTO` accept `"0*"` as a string for `s`/`m`/`l`; plain numbers decode as before. Saved matches decode without the new keys (the payload JSON is not a SwiftData column, so `SchemaV1` is unchanged).
+  - Solver: a 0\* band allows the shot. `CombatSolve.needsMinimalRoll` says the hit owes a die. `SATORAttackCommand.minimalDie` carries it; a hit without a valid die is refused. 4+ applies 1 damage (a natural 12 still owes its crit). 1 to 3 is a hit that deals 0 and rolls no crit, including on a natural 12.
+  - Owner-level calls where the book is silent: a Weapon Hit (p. 23, "reduced by 1, to a minimum of 0") leaves a printed 0\* at 0\*, while a printed 1 reduced to 0 is a plain 0 with no shot. Overheat points are ordinary damage, so a shot that overheats at a 0\* band is not minimal. A rear hit does not add to minimal damage, because the rule says "a single point". HT heat still lands on any hit. No shipped card has 0\* yet.
+- **Water (pp. 10, 17, 19-20, 24).** A 'Mech standing in depth 1" water has partial cover (+1 to hit), even against a higher attacker. The rulebook example (p. 20) adds that +1 for a target in water. Cooling Down step 2 subtracts 1 heat level if the 'Mech is in water.
+  - Data: `MatchUnitState.inWater`, set by `MatchReducer` command `.setInWater`, cleared by `resetTurnFlags` each turn. Water cover is the same +1 as other partial cover and never stacks with it.
+  - Heat: `AlphaStrikeHeat.endPhase` subtracts 1 after adding overheat and before the no-attack clear, floored at 0. External HT heat is added after.
+  - Movement cost of water is not tracked (players measure it on the table).
+
 ## Still open
 
-- **"0*" minimal damage** (1D6, 4+ deals 1). Settled for the shipped cards: masterunitlist.battletech.com prints the Locust LCT-1V as DMG 1/1/0/0, the Commando COM-2D and Wolverine WVR-6M as 2/2/0/0, and the Shadow Hawk SHD-2H as 2/2/1/0. Those are plain 0s, not 0*. The site marks minimal damage as "0*" (the Shadow Hawk's "IF 0*"), so "no shot at that range" is right. A card with 0* damage will need a minimal-damage field when one ships. The same lookup shows the Shadow Hawk's **JMPW 1** on its card, which settles playtest note 13.
+- **"0*" minimal damage** (now implemented, see the update above). Settled for the shipped cards: masterunitlist.battletech.com prints the Locust LCT-1V as DMG 1/1/0/0, the Commando COM-2D and Wolverine WVR-6M as 2/2/0/0, and the Shadow Hawk SHD-2H as 2/2/1/0. Those are plain 0s, not 0*. The site marks minimal damage as "0*" (the Shadow Hawk's "IF 0*"), so "no shot at that range" is right. A card with 0* damage will need a minimal-damage field when one ships. The same lookup shows the Shadow Hawk's **JMPW 1** on its card, which settles playtest note 13.
 - **Rear arc:** the exact definition is in diagrams that didn't extract. The Broken Ground tip says "back half".
-- **Not used by any mission yet:** water (partial cover, −1 heat), HT heat, REAR, physical attacks, Forced Withdrawal and crippled. See `mission-ladder-rules-intake.md` before building Missions 4–5.
+- **Not used by any mission yet:** HT heat, REAR, physical attacks, Forced Withdrawal and crippled. See `mission-ladder-rules-intake.md` before building Missions 4–5.
 - **MP hits and jumping:** whether an MP hit halves jump inches. The app halves them, which is the plain reading of "halves its Move".

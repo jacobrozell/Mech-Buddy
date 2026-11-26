@@ -170,6 +170,11 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var leftTable: Bool
     /// The End Phase has logged "… is crippled and must withdraw" for it (Forced Withdrawal).
     public var withdrawalAnnounced: Bool
+    /// Range bands whose printed damage is "0*" (minimal damage, Quick-Start Rulebook p. 21). Card damage stays 0 there.
+    public var minimalDamage: MinimalDamageBands = .none
+    /// Standing in water this turn (Quick-Start Rulebook pp. 10, 19, 24): partial cover for attackers and −1 heat in the
+    /// End Phase. Players set it each turn; `resetTurnFlags` clears it.
+    public var inWater: Bool = false
 
     public var pendingCritical: Bool {
         get { criticalsOwed > 0 }
@@ -213,7 +218,9 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         overheatThisTurn: Int = 0,
         mini: MiniMarker? = nil,
         leftTable: Bool = false,
-        withdrawalAnnounced: Bool = false
+        withdrawalAnnounced: Bool = false,
+        minimalDamage: MinimalDamageBands = .none,
+        inWater: Bool = false
     ) {
         self.id = id
         self.libraryUnitId = libraryUnitId
@@ -246,6 +253,8 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
         self.mini = mini
         self.leftTable = leftTable
         self.withdrawalAnnounced = withdrawalAnnounced
+        self.minimalDamage = minimalDamage
+        self.inWater = inWater
     }
 
     public var remainingArmor: Int { max(0, armorCap - armorDamage) }
@@ -317,6 +326,18 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var effectiveDamage: (s: Int, m: Int, l: Int) {
         let w = crits.weaponHits
         return (max(0, s - w), max(0, m - w), max(0, l - w))
+    }
+
+    /// True when this range prints "0*" and no weapon hit has touched it. A weapon hit takes 1 off every value to a
+    /// minimum of 0 (p. 23): a printed 1 drops to a plain 0 (no shot), a printed 0* stays 0*.
+    public func hasMinimalDamage(at bracket: RangeBracket) -> Bool {
+        guard minimalDamage.contains(bracket) else { return false }
+        switch bracket {
+        case .short: return s == 0
+        case .medium: return m == 0
+        case .long: return l == 0
+        case .outOfRange: return false
+        }
     }
 
     /// Crits that count for shots this combat phase (snapshot when one exists).
@@ -476,7 +497,7 @@ extension MatchUnitState {
         case movementMode, hasMovedThisTurn, hasAttackedThisTurn, turnShot, combatStatus
         case pendingCritical, criticalsOwed, overheatThisTurn, mini, incomingHeatThisTurn
         case rearShot, rearFireReduction
-        case leftTable, withdrawalAnnounced
+        case leftTable, withdrawalAnnounced, minimalDamage, inWater
     }
 
     public init(from decoder: Decoder) throws {
@@ -520,6 +541,8 @@ extension MatchUnitState {
         mini = try container.decodeIfPresent(MiniMarker.self, forKey: .mini)
         leftTable = try container.decodeIfPresent(Bool.self, forKey: .leftTable) ?? false
         withdrawalAnnounced = try container.decodeIfPresent(Bool.self, forKey: .withdrawalAnnounced) ?? false
+        minimalDamage = try container.decodeIfPresent(MinimalDamageBands.self, forKey: .minimalDamage) ?? .none
+        inWater = try container.decodeIfPresent(Bool.self, forKey: .inWater) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -559,5 +582,7 @@ extension MatchUnitState {
         try container.encodeIfPresent(mini, forKey: .mini)
         try container.encode(leftTable, forKey: .leftTable)
         try container.encode(withdrawalAnnounced, forKey: .withdrawalAnnounced)
+        if !minimalDamage.isEmpty { try container.encode(minimalDamage, forKey: .minimalDamage) }
+        if inWater { try container.encode(inWater, forKey: .inWater) }
     }
 }

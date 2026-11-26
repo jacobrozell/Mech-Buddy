@@ -40,7 +40,7 @@ With these, Mission 3 has enough 'Mechs that can overheat. The Catapult, Thunder
 | H3 | To-hit effect | + current heat level to weapon attacks. Doesn't apply to physical attacks (pp. 20, 24) | Done for weapons |
 | H4 | Movement effect | MV −2″ per heat level. TMM −1 at heat 2 or more. Neither applies to jumping moves (p. 24) | Not done |
 | H5 | Heat 4 | Shutdown. Next turn the 'Mech can't move or attack, and it counts as immobile (−4 to hit it) (p. 24) | Not done |
-| H6/H7 | Cooling and restart | End Phase, in this order: (1) add OV used this turn, (2) −1 if standing in water, (3) clear all heat if it made no weapon attack this turn, (4) if it started the End Phase shut down, clear all heat and restart it (p. 24). Heat does **not** tick down by 1 a turn. You cool off by not firing for a turn | Not done |
+| H6/H7 | Cooling and restart | End Phase, in this order: (1) add OV used this turn, (2) −1 if standing in water, (3) clear all heat if it made no weapon attack this turn, (4) if it started the End Phase shut down, clear all heat and restart it (p. 24). Heat does **not** tick down by 1 a turn. You cool off by not firing for a turn | Water −1 done in the domain 2026-11-25; End Phase toggle pending |
 | H8 | Engine hit | 1 heat in the End Phase of any turn the 'Mech fired, on top of any OV heat. A second engine hit destroys it (p. 23) | Adds the heat right away when it fires, not in the End Phase. Should move to the End Phase |
 | H9 | Jumping or sprinting heat | None in these rules | Matches |
 
