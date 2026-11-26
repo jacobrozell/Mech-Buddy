@@ -43,7 +43,10 @@ struct PlayForcesStep: View {
     }
 
     private var sidePicker: some View {
-        HStack(spacing: TMSpace.sm) {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: TMSpace.sm))
+            : AnyLayout(HStackLayout(spacing: TMSpace.sm))
+        return layout {
             ForEach(setup.sides) { item in
                 Button {
                     side = item.id
@@ -52,7 +55,7 @@ struct PlayForcesStep: View {
                         SideBadge(side: item.id)
                         Text(item.name)
                             .font(TMFont.detail.weight(.semibold))
-                            .lineLimit(1)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
                         Text("\(setup.force(item.id).count)")
                             .font(TMFont.detail)
                             .foregroundStyle(.secondary)
@@ -98,7 +101,9 @@ struct PlayForcesStep: View {
         let otherFaces = otherFaces(of: pick)
         return TMCard {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
-                HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                (dynamicTypeSize.isAccessibilitySize
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.xs))
+                    : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: TMSpace.sm))) {
                     VStack(alignment: .leading, spacing: TMSpace.xxs) {
                         Text(pick.name).font(TMFont.cardTitle)
                         Text("Size \(pick.size) · card \(pick.basePV) PV\(pick.isClan ? " · Clan" : "")")
@@ -106,7 +111,7 @@ struct PlayForcesStep: View {
                             .foregroundStyle(.secondary)
                     }
                     .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: TMSpace.sm)
+                    if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: TMSpace.sm) }
                     Text("\(pick.adjustedPV) PV")
                         .font(TMFont.stat)
                         .monospacedDigit()
@@ -192,14 +197,17 @@ struct PlayForcesStep: View {
 struct PlayBudgetBar: View {
     var check: BudgetCheck
     var side: SideId
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xs) {
-            HStack {
+            (dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.xs))
+                : AnyLayout(HStackLayout())) {
                 Text(usedText)
                     .font(TMFont.stat)
                     .monospacedDigit()
-                Spacer(minLength: TMSpace.sm)
+                if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: TMSpace.sm) }
                 Label(check.text, systemImage: check.isOver ? "exclamationmark.triangle.fill" : "checkmark.circle")
                     .font(TMFont.detail.weight(.semibold))
                     .foregroundStyle(check.isOver ? TMColor.warning : .secondary)
@@ -429,7 +437,7 @@ struct PlayReviewStep: View {
             if let player = side.players.first, !player.isEmpty {
                 Text(player).font(TMFont.detail).foregroundStyle(.secondary)
             }
-            Text("\(setup.totalPV(side.id)) PV · \(setup.force(side.id).count) ’Mechs · \(check.text)")
+            Text("\(setup.totalPV(side.id)) PV · \(PlayModeText.mechs(setup.force(side.id).count)) · \(check.text)")
                 .font(TMFont.stat)
                 .monospacedDigit()
                 .foregroundStyle(check.isOver ? TMColor.warning : .primary)

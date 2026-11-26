@@ -18,7 +18,7 @@ struct TableSetupStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xl) {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
-                Eyebrow("Mission briefing")
+                Eyebrow(session.isPlayGame ? "Game briefing" : "Mission briefing")
                 Text("Set up the table, pick sides, then start.")
                     .font(TMFont.body)
                 if let subtitle = scenario.subtitle, !subtitle.isEmpty {
@@ -63,6 +63,13 @@ struct TableSetupStep: View {
                 if let skill = sharedSkill {
                     // Printed cards leave Skill blank; players asked what to write there.
                     Label("Every ’Mech uses Skill \(skill). Write it on the card’s blank Skill line.", systemImage: "pencil")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.mission.skill")
+                } else if session.isPlayGame {
+                    Label("Pilots differ. Write each ’Mech’s Skill on its card’s blank Skill line: "
+                        + session.units.map { "\($0.name) \($0.skill)" }.joined(separator: ", ") + ".", systemImage: "pencil")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

@@ -191,7 +191,7 @@ struct PlayModeHomeView: View {
         TMCard {
             VStack(alignment: .leading, spacing: TMSpace.md) {
                 Eyebrow("Setting up")
-                Text("\(draft.formatName) · \(draft.budget.summary) · \(draft.unitCount) ’Mechs picked")
+                Text("\(draft.formatName) · \(draft.budget.summary) · \(PlayModeText.mechs(draft.unitCount)) picked")
                     .font(TMFont.cardTitle)
                     .fixedSize(horizontal: false, vertical: true)
                 ViewThatFits(in: .horizontal) {
@@ -275,6 +275,11 @@ enum PlayModeText {
     static func title(for session: MatchSession, missionTitle: String) -> String {
         guard let play = session.play else { return missionTitle }
         return "Play · \(play.formatName)"
+    }
+
+    /// "1 ’Mech", "3 ’Mechs".
+    static func mechs(_ count: Int) -> String {
+        count == 1 ? "1 ’Mech" : "\(count) ’Mechs"
     }
 
     /// "Turn 2 · Movement", with the turn limit when there is one.

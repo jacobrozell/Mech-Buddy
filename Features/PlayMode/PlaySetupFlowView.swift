@@ -78,6 +78,7 @@ struct PlaySetupFlowView: View {
         .navigationTitle(step.title)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 if step == .sides {
