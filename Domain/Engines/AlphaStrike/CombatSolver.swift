@@ -63,7 +63,9 @@ public struct CombatDamagePreview: Sendable, Equatable {
 
     public var chipsArmor: Int { armorBefore - armorAfter }
     public var chipsStructure: Int { structureBefore - structureAfter }
-    public var zeroDamage: Bool { delivered == 0 }
+    public var zeroDamage: Bool { delivered == 0 && !isMinimal }
+    /// The band is "0*": a hit needs a 1D6 and deals 1 on 4+ (`MinimalDamage`). `delivered` is 0 until it is rolled.
+    public var isMinimal: Bool = false
 }
 
 public struct CombatSolve: Sendable, Equatable {
@@ -79,6 +81,11 @@ public struct CombatSolve: Sendable, Equatable {
     public var roll: DiceRoll2D6?
     public var isHit: Bool?
     public var attackKind: AttackKind = .weapon
+    /// The target stands in water, so this shot already counts partial cover (+1, not stacked with other cover).
+    public var targetInWater: Bool = false
+
+    /// A hit at this band owes the minimal-damage 1D6 (rulebook p. 21).
+    public var needsMinimalRoll: Bool { ifHit.isMinimal }
 
     public var isPhysical: Bool { attackKind == .physical }
 
@@ -189,8 +196,21 @@ public enum CombatSolver {
                 overheatAllowed: overheatAllowed
             ).delivered
 
-        let ifHit = preview(defender: defender, amount: delivered, naturalTwelve: false)
-        let ifTwelve = preview(defender: defender, amount: delivered, naturalTwelve: true)
+        let minimal = !physical && isMinimalAttack(
+            attacker: attacker,
+            bracket: bracket,
+            kind: insight.attackKind,
+            overheatUsed: rearFiring ? 0 : AlphaStrikeHeat.usableOverheat(
+                requested: insight.overheatUsed,
+                attacker: attacker,
+                bracket: bracket,
+                overheatAllowed: overheatAllowed
+            )
+        )
+        var ifHit = preview(defender: defender, amount: delivered, naturalTwelve: false)
+        var ifTwelve = preview(defender: defender, amount: delivered, naturalTwelve: true)
+        ifHit.isMinimal = minimal
+        ifTwelve.isMinimal = minimal
 
         var isHit: Bool?
         if let tn, let roll, cannot == nil {
@@ -209,12 +229,26 @@ public enum CombatSolver {
             ifNaturalTwelve: ifTwelve,
             roll: roll,
             isHit: isHit,
-            attackKind: insight.attackKind
+            attackKind: insight.attackKind,
+            targetInWater: defender.inWater
         )
     }
 
+    /// A forward weapon shot at a "0*" band with no overheat added: a hit rolls 1D6 for 1 damage on 4+ (rulebook p. 21).
+    /// Overheat points are ordinary damage, so a shot that used them is not minimal. A REAR shot that already took
+    /// damage off the forward value leaves nothing to be minimal about.
+    public static func isMinimalAttack(
+        attacker: MatchUnitState,
+        bracket: RangeBracket,
+        kind: AttackKind = .weapon,
+        overheatUsed: Int = 0
+    ) -> Bool {
+        guard kind == .weapon, overheatUsed == 0, attacker.rearFireReduction == 0 else { return false }
+        return attacker.hasMinimalDamage(at: bracket)
+    }
+
     /// A range where the card does no damage ("—" or 0) has no weapon attack (rulebook p. 20).
-    /// "0*" minimal damage isn't stored on cards yet; every shipped 0 is treated as no damage.
+    /// A "0*" band (`MatchUnitState.minimalDamage`) is the exception: it allows the shot (rulebook p. 21).
     /// A REAR shot with no REAR damage at that range has no attack either, and a forward shot can drop to
     /// nothing after a REAR shot took its damage (p. 25).
     public static func noDamageReason(
@@ -235,6 +269,7 @@ public enum CombatSolver {
         }
         let value = forwardDamage(attacker: attacker, bracket: bracket)
         guard value == 0 else { return nil }
+        if isMinimalAttack(attacker: attacker, bracket: bracket, kind: kind) { return nil }
         if attacker.rearFireReduction > 0 {
             return "\(attacker.name)’s rear shot used its damage at \(name) range, so it has no forward shot there."
         }
@@ -275,7 +310,8 @@ public enum CombatSolver {
                 : max(0, defender.firingTMM - defender.heatTMMPenalty),
             other: OtherModifiers(
                 woods: woods,
-                partialCover: partialCover,
+                // Water is partial cover (pp. 10, 19); it never stacks with cover the table already gave.
+                partialCover: partialCover || defender.inWater,
                 targetHasSTL: defender.hasStealth,
                 fireControlHits: attacker.firingCrits.fireControlHits,
                 attackerHeat: attacker.heat,

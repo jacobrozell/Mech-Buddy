@@ -69,6 +69,26 @@ public struct ScenarioSidesDTO: Codable, Sendable {
     public var lanceB: [ScenarioUnitDTO]
 }
 
+/// A card damage value as printed: a number, or the string "0*" for minimal damage (rulebook p. 21).
+/// Plain JSON numbers keep decoding as before; "0*" decodes to 0 plus a minimal flag.
+struct PrintedDamage {
+    var value: Int
+    var minimal: Bool
+
+    static func decode<K: CodingKey>(_ c: KeyedDecodingContainer<K>, _ key: K) throws -> PrintedDamage {
+        if let n = try? c.decode(Int.self, forKey: key) { return PrintedDamage(value: n, minimal: false) }
+        let text = try c.decode(String.self, forKey: key)
+        guard let parsed = MinimalDamage.parse(text) else {
+            throw DecodingError.dataCorruptedError(forKey: key, in: c, debugDescription: "Bad damage value \(text)")
+        }
+        return PrintedDamage(value: parsed.value, minimal: parsed.minimal)
+    }
+
+    static func encode<K: CodingKey>(_ value: Int, minimal: Bool, _ c: inout KeyedEncodingContainer<K>, _ key: K) throws {
+        if minimal { try c.encode("0*", forKey: key) } else { try c.encode(value, forKey: key) }
+    }
+}
+
 public struct ScenarioUnitDTO: Codable, Sendable {
     public var name: String
     public var pv: Int
@@ -78,6 +98,8 @@ public struct ScenarioUnitDTO: Codable, Sendable {
     public var s: Int
     public var m: Int
     public var l: Int
+    /// Bands printed "0*". The matching `s`/`m`/`l` is 0. JSON writes it as the string "0*".
+    public var minimalDamage: MinimalDamageBands
     public var ov: Int
     public var armor: Int
     public var structure: Int
@@ -86,7 +108,8 @@ public struct ScenarioUnitDTO: Codable, Sendable {
 
     public init(
         name: String, pv: Int, mv: String, tmm: Int, sz: Int, s: Int, m: Int, l: Int,
-        ov: Int, armor: Int, structure: Int, skill: Int, abilities: String
+        ov: Int, armor: Int, structure: Int, skill: Int, abilities: String,
+        minimalDamage: MinimalDamageBands = .none
     ) {
         self.name = name
         self.pv = pv
@@ -96,11 +119,54 @@ public struct ScenarioUnitDTO: Codable, Sendable {
         self.s = s
         self.m = m
         self.l = l
+        self.minimalDamage = minimalDamage
         self.ov = ov
         self.armor = armor
         self.structure = structure
         self.skill = skill
         self.abilities = abilities
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, pv, mv, tmm, sz, s, m, l, ov, armor, structure, skill, abilities
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        pv = try c.decode(Int.self, forKey: .pv)
+        mv = try c.decode(String.self, forKey: .mv)
+        tmm = try c.decode(Int.self, forKey: .tmm)
+        sz = try c.decode(Int.self, forKey: .sz)
+        let ps = try PrintedDamage.decode(c, .s)
+        let pm = try PrintedDamage.decode(c, .m)
+        let pl = try PrintedDamage.decode(c, .l)
+        s = ps.value
+        m = pm.value
+        l = pl.value
+        minimalDamage = MinimalDamageBands(short: ps.minimal, medium: pm.minimal, long: pl.minimal)
+        ov = try c.decode(Int.self, forKey: .ov)
+        armor = try c.decode(Int.self, forKey: .armor)
+        structure = try c.decode(Int.self, forKey: .structure)
+        skill = try c.decode(Int.self, forKey: .skill)
+        abilities = try c.decode(String.self, forKey: .abilities)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(name, forKey: .name)
+        try c.encode(pv, forKey: .pv)
+        try c.encode(mv, forKey: .mv)
+        try c.encode(tmm, forKey: .tmm)
+        try c.encode(sz, forKey: .sz)
+        try PrintedDamage.encode(s, minimal: minimalDamage.short, &c, .s)
+        try PrintedDamage.encode(m, minimal: minimalDamage.medium, &c, .m)
+        try PrintedDamage.encode(l, minimal: minimalDamage.long, &c, .l)
+        try c.encode(ov, forKey: .ov)
+        try c.encode(armor, forKey: .armor)
+        try c.encode(structure, forKey: .structure)
+        try c.encode(skill, forKey: .skill)
+        try c.encode(abilities, forKey: .abilities)
     }
 }
 
@@ -126,7 +192,56 @@ public struct BoxCardDTO: Codable, Sendable {
     public var structure: Int?
     public var skill: Int?
     public var abilities: String?
+    /// Bands printed "0*" (the matching s/m/l decodes to 0). JSON writes them as the string "0*".
+    public var minimalDamage: MinimalDamageBands = .none
+
+    private enum CodingKeys: String, CodingKey {
+        case name, back, sz, defaultSide, pv, mv, tmm, s, m, l, ov, armor, structure, skill, abilities
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        back = try c.decodeIfPresent(String.self, forKey: .back)
+        sz = try c.decode(Int.self, forKey: .sz)
+        defaultSide = try c.decode(String.self, forKey: .defaultSide)
+        pv = try c.decodeIfPresent(Int.self, forKey: .pv)
+        mv = try c.decodeIfPresent(String.self, forKey: .mv)
+        tmm = try c.decodeIfPresent(Int.self, forKey: .tmm)
+        let ps = try c.contains(.s) && !c.decodeNil(forKey: .s) ? PrintedDamage.decode(c, .s) : nil
+        let pm = try c.contains(.m) && !c.decodeNil(forKey: .m) ? PrintedDamage.decode(c, .m) : nil
+        let pl = try c.contains(.l) && !c.decodeNil(forKey: .l) ? PrintedDamage.decode(c, .l) : nil
+        s = ps?.value
+        m = pm?.value
+        l = pl?.value
+        minimalDamage = MinimalDamageBands(short: ps?.minimal ?? false, medium: pm?.minimal ?? false, long: pl?.minimal ?? false)
+        ov = try c.decodeIfPresent(Int.self, forKey: .ov)
+        armor = try c.decodeIfPresent(Int.self, forKey: .armor)
+        structure = try c.decodeIfPresent(Int.self, forKey: .structure)
+        skill = try c.decodeIfPresent(Int.self, forKey: .skill)
+        abilities = try c.decodeIfPresent(String.self, forKey: .abilities)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(name, forKey: .name)
+        try c.encodeIfPresent(back, forKey: .back)
+        try c.encode(sz, forKey: .sz)
+        try c.encode(defaultSide, forKey: .defaultSide)
+        try c.encodeIfPresent(pv, forKey: .pv)
+        try c.encodeIfPresent(mv, forKey: .mv)
+        try c.encodeIfPresent(tmm, forKey: .tmm)
+        if let s { try PrintedDamage.encode(s, minimal: minimalDamage.short, &c, .s) }
+        if let m { try PrintedDamage.encode(m, minimal: minimalDamage.medium, &c, .m) }
+        if let l { try PrintedDamage.encode(l, minimal: minimalDamage.long, &c, .l) }
+        try c.encodeIfPresent(ov, forKey: .ov)
+        try c.encodeIfPresent(armor, forKey: .armor)
+        try c.encodeIfPresent(structure, forKey: .structure)
+        try c.encodeIfPresent(skill, forKey: .skill)
+        try c.encodeIfPresent(abilities, forKey: .abilities)
+    }
 }
+
 
 public struct CritTableDTO: Codable, Sendable, ContentSchemaVersioned {
     public var schemaVersion: Int

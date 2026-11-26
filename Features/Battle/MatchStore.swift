@@ -200,6 +200,11 @@ final class MatchStore: Identifiable {
         mutate(.setMini(unitId: unitId, mini: mini), undoable: false)
     }
 
+    /// Standing in water this turn: partial cover for shots at it, −1 heat in the End Phase.
+    func setInWater(unitId: UUID, _ inWater: Bool) {
+        mutate(.setInWater(unitId: unitId, inWater: inWater), undoable: false)
+    }
+
     /// The players agreed who moves first, so no initiative dice.
     func agreeInitiative(firstToMove side: SideId) {
         mutate(.agreeInitiative(firstToMove: side), failureTitle: "Couldn’t start the turn")
@@ -278,7 +283,8 @@ final class MatchStore: Identifiable {
         partialCover: Bool = false,
         rearHit: Bool = false,
         overheatUsed: Int = 0,
-        attackKind: AttackKind = .weapon
+        attackKind: AttackKind = .weapon,
+        minimalDie: Int? = nil
     ) -> Bool {
         guard let roll = DiceRoll2D6.validated(die1: die1, die2: die2) else {
             lastErrorTitle = "Couldn’t save the shot"
@@ -298,7 +304,8 @@ final class MatchStore: Identifiable {
                     partialCover: partialCover,
                     rearHit: rearHit,
                     overheatUsed: overheatUsed,
-                    attackKind: attackKind
+                    attackKind: attackKind,
+                    minimalDie: minimalDie
                 )
             ),
             failureTitle: attackKind == .physical ? "Couldn’t save the attack" : "Couldn’t save the shot"

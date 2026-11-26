@@ -35,7 +35,7 @@ public enum AlphaStrikeHeat {
 
     /// End Phase heat for one ’Mech, in rulebook order:
     /// 1. add overheat used this turn (and 1 per engine hit if it fired);
-    /// 2. (standing in water −1: not tracked by the app);
+    /// 2. subtract 1 if standing in water (p. 24; never below 0);
     /// 3. clear all heat if it made no weapon attack this turn (a punch or kick isn't one);
     /// 4. clear all heat and restart if it began this End Phase shut down;
     /// 5. add external heat: enemy HT hits this turn, at most 2 (p. 24–25).
@@ -48,6 +48,7 @@ public enum AlphaStrikeHeat {
             heat += unit.overheatThisTurn
             heat += min(1, unit.crits.engineHits)
         }
+        if unit.inWater { heat = max(0, heat - 1) }
         if !fired { heat = 0 }
         if beganShutdown { heat = 0 }
         heat += min(MatchUnitState.maxIncomingHeatPerTurn, unit.incomingHeatThisTurn)

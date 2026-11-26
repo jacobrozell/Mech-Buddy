@@ -60,6 +60,7 @@ public enum AlphaStrikePhaseEngine {
             units[i].hasAttackedThisTurn = false
             units[i].rearShot = nil
             units[i].rearFireReduction = 0
+            units[i].inWater = false
             units[i].turnShot = nil
             units[i].movementMode = .unset
         }

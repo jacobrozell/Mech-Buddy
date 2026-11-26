@@ -10,6 +10,9 @@ public enum MatchCommand: Sendable {
     case agreeInitiative(firstToMove: SideId)
     /// Tag a miniature with a colour so players can match minis to cards. Any phase.
     case setMini(unitId: UUID, mini: MiniMarker?)
+    /// Mark a ’Mech as standing in water this turn (partial cover for shots at it, −1 heat in the End Phase).
+    /// Any phase. Cleared when the next turn starts.
+    case setInWater(unitId: UUID, inWater: Bool)
     case setMovementMode(unitId: UUID, mode: MovementMode)
     case markMoved(unitId: UUID)
     /// Change a move already recorded this phase. Does not change whose turn it is.
@@ -43,6 +46,8 @@ public struct SATORAttackCommand: Sendable, Equatable {
     public var overheatUsed: Int
     /// Weapon fire or a punch/kick. A physical attack ignores `range` and `overheatUsed`.
     public var attackKind: AttackKind
+    /// The 1D6 for a hit at a "0*" band (rulebook p. 21). Required when such a shot hits.
+    public var minimalDie: Int?
 
     public init(
         attackerId: UUID,
@@ -55,7 +60,8 @@ public struct SATORAttackCommand: Sendable, Equatable {
         partialCover: Bool = false,
         rearHit: Bool = false,
         overheatUsed: Int = 0,
-        attackKind: AttackKind = .weapon
+        attackKind: AttackKind = .weapon,
+        minimalDie: Int? = nil
     ) {
         self.attackerId = attackerId
         self.defenderId = defenderId
@@ -68,6 +74,7 @@ public struct SATORAttackCommand: Sendable, Equatable {
         self.rearHit = rearHit
         self.overheatUsed = overheatUsed
         self.attackKind = attackKind
+        self.minimalDie = minimalDie
     }
 
     /// A punch or kick: within 1″, target in the front arc, damage = Size (rulebook pp. 20–22).
@@ -142,6 +149,12 @@ public enum MatchReducer {
                 throw MatchDomainError.unitNotFound
             }
             next.units[idx].mini = mini
+
+        case .setInWater(let unitId, let inWater):
+            guard let idx = next.units.firstIndex(where: { $0.id == unitId }) else {
+                throw MatchDomainError.unitNotFound
+            }
+            next.units[idx].inWater = inWater
 
         case .agreeInitiative(let first):
             guard next.phase == .initiative else {
@@ -394,7 +407,32 @@ public enum MatchReducer {
         // Keep the "X hit Y for N. Rolled R, needed T." shape: ShotFeed and Victory stats read it.
         let how = physical ? " Punch or kick." : (rearFiring ? " Rear-firing weapons." : "")
 
-        if hit {
+        let minimal = CombatSolver.isMinimalAttack(
+            attacker: attacker,
+            bracket: bracket,
+            kind: attack.attackKind,
+            overheatUsed: overheat
+        )
+        if hit, minimal {
+            // "0*" (rulebook p. 21): 1D6, 4+ is one point of damage; otherwise a hit that deals nothing and rolls no crit.
+            guard let die = attack.minimalDie, MinimalDamage.isValid(die: die) else {
+                throw MatchDomainError.cannotAttack("Roll the minimal damage die (1D6) for this hit.")
+            }
+            let amount = MinimalDamage.damage(forDie: die)
+            deliveredDamage = amount
+            if amount > 0 {
+                let applied = AlphaStrikeDamage.apply(
+                    to: defender,
+                    amount: amount,
+                    naturalTwelveHit: attack.roll.isNaturalTwelve
+                )
+                next.units[defenderIdx] = applied.unit
+                note = "\(attacker.name) hit \(defender.name) for \(amount). Rolled \(attack.roll.total), needed \(tn.value).\(how) Minimal damage die \(die): 1 point."
+                if applied.needsCritical { note += " A critical is owed." }
+            } else {
+                note = "\(attacker.name) hit \(defender.name) for 0. Rolled \(attack.roll.total), needed \(tn.value).\(how) Minimal damage die \(die), needs \(MinimalDamage.threshold)+: no damage and no critical."
+            }
+        } else if hit {
             let delivered = physical
                 ? AlphaStrikeDamage.physical(attacker: attacker, rearHit: attack.rearHit)
                 : AlphaStrikeDamage.delivered(
@@ -418,6 +456,10 @@ public enum MatchReducer {
             if applied.needsCritical {
                 note += " A critical is owed."
             }
+        } else {
+            note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value).\(how) No damage."
+        }
+        if hit {
             // HT#/#/#: a hit at that range adds heat to the target in the End Phase, at most 2 a turn (p. 25).
             let heatAbility = (physical || rearFiring) ? 0 : attacker.heatAbility(at: bracket)
             if heatAbility > 0 {
@@ -428,8 +470,6 @@ public enum MatchReducer {
                     note += " +\(after - before) heat to \(defender.name) in the End Phase (HT)."
                 }
             }
-        } else {
-            note = "\(attacker.name) missed \(defender.name). Rolled \(attack.roll.total), needed \(tn.value).\(how) No damage."
         }
 
         if overheat > 0 {
