@@ -205,6 +205,8 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     public var activeSide: SideId
     /// The sides in this match, in seat order. Missions: Side A, Side B.
     public var sides: [MatchSide]
+    /// The setup of a Play mode game (PlayModeSpec § 12). Nil for a mission.
+    public var play: PlaySetup?
     public var initiativeWinner: SideId?
     public var initiativeRolls: InitiativeRolls?
     /// This turn's initiative order, lowest first: first to move, winner last. Empty before initiative.
@@ -232,6 +234,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         phase: PhaseId = .initiative,
         activeSide: SideId = .lanceA,
         sides: [MatchSide] = MatchSide.missionPair,
+        play: PlaySetup? = nil,
         initiativeWinner: SideId? = nil,
         initiativeRolls: InitiativeRolls? = nil,
         initiativeOrder: [SideId]? = nil,
@@ -255,6 +258,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         self.phase = phase
         self.activeSide = activeSide
         self.sides = sides
+        self.play = play
         self.initiativeWinner = initiativeWinner
         self.initiativeRolls = initiativeRolls
         self.initiativeOrder = initiativeOrder
@@ -272,7 +276,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide, sides
+        case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide, sides, play
         case initiativeWinner, initiativeRolls, initiativeOrder, units, eventLog, status, outcome
         case tableReady, forcesLoaded, updatedAt, recoverySnapshots, diceMode, deploymentAcknowledged
     }
@@ -292,6 +296,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         phase = try container.decode(PhaseId.self, forKey: .phase)
         activeSide = try container.decode(SideId.self, forKey: .activeSide)
         sides = try container.decodeIfPresent([MatchSide].self, forKey: .sides) ?? MatchSide.missionPair
+        play = try container.decodeIfPresent(PlaySetup.self, forKey: .play)
         initiativeWinner = try container.decodeIfPresent(SideId.self, forKey: .initiativeWinner)
         initiativeRolls = try container.decodeIfPresent(InitiativeRolls.self, forKey: .initiativeRolls)
         initiativeOrder = try container.decodeIfPresent([SideId].self, forKey: .initiativeOrder)
@@ -319,6 +324,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         try container.encode(phase, forKey: .phase)
         try container.encode(activeSide, forKey: .activeSide)
         try container.encode(sides, forKey: .sides)
+        try container.encodeIfPresent(play, forKey: .play)
         try container.encodeIfPresent(initiativeWinner, forKey: .initiativeWinner)
         try container.encodeIfPresent(initiativeRolls, forKey: .initiativeRolls)
         try container.encode(initiativeOrder, forKey: .initiativeOrder)
@@ -384,6 +390,9 @@ extension MatchSession {
         let ids = sideIds
         return ids.first { $0 != id } ?? id
     }
+
+    /// A Play mode game, not a mission.
+    public var isPlayGame: Bool { play != nil }
 
     /// The side that moves first this turn: lowest initiative. Nil before initiative.
     public var firstToMove: SideId? { initiativeOrder.first }

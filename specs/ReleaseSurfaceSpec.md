@@ -11,7 +11,7 @@ Build wide internally; ship narrow. One module answers “is X reachable?”
 | Alpha Strike Play | on | on | |
 | Ridge Line mission | on | on | |
 | Full Lances scenario | off | on | Mission 5 on the path (`full-lances`) is playable under `missionLadder` from 1.4.0; this flag is unused by it |
-| Free Battle | **off** | on | **1.1**. Superseded by Play mode: [PlayModeSpec](features/PlayModeSpec.md) § 16 renames this flag `playMode` and adds `playModeMultiSide`, `playObjectives` and `playBoards` |
+| Play mode (`playMode`, was Free Battle) | **off** | on | **1.1**. Learn and Play tabs, Play home, pickup-game setup ([PlayModeSpec](features/PlayModeSpec.md) § 16). `playModeMultiSide`, `playObjectives` and `playBoards` come with their milestones |
 | Physical / OV / Forced Withdrawal tools | off | on | A ladder mission that turns a rule on in its ruleset (Running Hot: overheat; Close Quarters: physical attacks; Full Lances: Forced Withdrawal) shows that tool inside the mission; the flag gates it everywhere else |
 | Classic mode entry | **on (Coming soon)** | on | Visible teaser — not playable |
 | Classic play / tools | off | on | |
@@ -38,7 +38,7 @@ enum ReleaseFlag: String, CaseIterable, Sendable {
     case alphaStrikePlay
     case ridgeLineMission
     case fullLancesScenario
-    case freeBattle
+    case playMode              // was freeBattle; Learn | Play tabs and pickup games (PlayModeSpec § 16)
     case physicalOvWithdrawal
     case missionLadder         // Broken Ground + ladder list on Play (on)
     case classicComingSoonEntry
@@ -56,7 +56,7 @@ struct ReleaseSurface: ReleaseSurfaceProviding {
 
 Defaults: match table above when `isFullProductSurface == false`. Tip jar always false.
 
-Launch arg `-enable_full_product_surface` enables Full column (Classic tools, Full Lances, Free Battle, etc.). Never in App Store builds.
+Launch arg `-enable_full_product_surface` enables Full column (Classic tools, Full Lances, Play mode, etc.). Never in App Store builds.
 
 ## Verification
 

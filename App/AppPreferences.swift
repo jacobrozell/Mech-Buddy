@@ -68,6 +68,8 @@ final class AppPreferences {
     static let completedMissionsKey = "missions.completed"
     /// The game last picked on the Rules tab's switch. Unset until the player changes it.
     static let rulesGameKey = "rules.lastGame"
+    /// The root tab last shown, with Play mode on (PlayModeSpec § 3, Landing tab). Raw `AppTab` value.
+    static let lastRootTabKey = "app.lastRootTab"
 
     private let defaults: UserDefaults
 
@@ -75,7 +77,7 @@ final class AppPreferences {
 
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, coachingKey, gettingStartedChecksKey,
-        completedMissionsKey, rulesGameKey
+        completedMissionsKey, rulesGameKey, lastRootTabKey
     ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key]
 
     var hapticsEnabled: Bool {
@@ -152,6 +154,18 @@ final class AppPreferences {
         }
     }
 
+    /// Raw value of the root tab last shown. `nil` until a tab is picked with Play mode on.
+    var lastRootTab: String? {
+        didSet {
+            guard !isReloading else { return }
+            if let lastRootTab {
+                defaults.set(lastRootTab, forKey: Self.lastRootTabKey)
+            } else {
+                defaults.removeObject(forKey: Self.lastRootTabKey)
+            }
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isReloading = true
@@ -167,6 +181,7 @@ final class AppPreferences {
         completedMissions = []
         collection = nil
         mapSwaps = [:]
+        lastRootTab = nil
         isReloading = false
         reload()
     }
@@ -204,6 +219,7 @@ final class AppPreferences {
         let onboarding = OnboardingStore.load(from: defaults)
         learningTrack = onboarding.track
         rulesGame = defaults.string(forKey: Self.rulesGameKey).flatMap(LearningTrack.init(rawValue:))
+        lastRootTab = defaults.string(forKey: Self.lastRootTabKey)
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
         collection = CollectionStore.load(from: defaults)
