@@ -124,7 +124,7 @@ struct CombatSolverSheet: View {
         NavigationStack {
             content
                 .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: pairToken)
-                .navigationTitle("Solve a shot")
+                .navigationTitle(navigationTitleText)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbar }
                 .onChange(of: defenderId) { _, _ in
@@ -157,6 +157,11 @@ struct CombatSolverSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .accessibilityIdentifier("as.sator.sheet")
+    }
+
+    /// With Close and Change target both in the bar, "Solve a shot" truncates at accessibility sizes.
+    private var navigationTitleText: String {
+        dynamicTypeSize.isAccessibilitySize && attacker != nil && defender != nil ? "Shot" : "Solve a shot"
     }
 
     @ToolbarContentBuilder
@@ -330,97 +335,149 @@ struct CombatSolverSheet: View {
 
     private var gaugeBesideDice: Bool { verticalSizeClass == .compact }
 
+    /// One screen on a portrait phone: the verdict pinned on top, then attack kind, range and one chip row,
+    /// then the dice. Explainers sit behind ⓘ buttons. Landscape splits controls and dice into two columns.
     private func shotScreen(attacker: MatchUnitState, defender: MatchUnitState, solve: CombatSolve) -> some View {
         VStack(spacing: 0) {
             // Pinned above the scroll: a top inset used to cover the range and condition controls.
+            // At accessibility sizes the names wrap to four lines, so only the verdict stays pinned.
             VStack(alignment: .leading, spacing: TMSpace.xs) {
-                Text("\(attacker.name) → \(defender.name)")
-                    .font(TMFont.cardTitle)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityLabel("\(attacker.name) \(isPhysical ? "attacking" : "shooting") \(defender.name)")
-                needLine(solve)
-                if let reason = solve.cannotShootReason {
-                    Text(reason)
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityIdentifier("as.sator.blocked")
+                if dynamicTypeSize.isAccessibilitySize {
+                    needLine(solve)
+                } else if gaugeBesideDice {
+                    // Landscape: names and verdict share one row to leave height for the controls.
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .firstTextBaseline, spacing: TMSpace.lg) {
+                            needLine(solve)
+                                .fixedSize()
+                            pairTitle(attacker: attacker, defender: defender)
+                            Spacer(minLength: 0)
+                        }
+                        VStack(alignment: .leading, spacing: TMSpace.xs) {
+                            pairTitle(attacker: attacker, defender: defender)
+                            needLine(solve)
+                        }
+                    }
+                } else {
+                    pairTitle(attacker: attacker, defender: defender)
+                    needLine(solve)
                 }
+                blockedReason(solve)
             }
             .padding(.horizontal, TMSpace.lg)
             .padding(.top, TMSpace.sm)
-            .padding(.bottom, gaugeBesideDice ? TMSpace.sm : TMSpace.md)
+            .padding(.bottom, TMSpace.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.systemBackground))
-            ScrollView {
-                VStack(alignment: .leading, spacing: TMSpace.lg) {
-                    if defender.combatStatus == .destroyedPendingEnd {
-                        Text(isPhysical
-                             ? "\(defender.name) is already wrecked. This attack changes nothing, but it still uses \(attacker.name)’s attack."
-                             : "\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
-                            .font(TMFont.detail)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+            if gaugeBesideDice {
+                // Landscape: controls on the left, dice and the result on the right, each scrolling alone.
+                HStack(alignment: .top, spacing: 0) {
+                    ScrollView {
+                        shotControls(attacker: attacker, defender: defender)
+                            .padding(.horizontal, TMSpace.lg)
+                            .padding(.vertical, TMSpace.sm)
                     }
-                    if offersPhysical || attacker.hasRearFiring {
-                        attackKindControl(attacker)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    ScrollView {
+                        shotResult(attacker: attacker, defender: defender, solve: solve)
+                            .padding(.horizontal, TMSpace.lg)
+                            .padding(.vertical, TMSpace.sm)
                     }
-                    if !isPhysical {
-                        rangeControl
-                    }
-                    targetMovedControl(defender)
-                    conditions
-                    if !isPhysical, insight.attackKind != .rearFiring, live.ruleset.overheatAllowed, attacker.ov > 0 {
-                        overheatControl(attacker)
-                    }
-                    if gaugeBesideDice {
-                        compactRoll(solve)
-                    } else if solve.cannotShootReason == nil {
-                        rollSection
-                    }
-                    if let tn = solve.targetNumber {
-                        breakdown(tn)
-                    }
-                    if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
-                        OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
-                    }
-                    if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
-                       defender.combatStatus != .destroyedPendingEnd {
-                        DamagePreviewCard(
-                            solve: solve,
-                            defender: defender,
-                            physicalBase: AlphaStrikeDamage.physical(attacker: attacker, rearHit: false).delivered
-                        )
-                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 }
-                .padding(TMSpace.lg)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: TMSpace.md) {
+                        shotControls(attacker: attacker, defender: defender)
+                        shotResult(attacker: attacker, defender: defender, solve: solve)
+                    }
+                    .padding(.horizontal, TMSpace.lg)
+                    .padding(.top, TMSpace.xs)
+                    .padding(.bottom, TMSpace.lg)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             applyBar(solve)
                 .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
         }
     }
 
-    private var rollSection: some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
-            Eyebrow("Roll")
-            DiceTray(
-                mode: modeBinding,
-                die1: $d1,
-                die2: $d2,
-                manualPrompt: "Tap the faces you rolled.",
-                autoPrompt: "The app rolls.",
-                identifierPrefix: "as.sator"
-            )
-        }
+    private func pairTitle(attacker: MatchUnitState, defender: MatchUnitState) -> some View {
+        Text("\(attacker.name) → \(defender.name)")
+            .font(TMFont.cardTitle)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityLabel("\(attacker.name) \(isPhysical ? "attacking" : "shooting") \(defender.name)")
     }
 
     @ViewBuilder
-    private func compactRoll(_ solve: CombatSolve) -> some View {
-        // The pinned need line already shows the number; landscape keeps just the dice here.
-        if solve.cannotShootReason == nil {
-            rollSection
+    private func blockedReason(_ solve: CombatSolve) -> some View {
+        if let reason = solve.cannotShootReason {
+            Text(reason)
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("as.sator.blocked")
         }
+    }
+
+    /// Everything decided before the roll.
+    private func shotControls(attacker: MatchUnitState, defender: MatchUnitState) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.md) {
+            if dynamicTypeSize.isAccessibilitySize {
+                pairTitle(attacker: attacker, defender: defender)
+            }
+            if defender.combatStatus == .destroyedPendingEnd {
+                Text(isPhysical
+                     ? "\(defender.name) is already wrecked. This attack changes nothing, but it still uses \(attacker.name)’s attack."
+                     : "\(defender.name) is already wrecked. This shot changes nothing, but it still uses \(attacker.name)’s shot.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if offersPhysical || attacker.hasRearFiring {
+                attackKindControl(attacker)
+            }
+            if !isPhysical {
+                rangeControl
+            }
+            conditions(attacker: attacker, defender: defender)
+        }
+    }
+
+    /// The dice, then what the roll means.
+    @ViewBuilder
+    private func shotResult(attacker: MatchUnitState, defender: MatchUnitState, solve: CombatSolve) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.lg) {
+            if solve.cannotShootReason == nil {
+                rollSection
+            }
+            if let tn = solve.targetNumber {
+                breakdown(tn)
+            }
+            if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
+                OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
+            }
+            if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
+               defender.combatStatus != .destroyedPendingEnd {
+                DamagePreviewCard(
+                    solve: solve,
+                    defender: defender,
+                    physicalBase: AlphaStrikeDamage.physical(attacker: attacker, rearHit: false).delivered
+                )
+            }
+        }
+    }
+
+    private var rollSection: some View {
+        // No "Roll" eyebrow: the tray's own prompt says what to do, and the row it took pushed Apply down.
+        DiceTray(
+            mode: modeBinding,
+            die1: $d1,
+            die2: $d2,
+            manualPrompt: "Tap the faces you rolled.",
+            autoPrompt: "The app rolls.",
+            identifierPrefix: "as.sator"
+        )
     }
 
     @ViewBuilder
@@ -492,34 +549,100 @@ struct CombatSolverSheet: View {
         }
     }
 
-    /// Weapons or punch/kick. Only in missions that allow physical attacks. One attack a turn either way.
+    /// Weapons, punch/kick, or rear weapons. One attack a turn either way. The long explainer is behind ⓘ;
+    /// a one-line reminder stays visible for punches and rear shots, where the range control is gone.
     private func attackKindControl(_ attacker: MatchUnitState) -> some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
-            Eyebrow("Attack")
-            Group {
-                if dynamicTypeSize.isAccessibilitySize {
-                    // Segments truncate at accessibility sizes; a menu keeps both labels whole.
-                    Picker("Attack", selection: $insight.attackKind) {
-                        attackKindOptions(attacker)
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            HStack(alignment: .center, spacing: TMSpace.xs) {
+                fittingPicker(
+                    segmented: Picker("Attack", selection: $insight.attackKind) { attackKindOptions(attacker) }
+                        .pickerStyle(.segmented),
+                    menu: WrappingMenuPicker(title: "Attack", current: attackKindName(insight.attackKind)) {
+                        Picker("Attack", selection: $insight.attackKind) { attackKindOptions(attacker) }
                     }
-                    .pickerStyle(.menu)
-                } else {
-                    Picker("Attack", selection: $insight.attackKind) {
-                        attackKindOptions(attacker)
+                )
+                .accessibilityIdentifier("as.sator.attackKind")
+                InfoButton(title: attackKindInfoTitle, accessibilityIdentifier: "as.sator.attackKind.info") { _ in
+                    ScrollingPopoverBody {
+                        VStack(alignment: .leading, spacing: TMSpace.sm) {
+                            Text(attackKindInfoTitle)
+                                .font(TMFont.cardTitle)
+                            Text(attackKindExplainer(attacker))
+                                .font(TMFont.detail)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityIdentifier("as.sator.attackKind.note")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .pickerStyle(.segmented)
                 }
             }
-            .accessibilityIdentifier("as.sator.attackKind")
             // Choosing rear weapons says the target is behind; switching back puts it in front again.
             .onChange(of: insight.attackKind) { _, kind in
                 insight.targetInFrontArc = kind != .rearFiring
             }
-            Text(attackKindExplainer(attacker))
-                .font(TMFont.detail)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("as.sator.attackKind.note")
+            if let reminder = attackKindReminder(attacker) {
+                Text(reminder)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.sator.attackKind.reminder")
+            }
+        }
+    }
+
+    private func attackKindName(_ kind: AttackKind) -> String {
+        switch kind {
+        case .physical: "Punch or kick"
+        case .rearFiring: "Rear weapons"
+        case .weapon: "Weapons"
+        }
+    }
+
+    private func rangeName(_ bracket: RangeBracket) -> String {
+        switch bracket {
+        case .short: "≤6″"
+        case .medium: ">6–24″"
+        case .long: ">24–42″"
+        case .outOfRange: ">42″"
+        }
+    }
+
+    private var attackKindInfoTitle: String {
+        switch insight.attackKind {
+        case .physical: "Punch or kick"
+        case .rearFiring: "Rear weapons"
+        case .weapon: "Attack"
+        }
+    }
+
+    /// Short, visible reminders. The full wording lives in `attackKindExplainer` behind ⓘ.
+    private func attackKindReminder(_ attacker: MatchUnitState) -> String? {
+        if insight.attackKind == .rearFiring {
+            return "Target behind \(attacker.name). +1 to hit, no overheat. Take it before the forward shot."
+        }
+        if isPhysical {
+            return "Within \(attacker.hasMEL ? 2 : 1)″ and in front. No range or heat."
+        }
+        if attacker.rearFireReduction > 0 {
+            return "After the rear shot, \(attacker.name)’s forward damage is \(attacker.rearFireReduction) less this turn."
+        }
+        return nil
+    }
+
+    /// Segments when every label fits on one line; otherwise a menu, so no label truncates
+    /// (accessibility sizes, or a narrow landscape column).
+    @ViewBuilder
+    private func fittingPicker(segmented: some View, menu: some View) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            menu
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            ViewThatFits(in: .horizontal) {
+                segmented
+                menu
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 
@@ -557,22 +680,15 @@ struct CombatSolverSheet: View {
     }
 
     private var rangeControl: some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
             Eyebrow("Range")
-            Group {
-                if dynamicTypeSize.isAccessibilitySize {
-                    // Four segments truncate at accessibility sizes; a menu keeps every label whole.
-                    Picker("Range", selection: rangeBand) {
-                        rangeOptions
-                    }
-                    .pickerStyle(.menu)
-                } else {
-                    Picker("Range", selection: rangeBand) {
-                        rangeOptions
-                    }
-                    .pickerStyle(.segmented)
+            fittingPicker(
+                segmented: Picker("Range", selection: rangeBand) { rangeOptions }
+                    .pickerStyle(.segmented),
+                menu: WrappingMenuPicker(title: "Range", current: rangeName(insight.rangeBracket)) {
+                    Picker("Range", selection: rangeBand) { rangeOptions }
                 }
-            }
+            )
             .accessibilityIdentifier("as.sator.range")
             // No note under >42″: the verdict at the top already says "More than 42 inches — no shot."
         }
@@ -604,144 +720,214 @@ struct CombatSolverSheet: View {
         )
     }
 
-    private func targetMovedControl(_ defender: MatchUnitState) -> some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
-            Eyebrow("Target moved")
-            HStack(alignment: .center, spacing: TMSpace.md) {
-                VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                    Text(targetMoveTitle(defender))
-                        .font(TMFont.cardTitle)
-                    Text(targetMoveDetail(defender))
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                Spacer(minLength: TMSpace.sm)
-                Menu {
-                    Button {
-                        setTargetMove(.groundUsesTMM, sprint: false)
-                    } label: {
-                        targetMoveChoice("Walked", chosen: insight.targetMove == .groundUsesTMM && !countedSprint)
-                    }
-                    Button {
-                        setTargetMove(.groundUsesTMM, sprint: true)
-                    } label: {
-                        targetMoveChoice("Sprinted", chosen: insight.targetMove == .groundUsesTMM && countedSprint)
-                    }
-                    Button {
-                        setTargetMove(.standstill)
-                    } label: {
-                        targetMoveChoice("Stood still", chosen: insight.targetMove == .standstill)
-                    }
-                    Button {
-                        setTargetMove(.jumpedUsesTMMPlus1)
-                    } label: {
-                        targetMoveChoice("Jumped", chosen: insight.targetMove == .jumpedUsesTMMPlus1)
-                    }
-                    Button {
-                        setTargetMove(.immobile)
-                    } label: {
-                        targetMoveChoice("Can’t move", chosen: insight.targetMove == .immobile)
-                    }
-                } label: {
-                    Text("Change")
-                        .frame(minHeight: 44)
-                }
-                .disabled(defender.isImmobile)
-                .accessibilityIdentifier("as.sator.tgtMove")
-            }
-        }
-    }
-
-    private var conditions: some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
+    /// One row of chips: how the target moved (a menu), Woods, Cover, Rear, Overheat where the card has OV,
+    /// and More… for the shots that aren't allowed. What each one means is behind the ⓘ at the end.
+    private func conditions(attacker: MatchUnitState, defender: MatchUnitState) -> some View {
+        let showsOverheat = !isPhysical && insight.attackKind != .rearFiring
+            && live.ruleset.overheatAllowed && attacker.ov > 0
+        let overheatPoints = showsOverheat ? chosenOverheat(attacker) : 0
+        return VStack(alignment: .leading, spacing: TMSpace.xs) {
             Eyebrow("Conditions")
             FlowLayout(spacing: TMSpace.sm) {
+                targetMovedChip(defender)
                 chipToggle("Woods", isOn: $insight.woods)
-                chipToggle("Partial cover", isOn: $insight.partialCover)
-                chipToggle(isPhysical ? "Rear attack" : "Rear shot", isOn: $insight.rearHit)
-            }
-            Button {
-                showUnusual.toggle()
-            } label: {
-                HStack(spacing: TMSpace.xs) {
-                    Text("More…")
-                        .font(TMFont.detail.weight(.semibold))
-                    Image(systemName: showUnusual ? "chevron.up" : "chevron.down")
-                        .font(TMFont.detail.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                chipToggle("Cover", isOn: $insight.partialCover, label: "Partial cover")
+                chipToggle("Rear", isOn: $insight.rearHit, label: isPhysical ? "Rear attack" : "Rear shot")
+                if showsOverheat {
+                    overheatChip(attacker)
                 }
-                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint("Line of sight and front arc")
-            if showUnusual {
-                VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    Text(isPhysical
-                         ? "Leave these off for a normal attack. Turn one on only when that attack is not allowed."
-                         : "Leave these off for a normal shot. Turn one on only when that shot is not allowed.")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    chipToggle(
-                        "Can’t see the target",
-                        isOn: cannotSeeTarget,
-                        hint: "Something blocks line of sight, so this ’Mech cannot attack that target."
-                    )
-                    chipToggle(
-                        isPhysical ? "Behind the attacker" : "Behind the shooter",
-                        isOn: behindShooter,
-                        hint: "The target is outside the miniature’s front, so this attack is not allowed."
-                    )
-                    if !isPhysical {
-                        chipToggle(
-                            "Bases touching",
-                            isOn: $insight.basesTouching,
-                            hint: offersPhysical
-                                ? "’Mechs in base contact can’t make weapon attacks. Punch or kick instead."
-                                : "’Mechs in base contact can’t make weapon attacks."
-                        )
+                moreChip
+                InfoButton(title: "Conditions", accessibilityIdentifier: "as.sator.conditions.info") { _ in
+                    ScrollingPopoverBody {
+                        conditionsInfo(attacker: attacker, showsOverheat: showsOverheat)
                     }
                 }
-                .padding(.top, TMSpace.sm)
+            }
+            if overheatPoints > 0 {
+                // A declared overheat has a cost next turn; that stays in view, not behind ⓘ.
+                Text(overheatExplainer(attacker, points: overheatPoints))
+                    .font(TMFont.detail)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.sator.overheat.note")
+            }
+            if showUnusual {
+                unusualConditions
+                    .padding(.top, TMSpace.xs)
             }
         }
     }
 
-    /// Overheat: only in missions that turn it on, only for cards with OV. Declared before the roll.
-    private func overheatControl(_ attacker: MatchUnitState) -> some View {
-        let usable = AlphaStrikeHeat.usableOverheat(
+    private func targetMovedChip(_ defender: MatchUnitState) -> some View {
+        let title = targetMoveTitle(defender)
+        return Menu {
+            Section(targetMoveDetail(defender)) {
+                Button {
+                    setTargetMove(.groundUsesTMM, sprint: false)
+                } label: {
+                    targetMoveChoice("Walked", chosen: insight.targetMove == .groundUsesTMM && !countedSprint)
+                }
+                Button {
+                    setTargetMove(.groundUsesTMM, sprint: true)
+                } label: {
+                    targetMoveChoice("Sprinted", chosen: insight.targetMove == .groundUsesTMM && countedSprint)
+                }
+                Button {
+                    setTargetMove(.standstill)
+                } label: {
+                    targetMoveChoice("Stood still", chosen: insight.targetMove == .standstill)
+                }
+                Button {
+                    setTargetMove(.jumpedUsesTMMPlus1)
+                } label: {
+                    targetMoveChoice("Jumped", chosen: insight.targetMove == .jumpedUsesTMMPlus1)
+                }
+                Button {
+                    setTargetMove(.immobile)
+                } label: {
+                    targetMoveChoice("Can’t move", chosen: insight.targetMove == .immobile)
+                }
+            }
+        } label: {
+            ShotMenuChip(title: title, systemImage: "figure.walk", isOn: false, showsChevron: !defender.isImmobile)
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .disabled(defender.isImmobile)
+        .accessibilityLabel("Target moved")
+        .accessibilityValue("\(title), \(targetMoveDetail(defender))")
+        .accessibilityHint(defender.isImmobile ? "" : "Change how the target moved for this shot")
+        .accessibilityIdentifier("as.sator.tgtMove")
+    }
+
+    private func chosenOverheat(_ attacker: MatchUnitState) -> Int {
+        let usable = usableOverheat(attacker)
+        return min(insight.overheatUsed, usable)
+    }
+
+    private func usableOverheat(_ attacker: MatchUnitState) -> Int {
+        AlphaStrikeHeat.usableOverheat(
             requested: attacker.ov,
             attacker: attacker,
             bracket: insight.rangeBracket,
             overheatAllowed: true
         )
+    }
+
+    /// Overheat: only in missions that turn it on, only for cards with OV. Declared before the roll.
+    @ViewBuilder
+    private func overheatChip(_ attacker: MatchUnitState) -> some View {
+        let usable = usableOverheat(attacker)
         let chosen = min(insight.overheatUsed, usable)
-        return VStack(alignment: .leading, spacing: TMSpace.sm) {
-            Eyebrow("Overheat")
-            if usable == 0 {
-                Text(insight.rangeBracket == .long
-                     ? "Overheat only adds damage at short and medium range."
-                     : "No overheat on this shot.")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
+        let title = chosen > 0 ? "Overheat +\(chosen)" : "Overheat"
+        if usable == 0 {
+            ShotMenuChip(title: title, systemImage: "flame", isOn: false, showsChevron: false)
+                .opacity(0.45)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Overheat")
+                .accessibilityValue("Not on this shot")
+                .accessibilityHint(overheatUnavailableReason)
+                .accessibilityIdentifier("as.sator.overheat")
+        } else {
+            Menu {
                 Picker("Overheat", selection: overheatBinding(max: usable)) {
                     Text("None").tag(0)
                     ForEach(1...usable, id: \.self) { points in
                         Text("+\(points) damage").tag(points)
                     }
                 }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("as.sator.overheat")
-                Text(overheatExplainer(attacker, points: chosen))
-                    .font(TMFont.detail)
-                    .foregroundStyle(chosen > 0 ? .primary : .secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                .pickerStyle(.inline)
+            } label: {
+                ShotMenuChip(title: title, systemImage: "flame", isOn: chosen > 0, showsChevron: true)
+            }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Overheat")
+            .accessibilityValue(chosen > 0 ? "+\(chosen) damage" : "None")
+            .accessibilityHint("Extra damage now, heat in the End Phase. Decide before you roll.")
+            .accessibilityIdentifier("as.sator.overheat")
+        }
+    }
+
+    private var overheatUnavailableReason: String {
+        insight.rangeBracket == .long
+            ? "Overheat only adds damage at short and medium range."
+            : "No overheat on this shot."
+    }
+
+    private var moreChip: some View {
+        Button {
+            showUnusual.toggle()
+        } label: {
+            ShotMenuChip(
+                title: "More",
+                systemImage: nil,
+                isOn: false,
+                showsChevron: true,
+                chevron: showUnusual ? "chevron.up" : "chevron.down"
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("More conditions")
+        .accessibilityValue(showUnusual ? "Shown" : "Hidden")
+        .accessibilityHint("Line of sight and front arc")
+        .accessibilityIdentifier("as.sator.more")
+    }
+
+    private var unusualConditions: some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Text(isPhysical
+                 ? "Leave these off for a normal attack. Turn one on only when that attack is not allowed."
+                 : "Leave these off for a normal shot. Turn one on only when that shot is not allowed.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            chipToggle(
+                "Can’t see the target",
+                isOn: cannotSeeTarget,
+                hint: "Something blocks line of sight, so this ’Mech cannot attack that target."
+            )
+            chipToggle(
+                isPhysical ? "Behind the attacker" : "Behind the shooter",
+                isOn: behindShooter,
+                hint: "The target is outside the miniature’s front, so this attack is not allowed."
+            )
+            if !isPhysical {
+                chipToggle(
+                    "Bases touching",
+                    isOn: $insight.basesTouching,
+                    hint: offersPhysical
+                        ? "’Mechs in base contact can’t make weapon attacks. Punch or kick instead."
+                        : "’Mechs in base contact can’t make weapon attacks."
+                )
             }
         }
+    }
+
+    private func conditionsInfo(attacker: MatchUnitState, showsOverheat: Bool) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            Text("Conditions")
+                .font(TMFont.cardTitle)
+            infoLine("Target moved", "Filled in from the move you recorded. Change it if the table says otherwise.")
+            infoLine("Woods", "Trees in the way. +1 to hit.")
+            infoLine("Cover", "The target has partial cover. +1 to hit.")
+            infoLine("Rear", isPhysical
+                     ? "Turn on when the attacker is behind the target. A rear hit does 1 more damage."
+                     : "Turn on when the shooter is behind the target. A rear hit does 1 more damage.")
+            if showsOverheat {
+                infoLine("Overheat", usableOverheat(attacker) == 0
+                         ? overheatUnavailableReason
+                         : overheatExplainer(attacker, points: 0))
+            }
+            infoLine("More", "Line of sight, front arc and base contact: shots that aren’t allowed.")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func infoLine(_ title: String, _ message: String) -> some View {
+        Text("\(Text(title).bold()): \(message)")
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func overheatBinding(max usable: Int) -> Binding<Int> {
@@ -778,13 +964,14 @@ struct CombatSolverSheet: View {
     }
 
     @ViewBuilder
-    private func chipToggle(_ title: String, isOn: Binding<Bool>, hint: String? = nil) -> some View {
+    private func chipToggle(_ title: String, isOn: Binding<Bool>, label: String? = nil, hint: String? = nil) -> some View {
         // Chips: grey when off, filled with a check when on. Plain button toggles looked like links,
         // and a bordered tint made "on" hard to tell from "off".
         let toggle = Toggle(isOn: isOn) {
             Text(title)
         }
             .toggleStyle(ChipToggleStyle())
+            .accessibilityLabel(label ?? title)
         if let hint {
             toggle
                 .accessibilityHint(hint)
@@ -945,24 +1132,39 @@ struct CombatSolverSheet: View {
 
     @ViewBuilder
     private func needLine(_ solve: CombatSolve) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
-            if solve.cannotShootReason != nil {
-                Text(solve.isPhysical ? "Can’t attack" : "Can’t shoot")
-                    .font(TMFont.readoutM)
-            } else if let tn = solve.targetNumber {
-                Text(tn.autoMiss ? "Always misses" : "Need \(tn.value)+")
-                    .font(TMFont.readoutM)
-                    .contentTransition(.numericText())
-                if !tn.autoMiss {
-                    Text("\(TwoD6Display.percent(for: tn.value))% to hit")
-                        .font(TMFont.cardTitle)
-                        .foregroundStyle(.secondary)
-                }
+        // One line when it fits; the percentage drops below at large text sizes instead of truncating.
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                needParts(solve)
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 0) {
+                needParts(solve)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("as.sator.tn")
+    }
+
+    @ViewBuilder
+    private func needParts(_ solve: CombatSolve) -> some View {
+        if solve.cannotShootReason != nil {
+            Text(solve.isPhysical ? "Can’t attack" : "Can’t shoot")
+                .font(TMFont.readoutM)
+                .fixedSize(horizontal: false, vertical: true)
+        } else if let tn = solve.targetNumber {
+            Text(tn.autoMiss ? "Always misses" : "Need \(tn.value)+")
+                .font(TMFont.readoutM)
+                .contentTransition(.numericText())
+                .fixedSize(horizontal: false, vertical: true)
+            if !tn.autoMiss {
+                Text("\(TwoD6Display.percent(for: tn.value))% to hit")
+                    .font(TMFont.cardTitle)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     private static func openingAttacker(session: MatchSession, initial: UUID?) -> UUID? {
@@ -1305,5 +1507,84 @@ struct ChipToggleStyle: ToggleStyle {
         .accessibilityAddTraits(.isToggle)
         .accessibilityValue(isOn ? "On" : "Off")
         .animation(.snappy(duration: 0.15), value: isOn)
+    }
+}
+
+/// The look of `ChipToggleStyle` for chips that open a menu or a section (Target moved, Overheat, More).
+private struct ShotMenuChip: View {
+    var title: String
+    var systemImage: String?
+    var isOn: Bool
+    var showsChevron: Bool
+    var chevron: String = "chevron.down"
+
+    var body: some View {
+        HStack(spacing: TMSpace.xs) {
+            if let systemImage {
+                Image(systemName: systemImage)
+                    .font(TMFont.detail)
+                    .accessibilityHidden(true)
+            }
+            Text(title)
+                .font(TMFont.detail.weight(isOn ? .semibold : .regular))
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+            if showsChevron {
+                Image(systemName: chevron)
+                    .font(TMFont.detail.weight(.semibold))
+                    .imageScale(.small)
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.horizontal, TMSpace.md)
+        .frame(minHeight: 44)
+        .foregroundStyle(isOn ? TMColor.onSignal : Color.primary)
+        .background(Capsule().fill(isOn ? AnyShapeStyle(TMColor.signal) : AnyShapeStyle(.fill.tertiary)))
+        .contentShape(Capsule())
+    }
+}
+
+/// Popover text that scrolls when it is taller than the popover can grow (accessibility text sizes).
+private struct ScrollingPopoverBody<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        ViewThatFits(in: .vertical) {
+            content
+            ScrollView {
+                content
+            }
+        }
+    }
+}
+
+/// A menu picker whose label wraps instead of overlapping what is below it. `.pickerStyle(.menu)`
+/// kept a one-line height at accessibility sizes, so "Punch or kick" drew over the next line.
+private struct WrappingMenuPicker<Options: View>: View {
+    var title: String
+    var current: String
+    @ViewBuilder var options: Options
+
+    var body: some View {
+        Menu {
+            options
+                .pickerStyle(.inline)
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: TMSpace.xs) {
+                Text(current)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                Image(systemName: "chevron.up.chevron.down")
+                    .imageScale(.small)
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(TMColor.signal)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue(current)
     }
 }
