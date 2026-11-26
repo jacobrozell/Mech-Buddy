@@ -9,6 +9,8 @@ struct UnitFocusSheet: View {
     var onRollCrit: (() -> Void)?
     /// Forced Withdrawal missions: record that this ’Mech drove off the table.
     var onLeftTable: (() -> Void)?
+    /// "Standing in water" this turn (pp. 10, 19, 24). Set before shots at it and before Clean up.
+    var onSetInWater: ((Bool) -> Void)?
 
     @Environment(\.dismiss) private var dismiss
     @State private var confirmLeave = false
@@ -61,6 +63,12 @@ struct UnitFocusSheet: View {
                 }
                 if !isReadOnly {
                     thisTurn
+                }
+                if !isReadOnly, let onSetInWater, live.combatStatus == .active {
+                    InWaterToggle(
+                        unitName: unit.name,
+                        isInWater: Binding(get: { live.inWater }, set: { onSetInWater($0) })
+                    )
                 }
                 if offersLeaveTable {
                     leaveTable

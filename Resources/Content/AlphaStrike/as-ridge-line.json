@@ -95,7 +95,7 @@
     "Skip hills, water, and buildings for this first game.",
     "Each side places its two ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "winningSummary": "Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.",
   "layout": {
     "width": 36,
     "depth": 22,

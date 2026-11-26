@@ -24,7 +24,7 @@ struct CleanUpStep: View {
 
     private var message: String {
         if !wrecks.isEmpty {
-            return "Take wrecked ’Mechs off the table. Wrecks don’t explode or hurt anything nearby."
+            return "Take wrecked ’Mechs off the table."
         }
         if !crippled.isEmpty {
             return "Nothing was wrecked this turn. Crippled ’Mechs start to withdraw. Tap Next turn."

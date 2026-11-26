@@ -195,7 +195,7 @@ struct CritSheet: View {
             case .caseOne: "Ammo hit. CASE saves it: it takes 1 extra damage instead."
             case .none: "Ammo hit. Without CASE or ENE, this ’Mech is wrecked."
             }
-        case .engine: "Engine hit. A second one wrecks it, and later shots are harder."
+        case .engine: "Engine hit. It takes 1 heat whenever it fires, and a second engine hit wrecks it."
         case .fireControl: "Fire control hit. Its shots get harder."
         case .none: "No critical."
         case .weapon: "Weapon hit. Its damage goes down by 1. If it already does no damage, it takes 1 damage instead."

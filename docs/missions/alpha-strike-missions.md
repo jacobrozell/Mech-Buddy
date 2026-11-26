@@ -28,7 +28,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** Moving, Shooting, Woods, Criticals.
 
-**How to win:** Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Knock out both enemy ’Mechs (their Structure hits 0). If anyone is still standing after 6 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.
 
 **Forces**
 
@@ -66,7 +66,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** Hills, Partial cover, Rear shots, Jumping for position.
 
-**How to win:** Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.
 
 **Forces**
 
@@ -96,7 +96,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 - New lances: each side gets one jumper and one fast ’Mech. Same cards as Ridge Line, new partners.
 - Partial cover: if a hill crest or wall hides the bottom half of the target from the shooter, turn on Partial cover in the shot. It makes the shot 1 harder.
-- Rear shots: if the shooter is behind the target (in its back half), turn on Rear shot. A hit does 1 extra damage, so keep your back away from enemies.
+- Rear shots: if the attack comes in through the rear of the target’s base, turn on Rear hit. A hit does 1 extra damage, so keep your back away from enemies.
 - Jumping lets a ’Mech hop straight over woods and hills. The jumper is harder to hit, but its own shot is harder too.
 - Standing still makes your own shot 1 easier. Behind cover, that can be worth it.
 - Still no overheating and no punching. Those come in later missions.
@@ -107,7 +107,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** Overheat, Heat scale, Shutdown.
 
-**How to win:** Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Knock out both enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.
 
 **Forces**
 
@@ -148,7 +148,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** Physical attacks, 3 vs 3, Awesome and BattleMaster.
 
-**How to win:** Knock out all three enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Knock out all three enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.
 
 **Forces**
 
@@ -193,7 +193,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** All eight box ’Mechs, Forced Withdrawal, Every rule on.
 
-**How to win:** Cripple or knock out all four enemy ’Mechs. A crippled ’Mech, or one that leaves the table, counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Cripple or knock out all four enemy ’Mechs. A crippled ’Mech, or one that leaves the table, counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.
 
 **Forces**
 

@@ -332,6 +332,7 @@ enum UnitConditions {
         if crits.fireControlHits > 0 { parts.append("Fire control ×\(crits.fireControlHits)") }
         if crits.weaponHits > 0 { parts.append("Weapon ×\(crits.weaponHits)") }
         if crits.mpHit { parts.append("MP hit") }
+        if unit.inWater { parts.append("In water") }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 }

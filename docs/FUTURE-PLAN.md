@@ -31,18 +31,18 @@ With eight 'Mechs (Full Lances) you scroll several screens to find who hasn't fi
 
 Do 1.1–1.4 together. Check each on screen with Full Lances (eight 'Mechs) in portrait, landscape, the largest text size and dark mode. Keep the current full layout for Mission 1 if it reads better for first-timers.
 
-- [ ] **1.1 Coaching fades after first use.** (M) Show the full coach paragraph the first time each step appears in a mission; after that, show just the title with a "?" that expands it. Add **Settings → Coaching: Full / Brief / Off** (default Full for Mission 1, Brief after). *Frees ~15% of the screen every later turn.*
-- [ ] **1.2 One dense row per 'Mech.** (M) Line 1: side badge, name, move chip (Walked…), and a trailing **Shoot** button *inside* the card. Line 2: armor and structure pips together, plus the conditions line (heat, crits) only when there is one. Target about 70pt per 'Mech instead of ~210pt. *A 4 vs 4 fits without scrolling.*
-- [ ] **1.3 Header folds into the nav bar.** (S) Nav title "Close Quarters · Turn 1/8" and a thin four-segment step strip under it. Drop the TURN eyebrow and the progress ring (it repeats "1 / 8"). Keep `as.battle.activeSide` and the phase accessibility IDs.
-- [ ] **1.4 Smaller dock.** (S–M) One primary button, the secondary action as a text button beside it. Undo moves to a toast for a few seconds after each change, and stays in the ⋯ menu. *Roughly halves the dock.*
-- [ ] **1.5 Shot sheet on one screen.** (M–L) Target number at the top; range as the segmented control; one chip row for Target moved (Walked ▾), Woods, Cover, Rear and Overheat; the dice directly under. Explainers ("One attack a turn…", "Push … past safe limits…") move behind info buttons. Today it is a long scroll: Attack, Range, Target moved, Conditions, More…, Overheat, Roll.
-- [ ] **1.6 Armor pips stop using Side A's colour.** (S) Armor pips are teal, the same as Side A, so a Side B card shows Side A teal. Make armor a neutral steel/white so side colours only ever mean a side. Re-check contrast in light and dark mode.
+- [x] **1.1 Coaching fades after first use.** (M) Show the full coach paragraph the first time each step appears in a mission; after that, show just the title with a "?" that expands it. Add **Settings → Coaching: Full / Brief / Off** (default Full for Mission 1, Brief after). *Frees ~15% of the screen every later turn.* Done 2026-11-26: Settings → Coaching (Automatic / Full / Brief / Off).
+- [x] **1.2 One dense row per 'Mech.** (M) Line 1: side badge, name, move chip (Walked…), and a trailing **Shoot** button *inside* the card. Line 2: armor and structure pips together, plus the conditions line (heat, crits) only when there is one. Target about 70pt per 'Mech instead of ~210pt. *A 4 vs 4 fits without scrolling.*
+- [x] **1.3 Header folds into the nav bar.** (S) Nav title "Close Quarters · Turn 1/8" and a thin four-segment step strip under it. Drop the TURN eyebrow and the progress ring (it repeats "1 / 8"). Keep `as.battle.activeSide` and the phase accessibility IDs.
+- [x] **1.4 Smaller dock.** (S–M) One primary button, the secondary action as a text button beside it. Undo moves to a toast for a few seconds after each change, and stays in the ⋯ menu. *Roughly halves the dock.*
+- [x] **1.5 Shot sheet on one screen.** (M–L) Target number at the top; range as the segmented control; one chip row for Target moved (Walked ▾), Woods, Cover, Rear and Overheat; the dice directly under. Explainers ("One attack a turn…", "Push … past safe limits…") move behind info buttons. Today it is a long scroll: Attack, Range, Target moved, Conditions, More…, Overheat, Roll. Done 2026-11-26.
+- [x] **1.6 Armor pips stop using Side A's colour.** (S) Armor pips are teal, the same as Side A, so a Side B card shows Side A teal. Make armor a neutral steel/white so side colours only ever mean a side. Re-check contrast in light and dark mode.
 - [ ] **1.7 Landscape table view.** (L) Side A | Side B in two columns with the dock on the right, so the whole table is visible at once on a phone or iPad propped up at the table.
-- [ ] **1.8 Finishing touches.** (S each)
-  - [ ] Combat list: the per-unit Shoot button floats in its own row with a large gap; covered by 1.2.
-  - [ ] At accessibility sizes the two stacked dock buttons take ~280pt; consider one button plus a ⋯ for the second.
-  - [ ] Victory screen: check it on screen in landscape and at the largest text size (portrait checked 2026-11-25).
-  - [ ] The Play tab's large nav title leaves a tall empty band above "Play"; consider an inline title.
+- [x] **1.8 Finishing touches.** (S each)
+  - [x] Combat list: the per-unit Shoot button floats in its own row with a large gap; covered by 1.2.
+  - [x] At accessibility sizes the two stacked dock buttons take ~280pt; consider one button plus a ⋯ for the second.
+  - [x] Victory screen: check it on screen in landscape and at the largest text size (portrait checked 2026-11-25). Checked 2026-11-26; the tally and chips now stack at large text.
+  - [x] The Play tab's large nav title leaves a tall empty band above "Play"; consider an inline title.
 
 ---
 
@@ -60,9 +60,9 @@ Do 1.1–1.4 together. Check each on screen with Full Lances (eight 'Mechs) in p
 
 ## 3. Alpha Strike: polish still open
 
-- [ ] Rear weapons in the shot picker: check on screen in portrait, landscape and the largest text size (Missions 4–5, BattleMaster). (S)
-- [ ] Mission 5 withdrawal screens ("Withdrawing", "Left the table") and the Close Quarters punch control in landscape: check on screen. (S)
-- [ ] Playtest triage P1-2: the pass-the-phone banner shifts the list ~50pt, and the first swipe after a tap can be eaten. Make the banner an overlay that doesn't resize the inset; test notes 52 and 78 on a device. (M)
+- [x] Rear weapons in the shot picker: check on screen in portrait, landscape and the largest text size (Missions 4–5, BattleMaster). (S)
+- [x] Mission 5 withdrawal screens ("Withdrawing", "Left the table") and the Close Quarters punch control in landscape: check on screen. (S)
+- [x] Playtest triage P1-2: the pass-the-phone banner shifts the list ~50pt, and the first swipe after a tap can be eaten. Make the banner an overlay that doesn't resize the inset; test notes 52 and 78 on a device. (M) Already an overlay; confirmed 2026-11-26.
 - [ ] **Owner decision:** should a draw clear a mission? Today any finished match clears it ("played through"), which suits hotseat play.
 
 ---
@@ -79,8 +79,8 @@ Do 1.1–1.4 together. Check each on screen with Full Lances (eight 'Mechs) in p
   - Rules: [alpha-strike/clash-of-steel-rules-intake.md](game-modes/alpha-strike/clash-of-steel-rules-intake.md). Cards: [book-scenarios.md](game-modes/book-scenarios.md).
 
 **Open rules**
-- [ ] "0*" minimal damage (1D6, 4+ deals 1). No shipped card uses it; add a minimal-damage field to card data and the shot math with Clash of Steel, the first content that needs it. (M)
-- [ ] Water: partial cover and −1 heat. (S–M)
+- [x] "0*" minimal damage (1D6, 4+ deals 1). No shipped card uses it; add a minimal-damage field to card data and the shot math with Clash of Steel, the first content that needs it. (M) Done 2026-11-26: domain, card data and shot sheet die.
+- [x] Water: partial cover and −1 heat. (S–M) Done 2026-11-26: "In water" on the unit sheet; the shot sheet notes it.
 - [ ] Resolve the **[OPEN]** items in the Clash of Steel intake (building collapse footnote, weight capacity, level-change cost, support timing, formation reroll conflict, REAR vs one attack). **Owner** for the printing conflicts.
 
 **Open play** (after the guided path; [PRODUCT_SCOPE](game-modes/PRODUCT_SCOPE.md#long-term-roadmap-owner-2026-11-24))
@@ -94,11 +94,11 @@ Do 1.1–1.4 together. Check each on screen with Full Lances (eight 'Mechs) in p
 ## 5. Maps and collection
 
 - [x] Maps needed and a top-down layout diagram for every mission.
-- [ ] Experienced players can swap in any map they own (scope O3). (M)
+- [x] Experienced players can swap in any map they own (scope O3). (M)
 - [ ] Layouts for Classic missions, from the book's scenario maps. (M)
-- [ ] Map catalog: check the names of the ~20 Sarna entries left out (see `sourceNote` in `Resources/Content/map-catalog.json`). (S)
-- [ ] Alpha Strike box map names (not listed on Sarna). **Owner** to read them off the box. (S)
-- [ ] Mercenaries box: confirm contents and add its unit list (`as-box-sets.json`). Ships with none today. (S)
+- [x] Map catalog: check the names of the ~20 Sarna entries left out (see `sourceNote` in `Resources/Content/map-catalog.json`). (S) Done 2026-11-26: about 70 confirmed names added; the rest are listed in `sourceNote`.
+- [x] Alpha Strike box map names (not listed on Sarna). **Owner** to read them off the box. (S) Done 2026-11-26: the box has no mapsheets (owner, Sarna).
+- [x] Mercenaries box: confirm contents and add its unit list (`as-box-sets.json`). Ships with none today. (S) Done 2026-11-26: 8 ’Mechs and 4 vehicles from Sarna and retailer listings.
 - [ ] Later: a catalog of every known map, suggested per game. (L)
 
 ---
@@ -138,11 +138,11 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
 - [x] **Owner:** answer the spec's decisions table (D1–D29), or accept the recommended defaults. (S) All defaults accepted 2026-11-26.
 - [x] **PM0** Spec merged. (S)
 - [ ] **PM1** N-side Domain: sides C and D, initiative order, movement order for 3–4 sides, sides going out, payload schema v2. Every mission plays the same. (L)
-- [ ] **PM2** Card library: all 40 card faces for the owner's two boxes in one file. (M)
+- [x] **PM2** Card library: all 40 card faces for the owner's two boxes in one file. (M) Built 2026-11-26: 40 faces, 21 checked.
   - [ ] **Owner:** check the 19 faces not yet checked on the Master Unit List.
 - [ ] **PM3** Learn | Play tabs behind `playMode`. (M)
 - [ ] **PM4** First playable: 1 v 1 pickup game, from setup to result. (L)
-- [ ] **PM5** Compact battle mode (section 1, items 1.1–1.4 and 1.6), plus group by side. Needed before PM7. (L)
+- [ ] **PM5** Compact battle mode (section 1, items 1.1–1.4 and 1.6), plus group by side. Needed before PM7. (L) Items 1.1–1.6 and 1.8 done 2026-11-26; group by side remains.
 - [ ] **PM6** Teams: 1 v 2, 2 v 2, 1 v 3. (M)
 - [ ] **PM7** Three and four sides (free-for-all) behind `playModeMultiSide`. (L)
   - [ ] **Owner:** table test of 1 v 1 v 1 v 1.

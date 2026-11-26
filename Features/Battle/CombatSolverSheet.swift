@@ -23,6 +23,8 @@ struct CombatSolverSheet: View {
     /// Per-shot dice mode. "Let the app roll" must not leak into later shots or crits.
     @State private var diceMode: DiceMode = .manual
     @State private var isApplying = false
+    /// The extra die for a hit at a "0*" range (p. 21): 4 or higher deals 1 damage.
+    @State private var minimalDie: Int?
 
     init(session: MatchSession, store: MatchStore, initialAttackerId: UUID? = nil) {
         self.session = session
@@ -130,6 +132,7 @@ struct CombatSolverSheet: View {
                 .onChange(of: defenderId) { _, _ in
                     d1 = nil
                     d2 = nil
+                    minimalDie = nil
                     selectedLetter = nil
                     syncTargetMoveFromDefender()
                     restoreRange()
@@ -137,6 +140,7 @@ struct CombatSolverSheet: View {
                 .onChange(of: attackerId) { _, _ in
                     d1 = nil
                     d2 = nil
+                    minimalDie = nil
                     selectedLetter = nil
                     insight.overheatUsed = 0
                     insight.attackKind = .weapon
@@ -149,6 +153,7 @@ struct CombatSolverSheet: View {
                     restoreRange()
                 }
                 .onChange(of: insight.rangeInches) { _, inches in
+                    minimalDie = nil
                     guard let attackerId, let defenderId else { return }
                     store.rememberRange(inches, attacker: attackerId, defender: defenderId)
                 }
@@ -451,6 +456,17 @@ struct CombatSolverSheet: View {
             if solve.cannotShootReason == nil {
                 rollSection
             }
+            if solve.needsMinimalRoll, solve.isHit == true {
+                MinimalDamageRoll(die: $minimalDie, identifierPrefix: "as.sator.minimal")
+            }
+            if solve.targetInWater {
+                // The solver already adds partial cover for water, so the Cover chip must not be ticked too.
+                Label("\(defender.name) is in water: partial cover (+1) is already counted.", systemImage: "drop.fill")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.sator.inWater")
+            }
             if let tn = solve.targetNumber {
                 breakdown(tn)
             }
@@ -579,6 +595,7 @@ struct CombatSolverSheet: View {
             }
             // Choosing rear weapons says the target is behind; switching back puts it in front again.
             .onChange(of: insight.attackKind) { _, kind in
+                minimalDie = nil
                 insight.targetInFrontArc = kind != .rearFiring
             }
             if let reminder = attackKindReminder(attacker) {
@@ -649,7 +666,8 @@ struct CombatSolverSheet: View {
     @ViewBuilder
     private func attackKindOptions(_ attacker: MatchUnitState) -> some View {
         Text("Weapons").tag(AttackKind.weapon)
-        if offersPhysical {
+        // A rear shot is a weapon attack, so no punch or kick after it (p. 22).
+        if offersPhysical, attacker.canMakePhysicalAttack || insight.attackKind == .physical {
             Text("Punch or kick").tag(AttackKind.physical)
         }
         if attacker.canRearFireThisTurn || insight.attackKind == .rearFiring {
@@ -732,7 +750,7 @@ struct CombatSolverSheet: View {
                 targetMovedChip(defender)
                 chipToggle("Woods", isOn: $insight.woods)
                 chipToggle("Cover", isOn: $insight.partialCover, label: "Partial cover")
-                chipToggle("Rear", isOn: $insight.rearHit, label: isPhysical ? "Rear attack" : "Rear shot")
+                chipToggle("Rear hit", isOn: $insight.rearHit, label: isPhysical ? "Rear attack" : "Rear shot")
                 if showsOverheat {
                     overheatChip(attacker)
                 }
@@ -1009,6 +1027,10 @@ struct CombatSolverSheet: View {
         if solve.cannotShootReason != nil { return "Can’t apply" }
         if solve.targetNumber?.autoMiss == true { return "Apply miss" }
         if solve.isHit == true {
+            if solve.needsMinimalRoll {
+                guard let minimalDie else { return "Roll the damage die" }
+                return MinimalDamage.damage(forDie: minimalDie) > 0 ? "Apply 1 damage" : "Apply hit, no damage"
+            }
             if solve.ifHit.zeroDamage { return "Apply hit" }
             return "Apply \(solve.ifHit.delivered) damage"
         }
@@ -1023,7 +1045,9 @@ struct CombatSolverSheet: View {
     }
 
     private func canApply(_ solve: CombatSolve) -> Bool {
-        applyingFaces != nil && attackerId != nil && defenderId != nil && solve.canApply
+        // A hit at a "0*" range also needs its damage die (p. 21).
+        let minimalReady = !(solve.needsMinimalRoll && solve.isHit == true && minimalDie == nil)
+        return applyingFaces != nil && attackerId != nil && defenderId != nil && solve.canApply && minimalReady
     }
 
     private func applyShot() {
@@ -1042,7 +1066,8 @@ struct CombatSolverSheet: View {
             partialCover: insight.partialCover,
             rearHit: insight.rearHit,
             overheatUsed: isPhysical ? 0 : insight.overheatUsed,
-            attackKind: insight.attackKind
+            attackKind: insight.attackKind,
+            minimalDie: solve?.needsMinimalRoll == true ? minimalDie : nil
         ) {
             dismiss()
         } else {

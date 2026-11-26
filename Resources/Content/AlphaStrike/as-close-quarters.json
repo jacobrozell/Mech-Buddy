@@ -135,7 +135,7 @@
     "Keep a die or small token next to each ’Mech card to mark heat (0 to 3, then S). The app tracks it too.",
     "Each side places its three ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out all three enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "winningSummary": "Knock out all three enemy ’Mechs. If anyone is still standing after 8 turns, the side with more Structure left wins. Same Structure is a draw. The turn limit is a Mech Buddy rule; the rulebook has none.",
   "layout": {
     "width": 36,
     "depth": 22,

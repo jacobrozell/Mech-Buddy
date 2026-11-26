@@ -136,7 +136,8 @@ struct BattleFlowView: View {
                         isReadOnly: false,
                         onResolveAttack: { focusFollowUp = .shot(unit.id) },
                         onRollCrit: { focusFollowUp = .crit(unit) },
-                        onLeftTable: { store.leaveTable(unitId: unit.id) }
+                        onLeftTable: { store.leaveTable(unitId: unit.id) },
+                        onSetInWater: { store.setInWater(unitId: unit.id, $0) }
                     )
                 }
             }
