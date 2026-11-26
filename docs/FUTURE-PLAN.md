@@ -149,6 +149,6 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
 - [ ] **PM8** Objectives (five of six), victory points and turn limit, behind `playObjectives`. (L)
 - [ ] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M)
 - [ ] **PM10** Release: accessibility pass, screen catalog, inventory, flags on, TestFlight table test. (M)
-- [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L)
+- [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L) *Battlefield Support done; buildings and formations remain.*
 - [ ] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L)
 - [ ] **PM13** Board presets: save, duplicate, delete, starter boards from the missions. (M)

@@ -205,3 +205,38 @@ struct PlayGameTests {
         #expect(PlaySetupStore.load(PlaySetupStore.draftKey, from: defaults) == nil)
     }
 }
+
+@Suite("Play Battlefield Support (PM11)")
+struct PlaySupportTests {
+    private func unit(_ side: SideId) -> MatchUnitState {
+        MatchUnitState(name: "U", side: side, skill: 4, pv: 20, sz: 2, mv: "10\"", tmm: 2,
+                       s: 2, m: 2, l: 1, ov: 0, armorCap: 4, structureCap: 4, abilities: "")
+    }
+
+    @Test("Setup round-trips and old rules decode with support off")
+    func roundTrip() throws {
+        var setup = PlaySetup.pickup()
+        #expect(setup.rules.battlefieldSupport == nil)
+        setup.rules.battlefieldSupport = 12
+        let back = try JSONDecoder().decode(PlaySetup.self, from: JSONEncoder().encode(setup))
+        #expect(back.rules.battlefieldSupport == 12)
+        let old = try JSONDecoder().decode(PlayRules.self, from: Data(#"{"overheat":false}"#.utf8))
+        #expect(old.battlefieldSupport == nil && !old.overheat && old.forcedWithdrawal)
+    }
+
+    @Test("1D6 roll: 1-2 = 0, 3-4 = 5, 5-6 = 12")
+    func roll() {
+        #expect((1...6).map(PlayRules.supportPoints(forRoll:)) == [0, 0, 5, 5, 12, 12])
+    }
+
+    @Test("startPlay gives each side a budget; off gives no box rules")
+    func start() throws {
+        var setup = PlaySetup.pickup()
+        let units = [unit(.lanceA), unit(.lanceB)]
+        var off = try MatchReducer.reduce(MatchSession(ruleset: setup.ruleset), .startPlay(setup: setup, units: units))
+        #expect(off.boxRules == nil)
+        setup.rules.battlefieldSupport = 5
+        off = try MatchReducer.reduce(MatchSession(ruleset: setup.ruleset), .startPlay(setup: setup, units: units))
+        #expect(off.boxRules?.support[.lanceA]?.budget == 5 && off.boxRules?.support[.lanceB]?.budget == 5)
+    }
+}

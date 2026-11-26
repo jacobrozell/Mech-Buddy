@@ -23,7 +23,7 @@
 | Card library: 40 faces from the owner's two boxes, 21 checked | Built (PM2) | `as-card-library.json`, `Data/Content/CardLibraryDTO.swift` |
 | Up to four sides in the domain (house rules labelled [HOUSE]) | Built (PM1), not on screen | `Domain/Models/MatchSide.swift`, `AlphaStrikePhaseEngine`, `VictoryEvaluator` |
 | Learn / Play tabs | Built (PM3) behind `playMode` | `App/RootTabView.swift`, `Features/Play/` |
-| Play: 1 v 1 pickup game, six setup screens, standings, draft and last setup | Built (PM4) behind `playMode` | `Features/Play/` (setup flow), `MatchSession.play` (`PlaySetup`) |
+| Play: 1 v 1 pickup game, six setup screens, standings, draft and last setup | Built (PM4) behind `playMode`; Battlefield Support option built (PM11 slice 1: `PlayRules.battlefieldSupport`, `as.play.setup.support`, `startPlay` makes `boxRules`) | `Features/Play/` (setup flow), `MatchSession.play` (`PlaySetup`) |
 
 **Release flag:** `playMode` (`Support/Release/ReleaseSurface.swift`) is off in Release and on with the `-enable_full_product_surface` launch argument. With it off the app shows four tabs and the old mission path, exactly as TestFlight 1.0.0 (3).
 
@@ -31,7 +31,7 @@
 
 From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for each milestone's definition.
 
-1. **PM11** — switch on the Clash of Steel rules in Play (buildings, Battlefield Support, formations; the setup's "Coming with Clash of Steel" toggles are placeholders the owner approved).
+1. **PM11** — Battlefield Support done; buildings and formations remain (switch on the Clash of Steel rules in Play; the setup's "Coming with Clash of Steel" toggles are placeholders the owner approved).
 2. **PM5** — finish compact battle mode for Play: group by side (1.1–1.6 are done). Needed before PM7.
 3. **PM6** — teams (1 v 2, 2 v 2, 1 v 3); custom side names reach the battle screens.
 4. **PM7** — three and four sides behind `playModeMultiSide` (needs Side C/D colours; owner table test).
@@ -58,7 +58,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 ## 6. How to work in this repo
 
 - **Project file:** `MechBuddy.xcodeproj` is generated and untracked. Run `xcodegen generate` after adding files or after merging a branch that adds files.
-- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 387 on 2026-11-26) and `-scheme MechBuddyUI` (5 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game). Use your own `-derivedDataPath` when several agents build at once.
+- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 390 on 2026-11-26) and `-scheme MechBuddyUI` (5 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game). Use your own `-derivedDataPath` when several agents build at once.
 - **Parallel agents:** each works in its own git worktree (`git worktree add ../MechBuddy-wt-<name> -b <branch> main`), its own simulator and its own derived data, with a list of files it must not touch. Commit often ("WIP …:" prefixes) so usage limits don't lose work. The coordinator reviews, merges with `--no-ff`, re-runs both suites on `main`, then removes the worktree.
 - **Debug launch arguments:** `-ui_testing` (in-memory store), `-reset_state`, `-skip_onboarding`, `-open_rules`, `-enable_full_product_surface`, DEBUG `-open_mission <id>` and `-debug_damage`.
 - **Never** rename or remove an accessibility identifier; add new ones beside old ones (UI tests depend on them).

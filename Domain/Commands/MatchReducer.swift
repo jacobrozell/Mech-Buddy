@@ -144,6 +144,10 @@ public enum MatchReducer {
                 forcesLoaded: true,
                 diceMode: setup.diceMode
             )
+            if let points = setup.rules.battlefieldSupport, points > 0 {
+                next.boxRules = BoxRulesState(support: Dictionary(
+                    uniqueKeysWithValues: setup.sides.map { ($0.id, SupportInventory(budget: points)) }))
+            }
             next.appendLog("New game: \(setup.formatName), \(setup.budget.summary)")
 
         case .markTableReady:

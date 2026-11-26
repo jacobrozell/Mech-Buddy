@@ -237,13 +237,33 @@ public struct Battlefield: Codable, Sendable, Equatable {
 
 /// Optional rules for a Play game (§ 5.5). Defaults per D16 and D13.
 public struct PlayRules: Codable, Sendable, Equatable {
+    private enum CodingKeys: String, CodingKey {
+        case overheat, physicalAttacks, forcedWithdrawal, startOnTable, battlefieldSupport
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        overheat = try c.decodeIfPresent(Bool.self, forKey: .overheat) ?? true
+        physicalAttacks = try c.decodeIfPresent(Bool.self, forKey: .physicalAttacks) ?? true
+        forcedWithdrawal = try c.decodeIfPresent(Bool.self, forKey: .forcedWithdrawal) ?? true
+        startOnTable = try c.decodeIfPresent(Bool.self, forKey: .startOnTable) ?? true
+        battlefieldSupport = try c.decodeIfPresent(Int.self, forKey: .battlefieldSupport)
+    }
+
     public var overheat: Bool
     public var physicalAttacks: Bool
     public var forcedWithdrawal: Bool
     /// On: 'Mechs start on the table. Off: they enter from their home edge on Turn 1 (p. 11 default).
     public var startOnTable: Bool
+    /// Battlefield Support Points per side (pp. 12, 29-30). Nil = off. 0, 5 or 12.
+    public var battlefieldSupport: Int?
 
-    public init(overheat: Bool = true, physicalAttacks: Bool = true, forcedWithdrawal: Bool = true, startOnTable: Bool = true) {
+    /// 1D6: 1-2 = 0, 3-4 = 5, 5-6 = 12 BSPs (p. 12).
+    public static func supportPoints(forRoll roll: Int) -> Int { roll <= 2 ? 0 : (roll <= 4 ? 5 : 12) }
+
+    public init(overheat: Bool = true, physicalAttacks: Bool = true, forcedWithdrawal: Bool = true, startOnTable: Bool = true,
+                battlefieldSupport: Int? = nil) {
+        self.battlefieldSupport = battlefieldSupport
         self.overheat = overheat
         self.physicalAttacks = physicalAttacks
         self.forcedWithdrawal = forcedWithdrawal
