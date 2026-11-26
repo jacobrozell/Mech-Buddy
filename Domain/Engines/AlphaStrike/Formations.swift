@@ -141,7 +141,9 @@ public enum MoveTerrain: Sendable, Equatable {
 public enum MovementCost {
     /// Level change, up or down, per inch: one extra inch per inch (p. 15 Level Change paragraph). The table on
     /// the same page prints "+2″"; owner call 2026-11-26 follows the paragraph.
-    public static let levelChangePerInch = 1
+    /// +2″ per inch from the Movement Cost Table (p. 15); the paragraph on the same page says +1″.
+    /// Owner decision D27 (PlayModeSpec): use the table and show the conflict.
+    public static let levelChangePerInch = 2
 
     /// Extra inches per inch moved. Maneuvering Ace (Recon Lance, p. 32) takes 1″ off woods.
     public static func extraPerInch(_ terrain: MoveTerrain, maneuveringAce: Bool = false) -> Int {

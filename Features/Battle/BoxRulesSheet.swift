@@ -86,7 +86,7 @@ struct BoxRulesSheet: View {
             LabeledContent("Rubble or rough", value: "+1″")
             LabeledContent("Small building (Medium)", value: "+2″")
             LabeledContent("Large building (Heavy)", value: "+3″")
-            LabeledContent("Level change, up or down", value: "+\(MovementCost.levelChangePerInch)″ per inch, 2″ most")
+            LabeledContent("Level change, up or down", value: "+\(MovementCost.levelChangePerInch)″ per inch, 2″ most (the p. 15 paragraph says +1″)")
         }
         .font(TMFont.detail)
     }

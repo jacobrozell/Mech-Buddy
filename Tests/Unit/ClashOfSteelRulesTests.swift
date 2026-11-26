@@ -264,7 +264,7 @@ struct BoxRulesReducerTests {
     func maneuveringAce() {
         #expect(MovementCost.total(inches: 4, terrain: .woods) == 8)
         #expect(MovementCost.total(inches: 4, terrain: .woods, maneuveringAce: true) == 4)
-        #expect(MovementCost.total(inches: 3, terrain: .clear, levelChange: 2) == 5)
+        #expect(MovementCost.total(inches: 3, terrain: .clear, levelChange: 2) == 7) // +2″ per inch, table (D27)
     }
 
     @Test("Attacking a building damages its CF; CF 0 collapses it to rubble (p. 28)")
