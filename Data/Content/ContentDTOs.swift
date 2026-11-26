@@ -177,6 +177,8 @@ public struct BoxRosterDTO: Codable, Sendable, ContentSchemaVersioned {
 }
 
 public struct BoxCardDTO: Codable, Sendable {
+    /// Library face (`as-card-library.json`) this card's front shows, when there is one.
+    public var cardId: String?
     public var name: String
     public var back: String?
     public var sz: Int
@@ -196,11 +198,12 @@ public struct BoxCardDTO: Codable, Sendable {
     public var minimalDamage: MinimalDamageBands = .none
 
     private enum CodingKeys: String, CodingKey {
-        case name, back, sz, defaultSide, pv, mv, tmm, s, m, l, ov, armor, structure, skill, abilities
+        case cardId, name, back, sz, defaultSide, pv, mv, tmm, s, m, l, ov, armor, structure, skill, abilities
     }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        cardId = try c.decodeIfPresent(String.self, forKey: .cardId)
         name = try c.decode(String.self, forKey: .name)
         back = try c.decodeIfPresent(String.self, forKey: .back)
         sz = try c.decode(Int.self, forKey: .sz)
@@ -224,6 +227,7 @@ public struct BoxCardDTO: Codable, Sendable {
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(cardId, forKey: .cardId)
         try c.encode(name, forKey: .name)
         try c.encodeIfPresent(back, forKey: .back)
         try c.encode(sz, forKey: .sz)

@@ -68,7 +68,7 @@ struct MissionLadderTests {
             let dto = try catalog.scenario(id: ScenarioId(rawValue: item.id))
             for unit in dto.sides.lanceA + dto.sides.lanceB {
                 let card = try #require(checked[unit.name], "\(item.id): \(unit.name) has no checked card")
-                // Cards print PV at Skill 4; a better pilot costs more (Quick-Start p. 33).
+                // Cards print PV at Skill 4; a better pilot costs more (Quick-Start p. 35).
                 let pv = AlphaStrikePointValue.adjusted(base: card.pv, skill: unit.skill)
                 #expect(unit.pv == pv && unit.mv == card.mv && unit.tmm == card.tmm, "\(unit.name)")
                 #expect(unit.sz == card.sz && unit.s == card.s && unit.m == card.m && unit.l == card.l, "\(unit.name)")
