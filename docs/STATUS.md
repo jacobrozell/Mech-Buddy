@@ -58,7 +58,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 ## 6. How to work in this repo
 
 - **Project file:** `MechBuddy.xcodeproj` is generated and untracked. Run `xcodegen generate` after adding files or after merging a branch that adds files.
-- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 390 on 2026-11-26) and `-scheme MechBuddyUI` (5 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game). Use your own `-derivedDataPath` when several agents build at once.
+- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 390 on 2026-11-26) and `-scheme MechBuddyUI` (5 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game). Use your own `-derivedDataPath` when several agents build at once. **Run the UI suite on an iPhone 17-size simulator or larger**: on the iPhone 17e the Clash of Steel and Play pickup UI tests fail because controls sit off-screen.
 - **Parallel agents:** each works in its own git worktree (`git worktree add ../MechBuddy-wt-<name> -b <branch> main`), its own simulator and its own derived data, with a list of files it must not touch. Commit often ("WIP …:" prefixes) so usage limits don't lose work. The coordinator reviews, merges with `--no-ff`, re-runs both suites on `main`, then removes the worktree.
 - **Debug launch arguments:** `-ui_testing` (in-memory store), `-reset_state`, `-skip_onboarding`, `-open_rules`, `-enable_full_product_surface`, DEBUG `-open_mission <id>` and `-debug_damage`.
 - **Never** rename or remove an accessibility identifier; add new ones beside old ones (UI tests depend on them).
