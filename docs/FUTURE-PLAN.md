@@ -135,8 +135,8 @@ From `FutureIdeas/`. Not on the roadmap until the owner picks them up.
 
 Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section comes before section 6 in priority. The app splits into **Learn** (the guided path, box scenarios, How to play) and **Play** (a full game: 2–4 sides, up to 4 players, your forces, your map, an optional objective, a board you build and save). Play mode replaces Free Battle and covers the "Open play" items in section 4. Spec: [specs/features/PlayModeSpec.md](../specs/features/PlayModeSpec.md). Three and four sides use labelled house rules; the Quick-Start only covers two sides (p. 13).
 
-- [ ] **Owner:** answer the spec's decisions table (D1–D29), or accept the recommended defaults. (S)
-- [ ] **PM0** Spec merged. (S)
+- [x] **Owner:** answer the spec's decisions table (D1–D29), or accept the recommended defaults. (S) All defaults accepted 2026-11-26.
+- [x] **PM0** Spec merged. (S)
 - [ ] **PM1** N-side Domain: sides C and D, initiative order, movement order for 3–4 sides, sides going out, payload schema v2. Every mission plays the same. (L)
 - [ ] **PM2** Card library: all 40 card faces for the owner's two boxes in one file. (M)
   - [ ] **Owner:** check the 19 faces not yet checked on the Master Unit List.

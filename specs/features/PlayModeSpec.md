@@ -1,6 +1,6 @@
 # Play Mode Spec — Alpha Strike
 
-**Status:** draft, 2026-11-26. Not built. The owner asked for this mode to be fully specced before any work starts.
+**Status:** accepted, 2026-11-26. Not built. The owner asked for this mode to be fully specced before any work starts, and accepted every recommended default in § 18.
 
 Companions: [ModeHomeSpec](ModeHomeSpec.md) · [AppShellSpec](../AppShellSpec.md) · [MatchSessionSpec](MatchSessionSpec.md) · [HotseatSpec](HotseatSpec.md) · [BattleTableSpec](BattleTableSpec.md) · [RosterSpec](RosterSpec.md) · [GuidedMissionSpec](GuidedMissionSpec.md) · [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md) · [DataSchemaSpec](../DataSchemaSpec.md) · [ContentPackSpec](../ContentPackSpec.md) · [AccessibilitySpec](../AccessibilitySpec.md).
 
@@ -937,6 +937,8 @@ Target release: owner decision D17. Recommended: 1.1 = 2 sides (1 v 1, teams), p
 ## 18. Owner decisions
 
 Each has a recommended default. "Silent" means the default is built.
+
+**Owner, 2026-11-26: all recommended defaults accepted (D1–D29).** Build them as written.
 
 | # | Question | Options | Recommended default |
 |---|---|---|---|
