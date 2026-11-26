@@ -79,7 +79,7 @@ struct ForceListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
                 contextLabel
-                ForEach(SideId.allCases, id: \.self) { side in
+                ForEach(SideId.missionPair, id: \.self) { side in
                     sideSection(side)
                 }
                 PVBalanceBar(

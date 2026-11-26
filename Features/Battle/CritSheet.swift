@@ -76,7 +76,7 @@ struct CritSheet: View {
                     StatusChip(kind: .critOwed(unit.criticalsOwed))
                 }
             }
-            Text("\(unit.side.other.displayName) rolls, as the side that hit the \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
+            Text("\((store.session?.otherSide(of: unit.side) ?? unit.side).displayName) rolls, as the side that hit the \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

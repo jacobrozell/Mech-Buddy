@@ -12,7 +12,7 @@ struct PlaceMiniaturesStep: View {
             // No side badge: both sides place, taking turns.
             CoachPrompt(
                 title: "Place the miniatures",
-                message: "Each side sets its ’Mechs within 6″ of its own short edge. \(session.activeSide.other.displayName) won the roll and picks who places first; then take turns, one ’Mech at a time.",
+                message: "Each side sets its ’Mechs within 6″ of its own short edge. \(session.displayName(of: session.otherSide(of: session.activeSide))) won the roll and picks who places first; then take turns, one ’Mech at a time.",
                 side: nil,
                 accessibilityIdentifier: "as.battle.table"
             )

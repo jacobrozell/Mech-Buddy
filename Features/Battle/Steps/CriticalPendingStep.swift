@@ -3,6 +3,8 @@ import MechBuddyDomain
 
 struct CriticalPendingStep: View {
     var unit: MatchUnitState
+    /// The side that rolls the critical: the side that hit it (rulebook p. 23).
+    var rollingSide: SideId
     var count: Int
     var diceMode: DiceMode
     var landingUnitID: UUID?
@@ -58,7 +60,7 @@ struct CriticalPendingStep: View {
     private var message: String {
         // Name the roller and say it is not a shot: players read "Roll two dice" as their attack.
         // The attacker rolls the critical (rulebook p. 23), so the other side picks up the dice.
-        let who = unit.side.other.displayName
+        let who = rollingSide.displayName
         return "\(unit.name) took a critical hit. \(who), the side that hit it, rolls two dice for the critical check — this is not a shot."
     }
 }
@@ -68,6 +70,7 @@ struct CriticalPendingStep: View {
     ScrollView {
         CriticalPendingStep(
             unit: owedLocust(),
+            rollingSide: .lanceB,
             count: 2,
             diceMode: .manual,
             landingUnitID: nil,

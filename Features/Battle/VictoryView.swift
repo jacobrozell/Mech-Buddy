@@ -107,7 +107,7 @@ struct VictoryView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 } else {
-                    ForEach(SideId.allCases, id: \.self) { side in
+                    ForEach(session.sideIds, id: \.self) { side in
                         sideBlock(side)
                     }
                 }
@@ -318,7 +318,7 @@ struct VictoryView: View {
     private var symbolName: String {
         switch session.outcome {
         case .winner: "trophy.fill"
-        case .draw: "equal.circle"
+        case .draw, .tied: "equal.circle"
         case nil: "flag.checkered"
         }
     }
@@ -326,12 +326,15 @@ struct VictoryView: View {
     private var symbolColor: Color {
         switch session.outcome {
         case .winner(let side): TMColor.side(side)
-        case .draw, nil: Color.secondary
+        case .draw, .tied, nil: Color.secondary
         }
     }
 
     private var subtitle: String {
         switch session.outcome {
+        case .tied:
+            // Play standings (PM7) replace this; missions never tie.
+            return "Level at the top after turn \(session.turn)"
         case .draw:
             if VictoryEvaluator.livingSides(in: session).isEmpty {
                 return "Both sides are wrecked · \(turnPhrase)"

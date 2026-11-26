@@ -414,6 +414,7 @@ struct BattleFlowView: View {
                   let unit = session.units.first(where: { $0.id == owed.unitId }) {
             CriticalPendingStep(
                 unit: unit,
+                rollingSide: session.otherSide(of: unit.side),
                 count: owed.count,
                 diceMode: session.diceMode,
                 landingUnitID: landingUnitID,
@@ -574,6 +575,7 @@ struct BattleFlowView: View {
             )
         case .useInitiativeRolls:
             let winner = InitiativeDice.winner(a1: a1, a2: a2, b1: b1, b2: b2)
+            let first = InitiativeDice.firstToMove(a1: a1, a2: a2, b1: b1, b2: b2)
             let allEntered = a1 != nil && a2 != nil && b1 != nil && b2 != nil
             if allEntered, winner == nil {
                 return BattleDockButton(
@@ -586,21 +588,21 @@ struct BattleFlowView: View {
             }
             return BattleDockButton(
                 // Lead with who moves: "Side B wins — start moving" read as if Side B moved.
-                title: winner.map { "\($0.other.displayName) moves first — start" } ?? "Enter all four dice",
+                title: first.map { "\($0.displayName) moves first — start" } ?? "Enter all four dice",
                 identifier: "as.battle.primary",
                 specIdentifier: "as.initiative.confirm",
-                hint: winner.map { "\($0.displayName) won initiative. \($0.other.displayName) moves first." }
+                hint: winner.flatMap { w in first.map { "\(w.displayName) won initiative. \($0.displayName) moves first." } }
                     ?? "Enter all four dice. Higher total moves last.",
                 disabled: winner == nil,
                 action: applyManualInitiative
             )
         case .rollInitiative:
-            if let autoPreview, let winner = autoPreview.winner {
+            if let autoPreview, let winner = autoPreview.winner, let first = autoPreview.firstToMove {
                 return BattleDockButton(
-                    title: "\(winner.other.displayName) moves first — start",
+                    title: "\(first.displayName) moves first — start",
                     identifier: "as.battle.primary",
                     specIdentifier: "as.initiative.confirm",
-                    hint: "\(winner.displayName) won initiative. \(winner.other.displayName) moves first.",
+                    hint: "\(winner.displayName) won initiative. \(first.displayName) moves first.",
                     action: applyAutoPreview
                 )
             }

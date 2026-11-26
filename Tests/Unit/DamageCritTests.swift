@@ -90,7 +90,7 @@ struct DamageCritTests {
         )
         let winner = try AlphaStrikePhaseEngine.resolveInitiative(rolls: rolls)
         #expect(winner == .lanceA)
-        #expect(AlphaStrikePhaseEngine.initiativeLoser(winner: winner) == .lanceB)
+        #expect(try AlphaStrikePhaseEngine.initiativeOrder(rolls: rolls).first == .lanceB)
     }
 
     @Test("MP hit halves TMM and MV display")

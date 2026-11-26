@@ -62,7 +62,7 @@ enum BattleChrome {
         case .tableSetup:
             return "Set the table."
         case .placeMiniatures:
-            return "Place the miniatures. \(session.activeSide.other.displayName) picks who places first."
+            return "Place the miniatures. \(session.displayName(of: session.otherSide(of: session.activeSide))) picks who places first."
         case .initiative:
             return "Turn \(session.turn), Roll."
         case .movement:
@@ -117,7 +117,7 @@ struct BattleStepStrip: View {
             if let activeSide {
                 SideBadge(side: activeSide)
                     .accessibilityLabel("Active side, \(activeSide.displayName)")
-                    .accessibilityValue(activeSide == .lanceA ? "lanceA" : "lanceB")
+                    .accessibilityValue((activeSide ?? .lanceB).rawValue)
                     .accessibilityIdentifier("as.battle.activeSide")
             }
             Text(label)

@@ -331,7 +331,7 @@ final class MatchStore: Identifiable {
     /// "Left the table" and condition lines can be checked on screen without playing several turns.
     func debugSeedDamage() {
         guard var next = session else { return }
-        for side in SideId.allCases {
+        for side in next.sideIds {
             let ids = next.units.filter { $0.side == side }.map(\.id)
             guard ids.count >= 2, let crippled = next.units.firstIndex(where: { $0.id == ids[ids.count - 2] }),
                   let gone = next.units.firstIndex(where: { $0.id == ids[ids.count - 1] }) else { continue }
@@ -517,5 +517,10 @@ struct InitiativeDicePreview: Equatable, Sendable {
         if sideATotal > sideBTotal { return .lanceA }
         if sideBTotal > sideATotal { return .lanceB }
         return nil
+    }
+
+    /// The lower roll moves first.
+    var firstToMove: SideId? {
+        winner.map { $0 == .lanceA ? .lanceB : .lanceA }
     }
 }

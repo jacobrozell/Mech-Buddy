@@ -53,7 +53,7 @@ struct BattleRoster: View {
         ScrollView {
             ScrollViewReader { proxy in
                 LazyVStack(alignment: .leading, spacing: TMSpace.lg) {
-                    ForEach(SideId.allCases, id: \.self) { side in
+                    ForEach(session.sideIds, id: \.self) { side in
                         let sideUnits = units(on: side)
                         if !sideUnits.isEmpty {
                             VStack(alignment: .leading, spacing: TMSpace.xs) {
@@ -103,7 +103,7 @@ struct BattleRoster: View {
     }
 
     private var rosterUnits: [MatchUnitState] {
-        SideId.allCases.flatMap { units(on: $0) }
+        session.sideIds.flatMap { units(on: $0) }
     }
 
     private func units(on side: SideId) -> [MatchUnitState] {

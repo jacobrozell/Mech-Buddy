@@ -167,7 +167,7 @@ struct MatchReducerTests {
     func simultaneousFire() throws {
         var session = try combatReadySession()
         // The side that would have waited under side-by-side fire shoots first.
-        let waiting = session.activeSide.other
+        let waiting = session.otherSide(of: session.activeSide)
         let attacker = try #require(session.units.first { $0.side == waiting })
         let target = try #require(session.units.first { $0.side != waiting })
         session = try MatchReducer.reduce(

@@ -70,6 +70,11 @@ public enum InitiativeDice {
         return nil
     }
 
+    /// Two sides: the side that moves first is the lower roll. Nil until all four dice are in, or on a tie.
+    public static func firstToMove(a1: Int?, a2: Int?, b1: Int?, b2: Int?) -> SideId? {
+        winner(a1: a1, a2: a2, b1: b1, b2: b2).map { $0 == .lanceA ? .lanceB : .lanceA }
+    }
+
     public static func isTie(a1: Int?, a2: Int?, b1: Int?, b2: Int?) -> Bool {
         guard let a1, let a2, let b1, let b2 else { return false }
         return a1 + a2 == b1 + b2

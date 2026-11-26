@@ -112,7 +112,7 @@ struct MissionLadderTests {
         #expect(!ruleset.physicalAttacksAllowed && !ruleset.forcedWithdrawal)
         #expect(ruleset.maxTurns == 8)
         let units = GuidedScenarioFactory.makeUnits(from: dto)
-        for side in SideId.allCases {
+        for side in SideId.missionPair {
             #expect(units.filter { $0.side == side && $0.ov > 0 }.count == 1, "\(side)")
         }
     }
@@ -212,7 +212,7 @@ struct MissionLadderTests {
         #expect(!ruleset.overheatAllowed && !ruleset.physicalAttacksAllowed && !ruleset.forcedWithdrawal)
         // Each side has exactly one jumper.
         let units = GuidedScenarioFactory.makeUnits(from: dto)
-        for side in SideId.allCases {
+        for side in SideId.missionPair {
             #expect(units.filter { $0.side == side && $0.canJump }.count == 1, "\(side)")
         }
     }

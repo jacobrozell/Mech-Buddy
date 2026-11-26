@@ -47,7 +47,7 @@ struct CombatSolverSheet: View {
     /// Fire is simultaneous, so shooters come from both sides: the side that lost initiative first,
     /// as the rulebook orders it, but nothing enforces that order.
     private var friendlies: [MatchUnitState] {
-        let first = live.initiativeWinner?.other ?? live.activeSide
+        let first = live.firstToMove ?? live.activeSide
         let onTable = live.units.filter { $0.combatStatus != .removed }
         return onTable.filter { $0.side == first } + onTable.filter { $0.side != first }
     }

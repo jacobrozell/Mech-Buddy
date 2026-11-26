@@ -299,10 +299,10 @@ struct MovementStep: View {
 
     private var moveOrder: [MoveOrderEntry] {
         let active = session.units.filter { $0.combatStatus == .active }
-        var remaining: [SideId: [MatchUnitState]] = [
-            .lanceA: active.filter { $0.side == .lanceA && !$0.hasMovedThisTurn },
-            .lanceB: active.filter { $0.side == .lanceB && !$0.hasMovedThisTurn }
-        ]
+        var remaining: [SideId: [MatchUnitState]] = [:]
+        for side in session.sideIds {
+            remaining[side] = active.filter { $0.side == side && !$0.hasMovedThisTurn }
+        }
         // The chosen ’Mech is "Now"; the rest of its side follows.
         if let current, var queue = remaining[current.side],
            let index = queue.firstIndex(where: { $0.id == current.id }) {
@@ -311,8 +311,9 @@ struct MovementStep: View {
         }
         // Same order the reducer enforces, including uneven numbers moving in proportion.
         var upcoming: [MatchUnitState] = []
-        let firstToMove = session.initiativeWinner?.other ?? session.activeSide
-        let sequence = AlphaStrikePhaseEngine.movementSequence(firstToMove: firstToMove, units: session.units)
+        let sequence = session.initiativeOrder.isEmpty
+            ? AlphaStrikePhaseEngine.movementSequence(firstToMove: session.activeSide, units: session.units)
+            : AlphaStrikePhaseEngine.movementSequence(order: session.initiativeOrder, units: session.units)
         let movedCount = AlphaStrikePhaseEngine.movesRecorded(units: session.units)
         for side in sequence.dropFirst(movedCount) {
             guard var queue = remaining[side], !queue.isEmpty else { continue }
