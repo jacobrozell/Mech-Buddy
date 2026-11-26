@@ -52,6 +52,13 @@ public enum VictoryEvaluator {
         return nil
     }
 
+    /// Last side standing only, for checks outside the End Phase (conceding).
+    public static func lastSideStanding(in session: MatchSession) -> MatchOutcome? {
+        wipeOutcome(in: session)
+    }
+
+    /// Last side standing (§ 7.2): one side with living ’Mechs wins; none left (mutual wipe) is a draw.
+    /// Two sides: when all of one side's ’Mechs are gone the other wins (p. 13).
     private static func wipeOutcome(in session: MatchSession) -> MatchOutcome? {
         let living = livingSides(in: session)
         if living.count == 1, let winner = living.first {
@@ -63,11 +70,15 @@ public enum VictoryEvaluator {
         return nil
     }
 
+    /// Turn cap (missions): most Structure left wins. Two sides level is a draw, as before.
+    /// With 3–4 sides only sides still in the game compete, and sides level at the top tie **[HOUSE]** (§ 7.3).
     private static func structureCapOutcome(session: MatchSession) -> MatchOutcome {
-        let a = remainingStructure(side: .lanceA, in: session)
-        let b = remainingStructure(side: .lanceB, in: session)
-        if a > b { return .winner(.lanceA) }
-        if b > a { return .winner(.lanceB) }
-        return .draw
+        let contenders = session.sides.count <= 2 ? session.sideIds : session.sidesInGame
+        let scores = contenders.map { (side: $0, structure: remainingStructure(side: $0, in: session)) }
+        guard let best = scores.map(\.structure).max() else { return .draw }
+        let leaders = scores.filter { $0.structure == best }.map(\.side)
+        if leaders.count == 1 { return .winner(leaders[0]) }
+        if session.sides.count <= 2 { return .draw }
+        return .tied(leaders)
     }
 }

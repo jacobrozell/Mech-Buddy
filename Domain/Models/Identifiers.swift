@@ -17,20 +17,31 @@ public struct ScenarioId: RawRepresentable, Hashable, Codable, Sendable {
     public static let fullLances = ScenarioId(rawValue: "full-lances")
 }
 
-public enum SideId: String, Codable, Sendable, CaseIterable {
+/// A side in a match. Raw values are saved in payloads and `SDMatchSession.activeSideRaw`, so A and B keep
+/// their spelling. Missions use A and B; Play mode adds C and D (PlayModeSpec § 12).
+/// There is no `other`: with more than two sides "the other side" has no meaning. Ask the session
+/// (`MatchSession.opponents(of:)`, `otherSide(of:)`, `nextSide(after:)`).
+public enum SideId: String, Codable, Sendable, CaseIterable, CodingKeyRepresentable {
     case lanceA
     case lanceB
+    case lanceC
+    case lanceD
 
-    public var displayName: String {
+    /// The letter shown on the side badge. It stays when a side is renamed.
+    public var letter: String {
         switch self {
-        case .lanceA: "Side A"
-        case .lanceB: "Side B"
+        case .lanceA: "A"
+        case .lanceB: "B"
+        case .lanceC: "C"
+        case .lanceD: "D"
         }
     }
 
-    public var other: SideId {
-        self == .lanceA ? .lanceB : .lanceA
-    }
+    /// Default name. A Play session may rename a side (`MatchSide.name`).
+    public var displayName: String { "Side \(letter)" }
+
+    /// The two sides every mission uses, in seat order.
+    public static let missionPair: [SideId] = [.lanceA, .lanceB]
 }
 
 public enum PhaseId: String, Codable, Sendable, CaseIterable {
