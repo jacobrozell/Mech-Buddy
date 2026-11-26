@@ -1,6 +1,6 @@
 # Play Mode Spec — Alpha Strike
 
-**Status:** accepted, 2026-11-26. Not built. The owner asked for this mode to be fully specced before any work starts, and accepted every recommended default in § 18.
+**Status:** accepted, 2026-11-26. **PM1 (N-side Domain) built** on `feature/pm1-n-sides`, 2026-11-26: domain and payload only, no screen changes. PM2 onward not built. The owner asked for this mode to be fully specced before any work starts, and accepted every recommended default in § 18.
 
 Companions: [ModeHomeSpec](ModeHomeSpec.md) · [AppShellSpec](../AppShellSpec.md) · [MatchSessionSpec](MatchSessionSpec.md) · [HotseatSpec](HotseatSpec.md) · [BattleTableSpec](BattleTableSpec.md) · [RosterSpec](RosterSpec.md) · [GuidedMissionSpec](GuidedMissionSpec.md) · [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md) · [DataSchemaSpec](../DataSchemaSpec.md) · [ContentPackSpec](../ContentPackSpec.md) · [AccessibilitySpec](../AccessibilitySpec.md).
 
@@ -1063,4 +1063,4 @@ SchemaV1 store opened by SchemaV2 build (PM9); unreadable v3 payload set aside; 
 | Target release | 1.1 (2 sides) / 1.2 (3–4 sides, objectives), per D17 |
 | Last verified | 2026-11-26 (spec only) |
 | Commit | — |
-| Code paths | *not implemented* |
+| Code paths | PM1: `Domain/Models/Identifiers.swift` (`SideId` C/D), `Domain/Models/MatchSide.swift` (`MatchSide`, `TableEdge`, `InitiativeOrder`), `Domain/Models/MatchSession.swift` (`sides`, `initiativeOrder`, `InitiativeRolls` v2, `.tied`, side helpers, payload v2), `Domain/Engines/AlphaStrike/AlphaStrikePhaseEngine.swift` (§ 6.2 `movementSequence(order:units:)`, `markSidesOut`), `Domain/Engines/AlphaStrike/VictoryEvaluator.swift`, `Domain/Commands/MatchReducer.swift` (`agreeInitiativeOrder`, `concede`). Tests: `Tests/Unit/PlayModeDomainTests.swift`, `Tests/Unit/MissionsUnchangedTests.swift`, fixture `Tests/Unit/Fixtures/match-session-v1.json` |

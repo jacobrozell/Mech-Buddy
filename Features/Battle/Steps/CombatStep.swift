@@ -37,8 +37,8 @@ struct CombatStep: View {
 
     /// The side that lost initiative first, as the rulebook lists it. Either may shoot first.
     private var sideOrder: [SideId] {
-        let first = session.initiativeWinner?.other ?? session.activeSide
-        return [first, first.other]
+        let first = session.firstToMove ?? session.activeSide
+        return [first] + session.sideIds.filter { $0 != first }
     }
 
     private func visible(_ side: SideId) -> [MatchUnitState] {

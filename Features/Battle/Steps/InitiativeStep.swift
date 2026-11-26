@@ -74,7 +74,7 @@ struct InitiativeStep: View {
         } else if let winner = shownWinner {
             TMCard(edgeColor: TMColor.side(winner), isRaised: true) {
                 VStack(alignment: .leading, spacing: TMSpace.xs) {
-                    Text("\(winner.displayName) wins initiative · \(winner.other.displayName) moves first")
+                    Text("\(winner.displayName) wins initiative · \(shownFirstToMove?.displayName ?? "") moves first")
                         .font(TMFont.cardTitle)
                 }
             }
@@ -84,6 +84,13 @@ struct InitiativeStep: View {
     private var tieTotal: Int? {
         guard InitiativeDice.isTie(a1: a1, a2: a2, b1: b1, b2: b2), let a1, let a2 else { return nil }
         return a1 + a2
+    }
+
+    private var shownFirstToMove: SideId? {
+        if manual {
+            return InitiativeDice.firstToMove(a1: a1, a2: a2, b1: b1, b2: b2)
+        }
+        return preview?.firstToMove
     }
 
     private var shownWinner: SideId? {

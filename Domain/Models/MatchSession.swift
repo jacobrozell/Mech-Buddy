@@ -27,13 +27,78 @@ public enum DiceMode: String, Codable, Sendable, Equatable {
     case auto
 }
 
+/// Initiative dice for one turn (PlayModeSpec § 12). `order` is lowest first; its last side is the winner.
+/// Payload v1 saved `{ "lanceA": …, "lanceB": … }`; that shape still decodes.
 public struct InitiativeRolls: Codable, Sendable, Equatable {
-    public var lanceA: DiceRoll2D6
-    public var lanceB: DiceRoll2D6
+    public var rolls: [SideId: DiceRoll2D6]
+    /// Tie-break rounds (§ 6.1). Round k holds only the sides still tied after round k − 1.
+    public var rerolls: [[SideId: DiceRoll2D6]]
+    /// Lowest first. Empty while a tie is unresolved.
+    public var order: [SideId]
 
+    public init(rolls: [SideId: DiceRoll2D6], rerolls: [[SideId: DiceRoll2D6]] = []) {
+        self.rolls = rolls
+        self.rerolls = rerolls
+        let resolution = InitiativeOrder.resolve(rolls: rolls, rerolls: rerolls)
+        self.order = resolution.isResolved ? resolution.order : []
+    }
+
+    /// Two sides, one roll each (missions).
     public init(lanceA: DiceRoll2D6, lanceB: DiceRoll2D6) {
-        self.lanceA = lanceA
-        self.lanceB = lanceB
+        self.init(rolls: [.lanceA: lanceA, .lanceB: lanceB])
+    }
+
+    public var lanceA: DiceRoll2D6? { rolls[.lanceA] }
+    public var lanceB: DiceRoll2D6? { rolls[.lanceB] }
+
+    /// Highest roll, acts last. Nil while tied.
+    public var winner: SideId? { order.last }
+
+    public var resolution: InitiativeOrder.Resolution {
+        InitiativeOrder.resolve(rolls: rolls, rerolls: rerolls)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case rolls, rerolls, order
+        case lanceA, lanceB
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.rolls) {
+            let rolls = try container.decode([SideId: DiceRoll2D6].self, forKey: .rolls)
+            let rerolls = try container.decodeIfPresent([[SideId: DiceRoll2D6]].self, forKey: .rerolls) ?? []
+            self.init(rolls: rolls, rerolls: rerolls)
+            if let saved = try container.decodeIfPresent([SideId].self, forKey: .order), !saved.isEmpty {
+                order = saved
+            }
+        } else {
+            // Payload v1.
+            self.init(
+                lanceA: try container.decode(DiceRoll2D6.self, forKey: .lanceA),
+                lanceB: try container.decode(DiceRoll2D6.self, forKey: .lanceB)
+            )
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(rolls, forKey: .rolls)
+        if !rerolls.isEmpty {
+            try container.encode(rerolls, forKey: .rerolls)
+        }
+        try container.encode(order, forKey: .order)
+    }
+
+    /// The same rolls with sides renamed (Swap sides).
+    func mapSides(_ transform: (SideId) -> SideId) -> InitiativeRolls {
+        var copy = self
+        copy.rolls = Dictionary(uniqueKeysWithValues: rolls.map { (transform($0.key), $0.value) })
+        copy.rerolls = rerolls.map { round in
+            Dictionary(uniqueKeysWithValues: round.map { (transform($0.key), $0.value) })
+        }
+        copy.order = order.map(transform)
+        return copy
     }
 }
 
@@ -61,10 +126,13 @@ public struct MatchEvent: Identifiable, Codable, Sendable, Equatable {
 
 public enum MatchOutcome: Codable, Sendable, Equatable {
     case winner(SideId)
+    /// Every side level (two sides), or a mutual wipe. Missions only ever end this way or with a winner.
     case draw
+    /// Some sides finished level and share the result (3–4 sides, PlayModeSpec § 7.4).
+    case tied([SideId])
 
     private enum CodingKeys: String, CodingKey {
-        case type, side
+        case type, side, sides
     }
 
     public init(from decoder: Decoder) throws {
@@ -76,6 +144,8 @@ public enum MatchOutcome: Codable, Sendable, Equatable {
         case "winner":
             let side = try container.decode(SideId.self, forKey: .side)
             self = .winner(side)
+        case "tied":
+            self = .tied(try container.decode([SideId].self, forKey: .sides))
         default:
             throw DecodingError.dataCorruptedError(
                 forKey: .type,
@@ -93,6 +163,9 @@ public enum MatchOutcome: Codable, Sendable, Equatable {
         case .winner(let side):
             try container.encode("winner", forKey: .type)
             try container.encode(side, forKey: .side)
+        case .tied(let sides):
+            try container.encode("tied", forKey: .type)
+            try container.encode(sides, forKey: .sides)
         }
     }
 
@@ -102,12 +175,25 @@ public enum MatchOutcome: Codable, Sendable, Equatable {
             return "It’s a draw"
         case .winner(let side):
             return "\(side.displayName) wins"
+        case .tied(let sides):
+            return "Tie: " + sides.map(\.displayName).joined(separator: ", ")
+        }
+    }
+
+    /// The sides that share first place.
+    public var winningSides: [SideId] {
+        switch self {
+        case .winner(let side): [side]
+        case .tied(let sides): sides
+        case .draw: []
         }
     }
 }
 
 public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
-    public static let currentSchemaVersion = 1
+    /// Payload version. 2 added sides (C, D, `sides`), initiative order and `.tied` (PlayModeSpec § 12).
+    /// v1 payloads decode with Side A and Side B.
+    public static let currentSchemaVersion = 2
 
     public var id: UUID
     public var schemaVersion: Int
@@ -117,8 +203,12 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     public var turn: Int
     public var phase: PhaseId
     public var activeSide: SideId
+    /// The sides in this match, in seat order. Missions: Side A, Side B.
+    public var sides: [MatchSide]
     public var initiativeWinner: SideId?
     public var initiativeRolls: InitiativeRolls?
+    /// This turn's initiative order, lowest first: first to move, winner last. Empty before initiative.
+    public var initiativeOrder: [SideId]
     public var units: [MatchUnitState]
     public var eventLog: [MatchEvent]
     public var status: MatchStatus
@@ -141,8 +231,10 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         turn: Int = 1,
         phase: PhaseId = .initiative,
         activeSide: SideId = .lanceA,
+        sides: [MatchSide] = MatchSide.missionPair,
         initiativeWinner: SideId? = nil,
         initiativeRolls: InitiativeRolls? = nil,
+        initiativeOrder: [SideId]? = nil,
         units: [MatchUnitState] = [],
         eventLog: [MatchEvent] = [],
         status: MatchStatus = .active,
@@ -162,8 +254,11 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         self.turn = turn
         self.phase = phase
         self.activeSide = activeSide
+        self.sides = sides
         self.initiativeWinner = initiativeWinner
         self.initiativeRolls = initiativeRolls
+        self.initiativeOrder = initiativeOrder
+            ?? Self.legacyOrder(winner: initiativeWinner, rolls: initiativeRolls, sides: sides)
         self.units = units
         self.eventLog = eventLog
         self.status = status
@@ -177,24 +272,30 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide
-        case initiativeWinner, initiativeRolls, units, eventLog, status, outcome
+        case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide, sides
+        case initiativeWinner, initiativeRolls, initiativeOrder, units, eventLog, status, outcome
         case tableReady, forcesLoaded, updatedAt, recoverySnapshots, diceMode, deploymentAcknowledged
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
-        schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion)
+        // An older payload is upgraded in memory and saved as the current version. A newer one keeps its
+        // number so the repository can set it aside (MatchSessionSpec).
+        let savedVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion)
             ?? MatchSession.currentSchemaVersion
+        schemaVersion = max(savedVersion, MatchSession.currentSchemaVersion)
         modeId = try container.decode(GameModeId.self, forKey: .modeId)
         scenarioId = try container.decodeIfPresent(ScenarioId.self, forKey: .scenarioId)
         ruleset = try container.decode(ScenarioRuleset.self, forKey: .ruleset)
         turn = try container.decode(Int.self, forKey: .turn)
         phase = try container.decode(PhaseId.self, forKey: .phase)
         activeSide = try container.decode(SideId.self, forKey: .activeSide)
+        sides = try container.decodeIfPresent([MatchSide].self, forKey: .sides) ?? MatchSide.missionPair
         initiativeWinner = try container.decodeIfPresent(SideId.self, forKey: .initiativeWinner)
         initiativeRolls = try container.decodeIfPresent(InitiativeRolls.self, forKey: .initiativeRolls)
+        initiativeOrder = try container.decodeIfPresent([SideId].self, forKey: .initiativeOrder)
+            ?? Self.legacyOrder(winner: initiativeWinner, rolls: initiativeRolls, sides: sides)
         units = try container.decode([MatchUnitState].self, forKey: .units)
         eventLog = try container.decode([MatchEvent].self, forKey: .eventLog)
         status = try container.decode(MatchStatus.self, forKey: .status)
@@ -217,8 +318,10 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         try container.encode(turn, forKey: .turn)
         try container.encode(phase, forKey: .phase)
         try container.encode(activeSide, forKey: .activeSide)
+        try container.encode(sides, forKey: .sides)
         try container.encodeIfPresent(initiativeWinner, forKey: .initiativeWinner)
         try container.encodeIfPresent(initiativeRolls, forKey: .initiativeRolls)
+        try container.encode(initiativeOrder, forKey: .initiativeOrder)
         try container.encode(units, forKey: .units)
         try container.encode(eventLog, forKey: .eventLog)
         try container.encode(status, forKey: .status)
@@ -230,6 +333,60 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         try container.encode(updatedAt, forKey: .updatedAt)
         try container.encode(recoverySnapshots, forKey: .recoverySnapshots)
     }
+}
+
+extension MatchSession {
+    /// A v1 save has a winner and maybe rolls but no order. Two sides: loser first, winner last.
+    static func legacyOrder(winner: SideId?, rolls: InitiativeRolls?, sides: [MatchSide]) -> [SideId] {
+        if let rolls, !rolls.order.isEmpty { return rolls.order }
+        guard let winner else { return [] }
+        return sides.map(\.id).filter { $0 != winner } + [winner]
+    }
+}
+
+// MARK: - Sides
+
+extension MatchSession {
+    /// Every side in seat order, including sides that are out.
+    public var sideIds: [SideId] { sides.map(\.id) }
+
+    /// Sides still in the game, in seat order.
+    public var sidesInGame: [SideId] { sides.filter { !$0.isOut }.map(\.id) }
+
+    public func side(_ id: SideId) -> MatchSide? {
+        sides.first { $0.id == id }
+    }
+
+    /// The name players see for this side: the session's name, or "Side A" for a side it doesn't hold.
+    public func displayName(of id: SideId) -> String {
+        side(id)?.name ?? id.displayName
+    }
+
+    /// The other sides still in the game, in seat order. Any of their ’Mechs is a legal target (§ 6.3).
+    public func opponents(of id: SideId) -> [SideId] {
+        sidesInGame.filter { $0 != id }
+    }
+
+    /// The next side after this one in seat order, wrapping round. Sides that are out are skipped
+    /// unless every other side is out.
+    public func nextSide(after id: SideId) -> SideId {
+        let ids = sideIds
+        guard let index = ids.firstIndex(of: id), ids.count > 1 else { return id }
+        let rotated = Array(ids[(index + 1)...] + ids[..<index])
+        let inGame = Set(sidesInGame)
+        return rotated.first { inGame.contains($0) } ?? rotated[0]
+    }
+
+    /// The opposing side in a two-side game (every mission). Keeps mission code short.
+    /// With more sides there is no single "other side": use `opponents(of:)`.
+    public func otherSide(of id: SideId) -> SideId {
+        assert(sides.count == 2, "otherSide(of:) is for two-side games; use opponents(of:)")
+        let ids = sideIds
+        return ids.first { $0 != id } ?? id
+    }
+
+    /// The side that moves first this turn: lowest initiative. Nil before initiative.
+    public var firstToMove: SideId? { initiativeOrder.first }
 }
 
 extension MatchSession {

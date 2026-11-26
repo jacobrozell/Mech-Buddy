@@ -137,7 +137,7 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
 
 - [x] **Owner:** answer the spec's decisions table (D1–D29), or accept the recommended defaults. (S) All defaults accepted 2026-11-26.
 - [x] **PM0** Spec merged. (S)
-- [ ] **PM1** N-side Domain: sides C and D, initiative order, movement order for 3–4 sides, sides going out, payload schema v2. Every mission plays the same. (L)
+- [x] **PM1** N-side Domain: sides C and D, initiative order, movement order for 3–4 sides, sides going out, payload schema v2. Every mission plays the same. (L)
 - [x] **PM2** Card library: all 40 card faces for the owner's two boxes in one file. (M) Built 2026-11-26: 40 faces, 21 checked.
   - [ ] **Owner:** check the 19 faces not yet checked on the Master Unit List.
 - [ ] **PM3** Learn | Play tabs behind `playMode`. (M)

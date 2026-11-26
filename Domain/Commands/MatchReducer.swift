@@ -5,9 +5,14 @@ public enum MatchCommand: Sendable {
     case markTableReady
     case setDiceMode(DiceMode)
     case abandonMatch
+    /// One 2D6 per side still in the game, plus any tie-break rounds (PlayModeSpec § 6.1).
     case setInitiative(InitiativeRolls)
-    /// Skip the roll: the players agreed which side moves first (casual and learning games).
+    /// Skip the roll: the players agreed which side moves first (casual and learning games). Two sides.
     case agreeInitiative(firstToMove: SideId)
+    /// Skip the roll: the players chose the whole order, first to move first (§ 6.1 "Players choose the order").
+    case agreeInitiativeOrder([SideId])
+    /// The side gives up: its ’Mechs leave the table at once and it is out (§ 6.5).
+    case concede(side: SideId)
     /// Tag a miniature with a colour so players can match minis to cards. Any phase.
     case setMini(unitId: UUID, mini: MiniMarker?)
     /// Mark a ’Mech as standing in water this turn (partial cover for shots at it, −1 heat in the End Phase).
@@ -134,15 +139,31 @@ public enum MatchReducer {
             guard next.phase == .initiative else {
                 throw MatchDomainError.illegalPhaseTransition("Initiative already resolved")
             }
-            let winner = try AlphaStrikePhaseEngine.resolveInitiative(rolls: rolls)
-            next.initiativeRolls = rolls
+            guard Set(rolls.rolls.keys) == Set(next.sidesInGame) else {
+                throw MatchDomainError.illegalPhaseTransition("Enter a roll for every side still in the game")
+            }
+            let order = try AlphaStrikePhaseEngine.initiativeOrder(rolls: rolls)
+            let winner = order[order.count - 1]
+            var resolved = rolls
+            resolved.order = order
+            next.initiativeRolls = resolved
             next.initiativeWinner = winner
-            next.activeSide = AlphaStrikePhaseEngine.initiativeLoser(winner: winner)
+            next.initiativeOrder = order
+            next.activeSide = order[0]
             next.phase = .movement
             next.activeSide = firstMover(next)
-            next.appendLog(
-                "Initiative: \(rolls.lanceA.total) to \(rolls.lanceB.total). \(winner.displayName) goes last"
-            )
+            if order.count == 2, let a = rolls.lanceA, let b = rolls.lanceB {
+                next.appendLog("Initiative: \(a.total) to \(b.total). \(winner.displayName) goes last")
+            } else {
+                let totals = next.sidesInGame.compactMap { side in
+                    rolls.rolls[side].map { "\(side.letter) \($0.total)" }
+                }
+                next.appendLog(
+                    "Initiative: \(totals.joined(separator: ", ")). Order: "
+                        + order.map(\.letter).joined(separator: ", ")
+                        + ". \(next.displayName(of: winner)) goes last"
+                )
+            }
 
         case .setMini(let unitId, let mini):
             guard let idx = next.units.firstIndex(where: { $0.id == unitId }) else {
@@ -161,12 +182,68 @@ public enum MatchReducer {
                 throw MatchDomainError.illegalPhaseTransition("Initiative already resolved")
             }
             // The side that moves first is the one that "lost" the roll; the other moves last.
+            guard next.sidesInGame.contains(first) else {
+                throw MatchDomainError.illegalPhaseTransition("That side is out")
+            }
+            let order = [first] + next.sidesInGame.filter { $0 != first }
             next.initiativeRolls = nil
-            next.initiativeWinner = first.other
+            next.initiativeWinner = order.last
+            next.initiativeOrder = order
             next.activeSide = first
             next.phase = .movement
             next.activeSide = firstMover(next)
             next.appendLog("Players chose: \(first.displayName) moves first")
+
+        case .agreeInitiativeOrder(let order):
+            guard next.phase == .initiative else {
+                throw MatchDomainError.illegalPhaseTransition("Initiative already resolved")
+            }
+            guard order.count == next.sidesInGame.count, Set(order) == Set(next.sidesInGame) else {
+                throw MatchDomainError.illegalPhaseTransition("Put every side still in the game in order")
+            }
+            next.initiativeRolls = nil
+            next.initiativeWinner = order.last
+            next.initiativeOrder = order
+            next.activeSide = order[0]
+            next.phase = .movement
+            next.activeSide = firstMover(next)
+            next.appendLog("Players chose the order: " + order.map { next.displayName(of: $0) }.joined(separator: ", "))
+
+        case .concede(let side):
+            guard next.status == .active else {
+                throw MatchDomainError.illegalPhaseTransition("The game is over.")
+            }
+            guard let sideIndex = next.sides.firstIndex(where: { $0.id == side }), !next.sides[sideIndex].isOut else {
+                throw MatchDomainError.illegalPhaseTransition("That side is already out")
+            }
+            if next.units.contains(where: \.pendingCritical) {
+                throw MatchDomainError.illegalPhaseTransition("Roll the critical first.")
+            }
+            for i in next.units.indices where next.units[i].side == side && next.units[i].combatStatus != .removed {
+                next.units[i].combatStatus = .removed
+                next.units[i].criticalsOwed = 0
+            }
+            next.sides[sideIndex].isOut = true
+            next.sides[sideIndex].conceded = true
+            next.sides[sideIndex].outOnTurn = next.turn
+            next.initiativeOrder.removeAll { $0 == side }
+            next.appendLog("\(next.displayName(of: side)) conceded and is out.")
+            if let outcome = VictoryEvaluator.lastSideStanding(in: next) {
+                next.status = .completed
+                next.outcome = outcome
+                next.appendLog("Match complete: \(outcome.displaySummary)")
+                return next
+            }
+            if next.phase == .movement, next.activeSide == side || !next.sidesInGame.contains(next.activeSide) {
+                next.activeSide = AlphaStrikePhaseEngine.nextMovementActiveSide(
+                    current: next.activeSide,
+                    units: next.units,
+                    order: next.initiativeOrder
+                )
+            }
+            if next.activeSide == side {
+                next.activeSide = next.nextSide(after: side)
+            }
 
         case .setMovementMode(let unitId, let mode):
             guard next.phase == .movement else {
@@ -214,7 +291,7 @@ public enum MatchReducer {
             next.activeSide = AlphaStrikePhaseEngine.nextMovementActiveSide(
                 current: next.activeSide,
                 units: next.units,
-                firstToMove: next.initiativeWinner?.other
+                order: next.initiativeOrder
             )
 
         case .skipRemainingMoves:
@@ -232,14 +309,18 @@ public enum MatchReducer {
             guard next.canSwapSides else {
                 throw MatchDomainError.illegalPhaseTransition("Sides can be swapped until the first move")
             }
+            // Two sides trade places. With more sides this becomes "Reorder sides" before the battle (§ 8.1).
+            guard next.sides.count == 2 else {
+                throw MatchDomainError.illegalPhaseTransition("Reorder sides instead")
+            }
+            let swap = { (side: SideId) in session.otherSide(of: side) }
             for i in next.units.indices {
-                next.units[i].side = next.units[i].side.other
+                next.units[i].side = swap(next.units[i].side)
             }
-            next.activeSide = next.activeSide.other
-            next.initiativeWinner = next.initiativeWinner?.other
-            if let rolls = next.initiativeRolls {
-                next.initiativeRolls = InitiativeRolls(lanceA: rolls.lanceB, lanceB: rolls.lanceA)
-            }
+            next.activeSide = swap(next.activeSide)
+            next.initiativeWinner = next.initiativeWinner.map(swap)
+            next.initiativeOrder = next.initiativeOrder.map(swap)
+            next.initiativeRolls = next.initiativeRolls?.mapSides(swap)
             next.appendLog("Swapped sides")
 
         case .advancePhase:
@@ -297,7 +378,7 @@ public enum MatchReducer {
                 next.activeSide = AlphaStrikePhaseEngine.nextMovementActiveSide(
                     current: next.activeSide,
                     units: next.units,
-                    firstToMove: next.initiativeWinner?.other
+                    order: next.initiativeOrder
                 )
             }
             next.appendLog("\(next.units[idx].name) left the table")
@@ -318,6 +399,14 @@ public enum MatchReducer {
                 next.units[i].withdrawalAnnounced = true
                 next.appendLog("\(next.units[i].name) is crippled and must withdraw")
             }
+            // Sides with nothing left on the table are out (§ 6.5). Two sides: that ends the game below,
+            // and the result says so, so the line is only logged with three or more sides.
+            let wentOut = AlphaStrikePhaseEngine.markSidesOut(&next)
+            if next.sides.count > 2 {
+                for side in wentOut {
+                    next.appendLog("\(next.displayName(of: side)) is out.")
+                }
+            }
             if let outcome = VictoryEvaluator.evaluateAfterEnd(session: next) {
                 next.status = .completed
                 next.outcome = outcome
@@ -328,6 +417,7 @@ public enum MatchReducer {
             next.phase = .initiative
             next.initiativeWinner = nil
             next.initiativeRolls = nil
+            next.initiativeOrder = []
             AlphaStrikePhaseEngine.resetTurnFlags(&next.units)
             next.appendLog("Turn \(next.turn)")
 
@@ -507,10 +597,11 @@ public enum MatchReducer {
         return next
     }
 
-    /// Usually the initiative loser; the other side if the loser has nothing left to move.
+    /// Usually the initiative loser; the next side in order if the loser has nothing left to move.
     private static func firstMover(_ session: MatchSession) -> SideId {
-        let loser = session.initiativeWinner?.other ?? session.activeSide
-        return AlphaStrikePhaseEngine.movementSequence(firstToMove: loser, units: session.units).first ?? loser
+        let order = session.initiativeOrder
+        let loser = order.first ?? session.activeSide
+        return AlphaStrikePhaseEngine.movementSequence(order: order, units: session.units).first ?? loser
     }
 
     private static func validateMovement(_ mode: MovementMode, unit: MatchUnitState) throws {
@@ -535,8 +626,8 @@ public enum MatchReducer {
             for i in next.units.indices {
                 next.units[i].combatPhaseCrits = next.units[i].crits
             }
-            if let winner = next.initiativeWinner {
-                next.activeSide = winner.other
+            if let first = next.initiativeOrder.first {
+                next.activeSide = first
             }
             next.appendLog("Combat phase")
         case .combat:
