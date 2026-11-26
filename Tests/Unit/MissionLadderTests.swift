@@ -90,7 +90,15 @@ struct MissionLadderTests {
         card("Wasp WSP-5A", pv: 17, mv: "16\"j", tmm: 3, sz: 1, dmg: (1, 1, 0), ov: 0, armor: 2, structure: 1, abilities: "CASEII"),
         card("Locust LCT-7V", pv: 25, mv: "20\"", tmm: 4, sz: 1, dmg: (2, 2, 0), ov: 0, armor: 2, structure: 1, abilities: ""),
         card("Nova T", pv: 42, mv: "10\"j", tmm: 2, sz: 2, dmg: (6, 6, 0), ov: 0, armor: 5, structure: 3, abilities: "CASE, OMNI"),
-        card("Pouncer T", pv: 29, mv: "12\"/10\"j", tmm: 2, sz: 2, dmg: (3, 3, 0), ov: 0, armor: 4, structure: 2, abilities: "ENE, HT1/1/-, OMNI")
+        card("Pouncer T", pv: 29, mv: "12\"/10\"j", tmm: 2, sz: 2, dmg: (3, 3, 0), ov: 0, armor: 4, structure: 2, abilities: "ENE, HT1/1/-, OMNI"),
+        // Clash of Steel (Quick-Start p. 31). MUL values in docs/game-modes/book-scenarios.md, checked 2026-11-24.
+        card("Atlas AS7-S4", pv: 55, mv: "6\"", tmm: 1, sz: 4, dmg: (4, 4, 4), ov: 1, armor: 10, structure: 8, abilities: "CASEII, ECM, STL"),
+        card("Archer ARC-7C", pv: 49, mv: "10\"", tmm: 2, sz: 3, dmg: (5, 5, 4), ov: 0, armor: 7, structure: 3, abilities: "CASEII, IF2, REAR2/2/-"),
+        card("Warhammer WHM-8R", pv: 40, mv: "8\"", tmm: 1, sz: 3, dmg: (4, 4, 2), ov: 1, armor: 7, structure: 6, abilities: "CASEII"),
+        card("Wraith TR5", pv: 42, mv: "16\"/14\"j", tmm: 3, sz: 2, dmg: (3, 3, 0), ov: 0, armor: 5, structure: 3, abilities: "ENE"),
+        card("Warhawk T", pv: 50, mv: "8\"", tmm: 1, sz: 4, dmg: (5, 5, 4), ov: 1, armor: 9, structure: 5, abilities: "ENE, HT1/1/-, OMNI"),
+        card("Timber Wolf T", pv: 62, mv: "10\"", tmm: 2, sz: 3, dmg: (7, 7, 4), ov: 2, armor: 8, structure: 4, abilities: "CASE, IF2, OMNI"),
+        card("Fire Moth G", pv: 35, mv: "30\"", tmm: 4, sz: 1, dmg: (4, 4, 0), ov: 1, armor: 1, structure: 1, abilities: "CASE, OMNI")
     ]
 
     private static func card(
@@ -271,6 +279,72 @@ struct MeetAndGreetTests {
             boxes: try catalog.boxSets().boxes
         )
         #expect(check.hasAll && check.standIns.isEmpty, "\(check.summary)")
+    }
+}
+
+@Suite("Clash of Steel (box scenario 2)")
+struct ClashOfSteelScenarioTests {
+    private var catalog: BundleContentCatalogRepository {
+        BundleContentCatalogRepository(bundle: Bundle(for: MeetAndGreetBundleToken.self))
+    }
+    private let id = ScenarioId(rawValue: "clash-of-steel")
+
+    @Test("Listed after Meet and Greet in the Alpha Strike box section")
+    func catalogEntry() throws {
+        let items = try catalog.scenarios().scenarios
+        let entry = try #require(items.first { $0.id == "clash-of-steel" })
+        #expect(entry.stage == "From the Alpha Strike box" && !entry.gated)
+        #expect(try #require(items.firstIndex { $0.id == "clash-of-steel" }) == (items.firstIndex { $0.id == "meet-and-greet" } ?? -9) + 1)
+    }
+
+    @Test("The book's forces (p. 31): eight Skill 3 Highlanders vs the Battle Star, Skill 1 and 2; PV adjusted (p. 35)")
+    func forces() throws {
+        let dto = try catalog.scenario(id: id)
+        #expect(dto.sides.lanceA.count == 8 && dto.sides.lanceA.allSatisfy { $0.skill == 3 })
+        #expect(dto.sides.lanceB.map(\.skill) == [1, 2, 2, 2, 2])
+        #expect(dto.sides.lanceA.map(\.pv).reduce(0, +) == 342)
+        #expect(dto.sides.lanceB.map(\.pv).reduce(0, +) == 314)
+        let ruleset = GuidedScenarioFactory.mapRuleset(dto.ruleset)
+        #expect(ruleset.forcedWithdrawal && ruleset.overheatAllowed && ruleset.physicalAttacksAllowed)
+    }
+
+    @Test("Box rules: 5 BSP each, three Formations, six Medium and six Heavy buildings (pp. 28–32)")
+    func boxRules() throws {
+        let dto = try catalog.scenario(id: id)
+        let units = GuidedScenarioFactory.makeUnits(from: dto)
+        let rules = try #require(GuidedScenarioFactory.makeBoxRules(from: dto, units: units))
+        #expect(rules.support[.lanceA]?.budget == 5 && rules.support[.lanceB]?.budget == 5)
+        let command = try #require(rules.formations.first { $0.kind == .commandLance })
+        #expect(command.memberIds.count == 4 && command.combatIntuitionCount == 2)
+        #expect(units.first { $0.id == command.commandUnitId }?.name == "Atlas AS7-S4")
+        #expect(rules.formations.first { $0.kind == .reconLance }?.memberIds.count == 4)
+        let star = try #require(rules.formations.first { $0.kind == .battleStar })
+        #expect(star.memberIds.count == 5 && star.luckyUsesLeft == 7)
+        #expect(rules.buildings.filter { $0.type == .medium }.count == 6)
+        #expect(rules.buildings.filter { $0.type == .heavy && $0.cf == 12 }.count == 6)
+        #expect(dto.layout?.features.filter { $0.kind == .building }.count == 12)
+        // Other missions don't use them.
+        let meet = try catalog.scenario(id: ScenarioId(rawValue: "meet-and-greet"))
+        #expect(GuidedScenarioFactory.makeBoxRules(from: meet, units: []) == nil)
+    }
+
+    @Test("Alpha Strike box owners have all thirteen minis")
+    func boxCoversIt() throws {
+        let dto = try catalog.scenario(id: id)
+        let check = CollectionMath.miniCheck(
+            forces: (dto.sides.lanceA + dto.sides.lanceB).map(\.name),
+            collection: OwnedCollection(boxes: ["alpha-strike-box": 1]),
+            boxes: try catalog.boxSets().boxes
+        )
+        #expect(check.hasAll && check.standIns.isEmpty, "\(check.summary)")
+    }
+
+    @Test("8 vs 5 moves 1-1, 1-1, then 2-1 (p. 14)")
+    func unequalNumbers() throws {
+        let units = GuidedScenarioFactory.makeUnits(from: try catalog.scenario(id: id))
+        let sequence = AlphaStrikePhaseEngine.movementSequence(order: [.lanceA, .lanceB], units: units)
+        #expect(sequence.count == 13)
+        #expect(Array(sequence.prefix(4)) == [.lanceA, .lanceB, .lanceA, .lanceB])
     }
 }
 

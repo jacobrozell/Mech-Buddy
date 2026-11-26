@@ -94,6 +94,22 @@
       "gated": false,
       "icon": "person.2.fill",
       "stage": "From the Alpha Strike box"
+    },
+    {
+      "id": "clash-of-steel",
+      "title": "Clash of Steel",
+      "subtitle": "From the Alpha Strike box · 8 vs 5 · ~2 hours",
+      "missionNumber": 7,
+      "introduces": [
+        "Buildings",
+        "Battlefield Support",
+        "Formations"
+      ],
+      "bundle": "as-clash-of-steel.json",
+      "release": "1.5.0",
+      "gated": false,
+      "icon": "building.2.fill",
+      "stage": "From the Alpha Strike box"
     }
   ]
 }

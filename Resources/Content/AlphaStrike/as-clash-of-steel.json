@@ -1,0 +1,518 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "scenarioId": "clash-of-steel",
+  "title": "Clash of Steel",
+  "subtitle": "From the Alpha Strike box · 8 vs 5 · about 2 hours",
+  "missionNumber": 7,
+  "introduces": [
+    "Buildings",
+    "Battlefield Support",
+    "Formations"
+  ],
+  "estimatedMinutes": 120,
+  "release": "1.5.0",
+  "ruleset": {
+    "overheatAllowed": true,
+    "physicalAttacksAllowed": true,
+    "forcedWithdrawal": true,
+    "maxTurns": 12,
+    "victory": {
+      "type": "destroyAllEnemiesOrStructureAfterTurn",
+      "maxTurn": 12
+    }
+  },
+  "coachNotes": [
+    "The Alpha Strike box’s second scenario (Quick-Start Rulebook p. 31). Two lances of Northwind Highlanders try to split a Jade Falcon Battle Star in the ruined city of Aswan.",
+    "Side A, the Defender, is two lances: the Command Lance (Atlas, Archer, Warhammer, Blackjack) and the Recon Lance (Wraith, Wasp, Phoenix Hawk, Locust). Every Highlander is Skill 3. Side B, the Attacker, is a Battle Star of five Clan OmniMechs: Warhawk (Skill 1) and four Skill 2 pilots.",
+    "Open Scenario rules (the shield button at the top) for everything new: Battlefield Support, the three Formations and the twelve buildings.",
+    "Battlefield Support (pp. 29–30): each side secretly buys 5 points of support before play. In the Combat Phase, call one: roll 2D6 against its number, with no modifiers. Strikes hit one ’Mech; bombing and artillery hit every base under the template, and scatter when they miss. Each is used once.",
+    "Command Lance (p. 32): while the Atlas stands, Side A may reroll its Initiative once a turn; the new roll stands. Two ’Mechs (not the Atlas) get Combat Intuition: when Side A wins Initiative, each may move and fire in the Movement Phase, with the damage landing at once, once every 3 turns.",
+    "Recon Lance (p. 32): Maneuvering Ace. Woods cost 1″ less per inch, so they cost nothing extra.",
+    "Battle Star (p. 32): seven Lucky rerolls for the whole Star. After an attack roll, a Star ’Mech may spend one to roll again; the second roll stands. Not for criticals, Initiative or support.",
+    "A Formation keeps its bonus while at least three of its ’Mechs are not destroyed (p. 37).",
+    "Buildings (p. 28): small ones are Medium (CF 4, +2″ per inch to go through, holds Size 4), large ones Heavy (CF 12, +3″ per inch, holds Size 6). No ’Mech may end its move inside one. Going through does 1 damage per inch to the building. They block line of sight and give partial cover like hills. Shots at a building count it as immobile (−4).",
+    "Indirect fire (IF) and ECM have no effect in the Quick-Start rules (p. 25). The Atlas’s Stealth (STL) does: +1 to hit it at medium range, +2 at long.",
+    "Eight against five: when one side has twice as many ’Mechs left to move, it moves two at a time (p. 14). The app counts this for you.",
+    "Forced Withdrawal is on: crippled ’Mechs head home, and leaving the table counts as destroyed. A crippled ’Mech counts as out for victory."
+  ],
+  "sides": {
+    "lanceA": [
+      {
+        "name": "Atlas AS7-S4",
+        "pv": 66,
+        "mv": "6\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 4,
+        "m": 4,
+        "l": 4,
+        "ov": 1,
+        "armor": 10,
+        "structure": 8,
+        "skill": 3,
+        "abilities": "CASEII, ECM, STL"
+      },
+      {
+        "name": "Archer ARC-7C",
+        "pv": 59,
+        "mv": "10\"",
+        "tmm": 2,
+        "sz": 3,
+        "s": 5,
+        "m": 5,
+        "l": 4,
+        "ov": 0,
+        "armor": 7,
+        "structure": 3,
+        "skill": 3,
+        "abilities": "CASEII, IF2, REAR2/2/-"
+      },
+      {
+        "name": "Warhammer WHM-8R",
+        "pv": 48,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 3,
+        "s": 4,
+        "m": 4,
+        "l": 2,
+        "ov": 1,
+        "armor": 7,
+        "structure": 6,
+        "skill": 3,
+        "abilities": "CASEII"
+      },
+      {
+        "name": "Blackjack BJ-5",
+        "pv": 32,
+        "mv": "8\"j",
+        "tmm": 1,
+        "sz": 2,
+        "s": 2,
+        "m": 3,
+        "l": 3,
+        "ov": 0,
+        "armor": 5,
+        "structure": 2,
+        "skill": 3,
+        "abilities": "CASEII"
+      },
+      {
+        "name": "Wraith TR5",
+        "pv": 50,
+        "mv": "16\"/14\"j",
+        "tmm": 3,
+        "sz": 2,
+        "s": 3,
+        "m": 3,
+        "l": 0,
+        "ov": 0,
+        "armor": 5,
+        "structure": 3,
+        "skill": 3,
+        "abilities": "ENE"
+      },
+      {
+        "name": "Wasp WSP-5A",
+        "pv": 20,
+        "mv": "16\"j",
+        "tmm": 3,
+        "sz": 1,
+        "s": 1,
+        "m": 1,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 1,
+        "skill": 3,
+        "abilities": "CASEII"
+      },
+      {
+        "name": "Phoenix Hawk PXH-4M",
+        "pv": 37,
+        "mv": "12\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 3,
+        "m": 3,
+        "l": 1,
+        "ov": 0,
+        "armor": 5,
+        "structure": 2,
+        "skill": 3,
+        "abilities": "ENE"
+      },
+      {
+        "name": "Locust LCT-7V",
+        "pv": 30,
+        "mv": "20\"",
+        "tmm": 4,
+        "sz": 1,
+        "s": 2,
+        "m": 2,
+        "l": 0,
+        "ov": 0,
+        "armor": 2,
+        "structure": 1,
+        "skill": 3,
+        "abilities": ""
+      }
+    ],
+    "lanceB": [
+      {
+        "name": "Warhawk T",
+        "pv": 80,
+        "mv": "8\"",
+        "tmm": 1,
+        "sz": 4,
+        "s": 5,
+        "m": 5,
+        "l": 4,
+        "ov": 1,
+        "armor": 9,
+        "structure": 5,
+        "skill": 1,
+        "abilities": "ENE, HT1/1/-, OMNI"
+      },
+      {
+        "name": "Timber Wolf T",
+        "pv": 86,
+        "mv": "10\"",
+        "tmm": 2,
+        "sz": 3,
+        "s": 7,
+        "m": 7,
+        "l": 4,
+        "ov": 2,
+        "armor": 8,
+        "structure": 4,
+        "skill": 2,
+        "abilities": "CASE, IF2, OMNI"
+      },
+      {
+        "name": "Nova T",
+        "pv": 58,
+        "mv": "10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 6,
+        "m": 6,
+        "l": 0,
+        "ov": 0,
+        "armor": 5,
+        "structure": 3,
+        "skill": 2,
+        "abilities": "CASE, OMNI"
+      },
+      {
+        "name": "Pouncer T",
+        "pv": 41,
+        "mv": "12\"/10\"j",
+        "tmm": 2,
+        "sz": 2,
+        "s": 3,
+        "m": 3,
+        "l": 0,
+        "ov": 0,
+        "armor": 4,
+        "structure": 2,
+        "skill": 2,
+        "abilities": "ENE, HT1/1/-, OMNI"
+      },
+      {
+        "name": "Fire Moth G",
+        "pv": 49,
+        "mv": "30\"",
+        "tmm": 4,
+        "sz": 1,
+        "s": 4,
+        "m": 4,
+        "l": 0,
+        "ov": 1,
+        "armor": 1,
+        "structure": 1,
+        "skill": 2,
+        "abilities": "CASE, OMNI"
+      }
+    ]
+  },
+  "tableSteps": [
+    "Use an open table about 3 feet across. The two edges 4 feet apart are the home edges: Side A, the Highlanders, on one, Side B, the Jade Falcons, on the other. Measure in inches.",
+    "Terrain: each player takes three trees, three small buildings and three large buildings from the box. Side B places first; then take turns placing two pieces at a time, each within 24 inches of the centre. Trees within 4 inches of another tree, whoever placed them, form a patch of woods.",
+    "The box’s small buildings are Medium (CF 4) and the large ones Heavy (CF 12). The app tracks each one’s CF under Scenario rules. The diagram shows one way to lay out the city.",
+    "Before play, each side secretly buys 5 points of Battlefield Support in the app (Scenario rules), handing the phone over so the other side doesn’t see. Side A also picks its two Combat Intuition ’Mechs (not the Atlas).",
+    "Deploy: Side B places one ’Mech at least 24 inches from the centre toward its home edge; on a 4-foot table that is right at the edge. Then Side A places two the same way. Repeat until all thirteen are down."
+  ],
+  "winningSummary": "Cripple or destroy every enemy ’Mech first. A ’Mech that leaves the table counts as destroyed. The book has no turn limit; the app stops at 12 turns, and then the side with more Structure left wins.",
+  "layout": {
+    "width": 48,
+    "depth": 36,
+    "sheets": [],
+    "zones": [
+      {
+        "side": "A",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 2,
+          "depth": 36
+        }
+      },
+      {
+        "side": "B",
+        "area": {
+          "x": 46,
+          "y": 0,
+          "width": 2,
+          "depth": 36
+        }
+      }
+    ],
+    "features": [
+      {
+        "kind": "building",
+        "area": {
+          "x": 12,
+          "y": 5,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 32,
+          "y": 5,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 19,
+          "y": 16.5,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 25,
+          "y": 16.5,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 12,
+          "y": 28,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 32,
+          "y": 28,
+          "width": 4,
+          "depth": 3
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 22,
+          "y": 4,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 30,
+          "y": 12,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 8,
+          "y": 16,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 38,
+          "y": 16,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 16,
+          "y": 22,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "building",
+        "area": {
+          "x": 24,
+          "y": 30,
+          "width": 2,
+          "depth": 2
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 4,
+          "y": 23,
+          "width": 7,
+          "depth": 6
+        }
+      },
+      {
+        "kind": "woods",
+        "area": {
+          "x": 38,
+          "y": 5,
+          "width": 7,
+          "depth": 6
+        }
+      }
+    ],
+    "openTable": "An open table 4 feet between the two home edges and 3 feet wide, with the box’s buildings and trees. The Alpha Strike box has no maps; a 3 × 4 foot mat or any table works."
+  },
+  "boxRules": {
+    "battlefieldSupportPoints": 5,
+    "formations": [
+      {
+        "id": "command-lance",
+        "kind": "commandLance",
+        "name": "Command Lance",
+        "members": [
+          "Atlas AS7-S4",
+          "Archer ARC-7C",
+          "Warhammer WHM-8R",
+          "Blackjack BJ-5"
+        ],
+        "commandUnit": "Atlas AS7-S4",
+        "combatIntuitionCount": 2
+      },
+      {
+        "id": "recon-lance",
+        "kind": "reconLance",
+        "name": "Recon Lance",
+        "members": [
+          "Wraith TR5",
+          "Wasp WSP-5A",
+          "Phoenix Hawk PXH-4M",
+          "Locust LCT-7V"
+        ]
+      },
+      {
+        "id": "battle-star",
+        "kind": "battleStar",
+        "name": "Battle Star",
+        "members": [
+          "Warhawk T",
+          "Timber Wolf T",
+          "Nova T",
+          "Pouncer T",
+          "Fire Moth G"
+        ],
+        "luckyUses": 7
+      }
+    ],
+    "buildings": [
+      {
+        "id": "S1",
+        "name": "Small building 1",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "S2",
+        "name": "Small building 2",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "S3",
+        "name": "Small building 3",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "S4",
+        "name": "Small building 4",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "S5",
+        "name": "Small building 5",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "S6",
+        "name": "Small building 6",
+        "type": "medium",
+        "heightInches": 2
+      },
+      {
+        "id": "L1",
+        "name": "Large building 1",
+        "type": "heavy",
+        "heightInches": 3
+      },
+      {
+        "id": "L2",
+        "name": "Large building 2",
+        "type": "heavy",
+        "heightInches": 3
+      },
+      {
+        "id": "L3",
+        "name": "Large building 3",
+        "type": "heavy",
+        "heightInches": 3
+      },
+      {
+        "id": "L4",
+        "name": "Large building 4",
+        "type": "heavy",
+        "heightInches": 3
+      },
+      {
+        "id": "L5",
+        "name": "Large building 5",
+        "type": "heavy",
+        "heightInches": 3
+      },
+      {
+        "id": "L6",
+        "name": "Large building 6",
+        "type": "heavy",
+        "heightInches": 3
+      }
+    ]
+  }
+}
