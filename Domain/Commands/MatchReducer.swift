@@ -373,6 +373,10 @@ public enum MatchReducer {
         if physical, !next.ruleset.physicalAttacksAllowed {
             throw MatchDomainError.cannotAttack("Punches and kicks aren’t used in this mission.")
         }
+        // A REAR shot is a weapon attack, and a ’Mech can’t make a physical attack in a turn it made one (p. 22).
+        if physical, attacker.rearShot != nil {
+            throw MatchDomainError.cannotAttack("It already fired its rear weapons this turn, so it can’t punch or kick.")
+        }
         let bracket = physical ? RangeBracket.short : attack.range
         let move = attack.attackerMove
             ?? (attacker.movementMode == .unset ? .ground : attacker.movementMode)

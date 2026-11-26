@@ -78,7 +78,7 @@ struct RulesContentTests {
             .flatMap { [$0.title] + $0.sections.flatMap { [$0.heading, $0.body] } }
             .joined(separator: "\n")
         for phrase in ["JMPW", "JMPS", "MP hit", "natural 12", "CASE", "Bases touching", "0 damage",
-                       "Done shooting", "Size", "Forced Withdrawal", "HT", "shut down", "p. 33"] {
+                       "Done shooting", "Size", "Forced Withdrawal", "HT", "shut down", "p. 35"] {
             #expect(text.contains(phrase), "missing \(phrase)")
         }
     }

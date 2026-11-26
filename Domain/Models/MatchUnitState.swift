@@ -433,9 +433,15 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
 
     public var hasRearFiring: Bool { abilityTags.contains { $0.hasPrefix("REAR") } }
 
-    /// A REAR attack is allowed once a turn, before the forward shot or a punch (p. 25).
+    /// A REAR attack is allowed once a turn, before the forward shot (p. 25). It is a weapon attack, so the
+    /// ’Mech can’t punch or kick afterwards (p. 22): see `canMakePhysicalAttack`.
     public var canRearFireThisTurn: Bool {
         hasRearFiring && canAttackThisTurn && rearShot == nil
+    }
+
+    /// A physical attack needs a turn with no weapon attack, and a REAR shot counts as one (p. 22).
+    public var canMakePhysicalAttack: Bool {
+        canAttackThisTurn && rearShot == nil
     }
 
     /// Eligible to open SATOR this combat impulse.

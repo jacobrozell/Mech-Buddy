@@ -193,7 +193,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 
 **You'll learn:** All eight box ’Mechs, Forced Withdrawal, Every rule on.
 
-**How to win:** Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.
+**How to win:** Cripple or knock out all four enemy ’Mechs. A crippled ’Mech, or one that leaves the table, counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.
 
 **Forces**
 

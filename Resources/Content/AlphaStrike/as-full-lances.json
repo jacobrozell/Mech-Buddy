@@ -166,7 +166,7 @@
     "Each side’s own short table edge is its home edge. A crippled ’Mech must head back toward it.",
     "Each side places its four ’Mechs within 6 inches of its own short table edge. After the first dice roll, the winner picks which side places first; then take turns placing one ’Mech at a time."
   ],
-  "winningSummary": "Knock out all four enemy ’Mechs. A ’Mech that leaves the table counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.",
+  "winningSummary": "Cripple or knock out all four enemy ’Mechs. A crippled ’Mech, or one that leaves the table, counts as knocked out. If anyone is still standing after 10 turns, the side with more Structure left wins. Same Structure is a draw.",
   "layout": {
     "width": 36,
     "depth": 22,

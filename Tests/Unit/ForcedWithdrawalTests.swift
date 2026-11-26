@@ -285,4 +285,18 @@ struct ForcedWithdrawalTests {
         let old = try JSONDecoder().decode(MatchUnitState.self, from: JSONSerialization.data(withJSONObject: json))
         #expect(!old.leftTable && !old.withdrawalAnnounced)
     }
+
+    @Test("Under Forced Withdrawal, crippling every enemy wins; without it the game goes on (pp. 26, 31)")
+    func crippledEnemiesEndTheGame() {
+        let crippledBLR = blr(armorDamage: 8, structureDamage: 4)
+        #expect(crippledBLR.isCrippled)
+        let withRule = session([thunderbolt(), crippledBLR], phase: .end)
+        #expect(VictoryEvaluator.evaluate(session: withRule) == .winner(.lanceA))
+
+        let noRule = session([thunderbolt(), crippledBLR], phase: .end, ruleset: ScenarioRuleset(
+            overheatAllowed: true, physicalAttacksAllowed: true, forcedWithdrawal: false,
+            maxTurns: 10, victory: .destroyAllEnemiesOrStructureAfterTurn(maxTurn: 10)
+        ))
+        #expect(VictoryEvaluator.evaluate(session: noRule) == nil)
+    }
 }

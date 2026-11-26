@@ -2,12 +2,19 @@ import Foundation
 
 public enum VictoryEvaluator {
     /// Living = still on table for victory (active only; pending-end count as destroyed for victory).
+    /// Under Forced Withdrawal a crippled ’Mech is out too: those scenarios are won by crippling or destroying
+    /// every enemy (pp. 26, 31), and a withdrawing ’Mech that never reaches its edge must not stall the game.
     public static func livingSides(in session: MatchSession) -> Set<SideId> {
         var sides = Set<SideId>()
-        for unit in session.units where unit.combatStatus == .active {
+        for unit in session.units where countsAsLiving(unit, in: session) {
             sides.insert(unit.side)
         }
         return sides
+    }
+
+    static func countsAsLiving(_ unit: MatchUnitState, in session: MatchSession) -> Bool {
+        guard unit.combatStatus == .active else { return false }
+        return !(session.ruleset.forcedWithdrawal && unit.isCrippled)
     }
 
     public static func remainingStructure(side: SideId, in session: MatchSession) -> Int {

@@ -106,4 +106,19 @@ struct RearFiringTests {
         session.units = units
         #expect(session.units[0].rearShot == nil && session.units[0].rearFireReduction == 0)
     }
+
+    @Test("A rear shot is a weapon attack, so no punch or kick after it (p. 22)")
+    func noPhysicalAfterRear() throws {
+        var start = combat()
+        start.ruleset = ScenarioRuleset(
+            overheatAllowed: true, physicalAttacksAllowed: true, forcedWithdrawal: false,
+            maxTurns: 8, victory: .destroyAllEnemiesOrStructureAfterTurn(maxTurn: 8)
+        )
+        #expect(start.units[0].canMakePhysicalAttack)
+        let session = try attack(start, defender: 2, kind: .rearFiring)
+        #expect(!session.units[0].canMakePhysicalAttack)
+        #expect(throws: MatchDomainError.self) {
+            try attack(session, defender: 1, kind: .physical, range: .short)
+        }
+    }
 }

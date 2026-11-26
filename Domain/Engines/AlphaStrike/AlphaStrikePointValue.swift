@@ -1,6 +1,6 @@
 import Foundation
 
-/// Point Value by MechWarrior Skill (Alpha Strike Quick-Start Rulebook p. 33, Improved Skill PV Increase Table).
+/// Point Value by MechWarrior Skill (Alpha Strike Quick-Start Rulebook p. 35, Improved Skill PV Increase Table).
 public enum AlphaStrikePointValue {
     /// PV added per Skill point better than 4: base 0–7 → 1, 8–12 → 2, … 48–52 → 10, then +1 per 5 base PV.
     public static func increasePerSkillPoint(base: Int) -> Int {
