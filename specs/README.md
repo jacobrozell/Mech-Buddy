@@ -45,6 +45,7 @@ See [SpecGovernance.md](SpecGovernance.md). On conflict: Architecture + IOS26Pla
 | [features/ModeHomeSpec.md](features/ModeHomeSpec.md) | Both | draft |
 | [features/OnboardingSpec.md](features/OnboardingSpec.md) | Both | draft — first-run flow, track choice |
 | [features/GuidedMissionSpec.md](features/GuidedMissionSpec.md) | AS | draft — AC + DoD link |
+| [features/PlayModeSpec.md](features/PlayModeSpec.md) | AS | draft — Learn \| Play split; full games for 2–4 sides, forces, board builder, objectives (not built; replaces Free Battle) |
 | [features/BattleTableSpec.md](features/BattleTableSpec.md) | AS | draft |
 | [features/SATORAttackSpec.md](features/SATORAttackSpec.md) | AS | draft |
 | [features/RosterSpec.md](features/RosterSpec.md) | AS | draft |
