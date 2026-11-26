@@ -24,6 +24,9 @@ struct BattleFlowView: View {
     @State private var showAbandonConfirm = false
     @State private var showSkipConfirm = false
     @State private var showEventLog = false
+    /// Clash of Steel: Battlefield Support, Formations and buildings (BoxRulesSheet).
+    @State private var showBoxRules = false
+    @State private var boxRulesAttackerId: UUID?
     @State private var showBackConfirm = false
     @State private var showDoneShootingConfirm = false
     @State private var focusFollowUp: FocusFollowUp?
@@ -104,6 +107,16 @@ struct BattleFlowView: View {
             }
             .sheet(isPresented: $showEventLog) {
                 EventLogSheet(store: store)
+            }
+            .sheet(isPresented: $showBoxRules, onDismiss: {
+                // Combat Intuition: open the shot sheet for that 'Mech once this sheet has gone.
+                if let id = boxRulesAttackerId {
+                    boxRulesAttackerId = nil
+                    prefillAttackerId = id
+                    showSATOR = true
+                }
+            }) {
+                BoxRulesSheet(store: store) { boxRulesAttackerId = $0 }
             }
             .sheet(isPresented: $showSATOR) {
                 if let session = store.session {
@@ -508,6 +521,15 @@ struct BattleFlowView: View {
             .accessibilityIdentifier("as.battle.leave")
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
+            if store.boxRules != nil {
+                Button {
+                    showBoxRules = true
+                } label: {
+                    Image(systemName: "shield.lefthalf.filled")
+                }
+                .accessibilityLabel("Scenario rules")
+                .accessibilityIdentifier("cos.rules.open")
+            }
             Button {
                 showEventLog = true
             } label: {
