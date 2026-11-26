@@ -6,6 +6,8 @@ final class RidgeLineUITests: XCTestCase {
 
     override func setUp() {
         continueAfterFailure = false
+        // A landscape run (screenshots) leaves the simulator rotated; these flows expect portrait.
+        XCUIDevice.shared.orientation = .portrait
     }
 
     @MainActor

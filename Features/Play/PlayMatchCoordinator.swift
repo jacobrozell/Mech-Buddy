@@ -20,6 +20,10 @@ final class PlayMatchCoordinator {
     /// The mission the player asked for. Kept across the replace-the-saved-game confirmation.
     private(set) var pendingScenario: ScenarioId = .ridgeLine
     private(set) var pendingTitle = "Ridge Line"
+    /// A Play game waiting to start (PlayModeSpec § 5.6). Nil when the request is a mission.
+    private(set) var pendingPlay: PlaySetup?
+    /// "Edit and play again" on a Play result: Play home reopens setup at Review with this.
+    var editSetup: PlaySetup?
 
     func refresh(using dependencies: AppDependencies) {
         do {
@@ -47,9 +51,24 @@ final class PlayMatchCoordinator {
         prefersZoom: Bool = true
     ) {
         pendingScenario = scenarioId
+        pendingPlay = nil
         pendingTitle = title
         zoomSource = source
         self.prefersZoom = prefersZoom
+        refresh(using: dependencies)
+        if resumeSession != nil {
+            showReplaceConfirm = true
+        } else {
+            startNew(using: dependencies, replaceActive: false)
+        }
+    }
+
+    /// Start a Play game from Review. Asks first when a game is in progress (D15).
+    func requestPlay(_ setup: PlaySetup, using dependencies: AppDependencies) {
+        pendingPlay = setup
+        pendingTitle = "a new game"
+        zoomSource = "play"
+        prefersZoom = false
         refresh(using: dependencies)
         if resumeSession != nil {
             showReplaceConfirm = true
@@ -81,6 +100,20 @@ final class PlayMatchCoordinator {
 
     private func startNew(using dependencies: AppDependencies, replaceActive: Bool) {
         let store = MatchStore(repository: dependencies.matchSessions)
+        if let setup = pendingPlay {
+            store.startPlay(setup, library: dependencies.cardLibrary, replaceActive: replaceActive)
+            guard store.session != nil else {
+                lastErrorTitle = store.lastErrorTitle
+                lastError = store.lastError ?? "Could not start the game"
+                return
+            }
+            dependencies.preferences.playLastSetup = setup
+            dependencies.preferences.playDraft = nil
+            pendingPlay = nil
+            lastError = nil
+            matchStore = store
+            return
+        }
         store.startMission(pendingScenario, from: dependencies.content, replaceActive: replaceActive)
         guard store.session != nil else {
             lastErrorTitle = store.lastErrorTitle

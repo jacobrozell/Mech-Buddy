@@ -2,7 +2,14 @@ import SwiftUI
 import MechBuddyData
 import MechBuddyDomain
 
+/// The mission path. With Play mode on it is the Learn tab (PlayModeSpec § 3), unchanged inside.
 struct PlayHomeView: View {
+    /// Shown as the Learn tab: titled Learn, root id `learn.home`, with `play.home` kept beside it
+    /// for one release so UI tests still find it.
+    var isLearnTab = false
+    /// Learn tab: opens the Rules tab from "Keep learning".
+    var onOpenRules: (() -> Void)? = nil
+
     @Environment(AppDependencies.self) private var dependencies
     @Environment(PlayMatchCoordinator.self) private var matches
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -36,6 +43,9 @@ struct PlayHomeView: View {
                     if let resume = matches.resumeSession {
                         resumeStrip(resume)
                     }
+                    if isLearnTab {
+                        learnIntro
+                    }
                     if trackLayout.showsClassicSpotlight {
                         classicSpotlight
                     }
@@ -49,6 +59,9 @@ struct PlayHomeView: View {
                 if trackLayout.showsClassicRow {
                     classicBlock
                 }
+                if isLearnTab {
+                    keepLearning
+                }
                 if let loadError {
                     ErrorBanner(message: loadError) {
                         Task { await loadContent() }
@@ -59,10 +72,20 @@ struct PlayHomeView: View {
             .frame(maxWidth: contentWidth)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Play")
+        .navigationTitle(isLearnTab ? "Learn" : "Play")
         // Inline: the large title left a tall empty band above the mission path (FUTURE-PLAN §1.8).
         .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("play.home")
+        .accessibilityIdentifier(isLearnTab ? "learn.home" : "play.home")
+        .background {
+            if isLearnTab {
+                Color.clear
+                    .frame(width: 1, height: 1)
+                    .accessibilityElement()
+                    .accessibilityIdentifier("play.home")
+                    .accessibilityLabel("Learn")
+                    .allowsHitTesting(false)
+            }
+        }
         .navigationDestination(isPresented: $showHowToPlay) {
             HowToPlayRidgeLineView(onPlay: {
                 matches.requestNew(.ridgeLine, using: dependencies, prefersZoom: false)
@@ -145,6 +168,14 @@ struct PlayHomeView: View {
         }
     }
 
+    /// The game in progress, named by its mode: "Running Hot", or "Play · 1 v 1" for a Play game.
+    private func title(for session: MatchSession) -> String {
+        if let play = session.play {
+            return "Play · \(play.formatName)"
+        }
+        return title(for: session.scenarioId)
+    }
+
     private func title(for id: ScenarioId?) -> String {
         let key = (id ?? .ridgeLine).rawValue
         return missions[key]?.title ?? ladder.first { $0.id == key }?.title ?? "Ridge Line"
@@ -164,7 +195,7 @@ struct PlayHomeView: View {
         let sideA = PlayForceMath.structure(of: .lanceA, in: session.units)
         let sideB = PlayForceMath.structure(of: .lanceB, in: session.units)
         return ResumeCard(
-            title: title(for: session.scenarioId),
+            title: title(for: session),
             turn: session.turn,
             maxTurns: session.ruleset.maxTurns,
             phase: session.phase,
@@ -183,7 +214,7 @@ struct PlayHomeView: View {
         let turns = session.ruleset.maxTurns.map { "Turn \(session.turn) of \($0)" } ?? "Turn \(session.turn)"
         let copy = VStack(alignment: .leading, spacing: TMSpace.xxs) {
             Eyebrow("In progress")
-            Text(title(for: session.scenarioId))
+            Text(title(for: session))
                 .font(TMFont.cardTitle)
                 .fixedSize(horizontal: false, vertical: true)
             // Non-breaking space before the dot: a wrap at large text never starts a line with "·".
@@ -222,7 +253,7 @@ struct PlayHomeView: View {
         .tint(TMColor.signal)
         .controlSize(.large)
         .accessibilityIdentifier("as.modeHome.resume")
-        .accessibilityLabel("Continue \(title(for: session.scenarioId)), \(turns)")
+        .accessibilityLabel("Continue \(title(for: session)), \(turns)")
     }
 
     private func missionBlock(_ scenario: GuidedScenarioDTO) -> some View {
@@ -315,6 +346,71 @@ struct PlayHomeView: View {
                 stage: item.stage
             )
         }
+    }
+
+    // MARK: Learn tab
+
+    /// Says what the Learn tab is: a campaign that teaches the game, one mission at a time.
+    private var learnIntro: some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            Text("Learn Alpha Strike")
+                .font(TMFont.stepTitle)
+                .accessibilityAddTraits(.isHeader)
+            Text("A campaign of short missions. Each one adds a rule, and the app walks you through it. Clear them all for the trophy.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("learn.intro")
+    }
+
+    /// How to play and the rules, after the missions.
+    private var keepLearning: some View {
+        TMCard {
+            VStack(alignment: .leading, spacing: TMSpace.sm) {
+                Eyebrow("Keep learning")
+                Button {
+                    showHowToPlay = true
+                } label: {
+                    learnLink("How to play", detail: "A turn, step by step", systemImage: "play.rectangle")
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("learn.howToPlay")
+                if let onOpenRules {
+                    Divider()
+                    Button(action: onOpenRules) {
+                        learnLink("Rules reference", detail: "Look up any rule", systemImage: "book")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("learn.rules")
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("learn.keepLearning")
+    }
+
+    private func learnLink(_ title: String, detail: String, systemImage: String) -> some View {
+        HStack(spacing: TMSpace.md) {
+            Image(systemName: systemImage)
+                .font(.title3)
+                .foregroundStyle(TMColor.signal)
+                .frame(width: 32)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                Text(title).font(TMFont.cardTitle)
+                Text(detail).font(TMFont.detail).foregroundStyle(.secondary)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: TMSpace.sm)
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
     }
 
     private var pathBlock: some View {

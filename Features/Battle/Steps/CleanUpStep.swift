@@ -121,8 +121,13 @@ struct CleanUpStep: View {
     }
 
     private var scoreCard: some View {
-        let sideA = VictoryEvaluator.remainingStructure(side: .lanceA, in: session)
-        let sideB = VictoryEvaluator.remainingStructure(side: .lanceB, in: session)
+        // Play games break a turn-limit tie on PV left (PlayModeSpec § 7.3); missions on Structure.
+        let sideA = session.isPlayGame
+            ? VictoryEvaluator.pvLeft(side: .lanceA, in: session)
+            : VictoryEvaluator.remainingStructure(side: .lanceA, in: session)
+        let sideB = session.isPlayGame
+            ? VictoryEvaluator.pvLeft(side: .lanceB, in: session)
+            : VictoryEvaluator.remainingStructure(side: .lanceB, in: session)
         return VStack(alignment: .leading, spacing: TMSpace.md) {
             Eyebrow("Score if the game ended now")
             TMCard(edgeColor: TMColor.signal, isRaised: true) {
@@ -150,7 +155,7 @@ struct CleanUpStep: View {
                 .contentTransition(.numericText())
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(side.displayName) \(value) structure")
+        .accessibilityLabel("\(side.displayName) \(value) \(session.isPlayGame ? "PV left" : "structure")")
     }
 
     private func verdict(sideA: Int, sideB: Int) -> String {

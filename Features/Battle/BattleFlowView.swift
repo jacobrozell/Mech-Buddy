@@ -7,6 +7,8 @@ struct BattleFlowView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Bindable var store: MatchStore
     @Environment(\.dismiss) private var dismiss
+    /// Nil in previews. Play results hand "Edit and play again" back to Play home through it.
+    @Environment(PlayMatchCoordinator.self) private var matches: PlayMatchCoordinator?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -169,7 +171,24 @@ struct BattleFlowView: View {
     private var screen: some View {
         if let session = store.session {
             let coach = BattleCoach(session: session)
-            if coach.step == .victory {
+            if coach.step == .victory, session.isPlayGame {
+                // Play result (PlayModeSpec § 7.4): standings, Play again, Edit and play again. No mission card.
+                VictoryView(
+                    session: session,
+                    onRematch: { store.playAgain(library: dependencies.cardLibrary) },
+                    onShowLog: { showEventLog = true },
+                    onEditAndPlayAgain: {
+                        matches?.editSetup = session.play
+                        store.dismissCompleted()
+                        dismiss()
+                    },
+                    onDone: {
+                        store.dismissCompleted()
+                        dismiss()
+                    },
+                    onBack: { attemptBack() }
+                )
+            } else if coach.step == .victory {
                 VictoryView(
                     session: session,
                     progress: missionProgress(for: session),

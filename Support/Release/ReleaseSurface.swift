@@ -6,7 +6,8 @@ public enum ReleaseFlag: String, CaseIterable, Sendable {
     /// Missions after Ridge Line (Broken Ground on) and the ladder list on Play.
     case missionLadder
     case fullLancesScenario
-    case freeBattle
+    /// Learn | Play tabs, Play home, pickup-game setup and Play sessions (PlayModeSpec § 16). Was `freeBattle`.
+    case playMode
     case physicalOvWithdrawal
     case classicComingSoonEntry
     case classicPlayTools
@@ -35,7 +36,7 @@ public struct ReleaseSurface: ReleaseSurfaceProviding, Sendable {
             return true
         case .tipJar:
             return false
-        case .fullLancesScenario, .freeBattle, .physicalOvWithdrawal,
+        case .fullLancesScenario, .playMode, .physicalOvWithdrawal,
              .classicPlayTools, .mulNetworkFetch, .matchHistory:
             return isFullProductSurface
         }

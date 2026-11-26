@@ -68,6 +68,8 @@ final class AppPreferences {
     static let completedMissionsKey = "missions.completed"
     /// The game last picked on the Rules tab's switch. Unset until the player changes it.
     static let rulesGameKey = "rules.lastGame"
+    /// The root tab last shown, with Play mode on (PlayModeSpec § 3, Landing tab). Raw `AppTab` value.
+    static let lastRootTabKey = "app.lastRootTab"
 
     private let defaults: UserDefaults
 
@@ -75,8 +77,8 @@ final class AppPreferences {
 
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, coachingKey, gettingStartedChecksKey,
-        completedMissionsKey, rulesGameKey
-    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key]
+        completedMissionsKey, rulesGameKey, lastRootTabKey
+    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key] + PlaySetupStore.ownedKeys
 
     var hapticsEnabled: Bool {
         didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
@@ -152,6 +154,34 @@ final class AppPreferences {
         }
     }
 
+    /// Raw value of the root tab last shown. `nil` until a tab is picked with Play mode on.
+    var lastRootTab: String? {
+        didSet {
+            guard !isReloading else { return }
+            if let lastRootTab {
+                defaults.set(lastRootTab, forKey: Self.lastRootTabKey)
+            } else {
+                defaults.removeObject(forKey: Self.lastRootTabKey)
+            }
+        }
+    }
+
+    /// Play setup in progress (PlayModeSpec § 11). Saved on every change; cleared when the game starts.
+    var playDraft: PlaySetup? {
+        didSet {
+            guard !isReloading else { return }
+            PlaySetupStore.save(playDraft, key: PlaySetupStore.draftKey, to: defaults)
+        }
+    }
+
+    /// The last setup a game was started from. Kept after the game ends.
+    var playLastSetup: PlaySetup? {
+        didSet {
+            guard !isReloading else { return }
+            PlaySetupStore.save(playLastSetup, key: PlaySetupStore.lastSetupKey, to: defaults)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isReloading = true
@@ -167,6 +197,9 @@ final class AppPreferences {
         completedMissions = []
         collection = nil
         mapSwaps = [:]
+        lastRootTab = nil
+        playDraft = nil
+        playLastSetup = nil
         isReloading = false
         reload()
     }
@@ -204,6 +237,9 @@ final class AppPreferences {
         let onboarding = OnboardingStore.load(from: defaults)
         learningTrack = onboarding.track
         rulesGame = defaults.string(forKey: Self.rulesGameKey).flatMap(LearningTrack.init(rawValue:))
+        lastRootTab = defaults.string(forKey: Self.lastRootTabKey)
+        playDraft = PlaySetupStore.load(PlaySetupStore.draftKey, from: defaults)
+        playLastSetup = PlaySetupStore.load(PlaySetupStore.lastSetupKey, from: defaults)
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
         collection = CollectionStore.load(from: defaults)

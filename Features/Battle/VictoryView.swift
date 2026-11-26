@@ -18,6 +18,8 @@ struct VictoryView: View {
     let onRematch: () -> Void
     var onNextMission: (() -> Void)? = nil
     var onShowLog: (() -> Void)? = nil
+    /// Play games: back to Review with this setup (PlayModeSpec § 7.4).
+    var onEditAndPlayAgain: (() -> Void)? = nil
     let onDone: () -> Void
     let onBack: () -> Void
 
@@ -72,7 +74,7 @@ struct VictoryView: View {
                 .accessibilityHidden(true)
             if case .winner(let side) = session.outcome {
                 SideBadge(side: side)
-                Text("\(side.displayName) wins")
+                Text("\(session.displayName(of: side)) wins")
                     .font(TMFont.readoutL(size: titleSize))
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
@@ -98,8 +100,12 @@ struct VictoryView: View {
     private var tally: some View {
         TMCard {
             VStack(alignment: .leading, spacing: TMSpace.lg) {
-                Eyebrow("Final tally")
-                if usesPadColumns {
+                Eyebrow(session.isPlayGame ? "Standings" : "Final tally")
+                if session.isPlayGame {
+                    ForEach(Array(VictoryEvaluator.standings(in: session).enumerated()), id: \.element) { index, side in
+                        sideBlock(side, place: index + 1)
+                    }
+                } else if usesPadColumns {
                     HStack(alignment: .top, spacing: TMSpace.lg) {
                         sideBlock(.lanceA)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -121,7 +127,7 @@ struct VictoryView: View {
             && !dynamicTypeSize.isAccessibilitySize
     }
 
-    private func sideBlock(_ side: SideId) -> some View {
+    private func sideBlock(_ side: SideId, place: Int? = nil) -> some View {
         let total = VictoryEvaluator.remainingStructure(side: side, in: session)
         let units = session.units.filter { $0.side == side }
         return VStack(alignment: .leading, spacing: TMSpace.sm) {
@@ -131,24 +137,45 @@ struct VictoryView: View {
                 : AnyLayout(HStackLayout(spacing: TMSpace.sm))
             headLayout {
                 HStack(spacing: TMSpace.sm) {
+                    if let place {
+                        Text("\(place)")
+                            .font(TMFont.readoutM)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
                     SideBadge(side: side)
-                    Text(side.displayName)
+                    Text(session.displayName(of: side))
                         .font(TMFont.cardTitle)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 if !dynamicTypeSize.isAccessibilitySize {
                     Spacer(minLength: TMSpace.sm)
                 }
-                Text("\(total) structure left")
+                Text(tallyLine(side, structure: total))
                     .font(TMFont.stat)
                     .monospacedDigit()
                     .fixedSize(horizontal: false, vertical: true)
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(side.displayName), \(total) structure left")
+            .accessibilityLabel(standingLabel(side, place: place, structure: total))
+            .accessibilityIdentifier(place.map { "as.victory.standing.\($0)" } ?? "as.victory.side.\(side.rawValue)")
             ForEach(units) { unit in
                 unitRow(unit)
             }
         }
+    }
+
+    /// Missions: Structure left. Play: PV left and ’Mechs left (§ 7.4).
+    private func tallyLine(_ side: SideId, structure: Int) -> String {
+        guard session.isPlayGame else { return "\(structure) structure left" }
+        let pv = VictoryEvaluator.pvLeft(side: side, in: session)
+        let mechs = VictoryEvaluator.unitsLeft(side: side, in: session)
+        return "\(pv) PV · \(mechs) ’Mech\(mechs == 1 ? "" : "s") left"
+    }
+
+    private func standingLabel(_ side: SideId, place: Int?, structure: Int) -> String {
+        let prefix = place.map { "Place \($0), " } ?? ""
+        return "\(prefix)\(session.displayName(of: side)), \(tallyLine(side, structure: structure))"
     }
 
     private func unitRow(_ unit: MatchUnitState) -> some View {
@@ -295,6 +322,13 @@ struct VictoryView: View {
                     action: { confirmRematch = true }
                 )
             }
+            if let onEditAndPlayAgain {
+                SecondaryActionButton(
+                    title: "Edit and play again",
+                    accessibilityIdentifier: "as.victory.editSetup",
+                    action: onEditAndPlayAgain
+                )
+            }
             SecondaryActionButton(
                 title: "Back to Play",
                 accessibilityIdentifier: "as.victory.done",
@@ -339,7 +373,7 @@ struct VictoryView: View {
             if VictoryEvaluator.livingSides(in: session).isEmpty {
                 return "Both sides are wrecked · \(turnPhrase)"
             }
-            return "Equal structure after turn \(session.turn)"
+            return "Equal \(session.isPlayGame ? "PV" : "structure") after turn \(session.turn)"
         case .winner(let side):
             let enemies = session.units.filter { $0.side != side }
             let allDown = !enemies.isEmpty && enemies.allSatisfy { $0.combatStatus != .active }
@@ -355,7 +389,7 @@ struct VictoryView: View {
                 }
                 return "Enemy ’Mechs destroyed · \(turnPhrase)"
             }
-            return "More structure left after turn \(session.turn)"
+            return "More \(session.isPlayGame ? "PV" : "structure") left after turn \(session.turn)"
         case nil:
             return "The game is over"
         }

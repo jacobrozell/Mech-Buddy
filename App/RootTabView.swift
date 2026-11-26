@@ -2,7 +2,11 @@ import SwiftUI
 import MechBuddyData
 import MechBuddyDomain
 
-enum AppTab: Hashable {
+/// Root tabs. Raw values are saved as `AppPreferences.lastRootTab` (see `RootTabRule`).
+enum AppTab: String, Hashable {
+    /// Play mode on: today's Play tab (mission path), renamed Learn (PlayModeSpec § 3).
+    case learn
+    /// Play mode off: the mission path. Play mode on: Play mode home.
     case play
     case force
     case rules
@@ -13,6 +17,7 @@ struct RootTabView: View {
     @Environment(AppDependencies.self) private var dependencies
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var tab: AppTab = LaunchArguments.openRules ? .rules : .play
+    @State private var didPickLandingTab = false
     @State private var matches = PlayMatchCoordinator()
     @State private var replaceAfterConfirm = false
     /// The onboarding flow, when open. First launch opens it; Settings and Play can reopen it.
@@ -26,6 +31,7 @@ struct RootTabView: View {
             tabs
         }
         .task {
+            pickLandingTab()
             await Task.yield()
             showOnboardingIfNeeded()
             if let mission = LaunchArguments.openMission {
@@ -33,15 +39,28 @@ struct RootTabView: View {
             }
         }
         .fullScreenCover(item: $onboarding) { entry in
-            OnboardingFlowView(entry: entry, onFinish: { tab = .play })
+            OnboardingFlowView(entry: entry, onFinish: { tab = playMode ? .learn : .play })
         }
     }
 
     private var tabs: some View {
         TabView(selection: $tab) {
-            Tab("Play", systemImage: "flag.checkered", value: AppTab.play) {
-                NavigationStack {
-                    PlayHomeView()
+            if playMode {
+                Tab("Learn", systemImage: "graduationcap", value: AppTab.learn) {
+                    NavigationStack {
+                        PlayHomeView(isLearnTab: true, onOpenRules: { tab = .rules })
+                    }
+                }
+                Tab("Play", systemImage: "flag.checkered", value: AppTab.play) {
+                    NavigationStack {
+                        PlayModeHomeView()
+                    }
+                }
+            } else {
+                Tab("Play", systemImage: "flag.checkered", value: AppTab.play) {
+                    NavigationStack {
+                        PlayHomeView()
+                    }
                 }
             }
             Tab("Force", systemImage: "shield.lefthalf.filled", value: AppTab.force) {
@@ -63,6 +82,10 @@ struct RootTabView: View {
         .environment(\.openOnboarding, OpenOnboardingAction { entry in
             onboarding = entry
         })
+        .onChange(of: tab) { _, newTab in
+            guard playMode, didPickLandingTab else { return }
+            dependencies.preferences.lastRootTab = newTab.rawValue
+        }
         .tabViewStyle(.sidebarAdaptable)
         .tabBarMinimizeBehavior(.onScrollDown)
         .task(id: dependencies.sessionRevision) {
@@ -75,6 +98,7 @@ struct RootTabView: View {
             NavigationStack {
                 BattleFlowView(store: store)
             }
+            .environment(matches)
             .modifier(CoverZoom(
                 enabled: matches.prefersZoom && !reduceMotion,
                 sourceID: matches.zoomSource,
@@ -109,6 +133,25 @@ struct RootTabView: View {
         } message: {
             Text(matches.lastError ?? "")
         }
+    }
+
+    /// Learn | Play tabs (PlayModeSpec § 3). Off: today's four tabs, unchanged.
+    private var playMode: Bool {
+        dependencies.releaseSurface.isEnabled(.playMode)
+    }
+
+    /// Landing tab (PlayModeSpec § 3): new players on Learn, everyone else on the last tab used.
+    private func pickLandingTab() {
+        guard !didPickLandingTab else { return }
+        let raw = RootTabRule.landing(
+            playMode: playMode,
+            onboardingDone: dependencies.preferences.hasCompletedOnboarding,
+            missionsCleared: dependencies.preferences.completedMissions.count,
+            lastTab: dependencies.preferences.lastRootTab,
+            openRules: LaunchArguments.openRules
+        )
+        tab = AppTab(rawValue: raw) ?? .play
+        didPickLandingTab = true
     }
 
     /// First launch: cover the tabs with onboarding straight away, without a slide-up.
