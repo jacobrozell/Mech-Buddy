@@ -4,6 +4,7 @@ You are building **Mech Buddy**, an iOS 26 BattleTech tableside companion. Specs
 
 ## Read first (in order)
 
+0. [docs/STATUS.md](docs/STATUS.md) — **where the project is now**: what is built, owner priorities, next milestones, how agents work here  
 1. [docs/product-readiness.md](docs/product-readiness.md) — owner locks  
 2. [specs/README.md](specs/README.md) — index + governance  
 3. [specs/ArchitectureSpec.md](specs/ArchitectureSpec.md) + [DomainModelSpec.md](specs/DomainModelSpec.md)  
@@ -21,7 +22,7 @@ You are building **Mech Buddy**, an iOS 26 BattleTech tableside companion. Specs
 - Release gates via `ReleaseSurface` only  
 - Physical dice primary (enter results)  
 - One-device hotseat  
-- Free Battle **1.1**; Classic = Coming soon teaser only in 1.0  
+- Play mode (formerly "Free Battle") is specced in `specs/features/PlayModeSpec.md` and ships behind the `playMode` flag; Classic = Coming soon teaser only until Alpha Strike is finished  
 
 ## Vertical slice (Phase 6)
 
@@ -31,7 +32,7 @@ Move modes (optional) → SATOR enter 2D6 → Apply damage → Crit if owed →
 End phase → Victory
 ```
 
-Do not build Free Battle, Full Lances playables, or Classic tools for 1.0 Release.
+The 1.0 slice above shipped. Since then the owner widened scope: all five training missions, the two box scenarios and Play mode (behind its flag) are built — see docs/STATUS.md. Classic tools still wait until Alpha Strike is finished.
 
 ## Push
 

@@ -1,6 +1,8 @@
 # Mech Buddy roadmap
 
-The single starting point for future work. Each item links to the doc that holds its details. Last updated 2026-11-25.
+The single starting point for future work. Each item links to the doc that holds its details. Last updated 2026-11-26.
+
+**Current state for agents:** [STATUS.md](STATUS.md) — what is built, owner priorities and the next milestones.
 
 **Checklist of all known work:** [FUTURE-PLAN.md](FUTURE-PLAN.md), including the compact battle mode findings from the 2026-11-25 UI review.
 
