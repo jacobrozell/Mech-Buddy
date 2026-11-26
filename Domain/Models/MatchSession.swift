@@ -221,6 +221,8 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     public var updatedAt: Date
     /// Prior sessions for Undo and Back. Empty on snapshots so saves stay flat.
     public var recoverySnapshots: [MatchSession]
+    /// Battlefield Support, Formations and buildings (Clash of Steel). Nil for other missions; old saves decode as nil.
+    public var boxRules: BoxRulesState?
 
     public init(
         id: UUID = UUID(),
@@ -244,7 +246,8 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         diceMode: DiceMode = .manual,
         deploymentAcknowledged: Bool = false,
         updatedAt: Date = Date(),
-        recoverySnapshots: [MatchSession] = []
+        recoverySnapshots: [MatchSession] = [],
+        boxRules: BoxRulesState? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -269,12 +272,14 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         self.deploymentAcknowledged = deploymentAcknowledged
         self.updatedAt = updatedAt
         self.recoverySnapshots = recoverySnapshots
+        self.boxRules = boxRules
     }
 
     private enum CodingKeys: String, CodingKey {
         case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide, sides
         case initiativeWinner, initiativeRolls, initiativeOrder, units, eventLog, status, outcome
         case tableReady, forcesLoaded, updatedAt, recoverySnapshots, diceMode, deploymentAcknowledged
+        case boxRules
     }
 
     public init(from decoder: Decoder) throws {
@@ -306,6 +311,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         deploymentAcknowledged = try container.decodeIfPresent(Bool.self, forKey: .deploymentAcknowledged) ?? false
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         recoverySnapshots = try container.decodeIfPresent([MatchSession].self, forKey: .recoverySnapshots) ?? []
+        boxRules = try container.decodeIfPresent(BoxRulesState.self, forKey: .boxRules)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -332,6 +338,7 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         try container.encode(deploymentAcknowledged, forKey: .deploymentAcknowledged)
         try container.encode(updatedAt, forKey: .updatedAt)
         try container.encode(recoverySnapshots, forKey: .recoverySnapshots)
+        try container.encodeIfPresent(boxRules, forKey: .boxRules)
     }
 }
 

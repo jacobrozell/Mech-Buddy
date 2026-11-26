@@ -79,6 +79,7 @@ final class MatchStore: Identifiable {
                 MatchSession(ruleset: ruleset),
                 .startMission(scenarioId: scenarioId, ruleset: ruleset, units: units)
             )
+            session?.boxRules = GuidedScenarioFactory.makeBoxRules(from: dto, units: units)
             undoStack.removeAll()
             lastError = nil
             persist()
@@ -396,6 +397,22 @@ final class MatchStore: Identifiable {
             if undoable {
                 pushUndo(session)
             }
+            self.session = next
+            lastError = nil
+            persist()
+        } catch {
+            lastErrorTitle = failureTitle
+            lastError = error.localizedDescription
+        }
+    }
+
+    /// Box rules (Battlefield Support, Formations, buildings). Same undo and save as `mutate`. Helpers that
+    /// call it live in MatchStore+BoxRules.swift.
+    func mutateBoxRules(_ command: BoxRulesCommand, failureTitle: String = "Couldn’t update the game") {
+        guard let session else { return }
+        do {
+            let next = try BoxRulesReducer.reduce(session, command)
+            pushUndo(session)
             self.session = next
             lastError = nil
             persist()

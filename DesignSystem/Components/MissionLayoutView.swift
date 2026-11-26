@@ -90,6 +90,10 @@ struct MissionLayoutView: View {
                     path.addLine(to: CGPoint(x: frame.midX, y: frame.maxY))
                 }
                 context.stroke(path, with: .color(Color.primary.opacity(0.55)), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+            case .building:
+                // Box buildings: small (Medium) and large (Heavy), Quick-Start p. 28.
+                context.fill(Path(roundedRect: frame, cornerRadius: 2), with: .color(Color.gray.opacity(0.45)))
+                context.stroke(Path(roundedRect: frame, cornerRadius: 2), with: .color(Color.primary.opacity(0.6)), lineWidth: 1)
             }
         }
 
@@ -150,6 +154,7 @@ enum MissionLayoutDescription {
             case .woods: return n == 1 ? "one patch of woods" : "\(n) patches of woods"
             case .wall: return n == 1 ? "a low wall" : "\(n) low walls"
             case .tree: return n == 1 ? "a single tree" : "\(n) single trees"
+            case .building: return n == 1 ? "a building" : "\(n) buildings"
             }
         }
         if !terrain.isEmpty {

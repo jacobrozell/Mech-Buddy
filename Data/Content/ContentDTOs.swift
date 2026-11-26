@@ -49,6 +49,36 @@ public struct GuidedScenarioDTO: Codable, Sendable, ContentSchemaVersioned {
     public var coachNotes: [String]?
     /// Maps needed and a top-down table diagram. Optional in older packs.
     public var layout: MissionLayoutDTO?
+    /// Battlefield Support, Formations and buildings (Clash of Steel). Omitted by missions that don't use them.
+    public var boxRules: BoxRulesSetupDTO?
+}
+
+/// The box rules a scenario turns on (Alpha Strike Quick-Start pp. 28–32). Units are named as in `sides`.
+public struct BoxRulesSetupDTO: Codable, Sendable, Equatable {
+    public struct Formation: Codable, Sendable, Equatable {
+        public var id: String
+        /// "commandLance", "reconLance" or "battleStar".
+        public var kind: String
+        public var name: String?
+        public var members: [String]
+        public var commandUnit: String?
+        public var combatIntuitionCount: Int?
+        public var luckyUses: Int?
+    }
+
+    public struct Building: Codable, Sendable, Equatable {
+        public var id: String
+        public var name: String
+        /// "light", "medium", "heavy" or "hardened".
+        public var type: String
+        public var cf: Int?
+        public var heightInches: Int?
+    }
+
+    /// Battlefield Support Points per side (p. 29). Nil: no support.
+    public var battlefieldSupportPoints: Int?
+    public var formations: [Formation]
+    public var buildings: [Building]
 }
 
 public struct ScenarioRulesetDTO: Codable, Sendable {
@@ -481,7 +511,7 @@ public struct MissionLayoutDTO: Codable, Sendable, Equatable {
     }
 
     public enum FeatureKind: String, Codable, Sendable, CaseIterable {
-        case hill, woods, wall, tree
+        case hill, woods, wall, tree, building
     }
 
     /// Terrain to add on an open table. On printed maps, the map's own terrain is used instead.
