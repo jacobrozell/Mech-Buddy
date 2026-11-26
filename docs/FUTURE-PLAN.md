@@ -128,3 +128,27 @@ From `FutureIdeas/`. Not on the roadmap until the owner picks them up.
 - [ ] Later guided-play plans (`FutureIdeas/guided-play.md`, written 2026-11-01 before the mission path; check what the path already covers).
 - [ ] Analytics (`FutureIdeas/analytics.md`). Not started; the app ships with telemetry off and the "Data Not Collected" label depends on that.
 - [ ] Ridge Line walkthrough page (`FutureIdeas/alpha-strike-walkthrough.html`).
+
+---
+
+## 8. Alpha Strike: Play mode
+
+Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section comes before section 6 in priority. The app splits into **Learn** (the guided path, box scenarios, How to play) and **Play** (a full game: 2–4 sides, up to 4 players, your forces, your map, an optional objective, a board you build and save). Play mode replaces Free Battle and covers the "Open play" items in section 4. Spec: [specs/features/PlayModeSpec.md](../specs/features/PlayModeSpec.md). Three and four sides use labelled house rules; the Quick-Start only covers two sides (p. 13).
+
+- [ ] **Owner:** answer the spec's decisions table (D1–D29), or accept the recommended defaults. (S)
+- [ ] **PM0** Spec merged. (S)
+- [ ] **PM1** N-side Domain: sides C and D, initiative order, movement order for 3–4 sides, sides going out, payload schema v2. Every mission plays the same. (L)
+- [ ] **PM2** Card library: all 40 card faces for the owner's two boxes in one file. (M)
+  - [ ] **Owner:** check the 19 faces not yet checked on the Master Unit List.
+- [ ] **PM3** Learn | Play tabs behind `playMode`. (M)
+- [ ] **PM4** First playable: 1 v 1 pickup game, from setup to result. (L)
+- [ ] **PM5** Compact battle mode (section 1, items 1.1–1.4 and 1.6), plus group by side. Needed before PM7. (L)
+- [ ] **PM6** Teams: 1 v 2, 2 v 2, 1 v 3. (M)
+- [ ] **PM7** Three and four sides (free-for-all) behind `playModeMultiSide`. (L)
+  - [ ] **Owner:** table test of 1 v 1 v 1 v 1.
+- [ ] **PM8** Objectives (five of six), victory points and turn limit, behind `playObjectives`. (L)
+- [ ] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M)
+- [ ] **PM10** Release: accessibility pass, screen catalog, inventory, flags on, TestFlight table test. (M)
+- [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L)
+- [ ] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L)
+- [ ] **PM13** Board presets: save, duplicate, delete, starter boards from the missions. (M)

@@ -1,5 +1,7 @@
 # Mode Home Spec — Mech Buddy
 
+> **Superseded in part by [PlayModeSpec](PlayModeSpec.md) § 3 (draft, not built).** With `playMode` on, this screen becomes the **Learn** tab (`learn.home`, keeping `play.home` as a sibling id), a new **Play** tab holds Play mode, and the **Free battle** row below is removed: Play mode replaces Free Battle. With the flag off, this spec stands as written.
+
 ## User story
 
 As a player opening Mech Buddy, I land on Play, see resume if needed, and get clear next actions for Alpha Strike guided play (Classic shows Coming soon).

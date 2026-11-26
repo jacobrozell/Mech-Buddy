@@ -115,6 +115,8 @@ Reducer: `(MatchSession, MatchCommand) throws -> MatchSession` — pure Domain; 
 
 Command exists for 1.1; ReleaseSurface hides entry in 1.0.
 
+See [PlayModeSpec](PlayModeSpec.md), which replaces Free Battle with Play mode and specs the N-side session changes (§ 12): `sides`, initiative order, `startPlay`, `concede`, `.tied`, payload schema v2.
+
 ## Verification
 
 | Field | Value |

@@ -4,6 +4,8 @@ Companion: [IOS26PlatformSpec](IOS26PlatformSpec.md) · [MatchSessionSpec](featu
 
 ## Root information architecture
 
+> **See [PlayModeSpec](features/PlayModeSpec.md) § 3 (draft, not built).** With `playMode` on, the shell has five tabs: Learn (today's Play content), Play (Play mode), Force, Rules, Settings. Resume shows on Learn and Play. With the flag off, the four tabs below stand.
+
 Four tabs (phone + iPad via `.sidebarAdaptable`):
 
 | Tab | SF Symbol | Entry ID | Notes |
