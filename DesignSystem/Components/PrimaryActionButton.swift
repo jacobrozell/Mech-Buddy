@@ -37,10 +37,16 @@ struct PrimaryActionButton: View {
         return nil
     }
 
+    /// The dock's glass button adds its own padding, so a 50 pt label made a 78 pt button.
+    private var labelHeight: CGFloat {
+        if isShort { return 36 }
+        return placement == .dock ? 28 : 50
+    }
+
     private var button: some View {
         Button(role: role, action: action) {
             label
-                .frame(maxWidth: .infinity, minHeight: isShort ? 36 : 50)
+                .frame(maxWidth: .infinity, minHeight: labelHeight)
                 .modifier(OptionalForeground(style: isDisabled ? nil : labelStyle))
         }
         .controlSize(isShort ? .regular : .large)

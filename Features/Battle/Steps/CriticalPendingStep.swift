@@ -22,6 +22,9 @@ struct CriticalPendingStep: View {
                     side: unit.side,
                     accessibilityIdentifier: "as.battle.table"
                 )
+                // Always in full, whatever Settings → Coaching says: it names who rolls and says it is
+                // not a shot (playtest P1-4). That is game state, not teaching text.
+                .environment(\.coachDisplay, .full)
             }
             if count > 1 {
                 Text("1 of \(count)")

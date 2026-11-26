@@ -60,6 +60,8 @@ struct PlayHomeView: View {
             .frame(maxWidth: .infinity)
         }
         .navigationTitle("Play")
+        // Inline: the large title left a tall empty band above the mission path (FUTURE-PLAN §1.8).
+        .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("play.home")
         .navigationDestination(isPresented: $showHowToPlay) {
             HowToPlayRidgeLineView(onPlay: {

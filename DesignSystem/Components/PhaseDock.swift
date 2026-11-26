@@ -17,6 +17,7 @@ struct PhaseDock: View {
 
     var leadingTitle: String?
     var leadingIdentifier: String?
+    var leadingHint: String?
     var leadingAction: (() -> Void)?
 
     var containerIdentifier: String = "as.battle.phaseDock"
@@ -24,58 +25,107 @@ struct PhaseDock: View {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    /// Accessibility text sizes stack the buttons: side by side, "Done shooting" broke mid-word.
-    /// Landscape keeps the row, where height is scarcer than width.
+    /// One primary button with the secondary as a text button beside it (FUTURE-PLAN §1.4): two
+    /// full glass buttons took ~22% of the screen, and ~280 pt stacked at accessibility sizes.
+    /// Accessibility sizes put the text button under the primary, where "Done shooting" has room.
     private var stacks: Bool {
         dynamicTypeSize.isAccessibilitySize && verticalSizeClass != .compact
     }
 
     var body: some View {
-        GlassEffectContainer(spacing: TMSpace.md) {
-            let layout = stacks
-                ? AnyLayout(VStackLayout(spacing: TMSpace.sm))
-                : AnyLayout(HStackLayout(spacing: TMSpace.md))
-            layout {
-                if let leadingTitle, let leadingAction {
-                    SecondaryActionButton(
-                        title: leadingTitle,
-                        placement: .dock,
-                        accessibilityIdentifier: leadingIdentifier,
-                        action: leadingAction
-                    )
+        let layout = stacks
+            ? AnyLayout(VStackLayout(spacing: TMSpace.xxs))
+            : AnyLayout(HStackLayout(spacing: TMSpace.md))
+        layout {
+            if !stacks {
+                leadingButton
+                secondaryButton
+            }
+            PrimaryActionButton(
+                title: primaryTitle,
+                placement: .dock,
+                tint: primaryTint,
+                isDisabled: primaryDisabled,
+                accessibilityHint: primaryHint,
+                action: primaryAction
+            )
+            .accessibilityIdentifiers(
+                primary: primaryIdentifier,
+                extra: primarySpecIdentifier,
+                label: primaryTitle
+            )
+            if stacks {
+                HStack(spacing: TMSpace.lg) {
+                    leadingButton
+                    secondaryButton
                 }
-                if let secondaryTitle, let secondaryAction {
-                    SecondaryActionButton(
-                        title: secondaryTitle,
-                        placement: .dock,
-                        accessibilityHint: secondaryHint,
-                        action: secondaryAction
-                    )
-                    .accessibilityIdentifiers(
-                        primary: secondaryIdentifier,
-                        extra: secondarySpecIdentifier,
-                        label: secondaryTitle
-                    )
-                }
-                PrimaryActionButton(
-                    title: primaryTitle,
-                    placement: .dock,
-                    tint: primaryTint,
-                    isDisabled: primaryDisabled,
-                    accessibilityHint: primaryHint,
-                    action: primaryAction
-                )
-                .accessibilityIdentifiers(
-                    primary: primaryIdentifier,
-                    extra: primarySpecIdentifier,
-                    label: primaryTitle
-                )
             }
         }
+        // Chrome, not content: past AX2 the stacked dock took ~280 pt (FUTURE-PLAN §1.8).
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .padding(.horizontal, TMSpace.lg)
         .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xs : TMSpace.sm)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(containerIdentifier)
+    }
+
+    @ViewBuilder
+    private var leadingButton: some View {
+        if let leadingTitle, let leadingAction {
+            DockTextButton(
+                title: leadingTitle,
+                systemImage: "arrow.uturn.backward",
+                hint: leadingHint,
+                accessibilityIdentifier: leadingIdentifier,
+                action: leadingAction
+            )
+            .layoutPriority(1)
+            .transition(.opacity)
+        }
+    }
+
+    @ViewBuilder
+    private var secondaryButton: some View {
+        if let secondaryTitle, let secondaryAction {
+            // Priority: the text keeps its width and the primary title scales down instead.
+            DockTextButton(title: secondaryTitle, hint: secondaryHint, action: secondaryAction)
+                .layoutPriority(1)
+                .accessibilityIdentifiers(
+                    primary: secondaryIdentifier,
+                    extra: secondarySpecIdentifier,
+                    label: secondaryTitle
+                )
+        }
+    }
+}
+
+/// The dock's secondary action: a plain text button, 44 pt tall, so the primary keeps the width.
+struct DockTextButton: View {
+    var title: String
+    var systemImage: String?
+    var hint: String?
+    var accessibilityIdentifier: String?
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: TMSpace.xs) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .accessibilityHidden(true)
+                }
+                Text(title)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .font(TMFont.cardTitle)
+                .frame(minHeight: 44)
+                .padding(.horizontal, TMSpace.xs)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+        .accessibilityID(accessibilityIdentifier)
+        .accessibilityHint(hint ?? "")
     }
 }
 

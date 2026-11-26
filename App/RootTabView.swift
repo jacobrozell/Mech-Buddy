@@ -1,5 +1,6 @@
 import SwiftUI
 import MechBuddyData
+import MechBuddyDomain
 
 enum AppTab: Hashable {
     case play
@@ -27,6 +28,9 @@ struct RootTabView: View {
         .task {
             await Task.yield()
             showOnboardingIfNeeded()
+            if let mission = LaunchArguments.openMission {
+                matches.requestNew(ScenarioId(rawValue: mission), title: mission, using: dependencies, prefersZoom: false)
+            }
         }
         .fullScreenCover(item: $onboarding) { entry in
             OnboardingFlowView(entry: entry, onFinish: { tab = .play })

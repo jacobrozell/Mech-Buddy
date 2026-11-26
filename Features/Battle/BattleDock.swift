@@ -35,6 +35,7 @@ struct BattleDock: View {
                 secondaryAction: secondary?.action,
                 leadingTitle: leading?.title,
                 leadingIdentifier: leading?.identifier,
+                leadingHint: leading?.hint,
                 leadingAction: leading?.action
             )
             .background {
@@ -48,27 +49,28 @@ struct BattleDock: View {
                 }
             }
         } else if let secondary {
-            GlassEffectContainer(spacing: TMSpace.md) {
-              HStack(spacing: TMSpace.md) {
+            // Movement has no primary until every move is in: the skip is a quiet text button.
+            HStack(spacing: TMSpace.md) {
                 if let leading {
-                    SecondaryActionButton(
+                    DockTextButton(
                         title: leading.title,
-                        placement: .dock,
+                        systemImage: "arrow.uturn.backward",
+                        hint: leading.hint,
                         accessibilityIdentifier: leading.identifier,
                         action: leading.action
                     )
                 }
-                SecondaryActionButton(
+                DockTextButton(
                     title: secondary.title,
-                    placement: .dock,
+                    hint: secondary.hint,
                     accessibilityIdentifier: secondary.identifier,
-                    accessibilityHint: secondary.hint,
                     action: secondary.action
                 )
-              }
             }
+            .frame(maxWidth: .infinity)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             .padding(.horizontal, TMSpace.lg)
-            .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xs : TMSpace.sm)
+            .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xxs : TMSpace.xs)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("as.battle.phaseDock")
         }

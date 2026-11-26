@@ -12,6 +12,32 @@ enum BattleChrome {
         step == .movement
     }
 
+    /// "Close Quarters · Turn 1/8". Table setup and the result keep the plain mission name.
+    static func navigationTitle(scenarioTitle: String, session: MatchSession, coach: BattleCoach) -> String {
+        guard showsHeader(coach.step) else { return scenarioTitle }
+        let turn = session.ruleset.maxTurns.map { "Turn \(session.turn)/\($0)" } ?? "Turn \(session.turn)"
+        return "\(scenarioTitle) · \(turn)"
+    }
+
+    /// One key per game and step, so Brief coaching explains each step the first time it appears.
+    static func coachKey(session: MatchSession, coach: BattleCoach) -> String {
+        let step = coach.pendingCritical != nil ? "critical" : "\(coach.step)"
+        return "\(session.id.uuidString)|\(step)"
+    }
+
+    /// Full the turn a step is first seen; after that Brief shows only the title and a "?".
+    static func coachDisplay(level: CoachingLevel, scenario: ScenarioId?, firstSeenTurn: Int?, turn: Int) -> CoachDisplay {
+        switch level.resolved(for: scenario) {
+        case .automatic, .full:
+            return .full
+        case .off:
+            return .off
+        case .brief:
+            guard let firstSeenTurn else { return .full }
+            return firstSeenTurn == turn ? .full : .brief
+        }
+    }
+
     static func dockTint(session: MatchSession, coach: BattleCoach) -> Color {
         if coach.pendingCritical != nil {
             return TMColor.warning
@@ -51,102 +77,112 @@ enum BattleChrome {
     }
 }
 
-struct BattleHeader: View {
+/// The battle header, folded down to one thin row under the nav bar: four step segments and the
+/// current step's name. The turn moved into the nav title ("Close Quarters · Turn 1/8"); the old
+/// TURN eyebrow, big numeral and progress ring took about a quarter of the screen. FUTURE-PLAN §1.3.
+struct BattleStepStrip: View {
     var turn: Int
     var maxTurns: Int?
     var phase: PhaseId
     var activeSide: SideId?
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private struct Segment: Identifiable {
+        var id: PhaseId
+        var title: String
+        var identifier: String
+    }
+
+    private static let segments: [Segment] = [
+        Segment(id: .initiative, title: "Roll", identifier: "as.battle.phase.initiative"),
+        Segment(id: .movement, title: "Move", identifier: "as.battle.phase.movement"),
+        Segment(id: .combat, title: "Shoot", identifier: "as.battle.phase.combat"),
+        Segment(id: .end, title: "Clean up", identifier: "as.battle.phase.end")
+    ]
+
+    private var currentIndex: Int {
+        Self.segments.firstIndex { $0.id == phase } ?? 0
+    }
+
+    private var isLastTurn: Bool {
+        guard let maxTurns else { return false }
+        return turn >= maxTurns
+    }
 
     var body: some View {
-        Group {
-            if verticalSizeClass == .compact {
-                compactHeight
-            } else if dynamicTypeSize.isAccessibilitySize {
-                accessible
-                    // Chrome, not content: past AX2 the header crowded out the step itself.
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-            } else if sizeClass == .compact {
-                stacked
-            } else {
-                horizontal
-            }
-        }
-        .padding(.horizontal, TMSpace.lg)
-        .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xxs : TMSpace.sm)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.bar)
-    }
-
-    private var compactHeight: some View {
         HStack(alignment: .center, spacing: TMSpace.sm) {
-            TurnCounter(turn: turn, maxTurns: maxTurns)
-            Spacer(minLength: TMSpace.sm)
-            PhaseTrack(current: phase, isCompact: true)
+            bar
             if let activeSide {
-                // One line in landscape: every point of height goes to the step content.
-                SideTag(side: activeSide)
+                SideBadge(side: activeSide)
                     .accessibilityLabel("Active side, \(activeSide.displayName)")
+                    .accessibilityValue(activeSide == .lanceA ? "lanceA" : "lanceB")
                     .accessibilityIdentifier("as.battle.activeSide")
             }
-        }
-    }
-
-    /// Accessibility sizes: "Turn 1 / 8" and the side on one line, the step label under it, both small.
-    private var accessible: some View {
-        VStack(alignment: .leading, spacing: TMSpace.xs) {
-            HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
-                TurnCounter(turn: turn, maxTurns: maxTurns, isInline: true)
-                Spacer(minLength: TMSpace.sm)
-                if let activeSide {
-                    SideTag(side: activeSide)
-                        .accessibilityLabel("Active side, \(activeSide.displayName)")
-                        .accessibilityValue(activeSide == .lanceA ? "lanceA" : "lanceB")
-                        .accessibilityIdentifier("as.battle.activeSide")
-                }
-            }
-            PhaseTrack(current: phase, isCompact: true)
-        }
-    }
-
-    private var horizontal: some View {
-        HStack(alignment: .center, spacing: TMSpace.md) {
-            TurnCounter(turn: turn, maxTurns: maxTurns)
-            Spacer(minLength: TMSpace.sm)
-            PhaseTrack(current: phase, isCompact: true)
-            if let activeSide {
-                sideMark(activeSide)
-            }
-        }
-    }
-
-    private var stacked: some View {
-        VStack(alignment: .leading, spacing: TMSpace.sm) {
-            HStack(alignment: .center, spacing: TMSpace.md) {
-                TurnCounter(turn: turn, maxTurns: maxTurns)
-                Spacer(minLength: TMSpace.sm)
-                if let activeSide {
-                    sideMark(activeSide)
-                }
-            }
-            PhaseTrack(current: phase)
-        }
-    }
-
-    private func sideMark(_ side: SideId) -> some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            SideTag(side: side)
-            Text("is up")
-                .font(TMFont.detail)
+            Text(label)
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .fixedSize()
+                .accessibilityHidden(true)
+            if isLastTurn {
+                StatusChip(kind: .lastTurn)
+                    .fixedSize()
+            }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Active side, \(side.displayName)")
-        .accessibilityValue(side == .lanceA ? "lanceA" : "lanceB")
-        .accessibilityIdentifier("as.battle.activeSide")
+        // Chrome, not content: past AX2 the strip crowded out the step itself.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .padding(.horizontal, TMSpace.lg)
+        .padding(.vertical, verticalSizeClass == .compact ? TMSpace.xxs : TMSpace.xs)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.bar)
+        .tmAnimation(TMMotion.phase, value: phase)
+    }
+
+    private var bar: some View {
+        HStack(spacing: 3) {
+            ForEach(Array(Self.segments.enumerated()), id: \.element.id) { index, segment in
+                Capsule()
+                    .fill(fill(index))
+                    .frame(height: 4)
+                    .frame(maxWidth: .infinity)
+                    // One hidden element per step keeps the phase ids for UI tests and VoiceOver rotor.
+                    .background {
+                        Color.clear
+                            .frame(width: 1, height: 1)
+                            .accessibilityElement()
+                            .accessibilityLabel(segment.title)
+                            .accessibilityIdentifier(segment.identifier)
+                            .accessibilityAddTraits(index == currentIndex ? .isSelected : [])
+                    }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(spoken)
+        .accessibilityIdentifier("as.battle.stepStrip")
+    }
+
+    /// Large text truncates the nav title before the turn, so the strip repeats it there.
+    private var label: String {
+        let step = Self.segments[currentIndex].title
+        guard dynamicTypeSize.isAccessibilitySize else { return step }
+        let turnText = maxTurns.map { "Turn \(turn)/\($0)" } ?? "Turn \(turn)"
+        return "\(turnText) · \(step)"
+    }
+
+    private var spoken: String {
+        let turnText = maxTurns.map { "Turn \(turn) of \($0)\(isLastTurn ? ", last turn" : "")" } ?? "Turn \(turn)"
+        return "\(turnText). Step \(currentIndex + 1) of 4, \(Self.segments[currentIndex].title)"
+    }
+
+    private func fill(_ index: Int) -> Color {
+        if index == currentIndex {
+            // Movement belongs to one side, so its segment wears that side's colour.
+            return activeSide.map(TMColor.side) ?? TMColor.signal
+        }
+        return index < currentIndex ? TMColor.signal.opacity(0.45) : Color.secondary.opacity(0.25)
     }
 }
 
@@ -174,9 +210,12 @@ struct SidePassBanner: View {
 }
 
 #if DEBUG
-#Preview("Battle header") {
+#Preview("Step strip") {
     PreviewPair {
-        BattleHeader(turn: 3, maxTurns: 6, phase: .combat, activeSide: .lanceA)
+        VStack(spacing: TMSpace.md) {
+            BattleStepStrip(turn: 3, maxTurns: 6, phase: .combat, activeSide: nil)
+            BattleStepStrip(turn: 6, maxTurns: 6, phase: .movement, activeSide: .lanceB)
+        }
     }
 }
 #endif

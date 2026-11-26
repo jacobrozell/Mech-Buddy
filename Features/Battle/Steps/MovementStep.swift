@@ -286,7 +286,7 @@ struct MovementStep: View {
             .accessibilityValue(showTable ? "Expanded" : "Collapsed")
             if showTable {
                 ForEach(session.units.filter { $0.combatStatus != .removed }) { unit in
-                    UnitCard(
+                    UnitRowCard(
                         unit: unit,
                         isActiveSide: unit.side == session.activeSide && unit.id == current?.id,
                         accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
