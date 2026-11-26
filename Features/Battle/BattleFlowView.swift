@@ -39,7 +39,7 @@ struct BattleFlowView: View {
 
     var body: some View {
         screen
-            .navigationTitle(store.scenario.title)
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { battleToolbar }
             .onAppear { openMatch() }
@@ -282,7 +282,12 @@ struct BattleFlowView: View {
                     LazyVStack(alignment: .leading, spacing: TMSpace.md) {
                         step(session, coach: coach, showsUnits: showsUnits)
                     }
-                    .padding(TMSpace.lg)
+                    .environment(\.coachDisplay, coachDisplay(session, coach: coach))
+                    .task(id: BattleChrome.coachKey(session: session, coach: coach)) {
+                        store.noteCoachStep(BattleChrome.coachKey(session: session, coach: coach), turn: session.turn)
+                    }
+                    .padding(.horizontal, TMSpace.lg)
+                    .padding(.vertical, TMSpace.md)
                     .onChange(of: landingUnitID) { _, id in
                         guard showsUnits, let id else { return }
                         if reduceMotion {
@@ -319,15 +324,13 @@ struct BattleFlowView: View {
     @ViewBuilder
     private func headerInset(_ session: MatchSession, coach: BattleCoach) -> some View {
         if BattleChrome.showsHeader(coach.step) {
-            VStack(spacing: TMSpace.sm) {
-                BattleHeader(
-                    turn: session.turn,
-                    maxTurns: session.ruleset.maxTurns,
-                    phase: session.phase,
-                    activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
-                        ? session.activeSide : nil
-                )
-            }
+            BattleStepStrip(
+                turn: session.turn,
+                maxTurns: session.ruleset.maxTurns,
+                phase: session.phase,
+                activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
+                    ? session.activeSide : nil
+            )
         }
     }
 
@@ -341,46 +344,46 @@ struct BattleFlowView: View {
     private func dockInset(_ session: MatchSession, coach: BattleCoach) -> some View {
         let primary = primaryButton(session, coach: coach)
         let secondary = secondaryButton(session, coach: coach)
-        let undoInDock = verticalSizeClass == .compact && undoOffered && store.canUndo
-        VStack(spacing: TMSpace.xs) {
-            if undoOffered, store.canUndo, !undoInDock {
-                Button {
-                    undoOffered = false
-                    store.undo()
-                } label: {
-                    Label(store.undoMenuTitle, systemImage: "arrow.uturn.backward")
-                        .font(TMFont.detail.weight(.semibold))
-                        .frame(minHeight: verticalSizeClass == .compact ? 28 : 36)
-                        .padding(.horizontal, TMSpace.md)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(verticalSizeClass == .compact ? .small : .regular)
-                .buttonBorderShape(.capsule)
-                .padding(.top, TMSpace.xs)
-                .transition(.opacity)
-                .accessibilityIdentifier("as.battle.undoToast")
-            }
-            if primary != nil || secondary != nil {
-                BattleDock(
-                    primary: primary,
-                    secondary: secondary,
-                    // Landscape: Undo rides in the dock row instead of costing a row of height.
-                    leading: undoInDock
-                        ? BattleDockButton(
-                            title: "Undo",
-                            identifier: "as.battle.undoToast",
-                            hint: store.undoMenuTitle,
-                            action: {
-                                undoOffered = false
-                                store.undo()
-                            }
-                        )
-                        : nil,
-                    tint: BattleChrome.dockTint(session: session, coach: coach)
-                )
-            }
+        if primary != nil || secondary != nil {
+            BattleDock(
+                primary: primary,
+                secondary: secondary,
+                // Undo shows for a few seconds after each change, then lives only in the ⋯ menu
+                // (FUTURE-PLAN §1.4). It rides in the dock row: as a pill above the dock it cost ~50 pt
+                // and pushed the list, and floating over the list it hid the control under it.
+                leading: undoOffered && store.canUndo
+                    ? BattleDockButton(
+                        title: "Undo",
+                        identifier: "as.battle.undoToast",
+                        hint: store.undoMenuTitle,
+                        action: {
+                            undoOffered = false
+                            store.undo()
+                        }
+                    )
+                    : nil,
+                tint: BattleChrome.dockTint(session: session, coach: coach)
+            )
+            .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: undoOffered)
         }
-        .animation(reduceMotion ? TMMotion.reduced : TMMotion.reveal, value: undoOffered)
+    }
+
+    private var navigationTitle: String {
+        guard let session = store.session else { return store.scenario.title }
+        return BattleChrome.navigationTitle(
+            scenarioTitle: store.scenario.title,
+            session: session,
+            coach: BattleCoach(session: session)
+        )
+    }
+
+    private func coachDisplay(_ session: MatchSession, coach: BattleCoach) -> CoachDisplay {
+        BattleChrome.coachDisplay(
+            level: dependencies.preferences.coaching,
+            scenario: session.scenarioId,
+            firstSeenTurn: store.coachFirstSeen[BattleChrome.coachKey(session: session, coach: coach)],
+            turn: session.turn
+        )
     }
 
     private var stageLayout: BattleStageLayout {

@@ -45,7 +45,7 @@ struct CleanUpStep: View {
                     ForEach(wrecks) { unit in
                         VStack(alignment: .leading, spacing: TMSpace.sm) {
                             if showsUnits {
-                                UnitCard(
+                                UnitRowCard(
                                     unit: unit,
                                     isActiveSide: false,
                                     accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
@@ -81,10 +81,10 @@ struct CleanUpStep: View {
                 crippledSection
             }
             if showsUnits, !standing.isEmpty {
-                VStack(alignment: .leading, spacing: TMSpace.md) {
+                VStack(alignment: .leading, spacing: TMSpace.xs) {
                     Eyebrow("Standing")
                     ForEach(standing) { unit in
-                        UnitCard(
+                        UnitRowCard(
                             unit: unit,
                             isActiveSide: false,
                             accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",

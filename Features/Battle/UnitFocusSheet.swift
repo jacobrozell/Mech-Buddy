@@ -235,6 +235,9 @@ struct UnitFocusSheet: View {
                 }
             )
         }
+        // Chrome, not content: at AX5 "Shoot with Shadow Hawk SHD-2H" wrapped to three huge lines and
+        // covered most of the medium-height sheet, including "Left the table".
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .padding(.horizontal, TMSpace.lg)
         .padding(.vertical, TMSpace.sm)
     }

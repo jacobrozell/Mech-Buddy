@@ -56,7 +56,7 @@ struct BattleRoster: View {
                     ForEach(SideId.allCases, id: \.self) { side in
                         let sideUnits = units(on: side)
                         if !sideUnits.isEmpty {
-                            VStack(alignment: .leading, spacing: TMSpace.sm) {
+                            VStack(alignment: .leading, spacing: TMSpace.xs) {
                                 Eyebrow(side.displayName)
                                 ForEach(sideUnits) { unit in
                                     row(unit)
@@ -149,8 +149,6 @@ struct BattleRoster: View {
 }
 
 struct BattleUnitRow: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     var unit: MatchUnitState
     var isActiveSide: Bool
     var offersShoot: Bool
@@ -159,32 +157,19 @@ struct BattleUnitRow: View {
     var onShoot: () -> Void
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: TMSpace.sm) {
-            UnitCard(
-                unit: unit,
-                isActiveSide: isActiveSide,
-                accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
-                action: onOpenUnit
-            )
-            .overlay {
-                if landingUnitID == unit.id {
-                    RoundedRectangle(cornerRadius: TMRadius.card, style: .continuous)
-                        .strokeBorder(TMColor.damage, lineWidth: 3)
-                        .allowsHitTesting(false)
-                }
-            }
-            if offersShoot {
-                Button(action: onShoot) {
-                    Text("Shoot")
-                        .font(TMFont.detail.weight(.semibold))
-                        // Dark mode's lighter side colours need a dark label (white was about 2.6:1).
-                        .foregroundStyle(colorScheme == .dark ? TMColor.onSignal : Color.white)
-                        .padding(.horizontal, TMSpace.md)
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(TMColor.side(unit.side))
-                .accessibilityLabel("Shoot with \(unit.name)")
+        // Dense row with Shoot inside the card (FUTURE-PLAN §1.2); it used to float in its own row.
+        UnitRowCard(
+            unit: unit,
+            isActiveSide: isActiveSide,
+            accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
+            onShoot: offersShoot ? onShoot : nil,
+            action: onOpenUnit
+        )
+        .overlay {
+            if landingUnitID == unit.id {
+                RoundedRectangle(cornerRadius: TMRadius.card, style: .continuous)
+                    .strokeBorder(TMColor.damage, lineWidth: 3)
+                    .allowsHitTesting(false)
             }
         }
         .id(unit.id)

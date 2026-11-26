@@ -125,14 +125,23 @@ struct VictoryView: View {
         let total = VictoryEvaluator.remainingStructure(side: side, in: session)
         let units = session.units.filter { $0.side == side }
         return VStack(alignment: .leading, spacing: TMSpace.sm) {
-            HStack(spacing: TMSpace.sm) {
-                SideBadge(side: side)
-                Text(side.displayName)
-                    .font(TMFont.cardTitle)
-                Spacer(minLength: TMSpace.sm)
+            // Accessibility sizes stack the count under the side: beside it, "structure" broke as "struc-ture".
+            let headLayout = dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.xs))
+                : AnyLayout(HStackLayout(spacing: TMSpace.sm))
+            headLayout {
+                HStack(spacing: TMSpace.sm) {
+                    SideBadge(side: side)
+                    Text(side.displayName)
+                        .font(TMFont.cardTitle)
+                }
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Spacer(minLength: TMSpace.sm)
+                }
                 Text("\(total) structure left")
                     .font(TMFont.stat)
                     .monospacedDigit()
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("\(side.displayName), \(total) structure left")
@@ -143,9 +152,14 @@ struct VictoryView: View {
     }
 
     private func unitRow(_ unit: MatchUnitState) -> some View {
-        HStack(alignment: .center, spacing: TMSpace.sm) {
+        // Accessibility sizes put the pips under the name: beside them, "Commando" broke as "Comman-do".
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: TMSpace.xs))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: TMSpace.sm))
+        return layout {
             Text(unit.name)
                 .font(TMFont.body)
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if unit.combatStatus == .active {
                 PipTrack(
@@ -242,8 +256,11 @@ struct VictoryView: View {
                     VStack(alignment: .leading, spacing: TMSpace.xs) {
                         Text(progress.nextPlayable ? "Up next: \(next)" : "Coming soon: \(next)")
                             .font(TMFont.detail.weight(.semibold))
+                            .fixedSize(horizontal: false, vertical: true)
                         if !progress.nextUnlocks.isEmpty {
                             UnlockChips(rules: progress.nextUnlocks)
+                                // At AX5 "Jumping for position" was wider than the card and clipped.
+                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         }
                     }
                 } else {

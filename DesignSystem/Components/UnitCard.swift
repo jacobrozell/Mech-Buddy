@@ -87,6 +87,236 @@ struct UnitCard: View {
     }
 }
 
+/// One dense row per ’Mech for battle lists (FUTURE-PLAN §1.2). Line 1: side, name, status chip and a
+/// trailing Shoot button inside the card. Line 2: armor and structure pips together. A conditions line
+/// only when there is one. About 66 pt a row, so a 4 vs 4 fits on one portrait screen; the old card plus
+/// its own Shoot row was ~210 pt. Accessibility sizes stack each part on its own line.
+struct UnitRowCard: View {
+    var unit: MatchUnitState
+    var isActiveSide: Bool
+    var accessibilityIdentifier: String
+    var showsIdleStatus: Bool = true
+    var shootingOver: Bool = false
+    var hint: String = "Opens this ’Mech"
+    /// Shows the trailing Shoot button when set.
+    var onShoot: (() -> Void)?
+    var action: () -> Void
+
+    @Environment(\.forcedWithdrawal) private var forcedWithdrawal
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var isLarge: Bool { dynamicTypeSize.isAccessibilitySize }
+
+    private var chip: StatusChip.Kind? {
+        UnitStatus.chip(
+            for: unit,
+            isActiveSide: isActiveSide,
+            // The Shoot button already says "ready", so the row skips that chip.
+            showsIdleStatus: showsIdleStatus && onShoot == nil,
+            shootingOver: shootingOver,
+            forcedWithdrawal: forcedWithdrawal
+        )
+    }
+
+    var body: some View {
+        TMCard(edgeColor: TMColor.side(unit.side), isRaised: isActiveSide, isCompact: true) {
+            VStack(alignment: .leading, spacing: TMSpace.xs) {
+                if isLarge {
+                    largeLayout
+                } else {
+                    HStack(alignment: .center, spacing: TMSpace.sm) {
+                        openButton {
+                            HStack(alignment: .center, spacing: TMSpace.sm) {
+                                identity
+                                Spacer(minLength: TMSpace.xs)
+                                if let chip {
+                                    StatusChip(kind: chip)
+                                        .lineLimit(1)
+                                        .fixedSize()
+                                }
+                                if onShoot == nil {
+                                    chevron
+                                }
+                            }
+                            .frame(minHeight: 30)
+                        }
+                        if let onShoot {
+                            shootButton(onShoot)
+                        }
+                    }
+                    openButton { details }
+                        .accessibilityHidden(true)
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .id(unit.id)
+    }
+
+    /// Accessibility sizes: name on its own line, then the chip, pips, and a full-width Shoot.
+    private var largeLayout: some View {
+        VStack(alignment: .leading, spacing: TMSpace.sm) {
+            openButton {
+                VStack(alignment: .leading, spacing: TMSpace.sm) {
+                    HStack(spacing: TMSpace.sm) {
+                        SideBadge(side: unit.side)
+                        if let mini = unit.mini {
+                            MiniDot(marker: mini)
+                        }
+                        Spacer(minLength: 0)
+                        if onShoot == nil {
+                            chevron
+                        }
+                    }
+                    Text(unit.name)
+                        .font(TMFont.cardTitle)
+                        .strikethrough(unit.combatStatus == .removed)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let chip {
+                        StatusChip(kind: chip)
+                    }
+                    details
+                }
+            }
+            if let onShoot {
+                shootButton(onShoot)
+            }
+        }
+    }
+
+    /// The whole row except Shoot opens the ’Mech. Two buttons (identity line, then pips) rather than
+    /// one wrapping Shoot: a button inside a button's label is not reachable by VoiceOver.
+    private func openButton<Label: View>(@ViewBuilder _ label: () -> Label) -> some View {
+        Button(action: action) {
+            label()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .modifier(OpenRowAccessibility(
+            label: UnitCard.accessibilityLabel(for: unit, forcedWithdrawal: forcedWithdrawal),
+            hint: hint,
+            identifier: accessibilityIdentifier
+        ))
+    }
+
+    private var identity: some View {
+        HStack(alignment: .center, spacing: TMSpace.sm) {
+            SideBadge(side: unit.side)
+            if let mini = unit.mini {
+                MiniDot(marker: mini)
+            }
+            // Full name when it fits; "Wolverine" without the variant when the chip needs the room.
+            ViewThatFits(in: .horizontal) {
+                nameText(unit.name)
+                nameText(StatusChip.Kind.short(unit.name))
+            }
+            .layoutPriority(-1)
+        }
+    }
+
+    private func nameText(_ name: String) -> some View {
+        Text(name)
+            .font(TMFont.cardTitle)
+            .strikethrough(unit.combatStatus == .removed)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder
+    private var details: some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            if unit.combatStatus == .removed {
+                Text(unit.leftTable ? "Left the table" : "Off the table")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
+            // Armor and structure side by side; stacked only when they don't fit (large text, small phones).
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: TMSpace.md) {
+                    armorTrack
+                    structureTrack
+                }
+                VStack(alignment: .leading, spacing: TMSpace.xs) {
+                    armorTrack
+                    structureTrack
+                }
+            }
+            if let conditions = UnitConditions.line(for: unit) {
+                Label(conditions, systemImage: "exclamationmark.triangle.fill")
+                    .font(TMFont.detail)
+                    .foregroundStyle(TMColor.warning)
+                    .labelStyle(.titleAndIcon)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var armorTrack: some View {
+        track(icon: "shield.fill", remaining: unit.remainingArmor, capacity: unit.armorCap, kind: .armor)
+    }
+
+    private var structureTrack: some View {
+        track(
+            icon: "square.stack.3d.up.fill",
+            remaining: unit.remainingStructure,
+            capacity: unit.structureCap,
+            kind: .structure
+        )
+    }
+
+    private func track(icon: String, remaining: Int, capacity: Int, kind: PipTrack.Kind) -> some View {
+        HStack(alignment: .center, spacing: TMSpace.xs) {
+            Image(systemName: icon)
+                .font(.caption2)
+                // The pips don't scale, so the icon stops growing before it dwarfs them.
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            PipTrack(remaining: remaining, capacity: capacity, kind: kind, size: isLarge ? .regular : .compact)
+                .fixedSize()
+        }
+    }
+
+    private var chevron: some View {
+        Image(systemName: "chevron.right")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
+    }
+
+    private func shootButton(_ onShoot: @escaping () -> Void) -> some View {
+        Button(action: onShoot) {
+            Text("Shoot")
+                .font(TMFont.detail.weight(.semibold))
+                // Dark mode's lighter side colours need a dark label (white was about 2.6:1).
+                .foregroundStyle(colorScheme == .dark ? TMColor.onSignal : Color.white)
+                .lineLimit(1)
+                .padding(.horizontal, TMSpace.md)
+                .frame(maxWidth: isLarge ? .infinity : nil, minHeight: isLarge ? 44 : 30)
+                .background(TMColor.side(unit.side), in: Capsule())
+                // 30 pt drawn, 44 pt to tap: the extra reaches into the card's own padding.
+                .contentShape(Rectangle().inset(by: isLarge ? 0 : -7))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Shoot with \(unit.name)")
+        .accessibilityIdentifier("as.battle.shoot.\(unit.id.uuidString)")
+    }
+}
+
+private struct OpenRowAccessibility: ViewModifier {
+    var label: String
+    var hint: String
+    var identifier: String
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityLabel(label)
+            .accessibilityHint(hint)
+            .accessibilityIdentifier(identifier)
+    }
+}
+
 /// One line of lasting damage and heat for a unit row: "Heat 2 · Weapon ×1 · MP hit".
 enum UnitConditions {
     static func line(for unit: MatchUnitState) -> String? {
@@ -103,6 +333,54 @@ enum UnitConditions {
         if crits.weaponHits > 0 { parts.append("Weapon ×\(crits.weaponHits)") }
         if crits.mpHit { parts.append("MP hit") }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+}
+
+/// The one status chip a unit row shows ("Walked", "Hit Locust · 2", "Withdrawing"…).
+enum UnitStatus {
+    static func chip(
+        for unit: MatchUnitState,
+        isActiveSide: Bool,
+        showsIdleStatus: Bool,
+        shootingOver: Bool,
+        forcedWithdrawal: Bool
+    ) -> StatusChip.Kind? {
+        if unit.criticalsOwed > 0 {
+            return .critOwed(unit.criticalsOwed)
+        }
+        if unit.combatStatus == .destroyedPendingEnd {
+            return unit.canAttackThisTurn && !shootingOver ? .wrecked : .wreckedDone
+        }
+        if unit.combatStatus == .removed {
+            return nil
+        }
+        if unit.isShutdown {
+            return .shutdown
+        }
+        if unit.isImmobile {
+            return .immobile
+        }
+        if forcedWithdrawal, unit.isCrippled {
+            return .withdrawing
+        }
+        if unit.movementMode == .sprint, unit.hasMovedThisTurn {
+            return .sprinted
+        }
+        if let shot = unit.turnShot {
+            return shot.hit
+                ? .hit(target: shot.targetName, damage: shot.damage)
+                : .missed(target: shot.targetName)
+        }
+        if unit.hasMovedThisTurn, unit.movementMode != .unset {
+            return .moved(unit.movementMode)
+        }
+        if isActiveSide, unit.canAttackThisTurn {
+            return showsIdleStatus ? .ready : nil
+        }
+        if !isActiveSide {
+            return showsIdleStatus ? .waiting : nil
+        }
+        return nil
     }
 }
 
@@ -250,42 +528,13 @@ private struct UnitCardBody: View {
     }
 
     private var chip: StatusChip.Kind? {
-        if unit.criticalsOwed > 0 {
-            return .critOwed(unit.criticalsOwed)
-        }
-        if unit.combatStatus == .destroyedPendingEnd {
-            return unit.canAttackThisTurn && !shootingOver ? .wrecked : .wreckedDone
-        }
-        if unit.combatStatus == .removed {
-            return nil
-        }
-        if unit.isShutdown {
-            return .shutdown
-        }
-        if unit.isImmobile {
-            return .immobile
-        }
-        if forcedWithdrawal, unit.isCrippled {
-            return .withdrawing
-        }
-        if unit.movementMode == .sprint, unit.hasMovedThisTurn {
-            return .sprinted
-        }
-        if let shot = unit.turnShot {
-            return shot.hit
-                ? .hit(target: shot.targetName, damage: shot.damage)
-                : .missed(target: shot.targetName)
-        }
-        if unit.hasMovedThisTurn, unit.movementMode != .unset {
-            return .moved(unit.movementMode)
-        }
-        if isActiveSide, unit.canAttackThisTurn {
-            return showsIdleStatus ? .ready : nil
-        }
-        if !isActiveSide {
-            return showsIdleStatus ? .waiting : nil
-        }
-        return nil
+        UnitStatus.chip(
+            for: unit,
+            isActiveSide: isActiveSide,
+            showsIdleStatus: showsIdleStatus,
+            shootingOver: shootingOver,
+            forcedWithdrawal: forcedWithdrawal
+        )
     }
 
     private var statCells: [StatCell] {

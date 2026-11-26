@@ -3,6 +3,8 @@ import SwiftUI
 struct TMCard<Content: View>: View {
     var edgeColor: Color?
     var isRaised: Bool = false
+    /// Tighter padding for dense battle rows, where eight ’Mechs share one screen.
+    var isCompact: Bool = false
     @ViewBuilder var content: () -> Content
 
     @Environment(\.colorScheme) private var colorScheme
@@ -15,7 +17,8 @@ struct TMCard<Content: View>: View {
                     .frame(width: 4)
             }
             content()
-                .padding(TMSpace.lg)
+                .padding(.horizontal, isCompact ? TMSpace.md : TMSpace.lg)
+                .padding(.vertical, isCompact ? TMSpace.sm : TMSpace.lg)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(cardBackground)

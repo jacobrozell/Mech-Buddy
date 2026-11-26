@@ -19,6 +19,15 @@ struct SettingsHomeView: View {
                     SettingsIconLabel(title: "Dice", systemName: "dice", tint: TMColor.signal)
                 }
                 .pickerStyle(.navigationLink)
+                Picker(selection: Bindable(dependencies.preferences).coaching) {
+                    ForEach(CoachingLevel.allCases) { level in
+                        Text(level.title).tag(level)
+                    }
+                } label: {
+                    SettingsIconLabel(title: "Coaching", systemName: "text.bubble", tint: TMColor.signal)
+                }
+                .pickerStyle(.navigationLink)
+                .accessibilityIdentifier("settings.coaching")
                 Toggle(isOn: Bindable(dependencies.preferences).hapticsEnabled) {
                     SettingsIconLabel(
                         title: "Haptics",
@@ -32,7 +41,7 @@ struct SettingsHomeView: View {
             } header: {
                 Text("Gameplay")
             } footer: {
-                Text("Real dice is the default for a new game. Haptics buzz for dice and turn changes.")
+                Text("Real dice is the default for a new game. Coaching: Full explains every step; Brief explains a step the first time it comes up in a game, then shows a ? to reopen it; Off shows step titles only. Automatic is Full on Mission 1 and Brief after. Haptics buzz for dice and turn changes.")
             }
 
             Section {

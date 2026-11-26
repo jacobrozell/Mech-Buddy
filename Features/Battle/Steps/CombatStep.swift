@@ -15,7 +15,7 @@ struct CombatStep: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: TMSpace.lg) {
+        VStack(alignment: .leading, spacing: TMSpace.md) {
             CoachPrompt(
                 title: "Both sides shoot",
                 message: session.ruleset.physicalAttacksAllowed
@@ -23,12 +23,14 @@ struct CombatStep: View {
                     : "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
                 accessibilityIdentifier: "as.battle.table"
             )
-            shotFeed
+            // The ’Mechs first, so a 4 vs 4 fits above the fold; each row's chip already shows its
+            // own hit or miss, and the feed with the rolls follows below.
             if showsUnits {
                 ForEach(sideOrder, id: \.self) { side in
                     unitGroup(side: side, units: visible(side))
                 }
             }
+            shotFeed
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -101,7 +103,7 @@ struct CombatStep: View {
 
     private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {
         let left = units.filter(\.canAttackThisTurn).count
-        return VStack(alignment: .leading, spacing: TMSpace.md) {
+        return VStack(alignment: .leading, spacing: TMSpace.xs) {
             Eyebrow(side.displayName) {
                 Text(left == 0 ? "All fired" : "\(left) to fire")
                     .font(TMFont.detail)

@@ -87,6 +87,11 @@ final class PlayMatchCoordinator {
             lastError = store.lastError ?? "Could not start \(pendingTitle)"
             return
         }
+        #if DEBUG
+        if LaunchArguments.debugDamage {
+            store.debugSeedDamage()
+        }
+        #endif
         if dependencies.preferences.defaultDiceMode != .manual {
             store.setDiceMode(dependencies.preferences.defaultDiceMode)
         }

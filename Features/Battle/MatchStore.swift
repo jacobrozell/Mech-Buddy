@@ -319,6 +319,30 @@ final class MatchStore: Identifiable {
         return lastError == nil
     }
 
+    #if DEBUG
+    /// `-debug_damage` (DEBUG builds only): wear the last two ’Mechs of each side down so withdrawal,
+    /// "Left the table" and condition lines can be checked on screen without playing several turns.
+    func debugSeedDamage() {
+        guard var next = session else { return }
+        for side in SideId.allCases {
+            let ids = next.units.filter { $0.side == side }.map(\.id)
+            guard ids.count >= 2, let crippled = next.units.firstIndex(where: { $0.id == ids[ids.count - 2] }),
+                  let gone = next.units.firstIndex(where: { $0.id == ids[ids.count - 1] }) else { continue }
+            next.units[crippled].armorDamage = next.units[crippled].armorCap
+            next.units[crippled].structureDamage = next.units[crippled].structureCap / 2
+            next.units[crippled].heat = 2
+            next.units[crippled].crits.weaponHits = 1
+            if side == .lanceB {
+                next.units[gone].combatStatus = .removed
+                next.units[gone].leftTable = true
+            } else {
+                next.units[gone].armorDamage = 1
+            }
+        }
+        session = next
+    }
+    #endif
+
     /// Forced Withdrawal: the ’Mech drove off the table. It counts as destroyed. Undo puts it back.
     func leaveTable(unitId: UUID) {
         mutate(.leaveTable(unitId: unitId), failureTitle: "Couldn’t record that")
@@ -376,6 +400,16 @@ final class MatchStore: Identifiable {
 
     /// Bumps on every undoable change so the battle screen can offer a short-lived Undo.
     private(set) var undoToken = 0
+
+    /// Turn on which each coach step was first shown, keyed by game and step. Brief coaching explains
+    /// a step in full on that turn only. Kept here, not in view state, so rotating doesn't re-explain
+    /// it. Not saved: a resumed game explains each step once more.
+    private(set) var coachFirstSeen: [String: Int] = [:]
+
+    func noteCoachStep(_ key: String, turn: Int) {
+        guard coachFirstSeen[key] == nil else { return }
+        coachFirstSeen[key] = turn
+    }
 
     private func pushUndo(_ snapshot: MatchSession) {
         undoToken += 1

@@ -29,6 +29,32 @@ enum AppColorSchemePreference: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+/// How much teaching text the battle screen shows. FUTURE-PLAN §1.1.
+enum CoachingLevel: String, CaseIterable, Identifiable, Sendable {
+    /// Full on the first mission (Ridge Line), Brief on every later one.
+    case automatic
+    case full
+    case brief
+    case off
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .automatic: "Automatic"
+        case .full: "Full"
+        case .brief: "Brief"
+        case .off: "Off"
+        }
+    }
+
+    /// What a mission shows. Mission 1 teaches the turn, so it keeps the full text by default.
+    func resolved(for scenario: ScenarioId?) -> CoachingLevel {
+        guard self == .automatic else { return self }
+        return (scenario ?? .ridgeLine) == .ridgeLine ? .full : .brief
+    }
+}
+
 @Observable
 @MainActor
 final class AppPreferences {
@@ -36,6 +62,7 @@ final class AppPreferences {
     static let themeKey = "settings.theme"
     static let keepScreenAwakeKey = "settings.keepScreenAwake"
     static let defaultDiceModeKey = "settings.defaultDiceMode"
+    static let coachingKey = "settings.coaching"
     /// Ids from `as-getting-started.json` the player ticked on the onboarding "What do you have?" screen.
     static let gettingStartedChecksKey = "settings.gettingStartedChecks"
     static let completedMissionsKey = "missions.completed"
@@ -47,7 +74,7 @@ final class AppPreferences {
     private var isReloading = false
 
     private static let ownedKeys = [
-        hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, gettingStartedChecksKey,
+        hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, coachingKey, gettingStartedChecksKey,
         completedMissionsKey, rulesGameKey
     ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys
 
@@ -65,6 +92,10 @@ final class AppPreferences {
 
     var defaultDiceMode: DiceMode {
         didSet { persist(defaultDiceMode.rawValue, forKey: Self.defaultDiceModeKey) }
+    }
+
+    var coaching: CoachingLevel {
+        didSet { persist(coaching.rawValue, forKey: Self.coachingKey) }
     }
 
     var gettingStartedChecks: Set<String> {
@@ -119,6 +150,7 @@ final class AppPreferences {
         theme = .system
         keepScreenAwake = true
         defaultDiceMode = .manual
+        coaching = .automatic
         gettingStartedChecks = []
         learningTrack = nil
         rulesGame = nil
@@ -157,6 +189,7 @@ final class AppPreferences {
             keepScreenAwake = defaults.bool(forKey: Self.keepScreenAwakeKey)
         }
         defaultDiceMode = DiceMode(rawValue: defaults.string(forKey: Self.defaultDiceModeKey) ?? "") ?? .manual
+        coaching = CoachingLevel(rawValue: defaults.string(forKey: Self.coachingKey) ?? "") ?? .automatic
         gettingStartedChecks = Set(defaults.stringArray(forKey: Self.gettingStartedChecksKey) ?? [])
         let onboarding = OnboardingStore.load(from: defaults)
         learningTrack = onboarding.track
