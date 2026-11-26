@@ -1,0 +1,126 @@
+{
+  "activeSide" : "lanceB",
+  "deploymentAcknowledged" : true,
+  "diceMode" : "manual",
+  "eventLog" : [
+    {
+      "createdAt" : "2026-09-21T14:13:20Z",
+      "id" : "AAAAAAAA-2222-3333-4444-555555555555",
+      "message" : "Initiative: 9 to 5. Side A goes last",
+      "phase" : "initiative",
+      "turn" : 2
+    }
+  ],
+  "forcesLoaded" : true,
+  "id" : "11111111-2222-3333-4444-555555555555",
+  "initiativeRolls" : {
+    "lanceA" : {
+      "die1" : 5,
+      "die2" : 4
+    },
+    "lanceB" : {
+      "die1" : 2,
+      "die2" : 3
+    }
+  },
+  "initiativeWinner" : "lanceA",
+  "modeId" : "alpha-strike",
+  "phase" : "movement",
+  "recoverySnapshots" : [
+
+  ],
+  "ruleset" : {
+    "forcedWithdrawal" : false,
+    "maxTurns" : 6,
+    "overheatAllowed" : false,
+    "physicalAttacksAllowed" : false,
+    "victory" : {
+      "maxTurn" : 6,
+      "type" : "destroyAllEnemiesOrStructureAfterTurn"
+    }
+  },
+  "scenarioId" : "ridge-line",
+  "schemaVersion" : 1,
+  "status" : "active",
+  "tableReady" : true,
+  "turn" : 2,
+  "units" : [
+    {
+      "abilities" : "",
+      "armorCap" : 2,
+      "armorDamage" : 0,
+      "combatStatus" : "active",
+      "criticalsOwed" : 0,
+      "crits" : {
+        "ammoExploded" : false,
+        "destroyedByCrit" : false,
+        "engineHits" : 0,
+        "fireControlHits" : 0,
+        "mpHit" : false,
+        "mpHits" : 0,
+        "weaponHits" : 0
+      },
+      "hasAttackedThisTurn" : false,
+      "hasMovedThisTurn" : true,
+      "heat" : 0,
+      "id" : "F6D43545-3EE3-474F-BD28-E368F9665ABB",
+      "l" : 0,
+      "leftTable" : false,
+      "m" : 1,
+      "movementMode" : "ground",
+      "mv" : "16\"",
+      "name" : "Locust LCT-1V",
+      "ov" : 0,
+      "overheatThisTurn" : 0,
+      "pendingCritical" : false,
+      "pv" : 18,
+      "s" : 1,
+      "side" : "lanceA",
+      "skill" : 4,
+      "structureCap" : 2,
+      "structureDamage" : 0,
+      "sz" : 1,
+      "tmm" : 3,
+      "withdrawalAnnounced" : false
+    },
+    {
+      "abilities" : "",
+      "armorCap" : 2,
+      "armorDamage" : 0,
+      "combatStatus" : "active",
+      "criticalsOwed" : 0,
+      "crits" : {
+        "ammoExploded" : false,
+        "destroyedByCrit" : false,
+        "engineHits" : 0,
+        "fireControlHits" : 0,
+        "mpHit" : false,
+        "mpHits" : 0,
+        "weaponHits" : 0
+      },
+      "hasAttackedThisTurn" : false,
+      "hasMovedThisTurn" : false,
+      "heat" : 0,
+      "id" : "FD4ECD5E-0012-4923-80F6-BA0BA497D6BF",
+      "l" : 1,
+      "leftTable" : false,
+      "m" : 3,
+      "movementMode" : "unset",
+      "mv" : "10\"",
+      "name" : "Commando COM-2D",
+      "ov" : 0,
+      "overheatThisTurn" : 0,
+      "pendingCritical" : false,
+      "pv" : 20,
+      "s" : 3,
+      "side" : "lanceB",
+      "skill" : 4,
+      "structureCap" : 2,
+      "structureDamage" : 0,
+      "sz" : 1,
+      "tmm" : 1,
+      "withdrawalAnnounced" : false
+    }
+  ],
+  "updatedAt" : "2026-09-21T14:15:00Z"
+}
