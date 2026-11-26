@@ -401,6 +401,36 @@ struct PlayRulesStep: View {
                     ? "Deploy within 6″ of your edge before Turn 1"
                     : "Enter from your home edge on Turn 1 (p. 11)", id: "startOnTable", isOn: $setup.rules.startOnTable)
             }
+            PlaySetupSection(title: "Battlefield Support", footnote: "Each side secretly buys air and artillery strikes (pp. 29–30). Call them from the shield button in battle.") {
+                Toggle(isOn: Binding(
+                    get: { setup.rules.battlefieldSupport != nil },
+                    set: { setup.rules.battlefieldSupport = $0 ? 5 : nil }
+                )) {
+                    VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                        Text("Battlefield Support").font(TMFont.body)
+                        Text(setup.rules.battlefieldSupport.map { "\($0) points per side" } ?? "Off")
+                            .font(TMFont.detail).foregroundStyle(.secondary)
+                    }
+                }
+                .tint(TMColor.signal)
+                .accessibilityIdentifier("as.play.setup.support")
+                if setup.rules.battlefieldSupport != nil {
+                    Picker("Points", selection: Binding(
+                        get: { setup.rules.battlefieldSupport ?? 5 },
+                        set: { setup.rules.battlefieldSupport = $0 }
+                    )) {
+                        Text("5").tag(5)
+                        Text("12").tag(12)
+                        if let p = setup.rules.battlefieldSupport, p == 0 { Text("0").tag(0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("as.play.setup.support.points")
+                    Button("Roll 1D6 (1–2: 0, 3–4: 5, 5–6: 12)") {
+                        setup.rules.battlefieldSupport = PlayRules.supportPoints(forRoll: Int.random(in: 1...6))
+                    }
+                    .accessibilityIdentifier("as.play.setup.support.roll")
+                }
+            }
             PlaySetupSection(title: "Always in the game", footnote: "These come from the cards, so there is nothing to switch.") {
                 always("Skill and PV", detail: "Set in Game size; better pilots pay PV (p. 35)", id: "skillPV")
                 always("Minimal damage (0*)", detail: "Read from the card; the app rolls or asks", id: "minimalDamage")
@@ -410,7 +440,6 @@ struct PlayRulesStep: View {
             }
             PlaySetupSection(title: "Coming with Clash of Steel") {
                 comingSoon("Buildings", id: "buildings")
-                comingSoon("Battlefield Support", id: "battlefieldSupport")
                 comingSoon("Formations", id: "formations")
                 comingSoon("MechWarrior cards", id: "mechWarriorCards")
             }
