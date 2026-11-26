@@ -280,6 +280,7 @@ struct PlayUnitPickerSheet: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .accessibilityIdentifier("as.play.setup.unitPicker")
             .navigationTitle("Add to \(sideName)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -302,7 +303,6 @@ struct PlayUnitPickerSheet: View {
             }
         }
         .presentationDetents([.large])
-        .accessibilityIdentifier("as.play.setup.unitPicker")
     }
 
     private var sideName: String {
