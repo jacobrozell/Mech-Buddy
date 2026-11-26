@@ -2,6 +2,8 @@ import Foundation
 
 public enum MatchCommand: Sendable {
     case startMission(scenarioId: ScenarioId, ruleset: ScenarioRuleset, units: [MatchUnitState])
+    /// A Play mode game from its setup (PlayModeSpec § 5.6). `units` are built from the setup's forces.
+    case startPlay(setup: PlaySetup, units: [MatchUnitState])
     case markTableReady
     case setDiceMode(DiceMode)
     case abandonMatch
@@ -124,6 +126,25 @@ public enum MatchReducer {
                 tableReady: false,
                 forcesLoaded: true
             )
+
+        case .startPlay(let setup, let units):
+            next = MatchSession(
+                modeId: .alphaStrike,
+                scenarioId: nil,
+                ruleset: setup.ruleset,
+                sides: setup.sides.map { side in
+                    var fresh = MatchSide(id: side.id, name: side.name, players: side.players, homeEdge: side.homeEdge)
+                    fresh.name = side.name.trimmingCharacters(in: .whitespaces).isEmpty ? side.id.displayName : side.name
+                    return fresh
+                },
+                play: setup,
+                units: units,
+                status: .active,
+                tableReady: false,
+                forcesLoaded: true,
+                diceMode: setup.diceMode
+            )
+            next.appendLog("New game: \(setup.formatName), \(setup.budget.summary)")
 
         case .markTableReady:
             next.tableReady = true

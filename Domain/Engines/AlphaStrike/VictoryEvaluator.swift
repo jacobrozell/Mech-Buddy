@@ -49,7 +49,52 @@ public enum VictoryEvaluator {
            session.turn >= maxTurn {
             return structureCapOutcome(session: session)
         }
+        // Play: at the turn limit, most PV still on the table wins; level sides tie (§ 7.3, no objectives yet).
+        if let limit = session.play?.turnLimit, session.turn >= limit {
+            return pvLimitOutcome(session: session)
+        }
         return nil
+    }
+
+    /// Adjusted PV (p. 35) of this side's ’Mechs still in the fight: not destroyed, not withdrawn,
+    /// and under Forced Withdrawal not crippled (§ 7.3).
+    public static func pvLeft(side: SideId, in session: MatchSession) -> Int {
+        session.units
+            .filter { $0.side == side && countsAsLiving($0, in: session) }
+            .reduce(0) { $0 + AlphaStrikePointValue.adjusted(base: $1.pv, skill: $1.skill) }
+    }
+
+    /// ’Mechs of this side still in the fight.
+    public static func unitsLeft(side: SideId, in session: MatchSession) -> Int {
+        session.units.filter { $0.side == side && countsAsLiving($0, in: session) }.count
+    }
+
+    private static func pvLimitOutcome(session: MatchSession) -> MatchOutcome {
+        let contenders = session.sidesInGame.isEmpty ? session.sideIds : session.sidesInGame
+        let scores = contenders.map { (side: $0, pv: pvLeft(side: $0, in: session)) }
+        guard let best = scores.map(\.pv).max() else { return .draw }
+        let leaders = scores.filter { $0.pv == best }.map(\.side)
+        if leaders.count == 1 { return .winner(leaders[0]) }
+        return session.sides.count <= 2 ? .draw : .tied(leaders)
+    }
+
+    /// Play result order (§ 7.4): winners first, then by PV left, then sides that went out,
+    /// latest out first.
+    public static func standings(in session: MatchSession) -> [SideId] {
+        let winners = session.outcome?.winningSides ?? []
+        return session.sideIds.sorted { lhs, rhs in
+            let lw = winners.contains(lhs), rw = winners.contains(rhs)
+            if lw != rw { return lw }
+            let lOut = session.side(lhs)?.isOut ?? false, rOut = session.side(rhs)?.isOut ?? false
+            if lOut != rOut { return !lOut }
+            if lOut && rOut {
+                let lt = session.side(lhs)?.outOnTurn ?? 0, rt = session.side(rhs)?.outOnTurn ?? 0
+                if lt != rt { return lt > rt }
+            }
+            let lp = pvLeft(side: lhs, in: session), rp = pvLeft(side: rhs, in: session)
+            if lp != rp { return lp > rp }
+            return (session.sideIds.firstIndex(of: lhs) ?? 0) < (session.sideIds.firstIndex(of: rhs) ?? 0)
+        }
     }
 
     /// Last side standing only, for checks outside the End Phase (conceding).

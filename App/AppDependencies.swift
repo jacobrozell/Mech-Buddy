@@ -19,6 +19,8 @@ public final class AppDependencies {
     let boxSets: [BoxSetDTO]
     /// Mission chassis → suggested stand-in minis, from the same file.
     let standIns: [String: [String]]
+    /// `as-card-library.json`, loaded once (PlayModeSpec § 10). Empty when the file is missing.
+    let cardLibrary: CardLibrary
     /// Bumps when a match is saved or deleted. Play and Force reload from this.
     var sessionRevision = 0
 
@@ -80,6 +82,12 @@ public final class AppDependencies {
             logger.error("box sets: \(error)", category: "content")
             self.boxSets = []
             self.standIns = [:]
+        }
+        do {
+            self.cardLibrary = CardLibrary(try content.cardLibrary())
+        } catch {
+            logger.error("card library: \(error)", category: "content")
+            self.cardLibrary = CardLibrary(CardLibraryDTO(contentVersion: "0", cards: []))
         }
         revising.onMutation = { [weak self] in
             guard let self else { return }

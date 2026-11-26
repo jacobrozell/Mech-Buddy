@@ -78,7 +78,7 @@ final class AppPreferences {
     private static let ownedKeys = [
         hapticsKey, themeKey, keepScreenAwakeKey, defaultDiceModeKey, coachingKey, gettingStartedChecksKey,
         completedMissionsKey, rulesGameKey, lastRootTabKey
-    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key]
+    ] + OnboardingStore.ownedKeys + CollectionStore.ownedKeys + [MapSwap.key] + PlaySetupStore.ownedKeys
 
     var hapticsEnabled: Bool {
         didSet { persist(hapticsEnabled, forKey: Self.hapticsKey) }
@@ -166,6 +166,22 @@ final class AppPreferences {
         }
     }
 
+    /// Play setup in progress (PlayModeSpec § 11). Saved on every change; cleared when the game starts.
+    var playDraft: PlaySetup? {
+        didSet {
+            guard !isReloading else { return }
+            PlaySetupStore.save(playDraft, key: PlaySetupStore.draftKey, to: defaults)
+        }
+    }
+
+    /// The last setup a game was started from. Kept after the game ends.
+    var playLastSetup: PlaySetup? {
+        didSet {
+            guard !isReloading else { return }
+            PlaySetupStore.save(playLastSetup, key: PlaySetupStore.lastSetupKey, to: defaults)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isReloading = true
@@ -182,6 +198,8 @@ final class AppPreferences {
         collection = nil
         mapSwaps = [:]
         lastRootTab = nil
+        playDraft = nil
+        playLastSetup = nil
         isReloading = false
         reload()
     }
@@ -220,6 +238,8 @@ final class AppPreferences {
         learningTrack = onboarding.track
         rulesGame = defaults.string(forKey: Self.rulesGameKey).flatMap(LearningTrack.init(rawValue:))
         lastRootTab = defaults.string(forKey: Self.lastRootTabKey)
+        playDraft = PlaySetupStore.load(PlaySetupStore.draftKey, from: defaults)
+        playLastSetup = PlaySetupStore.load(PlaySetupStore.lastSetupKey, from: defaults)
         hasCompletedOnboarding = onboarding.isComplete
         completedMissions = Set(defaults.stringArray(forKey: Self.completedMissionsKey) ?? [])
         collection = CollectionStore.load(from: defaults)

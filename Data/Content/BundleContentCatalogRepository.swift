@@ -184,7 +184,7 @@ public enum GuidedScenarioFactory {
         )
     }
 
-    private static func mapUnit(_ dto: ScenarioUnitDTO, side: SideId) -> MatchUnitState {
+    public static func mapUnit(_ dto: ScenarioUnitDTO, side: SideId) -> MatchUnitState {
         MatchUnitState(
             name: dto.name,
             side: side,

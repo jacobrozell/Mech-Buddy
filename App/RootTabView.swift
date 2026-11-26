@@ -98,6 +98,7 @@ struct RootTabView: View {
             NavigationStack {
                 BattleFlowView(store: store)
             }
+            .environment(matches)
             .modifier(CoverZoom(
                 enabled: matches.prefersZoom && !reduceMotion,
                 sourceID: matches.zoomSource,

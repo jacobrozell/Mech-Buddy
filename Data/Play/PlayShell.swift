@@ -1,4 +1,5 @@
 import Foundation
+import MechBuddyDomain
 
 /// The root tabs and which one the app opens on (PlayModeSpec § 3).
 public enum RootTabRule {
@@ -26,5 +27,25 @@ public enum RootTabRule {
         let known = [learn, play, force, rules, settings]
         guard let lastTab, known.contains(lastTab) else { return learn }
         return lastTab
+    }
+}
+
+/// Setup draft and last setup, saved as JSON in UserDefaults (PlayModeSpec § 11, § 12 Persistence).
+public enum PlaySetupStore {
+    public static let draftKey = "play.setupDraft"
+    public static let lastSetupKey = "play.lastSetup"
+    public static var ownedKeys: [String] { [draftKey, lastSetupKey] }
+
+    public static func load(_ key: String, from defaults: UserDefaults) -> PlaySetup? {
+        guard let data = defaults.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(PlaySetup.self, from: data)
+    }
+
+    public static func save(_ setup: PlaySetup?, key: String, to defaults: UserDefaults) {
+        guard let setup, let data = try? JSONEncoder().encode(setup) else {
+            defaults.removeObject(forKey: key)
+            return
+        }
+        defaults.set(data, forKey: key)
     }
 }

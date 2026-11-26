@@ -88,10 +88,70 @@ final class MatchStore: Identifiable {
         }
     }
 
+    /// Starts a Play mode game from its setup (PlayModeSpec § 5.6). Same replace rules as a mission.
+    func startPlay(_ setup: PlaySetup, library: CardLibrary, replaceActive: Bool) {
+        do {
+            let existing = try Self.loadActive(from: repository)
+            switch MatchLaunch.decide(existingActive: existing, replaceActive: replaceActive) {
+            case .blocked:
+                lastErrorTitle = "Couldn’t start the game"
+                lastError = "A game is already in progress"
+                return
+            case .replace(let id):
+                try repository.delete(id: id)
+            case .startFresh:
+                break
+            }
+            let units = PlayUnits.make(setup: setup, library: library)
+            guard !units.isEmpty else {
+                lastErrorTitle = "Couldn’t start the game"
+                lastError = "Add at least one ’Mech to each side."
+                return
+            }
+            adoptPlay(setup)
+            session = try MatchReducer.reduce(
+                MatchSession(ruleset: setup.ruleset),
+                .startPlay(setup: setup, units: units)
+            )
+            undoStack.removeAll()
+            lastError = nil
+            persist()
+        } catch {
+            lastErrorTitle = "Couldn’t start the game"
+            lastError = error.localizedDescription
+        }
+    }
+
+    /// Play again (§ 11): a new session from the same setup, every ’Mech repaired.
+    func playAgain(library: CardLibrary) {
+        guard let setup = session?.play else { return }
+        if let session, session.status == .completed {
+            try? repository.delete(id: session.id)
+        }
+        startPlay(setup, library: library, replaceActive: false)
+    }
+
+    /// Briefing for a Play game: its format, the Play table checklist and the generated layout.
+    private func adoptPlay(_ setup: PlaySetup) {
+        scenario = ScenarioPresentation(
+            id: "",
+            title: setup.formatName,
+            subtitle: "\(setup.budget.summary) · \(setup.battlefield.summary)",
+            tableSteps: PlayLayout.tableSteps(for: setup),
+            winningSummary: "Destroy every enemy ’Mech",
+            layout: PlayLayout.layout(for: setup.battlefield)
+        )
+        scenarioLoaded = true
+    }
+
     /// Resume path. `startMission` already cached the briefing, so this is a no-op then.
     /// Games saved before the mission ladder have no scenario id. They were all Ridge Line.
     func ensureScenario(from catalog: any ContentCatalogRepository) {
         guard !scenarioLoaded else { return }
+        if let setup = session?.play {
+            adoptPlay(setup)
+            return
+        }
         scenarioLoaded = true
         guard let dto = try? catalog.scenario(id: session?.scenarioId ?? .ridgeLine) else { return }
         adoptScenario(dto)
