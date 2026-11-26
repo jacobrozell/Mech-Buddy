@@ -79,6 +79,7 @@ final class MatchStore: Identifiable {
                 MatchSession(ruleset: ruleset),
                 .startMission(scenarioId: scenarioId, ruleset: ruleset, units: units)
             )
+            session?.boxRules = GuidedScenarioFactory.makeBoxRules(from: dto, units: units)
             undoStack.removeAll()
             lastError = nil
             persist()
@@ -291,25 +292,27 @@ final class MatchStore: Identifiable {
             lastError = "Dice must be 1–6"
             return false
         }
-        mutate(
-            .resolveSATOR(
-                SATORAttackCommand(
-                    attackerId: attackerId,
-                    defenderId: defenderId,
-                    range: range,
-                    roll: roll,
-                    attackerMove: attackerMove,
-                    targetMove: targetMove,
-                    woods: woods,
-                    partialCover: partialCover,
-                    rearHit: rearHit,
-                    overheatUsed: overheatUsed,
-                    attackKind: attackKind,
-                    minimalDie: minimalDie
-                )
-            ),
-            failureTitle: attackKind == .physical ? "Couldn’t save the attack" : "Couldn’t save the shot"
+        let attack = SATORAttackCommand(
+            attackerId: attackerId,
+            defenderId: defenderId,
+            range: range,
+            roll: roll,
+            attackerMove: attackerMove,
+            targetMove: targetMove,
+            woods: woods,
+            partialCover: partialCover,
+            rearHit: rearHit,
+            overheatUsed: overheatUsed,
+            attackKind: attackKind,
+            minimalDie: minimalDie
         )
+        let failureTitle = attackKind == .physical ? "Couldn’t save the attack" : "Couldn’t save the shot"
+        // Combat Intuition (Clash of Steel): a shot in the Movement Phase, damage effects at once.
+        if let formation = combatIntuitionFormation(for: attackerId) {
+            mutateBoxRules(.combatIntuitionAttack(formationId: formation.id, attack: attack), failureTitle: failureTitle)
+            return lastError == nil
+        }
+        mutate(.resolveSATOR(attack), failureTitle: failureTitle)
         return lastError == nil
     }
 
@@ -323,6 +326,7 @@ final class MatchStore: Identifiable {
         // Already resolved (e.g. a double tap): nothing to do, and no developer-speak alert.
         guard session?.units.first(where: { $0.id == unitId })?.pendingCritical == true else { return true }
         mutate(.applyCritical(unitId: unitId, roll: roll), failureTitle: "Couldn’t save the critical")
+        settleCombatIntuition()
         return lastError == nil
     }
 
@@ -396,6 +400,22 @@ final class MatchStore: Identifiable {
             if undoable {
                 pushUndo(session)
             }
+            self.session = next
+            lastError = nil
+            persist()
+        } catch {
+            lastErrorTitle = failureTitle
+            lastError = error.localizedDescription
+        }
+    }
+
+    /// Box rules (Battlefield Support, Formations, buildings). Same undo and save as `mutate`. Helpers that
+    /// call it live in MatchStore+BoxRules.swift.
+    func mutateBoxRules(_ command: BoxRulesCommand, undoable: Bool = true, failureTitle: String = "Couldn’t update the game") {
+        guard let session else { return }
+        do {
+            let next = try BoxRulesReducer.reduce(session, command)
+            if undoable { pushUndo(session) }
             self.session = next
             lastError = nil
             persist()

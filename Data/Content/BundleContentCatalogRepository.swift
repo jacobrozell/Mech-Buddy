@@ -184,6 +184,30 @@ public enum GuidedScenarioFactory {
         )
     }
 
+    /// The box rules for a new match, tied to the units `makeUnits` made. Nil when the scenario has none.
+    public static func makeBoxRules(from scenario: GuidedScenarioDTO, units: [MatchUnitState]) -> BoxRulesState? {
+        guard let setup = scenario.boxRules else { return nil }
+        func id(_ name: String) -> UUID? { units.first { $0.name == name }?.id }
+        var support: [SideId: SupportInventory] = [:]
+        if let points = setup.battlefieldSupportPoints {
+            for side in Set(units.map(\.side)) { support[side] = SupportInventory(budget: points) }
+        }
+        let formations = setup.formations.compactMap { f -> FormationState? in
+            guard let kind = FormationKind(rawValue: f.kind) else { return nil }
+            return FormationState(
+                id: f.id, kind: kind, name: f.name, memberIds: f.members.compactMap(id),
+                commandUnitId: f.commandUnit.flatMap(id),
+                combatIntuitionCount: f.combatIntuitionCount ?? 0,
+                luckyUsesLeft: f.luckyUses ?? 0
+            )
+        }
+        let buildings = setup.buildings.compactMap { b -> BuildingState? in
+            guard let type = BuildingType(rawValue: b.type) else { return nil }
+            return BuildingState(id: b.id, name: b.name, type: type, cf: b.cf, heightInches: b.heightInches ?? 2)
+        }
+        return BoxRulesState(support: support, formations: formations, buildings: buildings)
+    }
+
     private static func mapUnit(_ dto: ScenarioUnitDTO, side: SideId) -> MatchUnitState {
         MatchUnitState(
             name: dto.name,

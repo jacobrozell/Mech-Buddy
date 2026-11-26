@@ -25,6 +25,8 @@ struct CombatSolverSheet: View {
     @State private var isApplying = false
     /// The extra die for a hit at a "0*" range (p. 21): 4 or higher deals 1 damage.
     @State private var minimalDie: Int?
+    /// Lucky was spent on this shot: the second roll stands (Clash of Steel, p. 32).
+    @State private var luckyUsed = false
 
     init(session: MatchSession, store: MatchStore, initialAttackerId: UUID? = nil) {
         self.session = session
@@ -53,7 +55,12 @@ struct CombatSolverSheet: View {
     }
 
     private var shooters: [MatchUnitState] {
-        friendlies.filter(\.canAttackThisTurn)
+        // Movement Phase: only Combat Intuition 'Mechs may shoot (Clash of Steel, p. 32).
+        if live.phase == .movement {
+            let ready = Set(store.combatIntuitionShooters.map(\.id))
+            return friendlies.filter { ready.contains($0.id) }
+        }
+        return friendlies.filter(\.canAttackThisTurn)
     }
 
     /// Units on the table that can't fire right now, for the one-line "Done" note.
@@ -141,6 +148,7 @@ struct CombatSolverSheet: View {
                     d1 = nil
                     d2 = nil
                     minimalDie = nil
+                    luckyUsed = false
                     selectedLetter = nil
                     insight.overheatUsed = 0
                     insight.attackKind = .weapon
@@ -472,6 +480,11 @@ struct CombatSolverSheet: View {
             }
             if let isHit = solve.isHit, let roll = solve.roll, let tn = solve.targetNumber {
                 OutcomeBanner(hit: isHit, rolled: roll.total, targetNumber: tn.value)
+                LuckyRerollButton(store: store, attackerId: attacker.id, used: $luckyUsed) {
+                    d1 = nil
+                    d2 = nil
+                    minimalDie = nil
+                }
             }
             if solve.cannotShootReason == nil, solve.targetNumber?.autoMiss != true,
                defender.combatStatus != .destroyedPendingEnd {

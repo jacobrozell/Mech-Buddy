@@ -72,16 +72,16 @@ Do 1.1–1.4 together. Check each on screen with Full Lances (eight 'Mechs) in p
 **Guided path and box scenarios**
 - [x] Training path, Missions 1–5.
 - [x] Meet and Greet (box scenario).
-- [ ] **Clash of Steel** (box scenario). (L) Needs:
-  - [ ] Battlefield Support.
-  - [ ] Formations: Lucky rerolls, Combat Intuition, Command Lance initiative reroll.
-  - [ ] Buildings.
+- [x] **Clash of Steel** (box scenario). (L) Done 2026-11-26: `as-clash-of-steel.json`, Scenario rules sheet in battle. Needs:
+  - [x] Battlefield Support.
+  - [x] Formations: Lucky rerolls, Combat Intuition, Command Lance initiative reroll.
+  - [x] Buildings.
   - Rules: [alpha-strike/clash-of-steel-rules-intake.md](game-modes/alpha-strike/clash-of-steel-rules-intake.md). Cards: [book-scenarios.md](game-modes/book-scenarios.md).
 
 **Open rules**
 - [x] "0*" minimal damage (1D6, 4+ deals 1). No shipped card uses it; add a minimal-damage field to card data and the shot math with Clash of Steel, the first content that needs it. (M) Done 2026-11-26: domain, card data and shot sheet die.
 - [x] Water: partial cover and −1 heat. (S–M) Done 2026-11-26: "In water" on the unit sheet; the shot sheet notes it.
-- [ ] Resolve the **[OPEN]** items in the Clash of Steel intake (building collapse footnote, weight capacity, level-change cost, support timing, formation reroll conflict, REAR vs one attack). **Owner** for the printing conflicts.
+- [x] Resolve the **[OPEN]** items in the Clash of Steel intake (owner calls recorded 2026-11-26 for review) (building collapse footnote, weight capacity, level-change cost, support timing, formation reroll conflict, REAR vs one attack). **Owner** for the printing conflicts.
 
 **Open play** (after the guided path; [PRODUCT_SCOPE](game-modes/PRODUCT_SCOPE.md#long-term-roadmap-owner-2026-11-24))
 - [ ] 250 PV forces built from the collection. (L)

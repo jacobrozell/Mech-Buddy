@@ -21,6 +21,7 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 - [Mission 4: Close Quarters](#mission-4-close-quarters)
 - [Mission 5: Full Lances](#mission-5-full-lances)
 - [From the Alpha Strike box: Meet and Greet](#from-the-alpha-strike-box-meet-and-greet)
+- [From the Alpha Strike box: Clash of Steel](#from-the-alpha-strike-box-clash-of-steel)
 
 ## Mission 1: Ridge Line
 
@@ -276,3 +277,59 @@ _Generated from `Resources/Content/AlphaStrike/` by `scripts/generate_mission_gu
 - New: better pilots. Skill is the base to-hit number, so a Skill 2 pilot hits on 2 less than a Skill 4 one. Better pilots cost more Point Value, which is why the two sides’ totals look uneven.
 - New: heat attacks (HT). The Pouncer’s HT1/1/- means a hit at short or medium range also gives the target 1 heat at Clean up (the End Phase). A ’Mech takes at most 2 heat a turn this way, and it lands even if the target didn’t fire.
 - Forced Withdrawal is on, as in Full Lances: crippled ’Mechs head home, and leaving the table counts as destroyed.
+
+## From the Alpha Strike box: Clash of Steel
+
+**8 vs 5 · about 120 minutes · up to 12 turns**
+
+**You'll learn:** Buildings, Battlefield Support, Formations.
+
+**How to win:** Cripple or destroy every enemy ’Mech first. A ’Mech that leaves the table counts as destroyed. The book has no turn limit; the app stops at 12 turns, and then the side with more Structure left wins.
+
+**Forces**
+
+| Side | ’Mech | Skill | PV | Move | Armor/Structure | Damage S/M/L | Specials |
+|---|---|---|---|---|---|---|---|
+| A | Atlas AS7-S4 | 3 | 66 | 6" | 10/8 | 4/4/4 | CASEII, ECM, STL |
+| A | Archer ARC-7C | 3 | 59 | 10" | 7/3 | 5/5/4 | CASEII, IF2, REAR2/2/- |
+| A | Warhammer WHM-8R | 3 | 48 | 8" | 7/6 | 4/4/2 | CASEII |
+| A | Blackjack BJ-5 | 3 | 32 | 8"j | 5/2 | 2/3/3 | CASEII |
+| A | Wraith TR5 | 3 | 50 | 16"/14"j | 5/3 | 3/3/0 | ENE |
+| A | Wasp WSP-5A | 3 | 20 | 16"j | 2/1 | 1/1/0 | CASEII |
+| A | Phoenix Hawk PXH-4M | 3 | 37 | 12"j | 5/2 | 3/3/1 | ENE |
+| A | Locust LCT-7V | 3 | 30 | 20" | 2/1 | 2/2/0 | — |
+| B | Warhawk T | 1 | 80 | 8" | 9/5 | 5/5/4 | ENE, HT1/1/-, OMNI |
+| B | Timber Wolf T | 2 | 86 | 10" | 8/4 | 7/7/4 | CASE, IF2, OMNI |
+| B | Nova T | 2 | 58 | 10"j | 5/3 | 6/6/0 | CASE, OMNI |
+| B | Pouncer T | 2 | 41 | 12"/10"j | 4/2 | 3/3/0 | ENE, HT1/1/-, OMNI |
+| B | Fire Moth G | 2 | 49 | 30" | 1/1 | 4/4/0 | CASE, OMNI |
+| | **Total PV** | | A 342 · B 314 | | | | |
+
+**Maps needed:** none. An open table 4 feet between the two home edges and 3 feet wide, with the box’s buildings and trees. The Alpha Strike box has no maps; a 3 × 4 foot mat or any table works.
+
+**Table:** 48 × 36 inches. Side A sets up on the left edge, Side B on the right. The app shows a top-down diagram of the layout on the mission sheet and at table setup.
+
+**Extra rules on:** overheat, punches and kicks, Forced Withdrawal.
+
+**Set up the table**
+
+1. Use an open table about 3 feet across. The two edges 4 feet apart are the home edges: Side A, the Highlanders, on one, Side B, the Jade Falcons, on the other. Measure in inches.
+2. Terrain: each player takes three trees, three small buildings and three large buildings from the box. Side B places first; then take turns placing two pieces at a time, each within 24 inches of the centre. Trees within 4 inches of another tree, whoever placed them, form a patch of woods.
+3. The box’s small buildings are Medium (CF 4) and the large ones Heavy (CF 12). The app tracks each one’s CF under Scenario rules. The diagram shows one way to lay out the city.
+4. Before play, each side secretly buys 5 points of Battlefield Support in the app (Scenario rules), handing the phone over so the other side doesn’t see. Side A also picks its two Combat Intuition ’Mechs (not the Atlas).
+5. Deploy: Side B places one ’Mech at least 24 inches from the centre toward its home edge; on a 4-foot table that is right at the edge. Then Side A places two the same way. Repeat until all thirteen are down.
+
+**What's new, and tips**
+
+- The Alpha Strike box’s second scenario (Quick-Start Rulebook p. 31). Two lances of Northwind Highlanders try to split a Jade Falcon Battle Star in the ruined city of Aswan.
+- Side A, the Defender, is two lances: the Command Lance (Atlas, Archer, Warhammer, Blackjack) and the Recon Lance (Wraith, Wasp, Phoenix Hawk, Locust). Every Highlander is Skill 3. Side B, the Attacker, is a Battle Star of five Clan OmniMechs: Warhawk (Skill 1) and four Skill 2 pilots.
+- Open Scenario rules (the shield button at the top) for everything new: Battlefield Support, the three Formations and the twelve buildings.
+- Battlefield Support (pp. 29–30): each side secretly buys 5 points of support before play. In the Combat Phase, call one: roll 2D6 against its number, with no modifiers. Strikes hit one ’Mech; bombing and artillery hit every base under the template, and scatter when they miss. Each is used once.
+- Command Lance (p. 32): while the Atlas stands, Side A may reroll its Initiative once a turn; the new roll stands. Two ’Mechs (not the Atlas) get Combat Intuition: when Side A wins Initiative, each may move and fire in the Movement Phase, with the damage landing at once, once every 3 turns.
+- Recon Lance (p. 32): Maneuvering Ace. Woods cost 1″ less per inch, so they cost nothing extra.
+- Battle Star (p. 32): seven Lucky rerolls for the whole Star. After an attack roll, a Star ’Mech may spend one to roll again; the second roll stands. Not for criticals, Initiative or support.
+- A Formation keeps its bonus while at least three of its ’Mechs are not destroyed (p. 37).
+- Buildings (p. 28): small ones are Medium (CF 4, +2″ per inch to go through, holds Size 4), large ones Heavy (CF 12, +3″ per inch, holds Size 6). No ’Mech may end its move inside one. Going through does 1 damage per inch to the building. They block line of sight and give partial cover like hills. Shots at a building count it as immobile (−4).
+- Indirect fire (IF) and ECM have no effect in the Quick-Start rules (p. 25). The Atlas’s Stealth (STL) does: +1 to hit it at medium range, +2 at long.
+- Eight against five: when one side has twice as many ’Mechs left to move, it moves two at a time (p. 14). The app counts this for you.
+- Forced Withdrawal is on: crippled ’Mechs head home, and leaving the table counts as destroyed. A crippled ’Mech counts as out for victory.

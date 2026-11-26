@@ -321,6 +321,7 @@ public enum MatchReducer {
             next.initiativeWinner = next.initiativeWinner.map(swap)
             next.initiativeOrder = next.initiativeOrder.map(swap)
             next.initiativeRolls = next.initiativeRolls?.mapSides(swap)
+            next.boxRules = next.boxRules?.mapSides(swap)
             next.appendLog("Swapped sides")
 
         case .advancePhase:
@@ -430,7 +431,7 @@ public enum MatchReducer {
         return next
     }
 
-    private static func applySATOR(_ session: MatchSession, _ attack: SATORAttackCommand) throws -> MatchSession {
+    static func applySATOR(_ session: MatchSession, _ attack: SATORAttackCommand) throws -> MatchSession {
         var next = session
         guard next.phase == .combat else {
             throw MatchDomainError.illegalPhaseTransition("Not in combat")
@@ -639,7 +640,7 @@ public enum MatchReducer {
     }
 }
 
-private extension MatchSession {
+extension MatchSession {
     mutating func appendLog(_ message: String) {
         eventLog.append(MatchEvent(turn: turn, phase: phase, message: message))
     }

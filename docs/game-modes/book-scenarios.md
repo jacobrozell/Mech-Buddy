@@ -134,7 +134,7 @@ For any game: 250 PV per side, and pick or roll one objective. Each objective's 
 - **Meet and Greet: built.** Mission 6, the first stop in a "From the Alpha Strike box" section below the training path's trophy (`as-meet-and-greet.json`, catalog `stage`). Two additions were needed:
   - Point Value adjusted for skill (`AlphaStrikePointValue`, p. 35);
   - HT heat attacks: a hit adds heat in the End Phase, at most 2 a turn, after cooling (p. 24–25).
-- **Clash of Steel: scoped, not built.** The cards are already checked (below). It needs three rule systems the app doesn't have yet:
+- **Clash of Steel: built 2026-11-26.** Mission 7, after Meet and Greet (`as-clash-of-steel.json`). The battle screen's Scenario rules sheet (shield button) covers Battlefield Support, the three Formations and the twelve buildings; owner calls are in the rules intake. The three rule systems it added:
   1. **Buildings (p. 28):** small and large buildings with a Construction Factor, extra Move cost to go through, no ending a move inside, 1 damage to the building per inch moved through it, climbing and rooftops, a capacity measured in Size, collapse damage, and attacking buildings.
   2. **Battlefield Support (pp. 29–30):** 5 points per side, chosen secretly. Each type is used once: aerospace strikes and artillery. Misses scatter using the area-of-effect template.
   3. **Formations (p. 31 on):** the Command Lance (Combat Intuition on two 'Mechs) and Recon Lance for the defender, and the Battle Star for the attacker.
