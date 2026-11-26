@@ -132,7 +132,7 @@ For any game: 250 PV per side, and pick or roll one objective. Each objective's 
 ## Status (2026-11-24)
 
 - **Meet and Greet: built.** Mission 6, the first stop in a "From the Alpha Strike box" section below the training path's trophy (`as-meet-and-greet.json`, catalog `stage`). Two additions were needed:
-  - Point Value adjusted for skill (`AlphaStrikePointValue`, p. 33);
+  - Point Value adjusted for skill (`AlphaStrikePointValue`, p. 35);
   - HT heat attacks: a hit adds heat in the End Phase, at most 2 a turn, after cooling (p. 24–25).
 - **Clash of Steel: scoped, not built.** The cards are already checked (below). It needs three rule systems the app doesn't have yet:
   1. **Buildings (p. 28):** small and large buildings with a Construction Factor, extra Move cost to go through, no ending a move inside, 1 damage to the building per inch moved through it, climbing and rooftops, a capacity measured in Size, collapse damage, and attacking buildings.
