@@ -10,6 +10,8 @@ struct PlayModeHomeView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var editingCollection = false
+    @State private var route: PlaySetupRoute?
+    @State private var confirmDiscardDraft = false
 
     var body: some View {
         ScrollView {
@@ -20,7 +22,13 @@ struct PlayModeHomeView: View {
                 if let resume = matches.resumeSession {
                     resumeCard(resume)
                 }
+                if let draft = dependencies.preferences.playDraft {
+                    draftCard(draft)
+                }
                 newGameBlock
+                if let last = dependencies.preferences.playLastSetup {
+                    lastSetupRow(last)
+                }
                 if dependencies.preferences.collection == nil {
                     collectionNote
                 }
@@ -31,6 +39,22 @@ struct PlayModeHomeView: View {
         }
         .navigationTitle("Play")
         .accessibilityIdentifier("as.play.home")
+        .navigationDestination(item: $route) { route in
+            PlaySetupFlowView(route: route)
+        }
+        .onChange(of: matches.matchStore == nil) { _, closed in
+            // Play game started: leave setup so Play home shows Resume when the cover closes.
+            if !closed { route = nil }
+        }
+        .onChange(of: matches.editSetup) { _, setup in
+            guard let setup else { return }
+            matches.editSetup = nil
+            route = PlaySetupRoute(setup: setup, step: .review)
+        }
+        .confirmationDialog("Discard this setup?", isPresented: $confirmDiscardDraft, titleVisibility: .visible) {
+            Button("Discard", role: .destructive) { dependencies.preferences.playDraft = nil }
+            Button("Keep", role: .cancel) {}
+        }
         .sheet(isPresented: $editingCollection) {
             CollectionEditSheet(
                 boxes: dependencies.boxSets,
@@ -106,7 +130,7 @@ struct PlayModeHomeView: View {
 
     @ViewBuilder
     private var newGameBlock: some View {
-        if matches.resumeSession == nil {
+        if matches.resumeSession == nil && dependencies.preferences.playDraft == nil {
             hero
         } else {
             SecondaryActionButton(
@@ -152,7 +176,79 @@ struct PlayModeHomeView: View {
     }
 
     private func startNewGame() {
-        // PM4 opens the setup flow here.
+        let owned = !(dependencies.preferences.collection?.isEmpty ?? true)
+        let setup = PlaySetup.pickup(
+            pool: owned ? .owned : .anyCard,
+            diceMode: dependencies.preferences.defaultDiceMode
+        )
+        dependencies.preferences.playDraft = nil
+        route = PlaySetupRoute(setup: setup, step: .sides)
+    }
+
+    // MARK: Draft and last setup (§ 11)
+
+    private func draftCard(_ draft: PlaySetup) -> some View {
+        TMCard {
+            VStack(alignment: .leading, spacing: TMSpace.md) {
+                Eyebrow("Setting up")
+                Text("\(draft.formatName) · \(draft.budget.summary) · \(draft.unitCount) ’Mechs picked")
+                    .font(TMFont.cardTitle)
+                    .fixedSize(horizontal: false, vertical: true)
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: TMSpace.md) { draftButtons(draft) }
+                    VStack(alignment: .leading, spacing: TMSpace.sm) { draftButtons(draft) }
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("as.play.draft")
+    }
+
+    @ViewBuilder
+    private func draftButtons(_ draft: PlaySetup) -> some View {
+        Button {
+            let ready = draft.sides.allSatisfy { !draft.force($0.id).isEmpty }
+            route = PlaySetupRoute(setup: draft, step: ready ? .review : .sides)
+        } label: {
+            Text("Finish setting up").frame(minHeight: 44)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(TMColor.signal)
+        .foregroundStyle(TMColor.onSignal)
+        .accessibilityIdentifier("as.play.draft.continue")
+        Button("Discard", role: .destructive) { confirmDiscardDraft = true }
+            .frame(minHeight: 44)
+            .accessibilityIdentifier("as.play.draft.discard")
+    }
+
+    private func lastSetupRow(_ last: PlaySetup) -> some View {
+        Button {
+            var fresh = last
+            fresh.diceMode = last.diceMode
+            route = PlaySetupRoute(setup: fresh, step: .review)
+        } label: {
+            HStack(spacing: TMSpace.md) {
+                Image(systemName: "arrow.counterclockwise")
+                    .foregroundStyle(TMColor.signal)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text("Last setup").font(TMFont.cardTitle)
+                    Text("\(last.formatName) · \(last.budget.summary) · \(last.battlefield.summary)")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: TMSpace.sm)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("as.play.lastSetup")
     }
 
     // MARK: Collection
