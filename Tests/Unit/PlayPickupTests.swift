@@ -240,3 +240,43 @@ struct PlaySupportTests {
         #expect(off.boxRules?.support[.lanceA]?.budget == 5 && off.boxRules?.support[.lanceB]?.budget == 5)
     }
 }
+
+@Suite("Play buildings and formations (PM11)")
+struct PlayBuildingsFormationsTests {
+    private func unit(_ side: SideId, pv: Int = 20) -> MatchUnitState {
+        MatchUnitState(name: "U", side: side, skill: 4, pv: pv, sz: 2, mv: "10\"", tmm: 2,
+                       s: 2, m: 2, l: 1, ov: 0, armorCap: 4, structureCap: 4, abilities: "")
+    }
+
+    @Test("Old saves decode with buildings and formations off")
+    func oldSave() throws {
+        let old = try JSONDecoder().decode(PlayRules.self, from: Data(#"{"overheat":false}"#.utf8))
+        #expect(old.buildings.isEmpty && old.formation == nil)
+        var r = PlayRules(); r.buildings = [BuildingState(id: "B1", name: "B", type: .heavy)]; r.formation = .battleStar
+        let back = try JSONDecoder().decode(PlayRules.self, from: JSONEncoder().encode(r))
+        #expect(back == r)
+    }
+
+    @Test("startPlay makes buildings and one Formation per side with 3+ units")
+    func start() throws {
+        var setup = PlaySetup.pickup()
+        setup.rules.buildings = [BuildingState(id: "B1", name: "B", type: .medium)]
+        setup.rules.formation = .commandLance
+        let units = [unit(.lanceA, pv: 30), unit(.lanceA), unit(.lanceA), unit(.lanceB), unit(.lanceB)]
+        let s = try MatchReducer.reduce(MatchSession(ruleset: setup.ruleset), .startPlay(setup: setup, units: units))
+        let rules = try #require(s.boxRules)
+        #expect(rules.buildings.count == 1 && rules.support.isEmpty)
+        #expect(rules.formations.count == 1)
+        let f = rules.formations[0]
+        #expect(f.memberIds.count == 3 && f.commandUnitId == units[0].id && f.combatIntuitionCount == 2)
+    }
+
+    @Test("Battle Star gets seven Lucky uses; nothing on means no box rules")
+    func star() throws {
+        let units = [unit(.lanceA), unit(.lanceA), unit(.lanceA)]
+        #expect(PlayRules.makeFormations(.battleStar, units: units).first?.luckyUsesLeft == 7)
+        let setup = PlaySetup.pickup()
+        let s = try MatchReducer.reduce(MatchSession(ruleset: setup.ruleset), .startPlay(setup: setup, units: units))
+        #expect(s.boxRules == nil)
+    }
+}
