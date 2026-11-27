@@ -44,3 +44,18 @@ struct SideGroupingTests {
         #expect(g[0].name == "Wolves")
     }
 }
+
+@Suite("Pinned side")
+struct SideGroupingPinTests {
+    @Test("Pinning moves the acting side first and keeps the rest in seat order")
+    func pin() {
+        func u(_ n: String, _ s: SideId) -> MatchUnitState {
+            MatchUnitState(name: n, side: s, pv: 1, sz: 1, mv: "10\"", tmm: 1,
+                           s: 1, m: 1, l: 0, ov: 0, armorCap: 2, structureCap: 2)
+        }
+        var session = MatchSession(ruleset: .ridgeLine, units: [u("A", .lanceA), u("B", .lanceB), u("C", .lanceC)])
+        session.sides = [MatchSide(id: .lanceA), MatchSide(id: .lanceB), MatchSide(id: .lanceC)]
+        #expect(SideGrouping.groups(in: session, pinned: .lanceC).map(\.side) == [.lanceC, .lanceA, .lanceB])
+        #expect(SideGrouping.groups(in: session, pinned: nil).map(\.side) == [.lanceA, .lanceB, .lanceC])
+    }
+}

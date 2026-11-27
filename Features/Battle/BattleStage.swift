@@ -53,7 +53,7 @@ struct BattleRoster: View {
         ScrollView {
             ScrollViewReader { proxy in
                 LazyVStack(alignment: .leading, spacing: TMSpace.md) {
-                    ForEach(SideGrouping.groups(in: session)) { group in
+                    ForEach(SideGrouping.groups(in: session, pinned: pinnedSide)) { group in
                         VStack(alignment: .leading, spacing: TMSpace.xs) {
                             sideHeader(group)
                             ForEach(group.units) { unit in
@@ -100,15 +100,20 @@ struct BattleRoster: View {
     }
 
     private var rosterUnits: [MatchUnitState] {
-        SideGrouping.groups(in: session).flatMap(\.units)
+        SideGrouping.groups(in: session, pinned: pinnedSide).flatMap(\.units)
     }
 
-    /// Side colour dot, the side's name and a unit count; one short line so 4 v 4 stays on one screen.
+    /// During Movement and Combat the side whose turn it is sits at the top.
+    private var pinnedSide: SideId? {
+        coach.step == .movement || coach.step == .combat ? session.activeSide : nil
+    }
+
+    /// Thin side-colour accent bar, the side's name and a unit count; one short line so 4 v 4 stays on one screen.
     private func sideHeader(_ group: SideGroup) -> some View {
         HStack(spacing: TMSpace.xs) {
-            Circle()
+            Capsule()
                 .fill(TMColor.side(group.side))
-                .frame(width: 8, height: 8)
+                .frame(width: 4, height: 14)
                 .accessibilityHidden(true)
             Eyebrow(group.name)
             Text("\(group.units.count)")
