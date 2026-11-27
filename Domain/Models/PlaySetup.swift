@@ -230,6 +230,9 @@ public struct Battlefield: Codable, Sendable, Equatable {
         if min(width, depth) < 34 {
             return "Small table. Forces will meet on Turn 1."
         }
+        if sides > 2, width < 48 || depth < 48 {
+            return "[HOUSE] Three or four sides need a 4′ × 4′ table or bigger, square if you can."
+        }
         if sides <= 2, let budgetPV, budgetPV > 300, width * depth < 72 * 48 {
             return "Over about 300 PV a side, the book suggests 4′ × 6′."
         }

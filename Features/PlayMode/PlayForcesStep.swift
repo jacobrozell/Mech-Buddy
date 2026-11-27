@@ -430,6 +430,13 @@ struct PlayReviewStep: View {
                 Text(setup.battlefield.summary).font(TMFont.detail)
             }
             section("Rules", edit: .rules) {
+                if setup.usesHouseRules {
+                    Label("[HOUSE] Initiative order, move order, targets, home edges and scoring for three or four sides are Mech Buddy’s house rules, not the Quick-Start’s.", systemImage: "house")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.play.setup.review.houseRules")
+                }
                 Text(rulesLine)
                     .font(TMFont.detail)
                     .fixedSize(horizontal: false, vertical: true)
@@ -499,7 +506,7 @@ struct PlayReviewStep: View {
     }
 
     private var rulesLine: String {
-        var on: [String] = ["Last side standing"]
+        var on: [String] = [setup.usesHouseRules ? "Last side standing [HOUSE]" : "Last side standing"]
         on.append(setup.turnLimit.map { "\($0)-turn limit" } ?? "No turn limit")
         if setup.rules.overheat { on.append("Overheat") }
         if setup.rules.physicalAttacks { on.append("Punches and kicks") }

@@ -22,11 +22,11 @@ struct PlayModeHomeView: View {
                 if let resume = matches.resumeSession {
                     resumeCard(resume)
                 }
-                if let draft = dependencies.preferences.playDraft {
+                if let draft = dependencies.preferences.playDraft, canOpen(draft) {
                     draftCard(draft)
                 }
                 newGameBlock
-                if let last = dependencies.preferences.playLastSetup {
+                if let last = dependencies.preferences.playLastSetup, canOpen(last) {
                     lastSetupRow(last)
                 }
                 if dependencies.preferences.collection == nil {
@@ -124,6 +124,12 @@ struct PlayModeHomeView: View {
         let id = (session.scenarioId ?? .ridgeLine).rawValue
         let item = (try? dependencies.content.scenarios().scenarios)?.first { $0.id == id }
         return item?.title ?? "Ridge Line"
+    }
+
+    /// A saved setup with three or four sides opens only while `playModeMultiSide` is on (a downgrade keeps
+    /// the save but can't start new free-for-all games, § 16).
+    private func canOpen(_ setup: PlaySetup) -> Bool {
+        setup.sides.count <= 2 || dependencies.releaseSurface.isEnabled(.playModeMultiSide)
     }
 
     // MARK: New game
