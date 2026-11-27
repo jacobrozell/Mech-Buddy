@@ -304,6 +304,7 @@ struct PlayModeHomeView: View {
         } label: {
             HStack(spacing: TMSpace.md) {
                 Image(systemName: "tray.full")
+                    .frame(width: 28)
                     .foregroundStyle(TMColor.signal)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: TMSpace.xxs) {
@@ -334,6 +335,7 @@ struct PlayModeHomeView: View {
         } label: {
             HStack(spacing: TMSpace.md) {
                 Image(systemName: "square.grid.3x3.topleft.filled")
+                    .frame(width: 28)
                     .foregroundStyle(TMColor.signal)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: TMSpace.xxs) {
