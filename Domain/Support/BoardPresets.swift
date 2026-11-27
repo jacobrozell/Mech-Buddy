@@ -62,13 +62,14 @@ public enum BoardPresets {
         return updated > copied ? preset : nil
     }
 
-    /// "4′ × 4′" when both sides are whole feet, else "30″ × 40″" (width × depth).
+    /// "4′ × 4′" when both sides are whole feet, else both in inches ("36″ × 22″"): never mixed units.
     public static func tableText(_ board: BoardLayout) -> String {
-        func side(_ value: Double) -> String {
-            let inches = Int(value.rounded())
-            return inches % 12 == 0 ? "\(inches / 12)′" : "\(inches)″"
+        let width = Int(board.width.rounded())
+        let depth = Int(board.depth.rounded())
+        if width % 12 == 0 && depth % 12 == 0 {
+            return "\(width / 12)′ × \(depth / 12)′"
         }
-        return "\(side(board.width)) × \(side(board.depth))"
+        return "\(width)″ × \(depth)″"
     }
 
     /// "4′ × 4′ · 2–4 sides · 12 pieces". Every board works for 2 to 4 sides: unset zone sets are generated.
