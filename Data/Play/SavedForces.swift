@@ -51,6 +51,8 @@ public enum SavedForces {
             }
             var pick = saved
             pick.id = UUID()
+            // A MechWarrior card is [HOUSE] and one a side: it comes along only when this game uses cards.
+            if !setup.rules.mechWarriorCards || setup.force(side).contains(where: { $0.pilotName != nil }) { pick.pilotName = nil }
             let range = PlayUnits.skillRange(for: pick, setup: setup)
             pick.skill = min(max(pick.skill, range.lowerBound), range.upperBound)
             if let tag = pick.controllerIndex, tag >= players || players == 1 { pick.controllerIndex = nil }

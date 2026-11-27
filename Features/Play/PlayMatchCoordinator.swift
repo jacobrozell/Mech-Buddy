@@ -100,7 +100,11 @@ final class PlayMatchCoordinator {
 
     private func startNew(using dependencies: AppDependencies, replaceActive: Bool) {
         let store = MatchStore(repository: dependencies.matchSessions)
-        if let setup = pendingPlay {
+        if let pending = pendingPlay {
+            let setup = pending.limited(
+                objectives: dependencies.releaseSurface.isEnabled(.playObjectives),
+                boards: dependencies.releaseSurface.isEnabled(.playBoards)
+            )
             store.startPlay(setup, library: dependencies.cardLibrary, replaceActive: replaceActive)
             guard store.session != nil else {
                 lastErrorTitle = store.lastErrorTitle

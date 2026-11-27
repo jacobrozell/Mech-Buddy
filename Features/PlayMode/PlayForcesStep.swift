@@ -705,6 +705,12 @@ struct PlayReviewStep: View {
         if setup.objectiveId == .findTheTarget || setup.sideObjectives.values.contains(ObjectiveId.findTheTarget.rawValue), !setup.hasBuildingsForTargets {
             list.append("Find the Target needs \(ObjectiveId.minimumBuildings) buildings. Without them it plays as last side standing.")
         }
+        if setup.perSideObjectives {
+            let missing = setup.sides.filter { setup.objectiveId(for: $0.id) == nil }
+            if !missing.isEmpty {
+                list.append("\(missing.map { $0.name.trimmingCharacters(in: .whitespaces).isEmpty ? $0.id.displayName : $0.name }.joined(separator: ", ")) hasn’t rolled an objective. Until every side has one, everyone plays the same objective, or last side standing.")
+            }
+        }
         if let advice = setup.battlefield.advice(sides: setup.sides.count, budgetPV: pv) {
             list.append(advice)
         }
