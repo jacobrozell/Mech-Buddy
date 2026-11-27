@@ -1243,7 +1243,7 @@ struct CombatSolverSheet: View {
 }
 
 /// Chips from `TargetNumber.breakdown` (`S skill 4`, `A ground +0`, …). Does not recompute the target number.
-private struct SATORTerm: Identifiable {
+struct SATORTerm: Identifiable {
     var letter: String
     var label: String
     var delta: Int
@@ -1251,7 +1251,7 @@ private struct SATORTerm: Identifiable {
     var id: String { letter }
 }
 
-private enum SATORTerms {
+enum SATORTerms {
     static func make(from tn: TargetNumber) -> [SATORTerm] {
         tn.breakdown.compactMap { line in
             let tokens = line.split(separator: " ").map(String.init)
