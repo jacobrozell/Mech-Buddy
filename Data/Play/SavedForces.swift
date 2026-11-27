@@ -26,6 +26,11 @@ public enum SavedForces {
         public var added: Int
         /// Picks left out: card no longer available, or no room (10 per side, 24 in the game).
         public var skipped: Int
+
+        public init(added: Int, skipped: Int) {
+            self.added = added
+            self.skipped = skipped
+        }
     }
 
     /// Replaces `side`'s force with the saved picks. New pick ids; skill clamped to what this setup offers;
