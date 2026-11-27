@@ -21,6 +21,7 @@
 | One-screen shot sheet | Built | `Features/Battle/CombatSolverSheet.swift` |
 | Map swap, map catalog, box contents (A Game of Armored Combat, Alpha Strike Box Set, Mercenaries) | Built | `Resources/Content/map-catalog.json`, `as-box-sets.json`, `Data/Collection/` |
 | Card library: 40 faces from the owner's two boxes, 21 checked | Built (PM2) | `as-card-library.json`, `Data/Content/CardLibraryDTO.swift` |
+| Lore (read-only BattleTech history: overview, era detail, timeline) | Built; a "History" row at the bottom of the Rules tab (`as.lore.*` ids) | `Features/Lore/LoreViews.swift`, `Data/Content/LoreDTO.swift`, `Resources/Content/Lore/` |
 | Up to four sides in the domain (house rules labelled [HOUSE]) | Built (PM1), not on screen | `Domain/Models/MatchSide.swift`, `AlphaStrikePhaseEngine`, `VictoryEvaluator` |
 | Learn / Play tabs | Built (PM3) behind `playMode` | `App/RootTabView.swift`, `Features/Play/` |
 | Play: 1 v 1 pickup game, six setup screens, standings, draft and last setup | Built (PM4) behind `playMode`; Battlefield Support option built (PM11 slice 1: `PlayRules.battlefieldSupport`, `as.play.setup.support`, `startPlay` makes `boxRules`) | `Features/Play/` (setup flow), `MatchSession.play` (`PlaySetup`) |
@@ -72,3 +73,4 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 - [game-modes/alpha-strike/](game-modes/alpha-strike/) — rules intakes, audits, owner calls.
 - [missions/alpha-strike-missions.md](missions/alpha-strike-missions.md) — player's guide (regenerate with `python3 scripts/generate_mission_guide.py`).
 - [release/todo.md](release/todo.md) — builds, uploads, polish history.
+- [game-modes/alpha-strike/multi-side-lessons-from-dartbuddy.md](game-modes/alpha-strike/multi-side-lessons-from-dartbuddy.md) — reading for PM6 (teams) and PM7 (three and four sides).

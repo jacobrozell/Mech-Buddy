@@ -126,6 +126,7 @@ Ten-mission path: [classic/mission-path-scope.md](game-modes/classic/mission-pat
 From `FutureIdeas/`. Not on the roadmap until the owner picks them up.
 
 - [ ] Later guided-play plans (`FutureIdeas/guided-play.md`, written 2026-11-01 before the mission path; check what the path already covers).
+- [x] **Lore:** read-only BattleTech history (overview, eras, timeline) from `Resources/Content/Lore/`, reached from the Rules tab. Lore text is an unchecked draft; verify against sourcebooks before shipping. (S)
 - [ ] Analytics (`FutureIdeas/analytics.md`). Not started; the app ships with telemetry off and the "Data Not Collected" label depends on that.
 - [ ] Ridge Line walkthrough page (`FutureIdeas/alpha-strike-walkthrough.html`).
 
