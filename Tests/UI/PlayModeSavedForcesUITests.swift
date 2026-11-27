@@ -44,7 +44,7 @@ final class PlayModeSavedForcesUITests: XCTestCase {
 
         // Save the force, remove the unit, load it back.
         tap(app.buttons["as.play.forces.saved.save"])
-        let name = app.textFields["as.play.forces.saved.name"]
+        let name = app.alerts.textFields.firstMatch
         tap(name)
         name.typeText("Scouts")
         tap(app.alerts.buttons["Save"])
