@@ -83,6 +83,11 @@ struct VictoryView: View {
                     .font(TMFont.readoutL(size: titleSize))
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
+            } else if case .tied = session.outcome {
+                Text("It’s a tie")
+                    .font(TMFont.readoutL(size: titleSize))
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
             } else {
                 Text("Game over")
                     .font(TMFont.readoutL(size: titleSize))
@@ -170,7 +175,13 @@ struct VictoryView: View {
         guard session.isPlayGame else { return "\(structure) structure left" }
         let pv = VictoryEvaluator.pvLeft(side: side, in: session)
         let mechs = VictoryEvaluator.unitsLeft(side: side, in: session)
-        return "\(pv) PV · \(mechs) ’Mech\(mechs == 1 ? "" : "s") left"
+        var line = "\(pv) PV · \(mechs) ’Mech\(mechs == 1 ? "" : "s") left"
+        // Three or four sides: say who went out and when (§ 6.5, § 14). Two sides already name the loser.
+        if session.sides.count > 2, let out = session.side(side), out.isOut {
+            let when = out.outOnTurn.map { " on turn \($0)" } ?? ""
+            line = (out.conceded ? "Conceded" : "Out") + when + " · " + line
+        }
+        return line
     }
 
     private func standingLabel(_ side: SideId, place: Int?, structure: Int) -> String {
@@ -366,9 +377,10 @@ struct VictoryView: View {
 
     private var subtitle: String {
         switch session.outcome {
-        case .tied:
-            // Play standings (PM7) replace this; missions never tie.
-            return "Level at the top after turn \(session.turn)"
+        case .tied(let sides):
+            // Three or four sides level at the top share first place (§ 7.4).
+            let names = sides.map { session.displayName(of: $0) }.joined(separator: " and ")
+            return "\(names) are level at the top after turn \(session.turn)"
         case .draw:
             if VictoryEvaluator.livingSides(in: session).isEmpty {
                 return "Both sides are wrecked · \(turnPhrase)"

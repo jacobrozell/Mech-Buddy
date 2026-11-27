@@ -49,15 +49,19 @@ struct TableSetupStep: View {
                         .accessibilityIdentifier("as.battle.swapSides")
                     }
                 }
+                // Two sides sit next to each other; three or four make a two-column grid (one column at AX sizes).
+                let ids = session.sides.map(\.id)
                 if dynamicTypeSize.isAccessibilitySize {
                     VStack(spacing: TMSpace.md) {
-                        sideCard(.lanceA)
-                        sideCard(.lanceB)
+                        ForEach(ids, id: \.self) { sideCard($0) }
+                    }
+                } else if ids.count > 2 {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: TMSpace.md, alignment: .top), GridItem(.flexible(), spacing: TMSpace.md, alignment: .top)], spacing: TMSpace.md) {
+                        ForEach(ids, id: \.self) { sideCard($0) }
                     }
                 } else {
                     HStack(alignment: .top, spacing: TMSpace.md) {
-                        sideCard(.lanceA)
-                        sideCard(.lanceB)
+                        ForEach(ids, id: \.self) { sideCard($0) }
                     }
                 }
                 if let skill = sharedSkill {

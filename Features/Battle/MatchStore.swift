@@ -257,6 +257,35 @@ final class MatchStore: Identifiable {
         mutate(.setInitiative(InitiativeRolls(lanceA: a, lanceB: b)))
     }
 
+    /// Three or four sides: the finished rolls, with any tie-break rounds (§ 6.1).
+    func setInitiative(rolls: InitiativeRolls) {
+        mutate(.setInitiative(rolls), failureTitle: "Couldn’t use those dice")
+    }
+
+    /// Three or four sides: the players chose the whole order, first to move first (§ 6.1).
+    func agreeInitiativeOrder(_ order: [SideId]) {
+        mutate(.agreeInitiativeOrder(order), failureTitle: "Couldn’t start the turn")
+    }
+
+    /// The side gives up (§ 6.5). Its ’Mechs leave the table; Undo brings them back.
+    func concede(side: SideId) {
+        mutate(.concede(side: side), failureTitle: "Couldn’t concede")
+    }
+
+    /// Home edge for a side before placement (§ 6.4). The side that held the edge takes this side's old one.
+    func assignHomeEdge(side: SideId, edge: TableEdge) {
+        mutate(.assignHomeEdge(side: side, edge: edge), undoable: false, failureTitle: "Couldn’t change the edge")
+    }
+
+    /// Rolls every side for the app; ties re-roll among the tied sides only. The screen shows the dice, then
+    /// calls `setInitiative(rolls:)`.
+    func rollInitiativeEntry() -> InitiativeEntry? {
+        guard let session else { return nil }
+        var generator = SystemRandomNumberGenerator()
+        let entry = InitiativeEntry.autoRolled(sides: session.sidesInGame, using: &generator)
+        return entry.isComplete ? entry : nil
+    }
+
     func setMini(unitId: UUID, mini: MiniMarker?) {
         mutate(.setMini(unitId: unitId, mini: mini), undoable: false)
     }

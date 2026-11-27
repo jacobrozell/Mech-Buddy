@@ -22,6 +22,11 @@ struct BattleFlowView: View {
     @State private var b1: Int?
     @State private var b2: Int?
     @State private var autoPreview: InitiativeDicePreview?
+    /// Three or four sides: dice typed in by round, and the app's roll (§ 6.1).
+    @State private var multiRounds: [[SideId: InitiativeEntry.Dice]] = []
+    @State private var multiAuto: InitiativeEntry?
+    @State private var showConcede = false
+    @State private var concedeCandidate: SideId?
 
     @State private var showAbandonConfirm = false
     @State private var showSkipConfirm = false
@@ -80,6 +85,7 @@ struct BattleFlowView: View {
             } message: {
                 Text("You’ll lose this game’s progress. You can start this mission again from Play.")
             }
+            .modifier(ConcedeDialogs(store: store, isPicking: $showConcede, candidate: $concedeCandidate))
             .confirmationDialog("Go back a step?", isPresented: $showBackConfirm, titleVisibility: .visible) {
                 Button("Go back", role: .destructive) {
                     store.back()
@@ -448,7 +454,7 @@ struct BattleFlowView: View {
                   let unit = session.units.first(where: { $0.id == owed.unitId }) {
             CriticalPendingStep(
                 unit: unit,
-                rollingSide: session.otherSide(of: unit.side),
+                rollingSide: session.sideThatHit(unit),
                 count: owed.count,
                 diceMode: session.diceMode,
                 landingUnitID: landingUnitID,
@@ -458,7 +464,22 @@ struct BattleFlowView: View {
         } else {
             switch coach.step {
             case .placeMiniatures:
-                PlaceMiniaturesStep(session: session, layout: store.scenario.layout)
+                PlaceMiniaturesStep(
+                    session: session,
+                    layout: store.scenario.layout,
+                    onAssignEdge: { store.assignHomeEdge(side: $0, edge: $1) }
+                )
+            case .initiative where session.sides.count > 2:
+                MultiSideInitiativeStep(
+                    sides: session.sidesInGame,
+                    rounds: $multiRounds,
+                    autoEntry: multiAuto,
+                    diceMode: diceModeBinding,
+                    onChooseOrder: { order in
+                        clearDice()
+                        store.agreeInitiativeOrder(order)
+                    }
+                )
             case .initiative:
                 InitiativeStep(
                     preview: autoPreview,
@@ -582,6 +603,13 @@ struct BattleFlowView: View {
                         }
                     }
                 }
+                if let session = store.session, session.sides.count > 2, session.status == .active,
+                   session.sidesInGame.count > 1 {
+                    Button("Concede…", systemImage: "flag") {
+                        showConcede = true
+                    }
+                    .accessibilityIdentifier("as.battle.concede")
+                }
                 Divider()
                 Button("Discard this game", role: .destructive) {
                     showAbandonConfirm = true
@@ -616,6 +644,10 @@ struct BattleFlowView: View {
                 hint: "Records that the miniatures are placed.",
                 action: { store.acknowledgeDeployment() }
             )
+        case .useInitiativeRolls where session.sides.count > 2:
+            return multiSidePrimary(session)
+        case .rollInitiative where session.sides.count > 2:
+            return multiSidePrimary(session)
         case .useInitiativeRolls:
             let winner = InitiativeDice.winner(a1: a1, a2: a2, b1: b1, b2: b2)
             let first = InitiativeDice.firstToMove(a1: a1, a2: a2, b1: b1, b2: b2)
@@ -695,6 +727,42 @@ struct BattleFlowView: View {
                 action: { store.resolveEnd() }
             )
         }
+    }
+
+    /// Initiative with three or four sides: one dock button for real dice and for the app's roll (§ 6.1).
+    private func multiSidePrimary(_ session: MatchSession) -> BattleDockButton {
+        let manual = session.diceMode == .manual
+        let entry = manual ? InitiativeEntry(sides: session.sidesInGame, rounds: multiRounds) : multiAuto
+        if let entry, let order = entry.order, let rolls = entry.initiativeRolls {
+            return BattleDockButton(
+                title: "\(sideName(order[0])) moves first — start",
+                identifier: "as.battle.primary",
+                specIdentifier: "as.initiative.confirm",
+                hint: "\(sideName(order[order.count - 1])) won initiative and moves last.",
+                action: {
+                    store.setInitiative(rolls: rolls)
+                    if store.lastError == nil { clearDice() }
+                }
+            )
+        }
+        if manual {
+            let tied = (entry?.pending?.round ?? 0) > 0
+            return BattleDockButton(
+                title: tied ? "Tie — enter the re-roll" : "Enter every side’s dice",
+                identifier: "as.battle.primary",
+                specIdentifier: "as.initiative.confirm",
+                hint: "Lowest total moves first. Sides that tie roll again.",
+                disabled: true,
+                action: {}
+            )
+        }
+        return BattleDockButton(
+            title: "Roll all sides",
+            identifier: "as.battle.primary",
+            specIdentifier: "as.initiative.confirm",
+            hint: "Rolls every side. The lowest total moves first.",
+            action: { multiAuto = store.rollInitiativeEntry() }
+        )
     }
 
     private func secondaryButton(_ session: MatchSession, coach: BattleCoach) -> BattleDockButton? {
@@ -866,6 +934,8 @@ struct BattleFlowView: View {
         b1 = nil
         b2 = nil
         autoPreview = nil
+        multiRounds = []
+        multiAuto = nil
     }
 
     private func attemptBack() {
@@ -896,4 +966,38 @@ private struct BattleCue: Equatable {
 private enum FocusFollowUp {
     case shot(UUID)
     case crit(MatchUnitState)
+}
+
+/// Concede for three or four sides: pick the side, then confirm (PlayModeSpec § 6.5). Undo brings the 'Mechs back.
+private struct ConcedeDialogs: ViewModifier {
+    var store: MatchStore
+    @Binding var isPicking: Bool
+    @Binding var candidate: SideId?
+
+    private func name(_ side: SideId) -> String { store.session?.displayName(of: side) ?? side.displayName }
+
+    func body(content: Content) -> some View {
+        content
+            .confirmationDialog("Which side concedes?", isPresented: $isPicking, titleVisibility: .visible) {
+                ForEach(store.session?.sidesInGame ?? [], id: \.self) { side in
+                    Button(name(side), role: .destructive) { candidate = side }
+                        .accessibilityIdentifier("as.battle.concede.\(side.rawValue)")
+                }
+                Button("Keep playing", role: .cancel) {}
+            } message: {
+                Text("[HOUSE] Its ’Mechs leave the table at once and the side is out. Undo brings them back.")
+            }
+            .confirmationDialog(
+                candidate.map { "\(name($0)) concedes?" } ?? "Concede?",
+                isPresented: Binding(get: { candidate != nil }, set: { if !$0 { candidate = nil } }),
+                titleVisibility: .visible
+            ) {
+                Button("Concede", role: .destructive) {
+                    if let side = candidate { store.concede(side: side) }
+                    candidate = nil
+                }
+                .accessibilityIdentifier("as.battle.concede.confirm")
+                Button("Keep playing", role: .cancel) { candidate = nil }
+            }
+    }
 }

@@ -20,16 +20,7 @@ struct PlaySidesStep: View {
                     .font(TMFont.stepTitle)
                     .accessibilityAddTraits(.isHeader)
                 ForEach(TeamFormat.available(multiSide: multiSide)) { format in
-                    ChoiceTile(
-                        title: format.title,
-                        detail: Self.detail(for: format),
-                        systemImage: format.players.reduce(0, +) > 2 ? "person.3" : "person.2",
-                        isSelected: setup.playerCounts == format.players,
-                        badge: format.isHouseRule ? "House rules" : nil,
-                        indicator: .single,
-                        accessibilityIdentifier: "as.play.setup.preset.\(format.title.replacingOccurrences(of: " ", with: ""))",
-                        action: { setup.setPlayerCounts(format.players) }
-                    )
+                    presetTile(format)
                 }
                 if !multiSide {
                     Text("Three or four sides are coming in a later update.")
@@ -92,6 +83,28 @@ struct PlaySidesStep: View {
         .sheet(isPresented: $showHouseRules) {
             PlayHouseRulesSheet()
         }
+    }
+
+    private func presetTile(_ format: TeamFormat) -> some View {
+        let players: Int = format.players.reduce(0, +)
+        let symbol: String = players > 2 ? "person.3" : "person.2"
+        let badge: String? = format.isHouseRule ? "House rules" : nil
+        return ChoiceTile(
+            title: format.title,
+            detail: Self.detail(for: format),
+            systemImage: symbol,
+            badge: badge,
+            isSelected: setup.playerCounts == format.players,
+            indicator: .single,
+            accessibilityIdentifier: Self.presetID(format),
+            action: { setup.setPlayerCounts(format.players) }
+        )
+    }
+
+    /// `as.play.setup.preset.1v1`, `…1v1v1v1`.
+    static func presetID(_ format: TeamFormat) -> String {
+        let compact = format.title.replacingOccurrences(of: " ", with: "")
+        return "as.play.setup.preset." + compact
     }
 
     static func detail(for format: TeamFormat) -> String {
