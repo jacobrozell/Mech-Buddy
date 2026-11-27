@@ -1,0 +1,24 @@
+[
+  {
+    "schemaVersion": 1,
+    "name": "Open 4′ × 4′ for four",
+    "isStarter": true,
+    "width": 48,
+    "depth": 48,
+    "sheets": [],
+    "zones": [],
+    "features": [],
+    "openTable": "Open 48″ × 48″ table. Zones for two to four sides."
+  },
+  {
+    "schemaVersion": 1,
+    "name": "Open 3′ × 4′",
+    "isStarter": true,
+    "width": 48,
+    "depth": 36,
+    "sheets": [],
+    "zones": [],
+    "features": [],
+    "openTable": "Open 48″ × 36″ table. Zones for two to four sides."
+  }
+]

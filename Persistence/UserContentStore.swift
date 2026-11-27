@@ -111,7 +111,96 @@ public final class UserContentStore {
         try context.save()
     }
 
+    // MARK: Board presets (PM13, PlayModeSpec § 9.7)
+
+    public enum BoardError: Error, Equatable {
+        case nameInUse
+        case emptyName
+        case notFound
+    }
+
+    /// Your boards, newest first. A row that no longer decodes is skipped, not deleted.
+    public func boardPresets() -> [BoardLayout] {
+        let rows = (try? context.fetch(FetchDescriptor<SDBoardPreset>(sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]))) ?? []
+        return rows.compactMap(Self.board(from:))
+    }
+
+    public func boardPreset(id: UUID) -> BoardLayout? {
+        (try? context.fetch(FetchDescriptor<SDBoardPreset>(predicate: #Predicate { $0.id == id })))?.first.flatMap(Self.board(from:))
+    }
+
+    private static func board(from row: SDBoardPreset) -> BoardLayout? {
+        guard var board = try? JSONDecoder().decode(BoardLayout.self, from: row.payload) else { return nil }
+        board.id = row.id
+        board.name = row.name
+        board.updatedAt = row.updatedAt
+        board.isStarter = false
+        board.presetID = nil
+        board.presetUpdatedAt = nil
+        return board
+    }
+
+    /// Saves under the board's id (a new id makes a new preset). Another preset with the same name (ignoring
+    /// case) is replaced, so a name is one board. Returns what was stored.
+    @discardableResult
+    public func saveBoard(_ board: BoardLayout, name: String, now: Date = Date()) throws -> BoardLayout {
+        let clean = BoardPresets.cleanName(name)
+        guard !clean.isEmpty else { throw BoardError.emptyName }
+        var stored = board
+        let id = board.id ?? UUID()
+        stored.id = id
+        stored.name = clean
+        stored.updatedAt = now
+        stored.createdAt = board.createdAt ?? now
+        stored.isStarter = nil
+        stored.presetID = nil
+        stored.presetUpdatedAt = nil
+        stored.schemaVersion = BoardLayout.currentSchemaVersion
+        stored = stored.assigningIDs()
+        let data = try JSONEncoder().encode(stored)
+        let rows = try context.fetch(FetchDescriptor<SDBoardPreset>())
+        for row in rows where row.id != id && row.name.caseInsensitiveCompare(clean) == .orderedSame {
+            context.delete(row)
+        }
+        if let row = rows.first(where: { $0.id == id }) {
+            row.name = clean
+            row.payload = data
+            row.updatedAt = now
+        } else {
+            context.insert(SDBoardPreset(id: id, name: clean, updatedAt: now, payload: data))
+        }
+        try context.save()
+        return stored
+    }
+
+    public func renameBoard(id: UUID, to name: String, now: Date = Date()) throws {
+        let clean = BoardPresets.cleanName(name)
+        guard !clean.isEmpty else { throw BoardError.emptyName }
+        let boards = boardPresets()
+        guard let board = boards.first(where: { $0.id == id }) else { throw BoardError.notFound }
+        if boards.contains(where: { $0.id != id && ($0.name ?? "").caseInsensitiveCompare(clean) == .orderedSame }) {
+            throw BoardError.nameInUse
+        }
+        try saveBoard(board, name: clean, now: now)
+    }
+
+    /// A copy under a new id named "Name copy", "Name copy 2", and so on.
+    @discardableResult
+    public func duplicateBoard(id: UUID, now: Date = Date()) throws -> BoardLayout {
+        let boards = boardPresets()
+        guard let board = boards.first(where: { $0.id == id }) else { throw BoardError.notFound }
+        let copy = BoardPresets.duplicate(board, among: boards.compactMap(\.name), now: now)
+        return try saveBoard(copy, name: copy.name ?? "Board", now: now)
+    }
+
+    public func deleteBoard(id: UUID) throws {
+        let rows = try context.fetch(FetchDescriptor<SDBoardPreset>(predicate: #Predicate { $0.id == id }))
+        rows.forEach(context.delete)
+        try context.save()
+    }
+
     public func deleteAll() {
+        try? context.delete(model: SDBoardPreset.self)
         try? context.delete(model: SDSavedForce.self)
         try? context.delete(model: SDUserCard.self)
         try? context.save()
