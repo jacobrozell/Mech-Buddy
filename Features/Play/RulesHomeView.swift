@@ -128,6 +128,11 @@ struct RulesHomeView: View {
                 }
             }
         }
+        if query.isEmpty {
+            Section("History") {
+                LoreEntryRow()
+            }
+        }
         if let disclaimer, query.isEmpty {
             Section {
                 Text(disclaimer)

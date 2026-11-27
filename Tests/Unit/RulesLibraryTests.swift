@@ -149,3 +149,23 @@ struct RulesGameChoiceTests {
 }
 
 private final class RulesBundleToken {}
+
+@Suite("Lore content")
+struct LoreContentTests {
+    @Test("The bundled lore file decodes and has eras with sub-eras")
+    func decodes() throws {
+        let lore = try BundleContentCatalogRepository(bundle: Bundle(for: RulesBundleToken.self)).lore()
+        #expect(!lore.summary.onParagraph.isEmpty)
+        #expect(lore.eras.count >= 7)
+        #expect(lore.eras.allSatisfy { !$0.subEras.isEmpty && !$0.yearLabel.isEmpty })
+        #expect(Set(lore.eras.map(\.id)).count == lore.eras.count)
+    }
+
+    @Test("Timeline is sorted by start year, undated events last")
+    func timelineOrder() throws {
+        let lore = try BundleContentCatalogRepository(bundle: Bundle(for: RulesBundleToken.self)).lore()
+        let years = lore.timeline.compactMap(\.startYear)
+        #expect(years == years.sorted())
+        #expect(lore.timeline.count == lore.data.events.count)
+    }
+}

@@ -37,6 +37,8 @@ public protocol ContentCatalogRepository: Sendable {
     func rulesLibrary() throws -> RulesLibrary
     func gettingStarted() throws -> GettingStartedDTO
     func scenarios() throws -> ScenariosCatalogDTO
+    /// General BattleTech history for the Lore section (reached from the Rules tab).
+    func lore() throws -> LoreDocumentDTO
 }
 
 public extension ContentCatalogRepository {
@@ -123,6 +125,10 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
 
     public func scenarios() throws -> ScenariosCatalogDTO {
         try load("as-scenarios", subdirectory: "Content/AlphaStrike", as: ScenariosCatalogDTO.self)
+    }
+
+    public func lore() throws -> LoreDocumentDTO {
+        try load("battletech-lore", subdirectory: "Content/Lore", as: LoreDocumentDTO.self)
     }
 
     private func load<T: Decodable>(
