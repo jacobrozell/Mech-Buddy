@@ -45,10 +45,10 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 
 | Screen | How to reach | Status | Notes |
 |---|---|---|---|
-| PlayModeHomeView / PlayHomeView | Play tab | ⬜ | Rows for Saved forces, Boards and Last setup |
-| PlaySidesStep, team presets (PM6/7) | Setup → Sides | ⬜ | |
-| PlaySizeStep | Setup → Size | ⬜ | |
-| PlayForcesStep | Setup → Forces | ⬜ | Save/Load force buttons |
+| PlayModeHomeView / PlayHomeView | Play tab | ⚠️ | 2026-11-27: the hero card fills the screen; the Saved forces and Boards rows sit below the fold. Consider a compact hero in landscape. `play-home.png` |
+| PlaySidesStep, team presets (PM6/7) | Setup → Sides | ⚠️ | 2026-11-27: only 1½ of the 7 presets are visible above Continue. Use a 2-column preset grid in landscape. `setup-sides.png` |
+| PlaySizeStep | Setup → Size | ✅ | 2026-11-27: fits; the presets are just above the Continue bar. `setup-size.png` |
+| PlayForcesStep | Setup → Forces | ⚠️ | 2026-11-27: Add 'Mech sits half under the Continue bar until you scroll. Save/Load force buttons are below the fold. `setup-forces.png` |
 | PlayUnitPickerSheet | Add a unit | ⬜ | Search field and keyboard |
 | PlayCardEntrySheet (PM9) | Add your own card | ⬜ | Keyboard covers the lower fields? |
 | PlaySavedForcesSheet (PM9) | Load a saved force | ⬜ | |
@@ -63,11 +63,12 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 
 | Screen | How to reach | Status | Notes |
 |---|---|---|---|
-| PlayBoardsView (boards list) | Play home → Boards | ⬜ | |
+| PlayBoardsView (boards list) | Play home → Boards | ⚠️ | 2026-11-27: layout fine. Copy: the size reads "3′ × 22″" (mixed units); use 36″ × 22″ or 3′ × 1′10″. `boards-list.png` |
 | BoardEditorView: canvas, palette | Build a board | ⬜ | PM12 has a landscape right column; verify it |
 | BoardInspectorView | Select a piece | ⬜ | |
 | BoardPieceListView (list editor) | Editor → list | ⬜ | |
 | BoardSaveSheet | Save board | ⬜ | Keyboard |
+| Starter board preview | Boards → a starter | ⚠️ | 2026-11-27: the board is fitted to width, so its bottom is cut off in landscape; fit to both width and height. `board-starter-preview.png` |
 | Import refusal messages | Import a bad `.mechboard` | ⬜ | |
 
 ## Learn, rules, lore, force, onboarding, settings
