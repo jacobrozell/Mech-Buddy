@@ -87,6 +87,9 @@ public struct ForcePick: Codable, Sendable, Equatable, Identifiable {
     /// Which player on a team side moves it (§ 5.3), as a 0-based index into the side's players. Nil = anyone.
     /// An index, not a name, so renaming a player in setup keeps the tag.
     public var controllerIndex: Int?
+    /// MechWarrior card **[HOUSE]**: the pilot's name. Set on at most one pick per side while
+    /// `PlayRules.mechWarriorCards` is on. The card's skill is the pick's `skill`. Nil = no card.
+    public var pilotName: String?
 
     public init(
         id: UUID = UUID(),
@@ -96,8 +99,10 @@ public struct ForcePick: Codable, Sendable, Equatable, Identifiable {
         size: Int,
         skill: Int,
         isClan: Bool,
-        controllerIndex: Int? = nil
+        controllerIndex: Int? = nil,
+        pilotName: String? = nil
     ) {
+        self.pilotName = pilotName
         self.controllerIndex = controllerIndex
         self.id = id
         self.cardId = cardId
@@ -257,7 +262,7 @@ public struct Battlefield: Codable, Sendable, Equatable {
 /// Optional rules for a Play game (§ 5.5). Defaults per D16 and D13.
 public struct PlayRules: Codable, Sendable, Equatable {
     private enum CodingKeys: String, CodingKey {
-        case overheat, physicalAttacks, forcedWithdrawal, startOnTable, battlefieldSupport, buildings, formation
+        case overheat, physicalAttacks, forcedWithdrawal, startOnTable, battlefieldSupport, buildings, formation, mechWarriorCards
     }
 
     public init(from decoder: Decoder) throws {
@@ -269,6 +274,7 @@ public struct PlayRules: Codable, Sendable, Equatable {
         battlefieldSupport = try c.decodeIfPresent(Int.self, forKey: .battlefieldSupport)
         buildings = try c.decodeIfPresent([BuildingState].self, forKey: .buildings) ?? []
         formation = try c.decodeIfPresent(FormationKind.self, forKey: .formation)
+        mechWarriorCards = try c.decodeIfPresent(Bool.self, forKey: .mechWarriorCards) ?? false
     }
 
     public var overheat: Bool
@@ -282,12 +288,16 @@ public struct PlayRules: Codable, Sendable, Equatable {
     public var buildings: [BuildingState] = []
     /// One Formation type given to every side with at least 3 'Mechs (pp. 32, 37). Nil = off.
     public var formation: FormationKind?
+    /// MechWarrior cards **[HOUSE]** (p. 48 variation): each side may give one 'Mech a named pilot card (`ForcePick.pilotName`).
+    public var mechWarriorCards: Bool = false
 
     /// 1D6: 1-2 = 0, 3-4 = 5, 5-6 = 12 BSPs (p. 12).
     public static func supportPoints(forRoll roll: Int) -> Int { roll <= 2 ? 0 : (roll <= 4 ? 5 : 12) }
 
     public init(overheat: Bool = true, physicalAttacks: Bool = true, forcedWithdrawal: Bool = true, startOnTable: Bool = true,
-                battlefieldSupport: Int? = nil, buildings: [BuildingState] = [], formation: FormationKind? = nil) {
+                battlefieldSupport: Int? = nil, buildings: [BuildingState] = [], formation: FormationKind? = nil,
+                mechWarriorCards: Bool = false) {
+        self.mechWarriorCards = mechWarriorCards
         self.battlefieldSupport = battlefieldSupport
         self.buildings = buildings
         self.formation = formation
@@ -325,6 +335,9 @@ public struct PlaySetup: Codable, Sendable, Equatable {
     public var battlefield: Battlefield
     /// An `ObjectiveId` raw value (PM8); nil = last side standing. Read and set it through `objectiveId`.
     public var objective: String?
+    /// Per-side objectives (PM11): `SideId.rawValue` to `ObjectiveId` raw value. Empty = every side plays `objective`.
+    /// Use `objectiveId(for:)` (Objective.swift).
+    public var sideObjectives: [String: String] = [:]
     /// Nil = no limit.
     public var turnLimit: Int?
     public var rules: PlayRules
@@ -359,7 +372,7 @@ public struct PlaySetup: Codable, Sendable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case sides, budget, allowImprovedSkills, minimumSkill, pool, battlefield
-        case objective, turnLimit, rules, diceMode, forces
+        case objective, turnLimit, rules, diceMode, forces, sideObjectives
     }
 
     public init(from decoder: Decoder) throws {
@@ -371,6 +384,7 @@ public struct PlaySetup: Codable, Sendable, Equatable {
         pool = try c.decodeIfPresent(UnitPool.self, forKey: .pool) ?? .owned
         battlefield = try c.decodeIfPresent(Battlefield.self, forKey: .battlefield) ?? Battlefield()
         objective = try c.decodeIfPresent(String.self, forKey: .objective)
+        sideObjectives = try c.decodeIfPresent([String: String].self, forKey: .sideObjectives) ?? [:]
         turnLimit = try c.decodeIfPresent(Int.self, forKey: .turnLimit)
         rules = try c.decodeIfPresent(PlayRules.self, forKey: .rules) ?? PlayRules()
         diceMode = try c.decodeIfPresent(DiceMode.self, forKey: .diceMode) ?? .manual

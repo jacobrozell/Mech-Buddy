@@ -187,6 +187,8 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var downedBy: SideId?
     /// The side that banked this 'Mech's points (Destroy the Enemy, Breakthrough). Set once, so it scores once.
     public var scoredFor: SideId?
+    /// MechWarrior card **[HOUSE]** (PM11): the named pilot on this 'Mech. Its `skill` is the card's. Nil = no card.
+    public var pilotName: String?
 
     public var pendingCritical: Bool {
         get { criticalsOwed > 0 }
@@ -516,7 +518,7 @@ extension MatchUnitState {
         case pendingCritical, criticalsOwed, overheatThisTurn, mini, incomingHeatThisTurn
         case rearShot, rearFireReduction
         case leftTable, withdrawalAnnounced, minimalDamage, inWater
-        case controller, isClan, lastDamagedBy, critCausedBy, downedBy, scoredFor
+        case controller, isClan, lastDamagedBy, critCausedBy, downedBy, scoredFor, pilotName
     }
 
     public init(from decoder: Decoder) throws {
@@ -568,6 +570,7 @@ extension MatchUnitState {
         critCausedBy = try container.decodeIfPresent(SideId.self, forKey: .critCausedBy)
         downedBy = try container.decodeIfPresent(SideId.self, forKey: .downedBy)
         scoredFor = try container.decodeIfPresent(SideId.self, forKey: .scoredFor)
+        pilotName = try container.decodeIfPresent(String.self, forKey: .pilotName)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -615,5 +618,6 @@ extension MatchUnitState {
         try container.encodeIfPresent(critCausedBy, forKey: .critCausedBy)
         try container.encodeIfPresent(downedBy, forKey: .downedBy)
         try container.encodeIfPresent(scoredFor, forKey: .scoredFor)
+        try container.encodeIfPresent(pilotName, forKey: .pilotName)
     }
 }

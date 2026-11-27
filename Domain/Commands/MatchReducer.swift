@@ -133,7 +133,10 @@ public enum MatchReducer {
                 forcesLoaded: true
             )
 
-        case .startPlay(let setup, let units):
+        case .startPlay(let rawSetup, let units):
+            // Find the Target without buildings, or per-side objectives without one for every side, play as asked
+            // for in setup only when the table can support them (PM11).
+            let setup = rawSetup.sanitizedObjectives()
             next = MatchSession(
                 modeId: .alphaStrike,
                 scenarioId: nil,
@@ -158,8 +161,20 @@ public enum MatchReducer {
             if let kind = setup.rules.formation { box.formations = PlayRules.makeFormations(kind, units: units) }
             if !box.support.isEmpty || !box.buildings.isEmpty || !box.formations.isEmpty { next.boxRules = box }
             if let objective = next.objective {
-                next.objectiveState = ObjectiveState.make(objective: objective, sides: setup.sides.map(\.id))
+                next.objectiveState = ObjectiveState.make(
+                    objectives: Dictionary(uniqueKeysWithValues: setup.sides.map { ($0.id, objective) }),
+                    sides: setup.sides.map(\.id), buildings: setup.rules.buildings, seed: next.id, mixed: false)
                 next.appendLog("Objective: \(objective.title) (\(objective.page)). First to \(ObjectiveRules.format(objective.baseThreshold)) points wins")
+            } else if next.hasPerSideObjectives {
+                var chosen: [SideId: ObjectiveId] = [:]
+                for side in setup.sides { chosen[side.id] = setup.objectiveId(for: side.id) }
+                next.objectiveState = ObjectiveState.make(
+                    objectives: chosen, sides: setup.sides.map(\.id), buildings: setup.rules.buildings, seed: next.id,
+                    mixed: Set(chosen.values).count > 1)
+                for side in setup.sides {
+                    guard let objective = chosen[side.id] else { continue }
+                    next.appendLog("\(next.displayName(of: side.id)) objective: \(objective.title) (\(objective.page)). First to \(ObjectiveRules.format(objective.baseThreshold)) points wins")
+                }
             }
             next.appendLog("New game: \(setup.formatName), \(setup.budget.summary)")
 
@@ -693,11 +708,12 @@ public enum MatchReducer {
     /// Destroy the Enemy scores itself: Size, or 1.5 × Size for a Clan side against the Inner Sphere (§ 7.1),
     /// for each 'Mech first crippled or destroyed by that side's attack (§ 6.6). Once per 'Mech.
     private static func bankDestroyTheEnemy(_ session: inout MatchSession) {
-        guard session.objective == .destroyTheEnemy else { return }
+        guard session.sideIds.contains(where: { session.objective(for: $0) == .destroyTheEnemy }) else { return }
         var gained: [SideId: Double] = [:]
         for index in session.units.indices {
             let unit = session.units[index]
-            guard let scorer = unit.downedBy, unit.scoredFor == nil else { continue }
+            // Only a side that plays Destroy the Enemy banks kills, and the 'Mech stays unbanked for others.
+            guard let scorer = unit.downedBy, unit.scoredFor == nil, session.objective(for: scorer) == .destroyTheEnemy else { continue }
             let points = Double(unit.sz) * ObjectiveRules.clanMultiplier(for: scorer, objective: .destroyTheEnemy, in: session)
             gained[scorer, default: 0] += points
             session.units[index].scoredFor = scorer
@@ -710,7 +726,7 @@ public enum MatchReducer {
         guard session.status == .active, session.phase == .end else {
             throw MatchDomainError.illegalPhaseTransition("Score the objective in the Clean up step.")
         }
-        guard let objective = session.objective, ObjectiveRules.asksQuestions(objective, turn: session.turn) else {
+        guard let objective = session.objective(for: side), ObjectiveRules.asksQuestions(objective, turn: session.turn) else {
             throw MatchDomainError.illegalPhaseTransition("This game has nothing to score by hand.")
         }
         guard session.sidesInGame.contains(side) else {
@@ -719,7 +735,7 @@ public enum MatchReducer {
         guard !ObjectiveRules.hasScored(side, in: session) else {
             throw MatchDomainError.illegalPhaseTransition("\(session.displayName(of: side)) has already scored this turn.")
         }
-        var state = session.objectiveState ?? ObjectiveState.make(objective: objective, sides: session.sideIds)
+        var state = session.objectiveState ?? ObjectiveState()
         if state.scoredTurn != session.turn {
             state.scoredTurn = session.turn
             state.scoredSides = []
@@ -738,7 +754,7 @@ public enum MatchReducer {
             // Returns first: a ’Mech scores for a token it carried into this End Phase, then others may pick up.
             for entry in entries where entry.kind == .returned {
                 let index = try activeUnit(entry.unitId)
-                guard let tokenIndex = state.tokens.firstIndex(where: { $0.carrier == session.units[index].id }) else {
+                guard let tokenIndex = state.tokens.firstIndex(where: { ObjectiveRules.isRaid($0, in: session) && $0.carrier == session.units[index].id }) else {
                     throw MatchDomainError.illegalPhaseTransition("\(session.units[index].name) isn’t carrying a token.")
                 }
                 state.tokens[tokenIndex].carrier = nil
@@ -749,10 +765,12 @@ public enum MatchReducer {
             for entry in entries where entry.kind == .pickedUp {
                 let index = try activeUnit(entry.unitId)
                 let unitId = session.units[index].id
-                guard !state.tokens.contains(where: { $0.carrier == unitId }) else {
+                guard !state.tokens.contains(where: { ObjectiveRules.isRaid($0, in: session) && $0.carrier == unitId }) else {
                     throw MatchDomainError.illegalPhaseTransition("\(session.units[index].name) already carries a token.")
                 }
-                guard let tokenIndex = state.tokens.firstIndex(where: { $0.owner != side && $0.carrier == nil && !$0.returned }) else {
+                guard let tokenIndex = state.tokens.firstIndex(where: {
+                    ObjectiveRules.isRaid($0, in: session) && $0.owner != side && $0.carrier == nil && !$0.returned
+                }) else {
                     throw MatchDomainError.illegalPhaseTransition("There is no enemy token left to pick up.")
                 }
                 state.tokens[tokenIndex].carrier = unitId
@@ -767,7 +785,7 @@ public enum MatchReducer {
         case .holdTheFort:
             let tokenIds = Set(entries.filter { $0.kind == .guarded }.compactMap(\.tokenId))
             for id in tokenIds {
-                guard state.tokens.contains(where: { $0.id == id && $0.owner == side }) else {
+                guard state.tokens.contains(where: { $0.id == id && $0.owner == side && ($0.objective ?? session.objective) == .holdTheFort }) else {
                     throw MatchDomainError.illegalPhaseTransition("That isn’t this side’s token.")
                 }
             }
@@ -788,7 +806,25 @@ public enum MatchReducer {
                 session.units[index].scoredFor = side
                 notes.append("\(session.units[index].name) broke through (\(ObjectiveRules.format(earned)))")
             }
-        case .destroyTheEnemy, .findTheTarget:
+        case .findTheTarget:
+            // Each building is searched once, in the order sides score this turn; the first side to search a
+            // target building finds it **[HOUSE]**. A search that finds nothing says so, not where the targets are.
+            let known = Set((session.boxRules?.buildings ?? []).map(\.id))
+            for id in Set(entries.filter { $0.kind == .searched }.compactMap(\.tokenId)).sorted() {
+                guard known.contains(id) else {
+                    throw MatchDomainError.illegalPhaseTransition("That building isn’t on the table.")
+                }
+                guard state.foundTargets[id] == nil else { continue }
+                let name = session.boxRules?.building(id)?.name ?? id
+                if state.targetBuildingIds.contains(id) {
+                    state.foundTargets[id] = side
+                    points += ObjectiveId.pointsPerTarget
+                    notes.append("found a target at \(name)")
+                } else {
+                    notes.append("\(name): nothing")
+                }
+            }
+        case .destroyTheEnemy:
             break
         }
         state.scoredSides.append(side)

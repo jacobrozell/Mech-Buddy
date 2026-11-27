@@ -201,6 +201,9 @@ struct PlayForcesStep: View {
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                 }
+                if setup.rules.mechWarriorCards {
+                    cardControls(pick)
+                }
                 if dependencies.cardLibrary.face(id: pick.cardId)?.isUserCard == true {
                     Label("Your numbers", systemImage: "square.and.pencil")
                         .font(TMFont.detail)
@@ -242,6 +245,43 @@ struct PlayForcesStep: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString)")
+    }
+
+    /// MechWarrior card (PM11 **[HOUSE]**): one named pilot a side. Its skill is the stepper above.
+    @ViewBuilder
+    private func cardControls(_ pick: ForcePick) -> some View {
+        let hasCard = pick.pilotName != nil
+        Toggle(isOn: Binding(
+            get: { hasCard },
+            set: { on in
+                PlayCards.setCard(on ? "" : nil, on: pick.id, side: side, in: &setup)
+                if !on { clampSkill(pick.id) }
+            }
+        )) {
+            Text("MechWarrior card").font(TMFont.body)
+        }
+        .tint(TMColor.signal)
+        .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString).card")
+        if hasCard {
+            TextField("Pilot name", text: Binding(
+                get: { pick.pilotName ?? "" },
+                set: { PlayCards.setCard($0, on: pick.id, side: side, in: &setup) }
+            ))
+            .textInputAutocapitalization(.words)
+            .autocorrectionDisabled()
+            .frame(minHeight: 44)
+            .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString).pilot")
+            Text("Card costs +\(PlayCards.cost(pick)) PV. The other side improves a skill by \(PlayCards.improvement(pick)) in return (p. 48).")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func clampSkill(_ id: UUID) {
+        guard let index = setup.forces[side]?.firstIndex(where: { $0.id == id }), let pick = setup.forces[side]?[index] else { return }
+        let range = PlayUnits.skillRange(for: pick, setup: setup)
+        setup.forces[side]?[index].skill = min(max(pick.skill, range.lowerBound), range.upperBound)
     }
 
     private var players: [String] { setup.sides.first { $0.id == side }?.players ?? [] }
@@ -592,7 +632,10 @@ struct PlayReviewStep: View {
                 .font(TMFont.stat)
                 .monospacedDigit()
                 .foregroundStyle(check.isOver ? TMColor.warning : .primary)
-            Text(setup.force(side.id).map { "\($0.name) (\($0.skill))" }.joined(separator: ", "))
+            Text(setup.force(side.id).map { pick in
+                    let pilot = setup.rules.mechWarriorCards ? pick.pilotName.flatMap { PlayCards.trimmedPilot($0) ?? "unnamed" } : nil
+                    return "\(pick.name) (\(pick.skill)\(pilot.map { ", \($0)" } ?? ""))"
+                }.joined(separator: ", "))
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -625,13 +668,18 @@ struct PlayReviewStep: View {
 
     private var rulesLine: String {
         var on: [String] = [setup.usesHouseRules ? "Last side standing [HOUSE]" : "Last side standing"]
-        if let objective = setup.objectiveId, objective.isBuilt {
+        if setup.perSideObjectives {
+            on = [setup.sides.compactMap { side in
+                setup.objectiveId(for: side.id).map { "\(side.id.letter): \($0.title) to \(ObjectiveRules.format($0.baseThreshold))" }
+            }.joined(separator: ", ") + " (own objectives [HOUSE])"]
+        } else if let objective = setup.objectiveId, objective.isBuilt {
             on = ["\(objective.title) to \(ObjectiveRules.format(objective.baseThreshold)) (\(objective.page))" + (setup.usesHouseRules ? " [HOUSE]" : "")]
         }
         on.append(setup.turnLimit.map { "\($0)-turn limit" } ?? "No turn limit")
         if setup.rules.overheat { on.append("Overheat") }
         if setup.rules.physicalAttacks { on.append("Punches and kicks") }
         if setup.rules.forcedWithdrawal { on.append("Forced Withdrawal") }
+        if setup.rules.mechWarriorCards { on.append("MechWarrior cards [HOUSE]") }
         on.append(setup.rules.startOnTable ? "Start on the table" : "Enter on Turn 1")
         on.append(setup.diceMode == .auto ? "App rolls" : "Real dice")
         return on.joined(separator: " · ")
@@ -653,6 +701,10 @@ struct PlayReviewStep: View {
             list.append("\(side.name) is \(setup.budgetCheck(side.id).text).")
         }
         let pv: Int? = { if case .pointValue(let value) = setup.budget { return value } else { return nil } }()
+        list.append(contentsOf: PlayCards.warnings(setup: setup))
+        if setup.objectiveId == .findTheTarget || setup.sideObjectives.values.contains(ObjectiveId.findTheTarget.rawValue), !setup.hasBuildingsForTargets {
+            list.append("Find the Target needs \(ObjectiveId.minimumBuildings) buildings. Without them it plays as last side standing.")
+        }
         if let advice = setup.battlefield.advice(sides: setup.sides.count, budgetPV: pv) {
             list.append(advice)
         }

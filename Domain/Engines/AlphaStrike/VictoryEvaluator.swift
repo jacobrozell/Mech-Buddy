@@ -55,7 +55,7 @@ public enum VictoryEvaluator {
         }
         // Play: at the turn limit the objective's points decide, then PV still on the table; level sides tie (§ 7.3).
         if let limit = session.play?.turnLimit, session.turn >= limit {
-            return session.objective != nil ? pointsLimitOutcome(session: session) : pvLimitOutcome(session: session)
+            return session.hasObjective ? pointsLimitOutcome(session: session) : pvLimitOutcome(session: session)
         }
         return nil
     }
@@ -76,9 +76,10 @@ public enum VictoryEvaluator {
     /// Objective: any side at or over its threshold wins; the higher score if several reach it together; equal
     /// scores tie **[HOUSE]** (§ 7.2). Nil when nobody has reached it.
     static func objectiveOutcome(in session: MatchSession) -> MatchOutcome? {
-        guard let objective = session.objective else { return nil }
-        let reached = session.sideIds.filter {
-            session.points(of: $0) >= ObjectiveRules.threshold(for: $0, objective: objective, in: session)
+        guard session.hasObjective else { return nil }
+        let reached = session.sideIds.filter { side in
+            guard let objective = session.objective(for: side) else { return false }
+            return session.points(of: side) >= ObjectiveRules.threshold(for: side, objective: objective, in: session)
         }
         guard !reached.isEmpty else { return nil }
         return leaders(among: reached, in: session, tieBreakPV: false)
@@ -124,7 +125,7 @@ public enum VictoryEvaluator {
                 let lt = session.side(lhs)?.outOnTurn ?? 0, rt = session.side(rhs)?.outOnTurn ?? 0
                 if lt != rt { return lt > rt }
             }
-            if session.objective != nil {
+            if session.hasObjective {
                 let lv = session.points(of: lhs), rv = session.points(of: rhs)
                 if lv != rv { return lv > rv }
             }

@@ -15,6 +15,7 @@ public enum PlayUnits {
                 var unit = GuidedScenarioFactory.mapUnit(dto, side: side)
                 unit.controller = setup.controllerName(of: pick, side: side)
                 unit.isClan = pick.isClan
+                if setup.rules.mechWarriorCards, pick.pilotName != nil { unit.pilotName = PlayCards.trimmedPilot(pick.pilotName) ?? "Unnamed pilot" }
                 units.append(unit)
             }
         }
@@ -40,12 +41,15 @@ public enum PlayUnits {
         next.id = pick.id
         next.skill = pick.skill
         next.controllerIndex = pick.controllerIndex
+        next.pilotName = pick.pilotName
         return next
     }
 
     /// Skills offered for a pick (§ 5.2, D7): the card skill down to the setup's best skill when
     /// better skills are allowed. Worse than 4 is never offered.
     public static func skillRange(for pick: ForcePick, setup: PlaySetup) -> ClosedRange<Int> {
+        // A MechWarrior card replaces the 'Mech's skill, so it isn't limited to the setup's best skill (PM11 [HOUSE]).
+        if setup.rules.mechWarriorCards, pick.pilotName != nil { return PlayCards.skillRange(for: pick) }
         let card = ForcePick.defaultSkill(isClan: pick.isClan)
         guard setup.allowImprovedSkills else { return card...card }
         return min(setup.minimumSkill, card)...4
@@ -67,6 +71,73 @@ public enum PlayUnits {
     public static func estimatedMinutes(units: Int) -> Int {
         let raw = 30 + 12 * max(units, 2)
         return Int((Double(raw) / 15).rounded()) * 15
+    }
+}
+
+/// MechWarrior cards in Play (PM11, **[HOUSE]**): a named pilot on one 'Mech per side. The card replaces that 'Mech's
+/// skill (the pick's own skill, no longer limited to the setup's best skill); the p. 48 variation asks for cards of
+/// equal cost on both sides, and the opponent improves a skill by the same amount.
+public enum PlayCards {
+    /// Best skill a card can give. Skill 0 is the Improved Skill table's best row (p. 35).
+    public static let bestSkill = 0
+
+    public static func trimmedPilot(_ name: String?) -> String? {
+        guard let text = name?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return nil }
+        return text
+    }
+
+    /// Skills a carded 'Mech may have: the best table skill up to its card skill.
+    public static func skillRange(for pick: ForcePick) -> ClosedRange<Int> {
+        bestSkill...ForcePick.defaultSkill(isClan: pick.isClan)
+    }
+
+    /// The pick on this side that holds a card, if any.
+    public static func card(of side: SideId, in setup: PlaySetup) -> ForcePick? {
+        guard setup.rules.mechWarriorCards else { return nil }
+        return setup.force(side).first { $0.pilotName != nil }
+    }
+
+    /// PV the card adds over the same 'Mech at its card skill.
+    public static func cost(_ pick: ForcePick) -> Int {
+        pick.adjustedPV - AlphaStrikePointValue.adjusted(base: pick.basePV, skill: ForcePick.defaultSkill(isClan: pick.isClan))
+    }
+
+    /// Skill steps the card improves on the card skill: what the opponent improves by in return.
+    public static func improvement(_ pick: ForcePick) -> Int {
+        ForcePick.defaultSkill(isClan: pick.isClan) - pick.skill
+    }
+
+    /// Gives this pick the card and takes it off the side's other picks (one a side). A name of nothing clears it.
+    public static func setCard(_ name: String?, on pickId: UUID, side: SideId, in setup: inout PlaySetup) {
+        guard var picks = setup.forces[side] else { return }
+        let pilot = name == nil ? nil : (name ?? "")
+        for index in picks.indices {
+            if picks[index].id == pickId {
+                picks[index].pilotName = pilot
+            } else if pilot != nil {
+                picks[index].pilotName = nil
+            }
+        }
+        setup.forces[side] = picks
+    }
+
+    /// Review warnings (§ 5.6): sides with a card against sides without, and cards of unequal cost.
+    public static func warnings(setup: PlaySetup) -> [String] {
+        guard setup.rules.mechWarriorCards else { return [] }
+        var lines: [String] = []
+        let carded = setup.sides.compactMap { side in card(of: side.id, in: setup).map { (side, $0) } }
+        if carded.isEmpty {
+            return ["MechWarrior cards are on but no side has one yet."]
+        }
+        let missing = setup.sides.filter { side in card(of: side.id, in: setup) == nil }
+        if !missing.isEmpty {
+            lines.append("MechWarrior cards: \(missing.map(\.name).joined(separator: ", ")) has none. The book wants one card per side (p. 48).")
+        }
+        if Set(carded.map { cost($0.1) }).count > 1 {
+            let costs = carded.map { "\($0.0.name) +\(cost($0.1)) PV" }.joined(separator: ", ")
+            lines.append("MechWarrior cards cost different amounts (\(costs)). The book wants equal cost (p. 48).")
+        }
+        return lines
     }
 }
 
@@ -216,6 +287,14 @@ public enum PlayLayout {
 
     /// "How you win" on the briefing (§ 7.1). Last side standing without an objective.
     public static func winningSummary(for setup: PlaySetup) -> String {
+        if setup.perSideObjectives {
+            let parts = setup.sides.compactMap { side in
+                setup.objectiveId(for: side.id).map { "\(side.name.isEmpty ? side.id.displayName : side.name): \($0.title) to \(ObjectiveRules.format($0.baseThreshold))" }
+            }
+            var line = "[HOUSE] Each side has its own objective (p. 7 optional rule). " + parts.joined(separator: ". ") + "."
+            if let limit = setup.turnLimit { line += " At turn \(limit), most points wins, then most PV [HOUSE]." }
+            return line
+        }
         guard let objective = setup.objectiveId, objective.isBuilt else { return "Destroy every enemy ’Mech" }
         var line = "\(objective.title): \(objective.summary) First to \(ObjectiveRules.format(objective.baseThreshold)) points wins (\(objective.page))."
         if let limit = setup.turnLimit { line += " At turn \(limit), most points wins, then most PV [HOUSE]." }
@@ -244,7 +323,13 @@ public enum PlayLayout {
         } else {
             steps.append("Each side picks 8 pieces of terrain and places them in turn: 4 toward the enemy, 2 toward its own edge, 2 near the centre line")
         }
-        if let objective = setup.objectiveId, objective.isBuilt, let placing = objective.setupStep {
+        if setup.perSideObjectives {
+            for side in setup.sides {
+                if let objective = setup.objectiveId(for: side.id), let placing = objective.setupStep {
+                    steps.append("\(side.name.isEmpty ? side.id.displayName : side.name) objective (\(objective.page)): " + placing)
+                }
+            }
+        } else if let objective = setup.objectiveId, objective.isBuilt, let placing = objective.setupStep {
             steps.append("Objective (\(objective.page)): " + placing)
         }
         if setup.rules.startOnTable {

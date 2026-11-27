@@ -386,8 +386,8 @@ struct BattleFlowView: View {
                         ? session.activeSide : nil,
                     activeSideName: session.displayName(of: session.activeSide)
                 )
-                if let objective = session.objective {
-                    ObjectiveVPStrip(session: session, objective: objective)
+                if session.hasObjective {
+                    ObjectiveVPStrip(session: session, objective: session.objective)
                 }
             }
         }

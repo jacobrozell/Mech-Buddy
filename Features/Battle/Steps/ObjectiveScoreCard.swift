@@ -6,18 +6,66 @@ import MechBuddyDomain
 /// the app works it out from who hit whom.
 struct ObjectiveScoreCard: View {
     var session: MatchSession
-    var objective: ObjectiveId
+    /// The one objective every side plays; nil when each side rolled its own (PM11), then `session.objective(for:)`.
+    var objective: ObjectiveId?
     @Binding var answers: [SideId: [ObjectiveScoreEntry]]
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
-            Eyebrow("Score: \(objective.title)") {
-                Text(objective.page)
+            Eyebrow(objective.map { "Score: \($0.title)" } ?? "Score the objectives") {
+                Text(objective?.page ?? "p. 7")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
             }
             TMCard(edgeColor: TMColor.signal) {
                 VStack(alignment: .leading, spacing: TMSpace.lg) {
+                    if let objective {
+                        sharedBody(objective)
+                    } else {
+                        perSideBody
+                    }
+                }
+            }
+        }
+        // The battle screen's identifier would replace one set on the card, so the id sits on a hidden marker inside a
+        // container, as the phase segments do (BattleStepStrip).
+        .background {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .accessibilityElement()
+                .accessibilityLabel("Score the objective")
+                .accessibilityIdentifier("as.battle.objective")
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    /// Each side answers its own objective's question (PM11). Destroy the Enemy sides need no answer.
+    @ViewBuilder
+    private var perSideBody: some View {
+        let waiting = ObjectiveRules.sidesStillToScore(in: session)
+        Text("[HOUSE] Each side rolled its own objective. Answer for each side below.")
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        ForEach(waiting, id: \.self) { side in
+            sideSection(side, objective: session.objective(for: side))
+        }
+        if waiting.isEmpty {
+            Text("Nothing to score by hand this turn.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+        }
+        if session.sideIds.contains(where: { session.objective(for: $0) == .destroyTheEnemy }) {
+            Text("Destroy the Enemy sides score from who hit whom, so they have nothing to enter.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder
+    private func sharedBody(_ objective: ObjectiveId) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.lg) {
                     if objective == .holdTheFort, !ObjectiveRules.asksQuestions(objective, turn: session.turn) {
                         Text("Scoring starts on Turn 3. Until then, guard your tokens (p. 7).")
                             .font(TMFont.detail)
@@ -29,7 +77,7 @@ struct ObjectiveScoreCard: View {
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                         ForEach(ObjectiveRules.sidesStillToScore(in: session), id: \.self) { side in
-                            sideSection(side)
+                            sideSection(side, objective: objective)
                         }
                         if ObjectiveRules.sidesStillToScore(in: session).isEmpty {
                             Text("Nothing to score this turn.")
@@ -48,19 +96,7 @@ struct ObjectiveScoreCard: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }
-                }
-            }
         }
-        // The battle screen's identifier would replace one set on the card, so the id sits on a hidden marker inside a
-        // container, as the phase segments do (BattleStepStrip).
-        .background {
-            Color.clear
-                .frame(width: 1, height: 1)
-                .accessibilityElement()
-                .accessibilityLabel("Score the objective")
-                .accessibilityIdentifier("as.battle.objective")
-        }
-        .accessibilityElement(children: .contain)
     }
 
     // MARK: Sections
@@ -79,21 +115,36 @@ struct ObjectiveScoreCard: View {
         session.units.filter { $0.side == side }
     }
 
-    private func sideSection(_ side: SideId) -> some View {
+    private func sideSection(_ side: SideId, objective: ObjectiveId?) -> some View {
         let own = entries(side)
-        let preview = ObjectiveRules.previewPoints(objective, side: side, entries: own, in: session)
+        let preview = objective.map { ObjectiveRules.previewPoints($0, side: side, entries: own, in: session) } ?? 0
+        let previewText = objective == .findTheTarget
+            ? (own.isEmpty ? "None" : "\(own.count) searched")
+            : (own.isEmpty ? "No one" : "+\(ObjectiveRules.format(preview))")
         return VStack(alignment: .leading, spacing: TMSpace.sm) {
             HStack(spacing: TMSpace.sm) {
                 SideBadge(side: side)
                 Text(session.displayName(of: side))
                     .font(TMFont.cardTitle)
                 Spacer(minLength: TMSpace.sm)
-                Text(own.isEmpty ? "No one" : "+\(ObjectiveRules.format(preview))")
+                Text(previewText)
                     .font(TMFont.stat)
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("as.battle.objective.\(side.rawValue).preview")
             }
+            // Sides with their own objective (PM11) say which one, then ask its question.
+            if self.objective == nil, let objective {
+                Text(objective.title).font(TMFont.detail.weight(.semibold))
+                if let question = objective.question {
+                    Text(question)
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
             switch objective {
+            case nil:
+                EmptyView()
             case .raid:
                 raidChips(side)
             case .controlTheField:
@@ -102,7 +153,9 @@ struct ObjectiveScoreCard: View {
                 unitChips(side, kind: .exited, units: units(side).filter { $0.combatStatus == .active }, caption: nil)
             case .holdTheFort:
                 tokenChips(side)
-            case .destroyTheEnemy, .findTheTarget:
+            case .findTheTarget:
+                searchChips(side)
+            case .destroyTheEnemy:
                 EmptyView()
             }
         }
@@ -159,7 +212,7 @@ struct ObjectiveScoreCard: View {
     }
 
     private func tokenChips(_ side: SideId) -> some View {
-        let tokens = (session.objectiveState?.tokens ?? []).filter { $0.owner == side }
+        let tokens = ObjectiveRules.holdTokens(of: side, in: session)
         return FlowLayout(spacing: TMSpace.sm) {
             ForEach(tokens) { token in
                 let entry = ObjectiveScoreEntry(kind: .guarded, tokenId: token.id)
@@ -169,6 +222,27 @@ struct ObjectiveScoreCard: View {
                     isEnabled: true,
                     identifier: "as.battle.objective.token.\(token.id)"
                 ) { toggle(side, entry) }
+            }
+        }
+    }
+
+    /// Find the Target: the buildings not yet found, to tick off as searched. Targets stay hidden.
+    private func searchChips(_ side: SideId) -> some View {
+        let buildings = ObjectiveRules.searchableBuildings(in: session)
+        return VStack(alignment: .leading, spacing: TMSpace.xs) {
+            FlowLayout(spacing: TMSpace.sm) {
+                ForEach(Array(buildings.enumerated()), id: \.element.id) { index, building in
+                    let entry = ObjectiveScoreEntry(kind: .searched, tokenId: building.id)
+                    chip(
+                        title: "\(building.name) searched",
+                        isOn: isOn(side, entry),
+                        isEnabled: true,
+                        identifier: "as.battle.objective.\(side.rawValue).searched.\(index)"
+                    ) { toggle(side, entry) }
+                }
+            }
+            if buildings.isEmpty {
+                Text("Every target is found.").font(TMFont.detail).foregroundStyle(.secondary)
             }
         }
     }
