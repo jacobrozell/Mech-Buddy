@@ -140,7 +140,7 @@ final class MatchStore: Identifiable {
             subtitle: "\(setup.budget.summary) · \(setup.battlefield.summary)",
             tableSteps: PlayLayout.tableSteps(for: setup),
             winningSummary: "Destroy every enemy ’Mech",
-            layout: PlayLayout.layout(for: setup.battlefield)
+            layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides)
         )
         scenarioLoaded = true
     }

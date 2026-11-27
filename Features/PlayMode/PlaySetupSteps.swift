@@ -285,7 +285,7 @@ struct PlayMapStep: View {
             }
             VStack(alignment: .leading, spacing: TMSpace.sm) {
                 Eyebrow("Layout")
-                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield))
+                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides))
                     .accessibilityIdentifier("as.play.setup.layout")
                 Text("\(setup.battlefield.summary) · each side deploys within 6″ of its home edge.")
                     .font(TMFont.detail)

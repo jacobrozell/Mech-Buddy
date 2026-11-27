@@ -131,7 +131,11 @@ public enum PlayLayout {
     /// Deployment depth from the home edge, inches (p. 11, "within 6 inches").
     public static let zoneDepth = 6.0
 
-    public static func layout(for battlefield: Battlefield) -> MissionLayoutDTO {
+    /// Three or four sides use the middle 3/8 of their edge **[HOUSE]** (§ 6.4): 18″ on a 48″ edge.
+    public static let houseZoneShare = 3.0 / 8.0
+
+    /// `sides` carries each side's home edge. Without it the layout is the two-side table (west, east).
+    public static func layout(for battlefield: Battlefield, sides: [MatchSide] = []) -> MissionLayoutDTO {
         let width = battlefield.width
         let depth = battlefield.depth
         var sheets: [MissionLayoutDTO.Sheet] = []
@@ -154,29 +158,59 @@ public enum PlayLayout {
                 }
             }
         }
-        let zone = min(zoneDepth, width / 3)
         return MissionLayoutDTO(
             width: width,
             depth: depth,
             sheets: sheets,
-            zones: [
-                .init(side: "A", area: .init(x: 0, y: 0, width: zone, depth: depth)),
-                .init(side: "B", area: .init(x: width - zone, y: 0, width: zone, depth: depth))
-            ],
+            zones: zones(width: width, depth: depth, sides: sides),
             features: [],
             openTable: battlefield.summary
         )
     }
 
-    /// Table setup checklist for a two-side Play game (§ 8.1, p. 8, p. 11).
+    /// One zone per side on its home edge, 6″ deep. Two sides take the full edge (p. 11); three or four take
+    /// the middle 3/8 of it so neighbouring zones stay apart **[HOUSE]**.
+    static func zones(width: Double, depth: Double, sides: [MatchSide]) -> [MissionLayoutDTO.Zone] {
+        let seats = sides.isEmpty
+            ? [(letter: "A", edge: TableEdge.west), (letter: "B", edge: .east)]
+            : sides.enumerated().map { index, side in
+                (letter: side.id.letter, edge: side.homeEdge ?? PlaySetup.defaultHomeEdges(sideCount: 4)[index])
+            }
+        let narrow = seats.count > 2
+        return seats.map { seat in
+            let vertical = seat.edge == .west || seat.edge == .east
+            let edgeLength = vertical ? depth : width
+            let band = narrow ? edgeLength * houseZoneShare : edgeLength
+            let offset = (edgeLength - band) / 2
+            let thick = min(zoneDepth, (vertical ? width : depth) / 3)
+            let area: MissionLayoutDTO.Rect
+            switch seat.edge {
+            case .west: area = .init(x: 0, y: offset, width: thick, depth: band)
+            case .east: area = .init(x: width - thick, y: offset, width: thick, depth: band)
+            case .north: area = .init(x: offset, y: 0, width: band, depth: thick)
+            case .south: area = .init(x: offset, y: depth - thick, width: band, depth: thick)
+            }
+            return .init(side: seat.letter, area: area)
+        }
+    }
+
+    /// Table setup checklist for a Play game (§ 8.1, p. 8, p. 11). Three or four sides use house rules (§ 5.4, D29).
     public static func tableSteps(for setup: PlaySetup) -> [String] {
+        let house = setup.usesHouseRules
         var steps = [
             "Lay out the battlefield: \(setup.battlefield.summary)",
-            "Each side rolls 2D6. The higher roll places terrain first",
-            "Each side picks 8 pieces of terrain and places them in turn: 4 toward the enemy, 2 toward its own edge, 2 near the centre line"
+            "Each side rolls 2D6. The higher roll places terrain first"
         ]
+        if house {
+            steps.append("[HOUSE] Each side picks 6 pieces of terrain and places them in setup-roll order, one at a time. None inside a deployment zone, and none within 4″ of another unless they form one woods area")
+            steps.append("[HOUSE] Home edges, highest setup roll first: one edge each, a zone in the middle 3/8 of the edge, 6″ deep")
+        } else {
+            steps.append("Each side picks 8 pieces of terrain and places them in turn: 4 toward the enemy, 2 toward its own edge, 2 near the centre line")
+        }
         if setup.rules.startOnTable {
-            steps.append("The setup winner chooses to deploy first or last, then sides place one ’Mech at a time within 6″ of their home edge")
+            steps.append(house
+                ? "[HOUSE] The setup winner chooses to deploy first or last, then sides place one ’Mech at a time in setup-roll order within their zone"
+                : "The setup winner chooses to deploy first or last, then sides place one ’Mech at a time within 6″ of their home edge")
         } else {
             steps.append("Leave the ’Mechs off the table. On Turn 1 they enter from their home edge")
         }

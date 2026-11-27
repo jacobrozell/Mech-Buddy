@@ -425,7 +425,7 @@ struct PlayReviewStep: View {
                 sideCard(side)
             }
             section("Battlefield", edit: .map) {
-                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield))
+                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides))
                     .accessibilityIdentifier("as.play.setup.review.layout")
                 Text(setup.battlefield.summary).font(TMFont.detail)
             }

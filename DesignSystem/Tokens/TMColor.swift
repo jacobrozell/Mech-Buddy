@@ -11,6 +11,12 @@ enum TMColor {
     static let sideAFill = Color("side.a.fill")
     static let sideB = Color("side.b")
     static let sideBFill = Color("side.b.fill")
+    /// Cobalt and orchid (PlayModeSpec § 14, D18). Contrast checked in PM7: text on fill 6.1 / 5.5 (light) and
+    /// 6.9 / 7.0 (dark); fill on background the same, all above 4.5.
+    static let sideC = Color("side.c")
+    static let sideCFill = Color("side.c.fill")
+    static let sideD = Color("side.d")
+    static let sideDFill = Color("side.d.fill")
 
     static let pipArmor = Color("pip.armor")
     static let pipStructure = Color("pip.structure")
@@ -53,6 +59,8 @@ private struct TokenSwatchGrid: View {
         ("Structure", TMColor.structure),
         ("Side A", TMColor.sideA),
         ("Side B", TMColor.sideB),
+        ("Side C", TMColor.sideC),
+        ("Side D", TMColor.sideD),
         ("Success", TMColor.success),
         ("Readout", TMColor.readout)
     ]

@@ -366,9 +366,24 @@ public struct PlaySetup: Codable, Sendable, Equatable {
     /// Players per side, e.g. [1, 2] (§ 5.1). At least one each.
     public var playerCounts: [Int] { sides.map { max(1, $0.players.count) } }
 
-    /// Resizes each side's player list to `counts` (a preset such as 1 v 2), keeping names already typed, and clears
-    /// controller tags that no longer point at a player. Extra sides in `counts` are ignored: teams are two sides (D3).
+    /// Resizes the sides and each side's player list to `counts` (a preset such as 1 v 2 or 1 v 1 v 1), keeping
+    /// names already typed, and clears controller tags that no longer point at a player. A change in the number
+    /// of sides adds or drops sides from the end, sets home edges for the new format (§ 6.4), and moves the
+    /// budget to the new default when it was still the old default (§ 5.2, D5).
     public mutating func setPlayerCounts(_ counts: [Int]) {
+        let wanted = min(max(counts.count, 2), SideId.allCases.count)
+        if wanted != sides.count {
+            let oldDefault = ForceBudget.pointValue(ForceBudget.defaultPV(sides: sides.count))
+            if sides.count > wanted {
+                for dropped in sides[wanted...] { forces[dropped.id] = nil }
+                sides.removeLast(sides.count - wanted)
+            }
+            while sides.count < wanted {
+                sides.append(MatchSide(id: SideId.allCases[sides.count], players: [""]))
+            }
+            if budget == oldDefault { budget = .pointValue(ForceBudget.defaultPV(sides: wanted)) }
+            for (index, edge) in Self.defaultHomeEdges(sideCount: wanted).enumerated() { sides[index].homeEdge = edge }
+        }
         for (index, count) in counts.enumerated() where sides.indices.contains(index) {
             var players = sides[index].players
             if players.count > count { players.removeLast(players.count - count) }
@@ -382,6 +397,15 @@ public struct PlaySetup: Codable, Sendable, Equatable {
             }
         }
     }
+
+    /// Home edges by seat. Two sides: west and east (p. 8). Three or four **[HOUSE]**: one edge each, in seat
+    /// order, until the players pick in setup-roll order (§ 6.4).
+    public static func defaultHomeEdges(sideCount: Int) -> [TableEdge] {
+        Array([TableEdge.west, .east, .south, .north].prefix(max(0, sideCount)))
+    }
+
+    /// Three or four sides use house rules (§ 6). Two sides, teams included, follow the Quick-Start.
+    public var usesHouseRules: Bool { sides.count > 2 }
 
     /// Setup checks that stop Start (§ 5.1): every side has a player and the format fits four players.
     /// Keys, not text, so the screen words them. Empty = valid.
@@ -467,11 +491,28 @@ public enum TeamIssue: Sendable, Equatable {
     case tooManyPlayers
 }
 
-/// The player-count presets (§ 5.1). All are two sides, so QSR p. 13 covers them: a team is a player.
+/// The player-count presets (§ 5.1). The first four are two sides, so QSR p. 13 covers them: a team is a player.
+/// Three and four sides are **[HOUSE]** (§ 6) and sit behind `playModeMultiSide`.
 public struct TeamFormat: Sendable, Equatable, Identifiable {
     public var title: String
     public var players: [Int]
     public var id: String { title }
+
+    public var sideCount: Int { players.count }
+    /// Free-for-all: the Quick-Start has no rules for it (p. 13), so Mech Buddy's house rules apply.
+    public var isHouseRule: Bool { players.count > 2 }
+
+    /// 1 v 1 v 1, 1 v 1 v 1 v 1 and 1 v 1 v 2 (§ 5.1). Four players at most.
+    public static let multiSide: [TeamFormat] = [
+        TeamFormat(title: "1 v 1 v 1", players: [1, 1, 1]),
+        TeamFormat(title: "1 v 1 v 2", players: [1, 1, 2]),
+        TeamFormat(title: "1 v 1 v 1 v 1", players: [1, 1, 1, 1])
+    ]
+
+    /// The presets Setup offers: teams under `playMode`, free-for-all only when `playModeMultiSide` is on.
+    public static func available(multiSide enabled: Bool) -> [TeamFormat] {
+        enabled ? all + multiSide : all
+    }
 
     public static let all: [TeamFormat] = [
         TeamFormat(title: "1 v 1", players: [1, 1]),

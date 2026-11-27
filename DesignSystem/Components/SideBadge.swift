@@ -2,17 +2,28 @@ import SwiftUI
 import MechBuddyDomain
 
 extension TMColor {
-    // Sides C and D get their own tokens (cobalt, orchid) in PM7, after the contrast checks in
-    // PlayModeSpec § 14. No screen shows them before then.
+    /// Coolant, ember, cobalt, orchid (PlayModeSpec § 14). Colour is never the only cue: the badge also
+    /// carries a letter and a shape.
     static func side(_ side: SideId) -> Color {
-        side == .lanceA ? sideA : sideB
+        switch side {
+        case .lanceA: sideA
+        case .lanceB: sideB
+        case .lanceC: sideC
+        case .lanceD: sideD
+        }
     }
 
     static func sideFill(_ side: SideId) -> Color {
-        side == .lanceA ? sideAFill : sideBFill
+        switch side {
+        case .lanceA: sideAFill
+        case .lanceB: sideBFill
+        case .lanceC: sideCFill
+        case .lanceD: sideDFill
+        }
     }
 
-    /// Coolant (Side A) needs light text. Ember (Side B) needs dark text in light mode.
+    /// Coolant (A), cobalt (C) and orchid (D) take `onSide` (white in light, near-black in dark; 5.5:1 or better).
+    /// Ember (Side B) needs dark text in light mode.
     static func badgeText(for side: SideId, scheme: ColorScheme) -> Color {
         if scheme == .light && side == .lanceB {
             return onSignal
@@ -93,6 +104,8 @@ struct Diamond: Shape {
         HStack(spacing: TMSpace.lg) {
             SideTag(side: .lanceA)
             SideTag(side: .lanceB)
+            SideTag(side: .lanceC)
+            SideTag(side: .lanceD)
         }
     }
 }
