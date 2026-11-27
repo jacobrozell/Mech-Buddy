@@ -10,40 +10,39 @@ struct ObjectiveVPStrip: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            row(showsTitle: true)
-            row(showsTitle: false)
-            // Narrow or large text: two lines rather than clipping.
-            VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                Text(objective.title).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                FlowLayout(spacing: TMSpace.md) { items }
-            }
-        }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-        .padding(.horizontal, TMSpace.lg)
-        .padding(.vertical, TMSpace.xxs)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.bar)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Self.spoken(session: session, objective: objective))
-        .accessibilityIdentifier("as.battle.vp")
-    }
-
-    private func row(showsTitle: Bool) -> some View {
-        HStack(spacing: TMSpace.md) {
-            if showsTitle {
-                Text(objective.title)
+        // The battle screen's own identifier would replace this row's, so the spoken summary and `as.battle.vp` sit on
+        // a hidden sibling inside a container, as the phase segments do (BattleStepStrip). The visible row is hidden
+        // from VoiceOver so the summary isn't read twice.
+        VStack(alignment: .leading, spacing: 0) {
+            // One wrapping row: the title, each side's points, the win total. Wraps at large text.
+            FlowLayout(spacing: TMSpace.md) {
+                if session.sides.count <= 2 || dynamicTypeSize.isAccessibilitySize {
+                    Text(objective.title)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                items
+                Text("to \(ObjectiveRules.format(objective.baseThreshold))")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-            items
-            Spacer(minLength: TMSpace.xs)
-            Text("to \(ObjectiveRules.format(objective.baseThreshold))")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            .accessibilityHidden(true)
+            .background {
+                Color.clear
+                    .frame(width: 1, height: 1)
+                    .accessibilityElement()
+                    .accessibilityLabel(Self.spoken(session: session, objective: objective))
+                    .accessibilityIdentifier("as.battle.vp")
+            }
         }
+        .padding(.horizontal, TMSpace.lg)
+        .padding(.vertical, TMSpace.xxs)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.bar)
+        .accessibilityElement(children: .contain)
     }
 
     @ViewBuilder

@@ -51,7 +51,16 @@ struct ObjectiveScoreCard: View {
                 }
             }
         }
-        .accessibilityIdentifier("as.battle.objective")
+        // The battle screen's identifier would replace one set on the card, so the id sits on a hidden marker inside a
+        // container, as the phase segments do (BattleStepStrip).
+        .background {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .accessibilityElement()
+                .accessibilityLabel("Score the objective")
+                .accessibilityIdentifier("as.battle.objective")
+        }
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: Sections

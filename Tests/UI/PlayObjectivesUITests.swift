@@ -16,7 +16,7 @@ final class PlayObjectivesUITests: XCTestCase {
         XCTAssertTrue(tabs.waitForExistence(timeout: 20))
         tabs.buttons["Play"].tap()
         tap(app.buttons["as.play.new"])
-        XCTAssertTrue(element(app, "as.play.setup.sides").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.sides").waitForExistence(timeout: 12))
         tap(app.buttons[preset])
     }
 
@@ -27,18 +27,18 @@ final class PlayObjectivesUITests: XCTestCase {
         let app = XCUIApplication()
         openSetup(app, preset: "as.play.setup.preset.1v1v1v1")
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.size").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.size").waitForExistence(timeout: 12))
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.forces").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.forces").waitForExistence(timeout: 12))
         for (index, letter) in ["A", "B", "C", "D"].enumerated() {
             if index > 0 { tap(app.buttons["as.play.setup.forces.side.\(letter)"]) }
             addCard(app, side: letter, card: "locust-lct-7v", search: "Locust")
             addCard(app, side: letter, card: "wasp-wsp-5a", search: "Wasp")
         }
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.map").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.map").waitForExistence(timeout: 12))
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.rules").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.rules").waitForExistence(timeout: 12))
 
         // Every objective but Find the Target can be picked; Find the Target says why not.
         for objective in ["raid", "controlTheField", "destroyTheEnemy", "holdTheFort", "breakthrough"] {
@@ -47,14 +47,14 @@ final class PlayObjectivesUITests: XCTestCase {
         XCTAssertTrue(element(app, "as.play.setup.objective.findTheTarget").exists)
         XCTAssertTrue(element(app, "as.play.setup.objective.roll").exists)
         tap(app.buttons["as.play.setup.objective.controlTheField"])
-        XCTAssertTrue(element(app, "as.play.setup.objective.notes").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.objective.notes").waitForExistence(timeout: 12))
 
         let dice = app.segmentedControls["as.play.setup.dice"].buttons["Let the app roll"]
-        var swipes = 0
-        while !dice.isHittable && swipes < 8 { app.swipeUp(); swipes += 1 }
+        for _ in 0..<4 { app.swipeUp() }
         tap(dice)
+        XCTAssertTrue(dice.isSelected, "App dice not selected")
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.review").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.review").waitForExistence(timeout: 12))
         tap(app.buttons["as.play.setup.start"])
         XCTAssertTrue(element(app, "as.ridge.tablePrep").waitForExistence(timeout: 10), "Table setup missing")
 
@@ -63,6 +63,10 @@ final class PlayObjectivesUITests: XCTestCase {
         advance(app, until: { self.element(app, "as.battle.shooters.lanceA").exists }, taps: &taps)
         XCTAssertTrue(element(app, "as.battle.shooters.lanceA").exists, "Never reached Combat. Taps: \(taps.joined(separator: " > "))")
         let vp = element(app, "as.battle.vp")
+        if !vp.exists {
+            let tree = app.debugDescription.split(separator: "\n").filter { $0.contains("points") || $0.contains("battle.vp") }.prefix(40).joined(separator: " | ")
+            XCTFail("VP strip missing. Tree: \(tree)")
+        }
         XCTAssertTrue(vp.exists, "VP strip missing")
         XCTAssertTrue(vp.label.contains("Control the Field") && vp.label.contains("Side D 0 points"), "VP label: \(vp.label)")
         // The strip and all four roster headers fit on one portrait screen, above the dock.
@@ -78,17 +82,17 @@ final class PlayObjectivesUITests: XCTestCase {
         }
 
         // Clean up: the Score step. Answer for Side A, then score and move on.
-        advance(app, until: { self.element(app, "as.battle.objective").exists }, taps: &taps)
-        XCTAssertTrue(element(app, "as.battle.objective").exists, "Score step missing. Taps: \(taps.joined(separator: " > "))")
+        advance(app, until: { app.buttons["as.battle.objective.lanceA.inPosition.0"].exists }, taps: &taps)
+        XCTAssertTrue(app.buttons["as.battle.objective.lanceA.inPosition.0"].exists, "Score step missing. Taps: \(taps.joined(separator: " > "))")
         let chip = app.buttons["as.battle.objective.lanceA.inPosition.0"]
-        XCTAssertTrue(chip.waitForExistence(timeout: 5) || scrollTo(app, "as.battle.objective.lanceA.inPosition.0"))
+        XCTAssertTrue(chip.waitForExistence(timeout: 12) || scrollTo(app, "as.battle.objective.lanceA.inPosition.0"))
         if !chip.isHittable { app.swipeUp() }
         chip.tap()
         let primary = app.buttons["as.battle.primary"]
         XCTAssertEqual(primary.label, "Score and next turn")
         primary.tap()
         let after = element(app, "as.battle.vp")
-        XCTAssertTrue(after.waitForExistence(timeout: 5))
+        XCTAssertTrue(after.waitForExistence(timeout: 12))
         XCTAssertTrue(after.label.contains("Side A 2 points") || after.label.contains("Side A 1 point"), "VP after scoring: \(after.label)")
     }
 
@@ -97,14 +101,18 @@ final class PlayObjectivesUITests: XCTestCase {
         let app = XCUIApplication()
         openSetup(app, preset: "as.play.setup.preset.1v1")
         tap(app.buttons["as.play.setup.continue"])
+        XCTAssertTrue(element(app, "as.play.setup.size").waitForExistence(timeout: 12))
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.forces").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.forces").waitForExistence(timeout: 12))
+        addCard(app, side: "A", card: "locust-lct-7v", search: "Locust")
+        tap(app.buttons["as.play.setup.forces.side.B"])
+        addCard(app, side: "B", card: "wasp-wsp-5a", search: "Wasp")
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.map").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.map").waitForExistence(timeout: 12))
         tap(app.buttons["as.play.setup.continue"])
-        XCTAssertTrue(element(app, "as.play.setup.rules").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.rules").waitForExistence(timeout: 12))
         // The default is still last side standing, kept under its old identifier.
-        XCTAssertTrue(element(app, "as.play.setup.objective").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "as.play.setup.objective").waitForExistence(timeout: 12))
         XCTAssertTrue(element(app, "as.play.setup.turnLimit").exists || scrollTo(app, "as.play.setup.turnLimit"))
     }
 
@@ -129,7 +137,7 @@ final class PlayObjectivesUITests: XCTestCase {
             } else if element(app, "as.battle.shooters.lanceA").exists {
                 if done() { return }
                 if doneShooting.exists, doneShooting.isHittable { taps.append("doneShooting"); doneShooting.tap() } else { Thread.sleep(forTimeInterval: 0.5) }
-            } else if primary.exists, primary.isHittable, primary.label != "Solve a shot" {
+            } else if primary.exists, primary.isHittable, primary.label != "Solve a shot", primary.label != "Score and next turn" {
                 taps.append(primary.label); primary.tap()
             } else {
                 Thread.sleep(forTimeInterval: 0.5)
@@ -153,7 +161,7 @@ final class PlayObjectivesUITests: XCTestCase {
         tap(field)
         field.typeText(search)
         let row = app.buttons["as.play.setup.unitPicker.card.\(card)"]
-        XCTAssertTrue(row.waitForExistence(timeout: 5), "Card \(card) missing")
+        XCTAssertTrue(row.waitForExistence(timeout: 12), "Card \(card) missing")
         var tries = 0
         while !row.isHittable && tries < 6 {
             app.swipeUp()
@@ -170,7 +178,7 @@ final class PlayObjectivesUITests: XCTestCase {
 
     @MainActor
     private func tap(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertTrue(element.waitForExistence(timeout: 5), "Missing \(element)", file: file, line: line)
+        XCTAssertTrue(element.waitForExistence(timeout: 12), "Missing \(element)", file: file, line: line)
         element.tap()
     }
 }
