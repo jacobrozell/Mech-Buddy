@@ -137,10 +137,15 @@ public struct CardLibrary: Sendable {
     public let faces: [CardFaceDTO]
     private let byId: [String: CardFaceDTO]
 
-    public init(_ dto: CardLibraryDTO) {
-        faces = dto.cards
-        byId = Dictionary(dto.cards.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+    /// `userCards` are the player's hand-entered cards (PM9). They join `faces` and the lookups, but belong to no box.
+    public init(_ dto: CardLibraryDTO, userCards: [CardFaceDTO] = []) {
+        let all = dto.cards + userCards
+        faces = all
+        byId = Dictionary(all.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
+
+    /// Hand-entered cards, in the order given.
+    public var userFaces: [CardFaceDTO] { faces.filter(\.isUserCard) }
 
     public func face(id: String) -> CardFaceDTO? { byId[id] }
 

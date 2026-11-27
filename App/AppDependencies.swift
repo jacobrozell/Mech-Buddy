@@ -20,7 +20,10 @@ public final class AppDependencies {
     /// Mission chassis → suggested stand-in minis, from the same file.
     let standIns: [String: [String]]
     /// `as-card-library.json`, loaded once (PlayModeSpec § 10). Empty when the file is missing.
-    let cardLibrary: CardLibrary
+    private(set) var cardLibrary: CardLibrary
+    /// Saved forces and hand-entered cards (PM9).
+    let userContent: UserContentStore
+    private let bundledCards: CardLibraryDTO
     /// Bumps when a match is saved or deleted. Play and Force reload from this.
     var sessionRevision = 0
 
@@ -62,12 +65,15 @@ public final class AppDependencies {
         let preferences = AppPreferences()
         if LaunchArguments.resetState {
             try? stored.deleteAll()
+            UserContentStore(container: container).deleteAll()
             preferences.reset()
         }
         if LaunchArguments.skipOnboarding {
             preferences.hasCompletedOnboarding = true
         }
         self.modelContainer = container
+        let userContent = UserContentStore(container: container)
+        self.userContent = userContent
         self.content = content
         self.matchSessions = revising
         self.releaseSurface = releaseSurface
@@ -83,16 +89,25 @@ public final class AppDependencies {
             self.boxSets = []
             self.standIns = [:]
         }
+        var bundled = CardLibraryDTO(contentVersion: "0", cards: [])
         do {
-            self.cardLibrary = CardLibrary(try content.cardLibrary())
+            bundled = try content.cardLibrary()
         } catch {
             logger.error("card library: \(error)", category: "content")
-            self.cardLibrary = CardLibrary(CardLibraryDTO(contentVersion: "0", cards: []))
         }
+        self.bundledCards = bundled
+        self.cardLibrary = CardLibrary(bundled, userCards: userContent.userCards())
         revising.onMutation = { [weak self] in
             guard let self else { return }
             self.sessionRevision += 1
         }
+    }
+}
+
+extension AppDependencies {
+    /// Rebuilds the card library after a hand-entered card is added, changed or deleted.
+    func reloadUserCards() {
+        cardLibrary = CardLibrary(bundledCards, userCards: userContent.userCards())
     }
 }
 

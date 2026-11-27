@@ -54,17 +54,22 @@ public enum MatchSessionPayloadSchema {
 }
 
 public enum MechBuddyMigrationPlan: SchemaMigrationPlan {
-    public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
-    public static var stages: [MigrationStage] { [] }
+    public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self, SchemaV2.self] }
+    public static var stages: [MigrationStage] {
+        [.lightweight(fromVersion: SchemaV1.self, toVersion: SchemaV2.self)]
+    }
 }
 
 public enum PersistenceController {
-    public static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: SchemaV1.self)
-        let configuration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: inMemory
-        )
+    /// `url` opens a store at that file (tests, migration checks); nil uses the app's default store.
+    public static func makeContainer(inMemory: Bool = false, url: URL? = nil) throws -> ModelContainer {
+        let schema = Schema(versionedSchema: SchemaV2.self)
+        let configuration: ModelConfiguration
+        if let url, !inMemory {
+            configuration = ModelConfiguration(schema: schema, url: url)
+        } else {
+            configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
+        }
         return try ModelContainer(
             for: schema,
             migrationPlan: MechBuddyMigrationPlan.self,
