@@ -102,7 +102,9 @@ public enum ObjectiveId: String, Codable, Sendable, CaseIterable {
     /// The 1D6 roll **[HOUSE mapping]**: the Quick-Start says "randomly determine" with no table (p. 7, D22). 1 Raid,
     /// 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough. A 6 is Find the Target: it means
     /// roll again (nil) unless the table has enough buildings (`hasBuildings`).
-    public static func fromRoll(_ die: Int, hasBuildings: Bool = false) -> ObjectiveId? {
+    public static func fromRoll(_ die: Int) -> ObjectiveId? { fromRoll(die, hasBuildings: false) }
+
+    public static func fromRoll(_ die: Int, hasBuildings: Bool) -> ObjectiveId? {
         switch die {
         case 1: .raid
         case 2: .controlTheField

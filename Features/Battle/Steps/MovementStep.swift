@@ -268,6 +268,7 @@ struct MovementStep: View {
             children: entry.marker == .done || (entry.unit.side == session.activeSide && entry.unit.id != current?.id)
                 ? .contain : .combine
         )
+        .accessibilityIdentifier("as.battle.moveOrder.\(entry.unit.id.uuidString)")
     }
 
     private func changeMenu(_ unit: MatchUnitState) -> some View {
