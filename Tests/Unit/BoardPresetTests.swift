@@ -192,7 +192,7 @@ struct StarterBoardTests {
 
         let centred = board.centred(onWidth: 48, depth: 48)
         let c = centred.features[0].area
-        #expect(c.x == 25 && c.y == 21 && c.width == 10)
+        #expect(c.x == 19 && c.y == 21 && c.width == 10)
     }
 }
 
