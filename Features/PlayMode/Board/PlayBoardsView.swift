@@ -195,24 +195,7 @@ struct PlayBoardsView: View {
     }
 
     private func rowText(name: String, detail: String, badge: String?) -> some View {
-        HStack(spacing: TMSpace.md) {
-            VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                Text(name).font(TMFont.cardTitle)
-                Text(detail)
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: TMSpace.sm)
-            if let badge {
-                Image(systemName: badge)
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        .contentShape(Rectangle())
+        PlayRowLabel(title: name, detail: detail, trailingSymbol: badge)
     }
 
     private func starterPreview(_ entry: BoardListEntry) -> some View {

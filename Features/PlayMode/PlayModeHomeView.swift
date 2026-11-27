@@ -58,7 +58,7 @@ struct PlayModeHomeView: View {
         .onChange(of: matches.editSetup) { _, setup in
             guard let setup else { return }
             matches.editSetup = nil
-            route = PlaySetupRoute(setup: setup, step: .review)
+            route = PlaySetupRoute(setup: available(setup), step: .review)
         }
         .confirmationDialog("Discard this setup?", isPresented: $confirmDiscardDraft, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { dependencies.preferences.playDraft = nil }
@@ -144,6 +144,14 @@ struct PlayModeHomeView: View {
         setup.sides.count <= 2 || dependencies.releaseSurface.isEnabled(.playModeMultiSide)
     }
 
+    /// A saved setup without what this build has switched off (objectives, boards).
+    private func available(_ setup: PlaySetup) -> PlaySetup {
+        setup.limited(
+            objectives: dependencies.releaseSurface.isEnabled(.playObjectives),
+            boards: dependencies.releaseSurface.isEnabled(.playBoards)
+        )
+    }
+
     // MARK: New game
 
     @ViewBuilder
@@ -226,7 +234,7 @@ struct PlayModeHomeView: View {
     private func draftButtons(_ draft: PlaySetup) -> some View {
         Button {
             let ready = draft.sides.allSatisfy { !draft.force($0.id).isEmpty }
-            route = PlaySetupRoute(setup: draft, step: ready ? .review : .sides)
+            route = PlaySetupRoute(setup: available(draft), step: ready ? .review : .sides)
         } label: {
             Text("Finish setting up").frame(minHeight: 44)
         }
@@ -265,33 +273,14 @@ struct PlayModeHomeView: View {
     }
 
     private func lastSetupRow(_ last: PlaySetup) -> some View {
-        Button {
-            var fresh = last
-            fresh.diceMode = last.diceMode
-            route = PlaySetupRoute(setup: fresh, step: .review)
-        } label: {
-            HStack(spacing: TMSpace.md) {
-                Image(systemName: "arrow.counterclockwise")
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                    Text("Last setup").font(TMFont.cardTitle)
-                    Text("\(last.formatName) · \(last.budget.summary) · \(last.battlefield.summary)")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: TMSpace.sm)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .frame(minHeight: 44)
-            .contentShape(Rectangle())
+        PlayHomeRow(
+            systemImage: "arrow.counterclockwise",
+            title: "Last setup",
+            detail: "\(last.formatName) · \(last.budget.summary) · \(last.battlefield.summary)",
+            identifier: "as.play.lastSetup"
+        ) {
+            route = PlaySetupRoute(setup: available(last), step: .review)
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("as.play.lastSetup")
     }
 
     // MARK: Saved forces (PM9)
@@ -303,32 +292,14 @@ struct PlayModeHomeView: View {
     // MARK: Boards (PM13, behind playBoards)
 
     private var boardsRow: some View {
-        let count = dependencies.userContent.boardPresets().count
-        return Button {
+        PlayHomeRow(
+            systemImage: "square.grid.3x3.topleft.filled",
+            title: "Boards",
+            detail: "\(dependencies.userContent.boardPresets().count) saved · \(StarterBoards.missionIDs.count + 2) starter boards",
+            identifier: "as.play.boards"
+        ) {
             showBoards = true
-        } label: {
-            HStack(spacing: TMSpace.md) {
-                Image(systemName: "square.grid.3x3.topleft.filled")
-                    .frame(width: 28)
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                    Text("Boards").font(TMFont.cardTitle)
-                    Text("\(count) saved · \(StarterBoards.missionIDs.count + 2) starter boards")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: TMSpace.sm)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .frame(minHeight: 44)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("as.play.boards")
     }
 
     // MARK: Collection
