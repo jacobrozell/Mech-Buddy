@@ -32,8 +32,8 @@ struct MovementStep: View {
                 title: coach.movementComplete
                     ? "Moves locked in"
                     : coach.otherMechStillToMove
-                        ? "\(session.activeSide.displayName)’s other ’Mech"
-                        : "\(session.activeSide.displayName) moves",
+                        ? "\(session.displayName(of: session.activeSide))’s other ’Mech"
+                        : "\(session.displayName(of: session.activeSide)) moves",
                 // "Everyone has moved" read wrong when a ’Mech stood still.
                 message: coach.movementComplete
                     ? "Every ’Mech’s move is set. Change any of them before you start shooting."

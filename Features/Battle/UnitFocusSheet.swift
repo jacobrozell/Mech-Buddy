@@ -13,6 +13,7 @@ struct UnitFocusSheet: View {
     var onSetInWater: ((Bool) -> Void)?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.sideNames) private var sideNames
     @State private var confirmLeave = false
 
     /// `unit` is the snapshot the sheet opened with; the session is live.
@@ -91,7 +92,7 @@ struct UnitFocusSheet: View {
         VStack(alignment: .leading, spacing: TMSpace.sm) {
             HStack(spacing: TMSpace.sm) {
                 SideBadge(side: unit.side)
-                Text("\(unit.side.displayName) · Size \(unit.sz)")
+                Text("\(sideNames(unit.side)) · Size \(unit.sz)")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
             }

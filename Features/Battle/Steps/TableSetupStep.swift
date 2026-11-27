@@ -200,7 +200,8 @@ struct TableSetupStep: View {
 
     private func sideLabel(_ side: SideId, units: [MatchUnitState]) -> String {
         let names = units.map(\.name).joined(separator: ", ")
-        return names.isEmpty ? side.displayName : "\(side.displayName). \(names)"
+        let title = session.displayName(of: side)
+        return names.isEmpty ? title : "\(title). \(names)"
     }
 
     private func toggle(_ index: Int) {

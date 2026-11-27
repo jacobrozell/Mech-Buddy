@@ -171,7 +171,8 @@ struct PlaySetupFlowView: View {
                     title: "Continue",
                     placement: .dock,
                     tint: TMColor.signal,
-                    isDisabled: step == .forces && setup.sides.contains { setup.force($0.id).isEmpty },
+                    isDisabled: (step == .sides && !setup.teamIssues.isEmpty)
+                        || (step == .forces && setup.sides.contains { setup.force($0.id).isEmpty }),
                     accessibilityIdentifier: "as.play.setup.continue",
                     action: advance
                 )
@@ -189,6 +190,7 @@ struct PlaySetupFlowView: View {
     }
 
     private var startBlockedReason: String? {
+        if let issue = setup.teamIssues.first { return PlaySidesStep.text(for: issue) }
         if let empty = setup.sides.first(where: { setup.force($0.id).isEmpty }) {
             return "\(empty.name) needs at least one ’Mech."
         }

@@ -6,6 +6,7 @@ struct ForceListView: View {
     private var previewUnits: [MatchUnitState]?
 
     @Environment(AppDependencies.self) private var dependencies
+    @Environment(\.sideNames) private var sideNames
     @State private var units: [MatchUnitState]
     @State private var loadedSession: MatchSession?
     @State private var loadError: String?
@@ -47,6 +48,7 @@ struct ForceListView: View {
                 roster
             }
         }
+        .environment(\.sideNames, SideNames(loadedSession))
         .navigationTitle("Force")
         .accessibilityIdentifier("force.as.list")
         .task(id: dependencies.sessionRevision) {
@@ -112,7 +114,7 @@ struct ForceListView: View {
         let sideUnits = units.filter { $0.side == side }
         if !sideUnits.isEmpty {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
-                Eyebrow(side.displayName) {
+                Eyebrow(sideNames(side)) {
                     HStack(spacing: TMSpace.sm) {
                         SideBadge(side: side)
                         Text("PV \(PlayForceMath.pointValue(of: side, in: units))")
@@ -177,6 +179,7 @@ private struct ForceSelection: Identifiable {
 }
 
 private struct PVBalanceBar: View {
+    @Environment(\.sideNames) private var sideNames
     var sideA: Int
     var sideB: Int
 
@@ -206,13 +209,13 @@ private struct PVBalanceBar: View {
                 .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Point value balance. Side A \(sideA), Side B \(sideB). \(caption(gap: gap))")
+        .accessibilityLabel("Point value balance. \(sideNames(.lanceA)) \(sideA), \(sideNames(.lanceB)) \(sideB). \(caption(gap: gap))")
     }
 
     private func caption(gap: Int) -> String {
         // Says who is ahead and by how much; "Gap 3 — even" read as jargon.
         if gap == 0 { return "Even match: both sides have \(sideA) PV." }
-        let leader = sideA > sideB ? SideId.lanceA.displayName : SideId.lanceB.displayName
+        let leader = sideA > sideB ? sideNames(.lanceA) : sideNames(.lanceB)
         if gap <= 5 { return "Even match. \(leader) has \(gap) more PV." }
         return "\(leader) has \(gap) more PV."
     }

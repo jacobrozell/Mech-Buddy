@@ -12,7 +12,9 @@ public enum PlayUnits {
         for side in setup.sides.map(\.id) {
             for pick in setup.force(side) {
                 guard let face = library.face(id: pick.cardId), let dto = face.scenarioUnit(skill: pick.skill) else { continue }
-                units.append(GuidedScenarioFactory.mapUnit(dto, side: side))
+                var unit = GuidedScenarioFactory.mapUnit(dto, side: side)
+                unit.controller = setup.controllerName(of: pick, side: side)
+                units.append(unit)
             }
         }
         return units
@@ -36,6 +38,7 @@ public enum PlayUnits {
         guard var next = Self.pick(face) else { return nil }
         next.id = pick.id
         next.skill = pick.skill
+        next.controllerIndex = pick.controllerIndex
         return next
     }
 

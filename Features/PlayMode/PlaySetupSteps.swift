@@ -12,26 +12,61 @@ struct PlaySidesStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xl) {
             VStack(alignment: .leading, spacing: TMSpace.sm) {
-                Text("How many sides?")
+                Text("Who is playing?")
                     .font(TMFont.stepTitle)
                     .accessibilityAddTraits(.isHeader)
-                ChoiceTile(
-                    title: "1 v 1",
-                    detail: "Two players, one force each. The Quick-Start game.",
-                    systemImage: "person.2",
-                    isSelected: true,
-                    indicator: .single,
-                    accessibilityIdentifier: "as.play.setup.preset.1v1",
-                    action: {}
-                )
-                Text("Teams (1 v 2, 2 v 2) and three or four sides are coming in a later update.")
+                ForEach(TeamFormat.all) { format in
+                    ChoiceTile(
+                        title: format.title,
+                        detail: Self.detail(for: format),
+                        systemImage: format.players.reduce(0, +) > 2 ? "person.3" : "person.2",
+                        isSelected: setup.playerCounts == format.players,
+                        indicator: .single,
+                        accessibilityIdentifier: "as.play.setup.preset.\(format.title.replacingOccurrences(of: " ", with: ""))",
+                        action: { setup.setPlayerCounts(format.players) }
+                    )
+                }
+                Text("Three or four sides are coming in a later update.")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            if setup.playerCounts.contains(where: { $0 > 1 }) {
+                Label(
+                    "A team is one side (Quick-Start p. 13). It rolls one initiative, shares one budget and moves as one side. Any player on it may move any of its ’Mechs.",
+                    systemImage: "person.2.badge.gearshape"
+                )
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("as.play.setup.team.note")
+            }
             ForEach($setup.sides) { $side in
                 sideRow($side)
             }
+            if let issue = setup.teamIssues.first {
+                Label(Self.text(for: issue), systemImage: "exclamationmark.triangle")
+                    .font(TMFont.detail)
+                    .foregroundStyle(TMColor.warning)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.play.setup.team.issue")
+            }
+        }
+    }
+
+    static func detail(for format: TeamFormat) -> String {
+        switch format.title {
+        case "1 v 1": "Two players, one force each. The Quick-Start game."
+        case "1 v 2": "One player against a team of two. Each side has the same budget."
+        case "2 v 2": "Two teams of two. Each team shares one force."
+        default: "One player against a team of three. Each side has the same budget."
+        }
+    }
+
+    static func text(for issue: TeamIssue) -> String {
+        switch issue {
+        case .sideWithoutPlayer: "Every side needs at least one player."
+        case .tooManyPlayers: "Up to \(PlaySetup.maxPlayers) players in all."
         }
     }
 
@@ -43,6 +78,13 @@ struct PlaySidesStep: View {
                     SideBadge(side: side.wrappedValue.id)
                     Text(side.wrappedValue.id.displayName)
                         .font(TMFont.cardTitle)
+                    if side.wrappedValue.players.count > 1 {
+                        Spacer(minLength: TMSpace.sm)
+                        Text("Team of \(side.wrappedValue.players.count)")
+                            .font(TMFont.detail)
+                            .foregroundStyle(.secondary)
+                            .accessibilityIdentifier("as.play.setup.team.size.\(letter)")
+                    }
                 }
                 TextField(side.wrappedValue.id.displayName, text: Binding(
                     get: { side.wrappedValue.name == side.wrappedValue.id.displayName ? "" : side.wrappedValue.name },
@@ -52,13 +94,15 @@ struct PlaySidesStep: View {
                 .textInputAutocapitalization(.words)
                 .accessibilityLabel("\(side.wrappedValue.id.displayName) name")
                 .accessibilityIdentifier("as.play.setup.side.\(letter)")
-                TextField("Player name (optional)", text: Binding(
-                    get: { side.wrappedValue.players.first ?? "" },
-                    set: { side.wrappedValue.players = [String($0.prefix(20))] }
-                ))
-                .textFieldStyle(.roundedBorder)
-                .textInputAutocapitalization(.words)
-                .accessibilityIdentifier("as.play.setup.side.\(letter).player.1")
+                ForEach(side.wrappedValue.players.indices, id: \.self) { index in
+                    TextField("Player \(index + 1) name (optional)", text: Binding(
+                        get: { side.wrappedValue.players.indices.contains(index) ? side.wrappedValue.players[index] : "" },
+                        set: { if side.wrappedValue.players.indices.contains(index) { side.wrappedValue.players[index] = String($0.prefix(20)) } }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .textInputAutocapitalization(.words)
+                    .accessibilityIdentifier("as.play.setup.side.\(letter).player.\(index + 1)")
+                }
             }
         }
     }
