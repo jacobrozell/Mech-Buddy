@@ -142,7 +142,7 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
   - [ ] **Owner:** check the 19 faces not yet checked on the Master Unit List.
 - [x] **PM3** Learn | Play tabs behind `playMode`. (M) Built 2026-11-26: five tabs with the flag on, Learn = the mission path (`learn.home`, `play.home` kept), Play home with empty state and resume, landing tab.
 - [x] **PM4** First playable: 1 v 1 pickup game, from setup to result. (L) Built 2026-11-26: six setup screens, PV and skill math, picker from minis and the card library (checked faces only), mat or mapsheets with layout, rules and options (turn limit with PV tie-break), standings, Play again, draft and last setup.
-- [ ] **PM5** Compact battle mode (section 1, items 1.1–1.4 and 1.6), plus group by side. Needed before PM7. (L) Items 1.1–1.6 and 1.8 done 2026-11-26; group by side remains.
+- [x] **PM5** Compact battle mode (section 1, items 1.1–1.4 and 1.6), plus group by side. Needed before PM7. (L) Items 1.1–1.6 and 1.8 done 2026-11-26; group by side done 2026-11-26 (`SideGrouping`, coloured side headers `as.battle.side.<sideId>`; filters not built).
 - [ ] **PM6** Teams: 1 v 2, 2 v 2, 1 v 3. (M)
 - [ ] **PM7** Three and four sides (free-for-all) behind `playModeMultiSide`. (L)
   - [ ] **Owner:** table test of 1 v 1 v 1 v 1.
