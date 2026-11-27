@@ -272,7 +272,8 @@ public enum BoardRules {
     public static func summary(_ board: BoardLayout, sideCount: Int) -> String {
         var parts = ["\(plain(board.width)) by \(plain(board.depth)) inch table."]
         var counts: [String] = []
-        for kind in BoardLayout.FeatureKind.allCases {
+        let order: [BoardLayout.FeatureKind] = [.woods, .hill, .water, .rough, .rubble, .tree, .building, .wall, .objectiveToken]
+        for kind in order {
             let items = board.features.enumerated().filter { $0.element.kind == kind }
             guard !items.isEmpty else { continue }
             if kind == .hill {

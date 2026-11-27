@@ -375,9 +375,9 @@ struct BoardEditorTests {
         let undone = editor.undo()
         #expect(undone)
         #expect(editor.feature(id)?.area.width == 6)
-        // Back through resize, two rotations, nudge, place: the piece is as first added.
-        for _ in 0..<5 { let ok = editor.undo(); #expect(ok) }
-        #expect(editor.feature(id)?.area == .init(x: 22, y: 22, width: 5, depth: 5))
+        // Back through resize, two rotations and the nudge: the piece is where `place` left it (a drag is its own step).
+        for _ in 0..<4 { let ok = editor.undo(); #expect(ok) }
+        #expect(editor.feature(id)?.area == .init(x: 10, y: 11, width: 5, depth: 5))
         let redone = editor.redo()
         #expect(redone)
         // Undo to empty, then a new change clears redo.
