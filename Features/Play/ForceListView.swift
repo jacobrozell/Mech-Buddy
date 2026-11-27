@@ -81,13 +81,16 @@ struct ForceListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: TMSpace.xl) {
                 contextLabel
-                ForEach(SideId.missionPair, id: \.self) { side in
+                let sides = loadedSession?.sideIds ?? SideId.missionPair
+                ForEach(sides, id: \.self) { side in
                     sideSection(side)
                 }
-                PVBalanceBar(
-                    sideA: PlayForceMath.pointValue(of: .lanceA, in: units),
-                    sideB: PlayForceMath.pointValue(of: .lanceB, in: units)
-                )
+                if sides.count == 2 {
+                    PVBalanceBar(
+                        sideA: PlayForceMath.pointValue(of: sides[0], in: units),
+                        sideB: PlayForceMath.pointValue(of: sides[1], in: units)
+                    )
+                }
                 ForceCollectionSection(
                     collection: dependencies.preferences.collection,
                     boxes: dependencies.boxSets,

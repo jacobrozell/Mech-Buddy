@@ -8,6 +8,8 @@ public enum ReleaseFlag: String, CaseIterable, Sendable {
     case fullLancesScenario
     /// Learn | Play tabs, Play home, pickup-game setup and Play sessions (PlayModeSpec § 16). Was `freeBattle`.
     case playMode
+    /// Three- and four-side presets in Play (PlayModeSpec § 16, PM7). Teams (1 v 2, 2 v 2) stay under `playMode`.
+    case playModeMultiSide
     case physicalOvWithdrawal
     case classicComingSoonEntry
     case classicPlayTools
@@ -36,7 +38,7 @@ public struct ReleaseSurface: ReleaseSurfaceProviding, Sendable {
             return true
         case .tipJar:
             return false
-        case .fullLancesScenario, .playMode, .physicalOvWithdrawal,
+        case .fullLancesScenario, .playMode, .playModeMultiSide, .physicalOvWithdrawal,
              .classicPlayTools, .mulNetworkFetch, .matchHistory:
             return isFullProductSurface
         }

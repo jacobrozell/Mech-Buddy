@@ -171,6 +171,7 @@ struct BattleUnitRow: View {
     var landingUnitID: UUID?
     var onOpenUnit: () -> Void
     var onShoot: () -> Void
+    var isDense = false
 
     var body: some View {
         // Dense row with Shoot inside the card (FUTURE-PLAN §1.2); it used to float in its own row.
@@ -178,6 +179,7 @@ struct BattleUnitRow: View {
             unit: unit,
             isActiveSide: isActiveSide,
             accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
+            isDense: isDense,
             onShoot: offersShoot ? onShoot : nil,
             action: onOpenUnit
         )

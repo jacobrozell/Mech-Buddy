@@ -8,6 +8,10 @@ import MechBuddyDomain
 
 struct PlaySidesStep: View {
     @Binding var setup: PlaySetup
+    @Environment(AppDependencies.self) private var dependencies
+    @State private var showHouseRules = false
+
+    private var multiSide: Bool { dependencies.releaseSurface.isEnabled(.playModeMultiSide) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xl) {
@@ -15,21 +19,18 @@ struct PlaySidesStep: View {
                 Text("Who is playing?")
                     .font(TMFont.stepTitle)
                     .accessibilityAddTraits(.isHeader)
-                ForEach(TeamFormat.all) { format in
-                    ChoiceTile(
-                        title: format.title,
-                        detail: Self.detail(for: format),
-                        systemImage: format.players.reduce(0, +) > 2 ? "person.3" : "person.2",
-                        isSelected: setup.playerCounts == format.players,
-                        indicator: .single,
-                        accessibilityIdentifier: "as.play.setup.preset.\(format.title.replacingOccurrences(of: " ", with: ""))",
-                        action: { setup.setPlayerCounts(format.players) }
-                    )
+                ForEach(TeamFormat.available(multiSide: multiSide)) { format in
+                    presetTile(format)
                 }
-                Text("Three or four sides are coming in a later update.")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                if !multiSide {
+                    Text("Three or four sides are coming in a later update.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            if setup.usesHouseRules {
+                houseRulesNote
             }
             if setup.playerCounts.contains(where: { $0 > 1 }) {
                 Label(
@@ -54,8 +55,63 @@ struct PlaySidesStep: View {
         }
     }
 
+    /// Free-for-all note with the house rules behind an info button (§ 5.1).
+    private var houseRulesNote: some View {
+        HStack(alignment: .top, spacing: TMSpace.sm) {
+            Label {
+                Text("[HOUSE] Three or more sides isn’t in the Quick-Start rules (p. 13). Mech Buddy uses house rules for turn order, targets and scoring.")
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "house")
+            }
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("as.play.setup.houseRules.note")
+            Button {
+                showHouseRules = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .symbolRenderingMode(.hierarchical)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel("About the house rules")
+            .accessibilityIdentifier("as.play.setup.houseRules")
+        }
+        .sheet(isPresented: $showHouseRules) {
+            PlayHouseRulesSheet()
+        }
+    }
+
+    private func presetTile(_ format: TeamFormat) -> some View {
+        let players: Int = format.players.reduce(0, +)
+        let symbol: String = players > 2 ? "person.3" : "person.2"
+        let badge: String? = format.isHouseRule ? "House rules" : nil
+        return ChoiceTile(
+            title: format.title,
+            detail: Self.detail(for: format),
+            systemImage: symbol,
+            badge: badge,
+            isSelected: setup.playerCounts == format.players,
+            indicator: .single,
+            accessibilityIdentifier: Self.presetID(format),
+            action: { setup.setPlayerCounts(format.players) }
+        )
+    }
+
+    /// `as.play.setup.preset.1v1`, `…1v1v1v1`.
+    static func presetID(_ format: TeamFormat) -> String {
+        let compact = format.title.replacingOccurrences(of: " ", with: "")
+        return "as.play.setup.preset." + compact
+    }
+
     static func detail(for format: TeamFormat) -> String {
         switch format.title {
+        case "1 v 1 v 1": "Three players, one force each. Free-for-all [HOUSE]."
+        case "1 v 1 v 2": "Three sides: two players alone and a team of two. [HOUSE]."
+        case "1 v 1 v 1 v 1": "Four players, every one for themselves. Each side gets a smaller budget. [HOUSE]."
         case "1 v 1": "Two players, one force each. The Quick-Start game."
         case "1 v 2": "One player against a team of two. Each side has the same budget."
         case "2 v 2": "Two teams of two. Each team shares one force."
@@ -285,7 +341,7 @@ struct PlayMapStep: View {
             }
             VStack(alignment: .leading, spacing: TMSpace.sm) {
                 Eyebrow("Layout")
-                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield))
+                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides))
                     .accessibilityIdentifier("as.play.setup.layout")
                 Text("\(setup.battlefield.summary) · each side deploys within 6″ of its home edge.")
                     .font(TMFont.detail)

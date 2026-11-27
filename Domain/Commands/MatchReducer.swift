@@ -16,6 +16,9 @@ public enum MatchCommand: Sendable {
     /// The side gives up: its ’Mechs leave the table at once and it is out (§ 6.5).
     case concede(side: SideId)
     /// Tag a miniature with a colour so players can match minis to cards. Any phase.
+    /// Three or four sides: this side takes `edge`; the side that held it takes this side's old edge (§ 6.4).
+    /// Allowed until Turn 1 placement is confirmed.
+    case assignHomeEdge(side: SideId, edge: TableEdge)
     case setMini(unitId: UUID, mini: MiniMarker?)
     /// Mark a ’Mech as standing in water this turn (partial cover for shots at it, −1 heat in the End Phase).
     /// Any phase. Cleared when the next turn starts.
@@ -192,6 +195,20 @@ public enum MatchReducer {
                         + ". \(next.displayName(of: winner)) goes last"
                 )
             }
+
+        case .assignHomeEdge(let side, let edge):
+            guard next.turn == 1, !next.deploymentAcknowledged, !next.units.contains(where: \.hasMovedThisTurn) else {
+                throw MatchDomainError.illegalPhaseTransition("Home edges are fixed once placement is confirmed.")
+            }
+            guard let index = next.sides.firstIndex(where: { $0.id == side }) else {
+                throw MatchDomainError.illegalPhaseTransition("That side isn't in this game")
+            }
+            let previous = next.sides[index].homeEdge
+            if let other = next.sides.firstIndex(where: { $0.homeEdge == edge && $0.id != side }) {
+                next.sides[other].homeEdge = previous
+            }
+            next.sides[index].homeEdge = edge
+            next.appendLog("\(next.displayName(of: side)) takes the \(edge.rawValue) edge")
 
         case .setMini(let unitId, let mini):
             guard let idx = next.units.firstIndex(where: { $0.id == unitId }) else {

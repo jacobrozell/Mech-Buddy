@@ -401,6 +401,19 @@ extension MatchSession {
         (side(id)?.players ?? []).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
     }
 
+    /// The side that made a critical roll or hit this 'Mech, when the table settles it: with exactly one
+    /// other side in the game that is it. With three or four sides the attacker isn't recorded until PM8, so
+    /// this is nil and the screen says "the side that hit it" (§ 6.6).
+    public func sideThatHit(_ unit: MatchUnitState) -> SideId? {
+        let others = opponents(of: unit.side)
+        return others.count == 1 ? others[0] : nil
+    }
+
+    /// Words for who rolls a critical (p. 23): "Side B", or "The side that hit it" with several enemies.
+    public func criticalRollerName(for unit: MatchUnitState) -> String {
+        sideThatHit(unit).map { displayName(of: $0) } ?? "The side that hit it"
+    }
+
     /// The next side after this one in seat order, wrapping round. Sides that are out are skipped
     /// unless every other side is out.
     public func nextSide(after id: SideId) -> SideId {
@@ -429,7 +442,8 @@ extension MatchSession {
 extension MatchSession {
     /// Sides can be traded until a move, a shot, or damage is recorded.
     public var canSwapSides: Bool {
-        guard phase == .initiative || phase == .movement else { return false }
+        // Two sides trade places; three or four have no single "other" side (§ 8.1).
+        guard sides.count == 2, phase == .initiative || phase == .movement else { return false }
         return !units.contains {
             $0.hasMovedThisTurn || $0.hasAttackedThisTurn || $0.armorDamage > 0 || $0.structureDamage > 0
         }

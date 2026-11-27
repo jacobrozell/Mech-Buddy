@@ -14,6 +14,8 @@ struct CombatStep: View {
         ShotFeed.rows(in: session)
     }
 
+    @Environment(\.coachDisplay) private var coachDisplay
+
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
             CoachPrompt(
@@ -23,6 +25,8 @@ struct CombatStep: View {
                     : "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
                 accessibilityIdentifier: "as.battle.table"
             )
+            // Three or four sides: the prompt folds to its title so every side fits the screen.
+            .environment(\.coachDisplay, session.sides.count > 2 ? .brief : coachDisplay)
             // The ’Mechs first, so a 4 vs 4 fits above the fold; each row's chip already shows its
             // own hit or miss, and the feed with the rolls follows below.
             if showsUnits {
@@ -104,12 +108,19 @@ struct CombatStep: View {
     private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {
         let left = units.filter(\.canAttackThisTurn).count
         return VStack(alignment: .leading, spacing: TMSpace.xs) {
-            Eyebrow(session.displayName(of: side)) {
-                Text(left == 0 ? "All fired" : "\(left) to fire")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+            HStack(spacing: TMSpace.xs) {
+                // Three or four sides: letter, shape and colour in the header, so sides tell apart without colour (§ 14).
+                if session.sides.count > 2 {
+                    SideBadge(side: side)
+                }
+                Eyebrow(session.displayName(of: side)) {
+                    Text(left == 0 ? "All fired" : "\(left) to fire")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
             }
+            .accessibilityElement(children: .combine)
             .accessibilityIdentifier("as.battle.shooters.\(side.rawValue)")
             ForEach(units) { unit in
                 BattleUnitRow(
@@ -118,7 +129,8 @@ struct CombatStep: View {
                     offersShoot: unit.canAttackThisTurn,
                     landingUnitID: landingUnitID,
                     onOpenUnit: { onOpenUnit(unit) },
-                    onShoot: { onShoot(unit) }
+                    onShoot: { onShoot(unit) },
+                    isDense: session.sides.count > 2
                 )
             }
         }

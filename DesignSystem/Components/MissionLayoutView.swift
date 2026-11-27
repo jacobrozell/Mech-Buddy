@@ -19,8 +19,9 @@ struct MissionLayoutView: View {
             .frame(maxWidth: .infinity)
             .background(TMColor.readout, in: RoundedRectangle(cornerRadius: TMRadius.chip, style: .continuous))
             HStack(spacing: TMSpace.md) {
-                legendItem(color: TMColor.sideA, text: "Side A sets up")
-                legendItem(color: TMColor.sideB, text: "Side B sets up")
+                ForEach(layout.zones.map(\.side), id: \.self) { letter in
+                    legendItem(color: Self.color(forZone: letter), text: "Side \(letter) sets up")
+                }
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -28,6 +29,16 @@ struct MissionLayoutView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(MissionLayoutDescription.spoken(layout))
         .accessibilityIdentifier("mission.layout")
+    }
+
+    /// Zones name their side by letter ("A" to "D").
+    static func color(forZone letter: String) -> Color {
+        switch letter {
+        case "B": TMColor.sideB
+        case "C": TMColor.sideC
+        case "D": TMColor.sideD
+        default: TMColor.sideA
+        }
     }
 
     private func legendItem(color: Color, text: String) -> some View {
@@ -52,7 +63,7 @@ struct MissionLayoutView: View {
 
         // Setup zones in side colours.
         for zone in layout.zones {
-            let color = zone.side == "A" ? TMColor.sideA : TMColor.sideB
+            let color = Self.color(forZone: zone.side)
             let frame = rect(zone.area)
             context.fill(Path(frame), with: .color(color.opacity(0.3)))
             context.draw(
@@ -110,7 +121,8 @@ struct MissionLayoutView: View {
         // Scale bar: 6 inches, bottom centre (clear of both setup zones).
         let bar = 6 * scale
         let y = layout.depth * scale - 8
-        let x = (layout.width * scale - bar) / 2
+        // Three or four zones: the bottom edge may hold one, so the bar moves to the corner (zones there are narrow).
+        let x = layout.zones.count > 2 ? 8 : (layout.width * scale - bar) / 2
         var scalePath = Path()
         scalePath.move(to: CGPoint(x: x, y: y))
         scalePath.addLine(to: CGPoint(x: x + bar, y: y))
@@ -142,8 +154,14 @@ enum MissionLayoutDescription {
             parts.append("Maps, left to right: \(layout.sheetNames.joined(separator: ", ")).")
         }
         for zone in layout.zones {
-            let edge = zone.area.x < layout.width / 2 ? "left" : "right"
-            let depth = inches(zone.area.width)
+            let vertical = zone.area.depth > zone.area.width
+            let edge: String
+            if vertical {
+                edge = zone.area.x < layout.width / 2 ? "left" : "right"
+            } else {
+                edge = zone.area.y < layout.depth / 2 ? "top" : "bottom"
+            }
+            let depth = inches(vertical ? zone.area.width : zone.area.depth)
             parts.append("Side \(zone.side) sets up within \(depth) inches of the \(edge) edge.")
         }
         let counts = Dictionary(grouping: layout.features, by: \.kind).mapValues(\.count)

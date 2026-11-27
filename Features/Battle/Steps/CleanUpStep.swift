@@ -120,26 +120,38 @@ struct CleanUpStep: View {
         .accessibilityIdentifier("as.battle.crippled")
     }
 
-    private var scoreCard: some View {
+    private func points(_ side: SideId) -> Int {
         // Play games break a turn-limit tie on PV left (PlayModeSpec § 7.3); missions on Structure.
-        let sideA = session.isPlayGame
-            ? VictoryEvaluator.pvLeft(side: .lanceA, in: session)
-            : VictoryEvaluator.remainingStructure(side: .lanceA, in: session)
-        let sideB = session.isPlayGame
-            ? VictoryEvaluator.pvLeft(side: .lanceB, in: session)
-            : VictoryEvaluator.remainingStructure(side: .lanceB, in: session)
+        session.isPlayGame
+            ? VictoryEvaluator.pvLeft(side: side, in: session)
+            : VictoryEvaluator.remainingStructure(side: side, in: session)
+    }
+
+    private var scoreCard: some View {
+        // Sides still in the game compete; a side that is out keeps its row only in the result.
+        let sides = session.sides.count > 2 ? session.sidesInGame : session.sideIds
+        let scores = sides.map { (side: $0, value: points($0)) }
         return VStack(alignment: .leading, spacing: TMSpace.md) {
             Eyebrow("Score if the game ended now")
             TMCard(edgeColor: TMColor.signal, isRaised: true) {
                 VStack(alignment: .leading, spacing: TMSpace.sm) {
-                    HStack(spacing: TMSpace.lg) {
-                        score(value: sideA, side: .lanceA)
-                        Text("vs")
-                            .font(TMFont.detail)
-                            .foregroundStyle(.secondary)
-                        score(value: sideB, side: .lanceB)
+                    if sides.count > 2 {
+                        FlowLayout(spacing: TMSpace.lg) {
+                            ForEach(scores, id: \.side) { score(value: $0.value, side: $0.side) }
+                        }
+                    } else {
+                        HStack(spacing: TMSpace.lg) {
+                            ForEach(Array(scores.enumerated()), id: \.element.side) { index, item in
+                                if index > 0 {
+                                    Text("vs")
+                                        .font(TMFont.detail)
+                                        .foregroundStyle(.secondary)
+                                }
+                                score(value: item.value, side: item.side)
+                            }
+                        }
                     }
-                    Text(verdict(sideA: sideA, sideB: sideB))
+                    Text(verdict(scores))
                         .font(TMFont.cardTitle)
                 }
             }
@@ -158,10 +170,11 @@ struct CleanUpStep: View {
         .accessibilityLabel("\(session.displayName(of: side)) \(value) \(session.isPlayGame ? "PV left" : "structure")")
     }
 
-    private func verdict(sideA: Int, sideB: Int) -> String {
-        if sideA > sideB { return "\(session.displayName(of: .lanceA)) would win" }
-        if sideB > sideA { return "\(session.displayName(of: .lanceB)) would win" }
-        return "It would be a draw"
+    private func verdict(_ scores: [(side: SideId, value: Int)]) -> String {
+        guard let best = scores.map(\.value).max() else { return "It would be a draw" }
+        let leaders = scores.filter { $0.value == best }.map(\.side)
+        if leaders.count == 1 { return "\(session.displayName(of: leaders[0])) would win" }
+        return scores.count > 2 ? "\(leaders.map { session.displayName(of: $0) }.joined(separator: " and ")) would tie" : "It would be a draw"
     }
 }
 

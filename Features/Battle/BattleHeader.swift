@@ -62,7 +62,10 @@ enum BattleChrome {
         case .tableSetup:
             return "Set the table."
         case .placeMiniatures:
-            return "Place the miniatures. \(session.displayName(of: session.otherSide(of: session.activeSide))) picks who places first."
+            let first = session.sides.count == 2
+                ? session.otherSide(of: session.activeSide)
+                : (session.initiativeWinner ?? session.activeSide)
+            return "Place the miniatures. \(session.displayName(of: first)) picks who places first."
         case .initiative:
             return "Turn \(session.turn), Roll."
         case .movement:

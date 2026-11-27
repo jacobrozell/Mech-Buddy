@@ -23,7 +23,10 @@ struct RulesHomeView: View {
     }
 
     private var topics: [RulesTopicDTO] {
-        library?.topics(for: game) ?? []
+        let all = library?.topics(for: game) ?? []
+        // House rules for three or four sides only exist while that part of Play does (PlayModeSpec § 16).
+        guard !dependencies.releaseSurface.isEnabled(.playModeMultiSide) else { return all }
+        return all.filter { $0.id != PlayHouseRules.topicId }
     }
 
     private var disclaimer: String? {

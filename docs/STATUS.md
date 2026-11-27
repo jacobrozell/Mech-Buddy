@@ -22,7 +22,7 @@
 | Map swap, map catalog, box contents (A Game of Armored Combat, Alpha Strike Box Set, Mercenaries) | Built | `Resources/Content/map-catalog.json`, `as-box-sets.json`, `Data/Collection/` |
 | Card library: 40 faces from the owner's two boxes, 21 checked | Built (PM2) | `as-card-library.json`, `Data/Content/CardLibraryDTO.swift` |
 | Lore (read-only BattleTech history: overview, era detail, timeline) | Built; a "History" row at the bottom of the Rules tab (`as.lore.*` ids) | `Features/Lore/LoreViews.swift`, `Data/Content/LoreDTO.swift`, `Resources/Content/Lore/` |
-| Up to four sides in the domain (house rules labelled [HOUSE]) | Built (PM1), not on screen | `Domain/Models/MatchSide.swift`, `AlphaStrikePhaseEngine`, `VictoryEvaluator` |
+| Up to four sides in the domain (house rules labelled [HOUSE]) | Built (PM1); on screen behind `playModeMultiSide` (PM7) | `Domain/Models/MatchSide.swift`, `AlphaStrikePhaseEngine`, `VictoryEvaluator` |
 | Learn / Play tabs | Built (PM3) behind `playMode` | `App/RootTabView.swift`, `Features/Play/` |
 | Play: 1 v 1 pickup game, six setup screens, standings, draft and last setup | Built (PM4) behind `playMode`; Battlefield Support option built (PM11 slice 1: `PlayRules.battlefieldSupport`, `as.play.setup.support`, `startPlay` makes `boxRules`) | `Features/Play/` (setup flow), `MatchSession.play` (`PlaySetup`) |
 
@@ -35,7 +35,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 1. **PM11** — Battlefield Support, buildings and formations done in Play setup (`PlayRules.buildings`, `PlayRules.formation`); MechWarrior cards remain a placeholder.
 2. ~~**PM5**~~ — done: battle roster groups by side with a colour/name header (`SideGrouping`, `as.battle.side.<sideId>`); shared with Learn missions. Filters not built.
 3. ~~**PM6**~~ — done: teams as players per side (1 v 2, 2 v 2, 1 v 3 presets, `as.play.setup.preset.*`, `as.play.setup.team.*`), controller tags per 'Mech, pass lines naming the controller, custom side names in battle chrome (`SideNames` environment, `MatchSession.passLine`). A team is one side (spec D3); no team map or Balance action. On `main` only after merge.
-4. **PM7** — three and four sides behind `playModeMultiSide` (needs Side C/D colours; owner table test).
+4. ~~**PM7**~~ — done on branch `feature/pm7-multiside`: three and four sides behind `playModeMultiSide` (off in Release, on with `-enable_full_product_surface`). Side C cobalt ▲ and D orchid ■ (`side.c`, `side.d` tokens; contrast checked 5.5:1 or better), presets `as.play.setup.preset.1v1v1` / `1v1v2` / `1v1v1v1`, [HOUSE] labelling in setup, review, table checklist and the Rules topic `play-house-rules` (also the info sheet `as.play.setup.houseRules`), `InitiativeEntry` + `MultiSideInitiativeStep` (tie re-rolls among tied sides, "choose the order" with move buttons), edge menu per side in placement (`assignHomeEdge`), concede (`as.battle.concede`), out/conceded labels in standings, tied result. **Owner table test of a 1 v 1 v 1 v 1 is still owed.** Not built: "More…" format picker, attacker recorded per damage event (critical roller reads "the side that hit it"; Destroy the Enemy attribution is PM8), reorder-sides before battle.
 5. **PM8** — objectives (five of six) and victory points behind `playObjectives` (turn limit already built in PM4).
 6. **PM9** — saved forces and hand-entered cards (SwiftData SchemaV2).
 7. **PM12 → PM13** — terrain board builder and board presets behind `playBoards`.
@@ -54,6 +54,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 - In-battle Clash of Steel flows (calling support, "Attack now", initiative reroll, Lucky) are tested in the domain but not checked on screen.
 - Light-building collapse has no die entry (no scenario uses Light buildings yet); 'Mechs inside or on buildings aren't tracked; no physical attacks on buildings.
 - Play: battle roster headers and chrome use the session's side names (PM6); mini markers are set in battle, not on the Forces screen; hand card entry waits for PM9.
+- PM7: with three or four sides the app doesn't record who hit whom, so the critical prompt says "the side that hit it" instead of naming a side; a Play game saved with 3+ sides can't be edited from its draft/last setup while `playModeMultiSide` is off (it still resumes and plays).
 - No shipped card uses 0* damage, so the minimal-damage die has not been seen on screen.
 
 ## 6. How to work in this repo
