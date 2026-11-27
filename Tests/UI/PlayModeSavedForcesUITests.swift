@@ -62,7 +62,13 @@ final class PlayModeSavedForcesUITests: XCTestCase {
     private func fill(_ app: XCUIApplication, _ field: String, _ text: String) {
         let element = app.textFields["as.card.entry.\(field)"]
         var tries = 0
-        while (!element.exists || !element.isHittable) && tries < 10 { app.swipeUp(); tries += 1 }
+        // Drag in the top third: with the keyboard up, a swipe in the middle lands on the keyboard and scrolls nothing.
+        func drag(_ from: Double, _ to: Double) {
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: from))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: to)))
+        }
+        while (!element.exists || !element.isHittable) && tries < 10 { drag(0.38, 0.18); tries += 1 }
+        while (!element.exists || !element.isHittable) && tries < 22 { drag(0.18, 0.38); tries += 1 }
         tap(element)
         element.typeText(text)
     }
