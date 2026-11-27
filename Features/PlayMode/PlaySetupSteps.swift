@@ -467,25 +467,36 @@ struct PlayMapStep: View {
 
 struct PlayRulesStep: View {
     @Binding var setup: PlaySetup
+    @Environment(AppDependencies.self) private var dependencies
+    /// What "Roll for it" last rolled, so the screen can say so.
+    @State private var rolledObjective: ObjectiveId?
+
+    private var objectivesOn: Bool { dependencies.releaseSurface.isEnabled(.playObjectives) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xl) {
             PlaySetupSection(title: "How to win") {
-                PlaySetupRow(title: "Last side standing", detail: "Destroy every enemy ’Mech (p. 13). With Forced Withdrawal on, ’Mechs that leave count as destroyed.") {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(TMColor.signal)
-                        .accessibilityHidden(true)
+                if objectivesOn {
+                    objectivePicker
+                } else {
+                    PlaySetupRow(title: "Last side standing", detail: "Destroy every enemy ’Mech (p. 13). With Forced Withdrawal on, ’Mechs that leave count as destroyed.") {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(TMColor.signal)
+                            .accessibilityHidden(true)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("as.play.setup.objective")
+                    Text("Objectives (Raid, Hold the Fort and more) are coming in a later update.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("as.play.setup.objective")
-                Text("Objectives (Raid, Hold the Fort and more) are coming in a later update.")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
                 Divider()
                 PlaySetupRow(title: "Turn limit", detail: setup.turnLimit == nil
                     ? "Play until one side is left (p. 13)."
-                    : "At the limit, most PV still on the table wins.") {
+                    : (objectivesOn && setup.objectiveId?.isBuilt == true
+                        ? "[HOUSE] At the limit, most victory points wins; then most PV on the table."
+                        : "At the limit, most PV still on the table wins.")) {
                     Picker("Turn limit", selection: $setup.turnLimit) {
                         Text("None").tag(Int?.none)
                         ForEach([6, 8, 10, 12], id: \.self) { Text("\($0) turns").tag(Int?.some($0)) }
@@ -612,6 +623,95 @@ struct PlayRulesStep: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+
+    // MARK: Objective (PM8, behind playObjectives)
+
+    @ViewBuilder
+    private var objectivePicker: some View {
+        objectiveTile(nil, title: "None: last side standing", detail: "Destroy every enemy ’Mech (p. 13). With Forced Withdrawal on, ’Mechs that leave count as destroyed.", id: "as.play.setup.objective")
+        ForEach(ObjectiveId.built, id: \.self) { objective in
+            objectiveTile(objective, title: objective.title, detail: objective.summary, id: "as.play.setup.objective.\(objective.rawValue)")
+        }
+        HStack(spacing: TMSpace.md) {
+            Image(systemName: "lock")
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            Text("Find the Target needs buildings: coming later.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("as.play.setup.objective.findTheTarget")
+        Button {
+            var generator = SystemRandomNumberGenerator()
+            let rolled = ObjectiveId.roll(using: &generator)
+            rolledObjective = rolled
+            setup.objectiveId = rolled
+        } label: {
+            Label("Roll for it", systemImage: "dice")
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityHint("Rolls 1D6: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough. A 6 rolls again.")
+        .accessibilityIdentifier("as.play.setup.objective.roll")
+        Text(rolledObjective != nil && rolledObjective == setup.objectiveId
+            ? "Rolled: \(rolledObjective?.title ?? ""). [HOUSE] The Quick-Start says to pick one at random (p. 7) without a table, so 1D6 follows the book’s list order; a 6 is Find the Target, so it rolls again."
+            : "[HOUSE] Roll 1D6 in the book’s order: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough. A 6 rolls again.")
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("as.play.setup.objective.rolled")
+        if let objective = setup.objectiveId, objective.isBuilt {
+            Divider()
+            objectiveNotes(objective)
+        }
+    }
+
+    private func objectiveTile(_ objective: ObjectiveId?, title: String, detail: String, id: String) -> some View {
+        let selected = setup.objectiveId == objective || (objective == nil && setup.objectiveId?.isBuilt != true)
+        return ChoiceTile(
+            title: title,
+            detail: detail,
+            systemImage: objective == nil ? "flag.checkered" : "scope",
+            isSelected: selected,
+            indicator: .single,
+            accessibilityIdentifier: id,
+            action: {
+                rolledObjective = nil
+                setup.objectiveId = objective
+            }
+        )
+    }
+
+    /// Setup step, win line and house notes for the chosen objective (§ 7.1).
+    @ViewBuilder
+    private func objectiveNotes(_ objective: ObjectiveId) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            Text("First side to \(ObjectiveRules.format(objective.baseThreshold)) points wins (\(objective.page)).")
+                .font(TMFont.detail)
+            if let step = objective.setupStep {
+                Text("Setup: \(step)")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
+            if objective.usesClanMultiplier {
+                Text(objective == .destroyTheEnemy
+                    ? "A Clan force against the Inner Sphere scores 1.5 × Size and needs 12 (p. 7). Mixed forces use no multiplier [HOUSE]."
+                    : "A Clan force against the Inner Sphere scores 1.5 × Size (p. 7). Mixed forces use no multiplier [HOUSE].")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
+            if setup.usesHouseRules {
+                Text("[HOUSE] With three or four sides, “an enemy home edge” is any other side’s edge, and a ’Mech scores for the side whose attack crippled or destroyed it. Sides level at the top tie.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("as.play.setup.objective.notes")
     }
 
     private func toggle(_ title: String, detail: String, id: String, isOn: Binding<Bool>) -> some View {

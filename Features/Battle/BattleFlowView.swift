@@ -25,6 +25,8 @@ struct BattleFlowView: View {
     /// Three or four sides: dice typed in by round, and the app's roll (§ 6.1).
     @State private var multiRounds: [[SideId: InitiativeEntry.Dice]] = []
     @State private var multiAuto: InitiativeEntry?
+    /// Play objective Score step: what each side answered before the dock scores the turn (§ 7.1).
+    @State private var objectiveAnswers: [SideId: [ObjectiveScoreEntry]] = [:]
     @State private var showConcede = false
     @State private var concedeCandidate: SideId?
 
@@ -64,6 +66,10 @@ struct BattleFlowView: View {
                 if phase == .initiative {
                     clearDice()
                 }
+                if phase != .end { objectiveAnswers = [:] }
+            }
+            .onChange(of: store.session?.turn) { _, _ in
+                objectiveAnswers = [:]
             }
             .onChange(of: cue) { previous, next in
                 handleCue(previous: previous, next: next)
@@ -364,14 +370,19 @@ struct BattleFlowView: View {
     @ViewBuilder
     private func headerInset(_ session: MatchSession, coach: BattleCoach) -> some View {
         if BattleChrome.showsHeader(coach.step) {
-            BattleStepStrip(
-                turn: session.turn,
-                maxTurns: session.ruleset.maxTurns,
-                phase: session.phase,
-                activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
-                    ? session.activeSide : nil,
-                activeSideName: session.displayName(of: session.activeSide)
-            )
+            VStack(spacing: 0) {
+                BattleStepStrip(
+                    turn: session.turn,
+                    maxTurns: session.ruleset.maxTurns,
+                    phase: session.phase,
+                    activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
+                        ? session.activeSide : nil,
+                    activeSideName: session.displayName(of: session.activeSide)
+                )
+                if let objective = session.objective {
+                    ObjectiveVPStrip(session: session, objective: objective)
+                }
+            }
         }
     }
 
@@ -516,7 +527,8 @@ struct BattleFlowView: View {
                     session: session,
                     coach: coach,
                     showsUnits: showsUnits,
-                    onOpenUnit: { focusUnit = $0 }
+                    onOpenUnit: { focusUnit = $0 },
+                    objectiveAnswers: $objectiveAnswers
                 )
             case .tableSetup, .victory:
                 EmptyView()
@@ -715,6 +727,14 @@ struct BattleFlowView: View {
                 identifier: "as.battle.primary",
                 hint: hint,
                 action: { openCritical(session, coach: coach) }
+            )
+        case .resolveEnd where !ObjectiveRules.sidesStillToScore(in: session).isEmpty:
+            // Play objective: the Score step's answers and the end of the turn in one tap (§ 8.5).
+            return BattleDockButton(
+                title: "Score and next turn",
+                identifier: "as.battle.primary",
+                hint: "Adds the points you entered, checks for a winner, and starts the next turn.",
+                action: { store.scoreObjectiveAndFinish(objectiveAnswers) }
             )
         case .resolveEnd:
             let finishes = coach.endWouldFinishMatch

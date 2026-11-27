@@ -6,6 +6,8 @@ struct CleanUpStep: View {
     var coach: BattleCoach
     var showsUnits: Bool = true
     var onOpenUnit: (MatchUnitState) -> Void
+    /// The Score step's answers (Play with an objective), owned by the battle screen so the dock can submit them.
+    var objectiveAnswers: Binding<[SideId: [ObjectiveScoreEntry]]> = .constant([:])
 
     @State private var pickedUp: Set<UUID> = []
 
@@ -93,6 +95,9 @@ struct CleanUpStep: View {
                     }
                 }
             }
+            if let objective = session.objective {
+                ObjectiveScoreCard(session: session, objective: objective, answers: objectiveAnswers)
+            }
             // From turn 5 so players can plan the structure tiebreak, not only on the last turn.
             if coach.isLastTurn || session.ruleset.maxTurns.map({ session.turn >= $0 - 1 }) == true {
                 scoreCard
@@ -121,6 +126,7 @@ struct CleanUpStep: View {
     }
 
     private func points(_ side: SideId) -> Int {
+        // The objective's victory points have their own strip; this card keeps the PV tiebreak.
         // Play games break a turn-limit tie on PV left (PlayModeSpec § 7.3); missions on Structure.
         session.isPlayGame
             ? VictoryEvaluator.pvLeft(side: side, in: session)

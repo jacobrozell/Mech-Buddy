@@ -176,6 +176,11 @@ struct VictoryView: View {
         let pv = VictoryEvaluator.pvLeft(side: side, in: session)
         let mechs = VictoryEvaluator.unitsLeft(side: side, in: session)
         var line = "\(pv) PV · \(mechs) ’Mech\(mechs == 1 ? "" : "s") left"
+        // An objective game ranks by victory points first (§ 7.4).
+        if session.objective != nil {
+            let points = session.points(of: side)
+            line = "\(ObjectiveRules.format(points)) point\(points == 1 ? "" : "s") · " + line
+        }
         // Three or four sides: say who went out and when (§ 6.5, § 14). Two sides already name the loser.
         if session.sides.count > 2, let out = session.side(side), out.isOut {
             let when = out.outOnTurn.map { " on turn \($0)" } ?? ""

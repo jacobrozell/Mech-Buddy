@@ -507,6 +507,9 @@ struct PlayReviewStep: View {
 
     private var rulesLine: String {
         var on: [String] = [setup.usesHouseRules ? "Last side standing [HOUSE]" : "Last side standing"]
+        if let objective = setup.objectiveId, objective.isBuilt {
+            on = ["\(objective.title) to \(ObjectiveRules.format(objective.baseThreshold)) (\(objective.page))" + (setup.usesHouseRules ? " [HOUSE]" : "")]
+        }
         on.append(setup.turnLimit.map { "\($0)-turn limit" } ?? "No turn limit")
         if setup.rules.overheat { on.append("Overheat") }
         if setup.rules.physicalAttacks { on.append("Punches and kicks") }

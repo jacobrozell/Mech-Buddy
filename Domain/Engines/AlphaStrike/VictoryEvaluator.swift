@@ -41,6 +41,10 @@ public enum VictoryEvaluator {
 
     /// Call after End phase work when checking turn-cap victory.
     public static func evaluateAfterEnd(session: MatchSession) -> MatchOutcome? {
+        // § 7.2 order: sides out (done by the caller), objective, last side standing, turn limit.
+        if let reached = objectiveOutcome(in: session) {
+            return reached
+        }
         if let wipe = wipeOutcome(in: session) {
             return wipe
         }
@@ -49,9 +53,9 @@ public enum VictoryEvaluator {
            session.turn >= maxTurn {
             return structureCapOutcome(session: session)
         }
-        // Play: at the turn limit, most PV still on the table wins; level sides tie (§ 7.3, no objectives yet).
+        // Play: at the turn limit the objective's points decide, then PV still on the table; level sides tie (§ 7.3).
         if let limit = session.play?.turnLimit, session.turn >= limit {
-            return pvLimitOutcome(session: session)
+            return session.objective != nil ? pointsLimitOutcome(session: session) : pvLimitOutcome(session: session)
         }
         return nil
     }
@@ -67,6 +71,35 @@ public enum VictoryEvaluator {
     /// ’Mechs of this side still in the fight.
     public static func unitsLeft(side: SideId, in session: MatchSession) -> Int {
         session.units.filter { $0.side == side && countsAsLiving($0, in: session) }.count
+    }
+
+    /// Objective: any side at or over its threshold wins; the higher score if several reach it together; equal
+    /// scores tie **[HOUSE]** (§ 7.2). Nil when nobody has reached it.
+    static func objectiveOutcome(in session: MatchSession) -> MatchOutcome? {
+        guard let objective = session.objective else { return nil }
+        let reached = session.sideIds.filter {
+            session.points(of: $0) >= ObjectiveRules.threshold(for: $0, objective: objective, in: session)
+        }
+        guard !reached.isEmpty else { return nil }
+        return leaders(among: reached, in: session, tieBreakPV: false)
+    }
+
+    /// Turn limit with an objective (§ 7.3): most victory points, then most PV still on the table, then a tie.
+    private static func pointsLimitOutcome(session: MatchSession) -> MatchOutcome {
+        let contenders = session.sidesInGame.isEmpty ? session.sideIds : session.sidesInGame
+        return leaders(among: contenders, in: session, tieBreakPV: true)
+    }
+
+    /// The side with the most points among `sides`; level sides tie. `tieBreakPV` then asks for most PV left first.
+    private static func leaders(among sides: [SideId], in session: MatchSession, tieBreakPV: Bool) -> MatchOutcome {
+        let best = sides.map { session.points(of: $0) }.max() ?? 0
+        var top = sides.filter { session.points(of: $0) == best }
+        if top.count > 1, tieBreakPV {
+            let bestPV = top.map { pvLeft(side: $0, in: session) }.max() ?? 0
+            top = top.filter { pvLeft(side: $0, in: session) == bestPV }
+        }
+        if top.count == 1 { return .winner(top[0]) }
+        return session.sides.count <= 2 ? .draw : .tied(top)
     }
 
     private static func pvLimitOutcome(session: MatchSession) -> MatchOutcome {
@@ -90,6 +123,10 @@ public enum VictoryEvaluator {
             if lOut && rOut {
                 let lt = session.side(lhs)?.outOnTurn ?? 0, rt = session.side(rhs)?.outOnTurn ?? 0
                 if lt != rt { return lt > rt }
+            }
+            if session.objective != nil {
+                let lv = session.points(of: lhs), rv = session.points(of: rhs)
+                if lv != rv { return lv > rv }
             }
             let lp = pvLeft(side: lhs, in: session), rp = pvLeft(side: rhs, in: session)
             if lp != rp { return lp > rp }

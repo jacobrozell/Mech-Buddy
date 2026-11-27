@@ -41,6 +41,9 @@ public enum MatchCommand: Sendable {
     case leaveTable(unitId: UUID)
     case resolveEndPhase
     case completeMatch(MatchOutcome)
+    /// The End Phase Score step for one side: its answers for the objective (PlayModeSpec § 7.1). Needs Play with an
+    /// objective the players answer for (not Destroy the Enemy, which the app works out).
+    case scoreObjective(side: SideId, entries: [ObjectiveScoreEntry])
 }
 
 public struct SATORAttackCommand: Sendable, Equatable {
@@ -154,6 +157,10 @@ public enum MatchReducer {
             box.buildings = setup.rules.buildings
             if let kind = setup.rules.formation { box.formations = PlayRules.makeFormations(kind, units: units) }
             if !box.support.isEmpty || !box.buildings.isEmpty || !box.formations.isEmpty { next.boxRules = box }
+            if let objective = next.objective {
+                next.objectiveState = ObjectiveState.make(objective: objective, sides: setup.sides.map(\.id))
+                next.appendLog("Objective: \(objective.title) (\(objective.page)). First to \(ObjectiveRules.format(objective.baseThreshold)) points wins")
+            }
             next.appendLog("New game: \(setup.formatName), \(setup.budget.summary)")
 
         case .markTableReady:
@@ -264,10 +271,15 @@ public enum MatchReducer {
             if next.units.contains(where: \.pendingCritical) {
                 throw MatchDomainError.illegalPhaseTransition("Roll the critical first.")
             }
-            for i in next.units.indices where next.units[i].side == side && next.units[i].combatStatus != .removed {
+            for i in next.units.indices where next.units[i].side == side {
+                // Conceded 'Mechs score for nobody [HOUSE] (D19, § 6.5).
+                if next.units[i].scoredFor == nil { next.units[i].downedBy = nil }
+                guard next.units[i].combatStatus != .removed else { continue }
                 next.units[i].combatStatus = .removed
                 next.units[i].criticalsOwed = 0
+                next.units[i].critCausedBy = nil
             }
+            AlphaStrikePhaseEngine.dropOrphanedTokens(&next)
             next.sides[sideIndex].isOut = true
             next.sides[sideIndex].conceded = true
             next.sides[sideIndex].outOnTurn = next.turn
@@ -398,7 +410,12 @@ public enum MatchReducer {
             guard next.units[idx].pendingCritical else {
                 throw MatchDomainError.illegalPhaseTransition("No critical owed")
             }
-            let result = AlphaStrikeCriticals.apply(to: next.units[idx], roll: roll)
+            let causedBy = next.units[idx].critCausedBy ?? next.units[idx].lastDamagedBy
+            let before = next.units[idx]
+            var result = AlphaStrikeCriticals.apply(to: before, roll: roll)
+            // A critical that destroys or cripples scores for the side whose hit caused the roll (§ 6.6).
+            Self.recordDowned(before: before, after: &result.unit, by: causedBy)
+            if result.unit.criticalsOwed == 0 { result.unit.critCausedBy = nil }
             next.units[idx] = result.unit
             next.appendLog("Crit \(result.title) on \(result.unit.name)")
 
@@ -427,11 +444,16 @@ public enum MatchReducer {
                     order: next.initiativeOrder
                 )
             }
+            AlphaStrikePhaseEngine.dropOrphanedTokens(&next)
             next.appendLog("\(next.units[idx].name) left the table")
 
         case .resolveEndPhase:
             guard next.phase == .end else {
                 throw MatchDomainError.illegalPhaseTransition("Not in end phase")
+            }
+            // The Score step comes before the End Phase closes: every side with a ’Mech on the table answers (§ 8.5).
+            if !ObjectiveRules.sidesStillToScore(in: next).isEmpty {
+                throw MatchDomainError.illegalPhaseTransition("Score the objective first.")
             }
             for line in AlphaStrikeHeat.applyEndPhase(&next.units) {
                 next.appendLog(line)
@@ -440,6 +462,8 @@ public enum MatchReducer {
             for i in next.units.indices {
                 next.units[i].combatPhaseCrits = nil
             }
+            bankDestroyTheEnemy(&next)
+            AlphaStrikePhaseEngine.dropOrphanedTokens(&next)
             // Forced Withdrawal: say once that a ’Mech is crippled. From now on it heads home.
             for i in next.units.indices where next.mustWithdraw(next.units[i]) && !next.units[i].withdrawalAnnounced {
                 next.units[i].withdrawalAnnounced = true
@@ -467,6 +491,9 @@ public enum MatchReducer {
             AlphaStrikePhaseEngine.resetTurnFlags(&next.units)
             next.appendLog("Turn \(next.turn)")
 
+        case .scoreObjective(let side, let entries):
+            try scoreObjective(&next, side: side, entries: entries)
+
         case .completeMatch(let outcome):
             next.status = .completed
             next.outcome = outcome
@@ -491,6 +518,7 @@ public enum MatchReducer {
 
         var attacker = next.units[attackerIdx]
         let defender = next.units[defenderIdx]
+        let attackerSide = attacker.side
 
         // No side gate: damage and crits land at the end of the phase (combatPhaseCrits),
         // so the order shots are entered in can't change the result. Players roll together.
@@ -567,6 +595,7 @@ public enum MatchReducer {
                     naturalTwelveHit: attack.roll.isNaturalTwelve
                 )
                 next.units[defenderIdx] = applied.unit
+                recordHit(&next.units[defenderIdx], before: defender, by: attackerSide, causedCritical: applied.needsCritical)
                 note = "\(attacker.name) hit \(defender.name) for \(amount). Rolled \(attack.roll.total), needed \(tn.value).\(how) Minimal damage die \(die): 1 point."
                 if applied.needsCritical { note += " A critical is owed." }
             } else {
@@ -591,6 +620,7 @@ public enum MatchReducer {
                 naturalTwelveHit: attack.roll.isNaturalTwelve
             )
             next.units[defenderIdx] = applied.unit
+            recordHit(&next.units[defenderIdx], before: defender, by: attackerSide, causedCritical: applied.needsCritical)
             deliveredDamage = delivered.delivered
             note = "\(attacker.name) hit \(defender.name) for \(delivered.delivered). Rolled \(attack.roll.total), needed \(tn.value).\(how)"
             if applied.needsCritical {
@@ -641,6 +671,131 @@ public enum MatchReducer {
         next.units[attackerIdx] = attacker
         next.appendLog(note)
         return next
+    }
+
+    /// Records who dealt the damage (§ 6.6): the last attacker, the side that caused a critical roll, and the side
+    /// whose hit first crippled or destroyed the 'Mech (D11).
+    static func recordHit(_ unit: inout MatchUnitState, before: MatchUnitState, by side: SideId, causedCritical: Bool) {
+        unit.lastDamagedBy = side
+        if causedCritical { unit.critCausedBy = side }
+        recordDowned(before: before, after: &unit, by: side)
+    }
+
+    /// Sets `downedBy` the first time a 'Mech goes from fighting to crippled or destroyed. Own-heat shutdown and
+    /// Forced Withdrawal never come through here, so they score for nobody.
+    static func recordDowned(before: MatchUnitState, after unit: inout MatchUnitState, by side: SideId?) {
+        guard let side, side != unit.side, unit.downedBy == nil else { return }
+        let wasDown = before.isCrippled || before.combatStatus != .active
+        let isDown = unit.isCrippled || unit.combatStatus != .active
+        if isDown, !wasDown { unit.downedBy = side }
+    }
+
+    /// Destroy the Enemy scores itself: Size, or 1.5 × Size for a Clan side against the Inner Sphere (§ 7.1),
+    /// for each 'Mech first crippled or destroyed by that side's attack (§ 6.6). Once per 'Mech.
+    private static func bankDestroyTheEnemy(_ session: inout MatchSession) {
+        guard session.objective == .destroyTheEnemy else { return }
+        var gained: [SideId: Double] = [:]
+        for index in session.units.indices {
+            let unit = session.units[index]
+            guard let scorer = unit.downedBy, unit.scoredFor == nil else { continue }
+            let points = Double(unit.sz) * ObjectiveRules.clanMultiplier(for: scorer, objective: .destroyTheEnemy, in: session)
+            gained[scorer, default: 0] += points
+            session.units[index].scoredFor = scorer
+            session.appendLog("\(session.displayName(of: scorer)) scores \(ObjectiveRules.format(points)) for \(unit.name)")
+        }
+        for (side, points) in gained { session.victoryPoints[side, default: 0] += points }
+    }
+
+    private static func scoreObjective(_ session: inout MatchSession, side: SideId, entries: [ObjectiveScoreEntry]) throws {
+        guard session.status == .active, session.phase == .end else {
+            throw MatchDomainError.illegalPhaseTransition("Score the objective in the Clean up step.")
+        }
+        guard let objective = session.objective, ObjectiveRules.asksQuestions(objective, turn: session.turn) else {
+            throw MatchDomainError.illegalPhaseTransition("This game has nothing to score by hand.")
+        }
+        guard session.sidesInGame.contains(side) else {
+            throw MatchDomainError.illegalPhaseTransition("That side is out")
+        }
+        guard !ObjectiveRules.hasScored(side, in: session) else {
+            throw MatchDomainError.illegalPhaseTransition("\(session.displayName(of: side)) has already scored this turn.")
+        }
+        var state = session.objectiveState ?? ObjectiveState.make(objective: objective, sides: session.sideIds)
+        if state.scoredTurn != session.turn {
+            state.scoredTurn = session.turn
+            state.scoredSides = []
+        }
+        func activeUnit(_ id: UUID?) throws -> Int {
+            guard let id, let index = session.units.firstIndex(where: { $0.id == id }) else { throw MatchDomainError.unitNotFound }
+            guard session.units[index].side == side, session.units[index].combatStatus == .active else {
+                throw MatchDomainError.illegalPhaseTransition("Only the side's own ’Mechs on the table can score.")
+            }
+            return index
+        }
+        var points = 0.0
+        var notes: [String] = []
+        switch objective {
+        case .raid:
+            // Returns first: a ’Mech scores for a token it carried into this End Phase, then others may pick up.
+            for entry in entries where entry.kind == .returned {
+                let index = try activeUnit(entry.unitId)
+                guard let tokenIndex = state.tokens.firstIndex(where: { $0.carrier == session.units[index].id }) else {
+                    throw MatchDomainError.illegalPhaseTransition("\(session.units[index].name) isn’t carrying a token.")
+                }
+                state.tokens[tokenIndex].carrier = nil
+                state.tokens[tokenIndex].returned = true
+                points += 2
+                notes.append("\(session.units[index].name) returned a token")
+            }
+            for entry in entries where entry.kind == .pickedUp {
+                let index = try activeUnit(entry.unitId)
+                let unitId = session.units[index].id
+                guard !state.tokens.contains(where: { $0.carrier == unitId }) else {
+                    throw MatchDomainError.illegalPhaseTransition("\(session.units[index].name) already carries a token.")
+                }
+                guard let tokenIndex = state.tokens.firstIndex(where: { $0.owner != side && $0.carrier == nil && !$0.returned }) else {
+                    throw MatchDomainError.illegalPhaseTransition("There is no enemy token left to pick up.")
+                }
+                state.tokens[tokenIndex].carrier = unitId
+                notes.append("\(session.units[index].name) picked up a token")
+            }
+        case .controlTheField:
+            for unitId in Set(entries.filter { $0.kind == .inPosition }.compactMap(\.unitId)) {
+                let index = try activeUnit(unitId)
+                points += Double(session.units[index].sz)
+                notes.append(session.units[index].name)
+            }
+        case .holdTheFort:
+            let tokenIds = Set(entries.filter { $0.kind == .guarded }.compactMap(\.tokenId))
+            for id in tokenIds {
+                guard state.tokens.contains(where: { $0.id == id && $0.owner == side }) else {
+                    throw MatchDomainError.illegalPhaseTransition("That isn’t this side’s token.")
+                }
+            }
+            // 1 per token, at most 2 a turn (§ 7.1).
+            points = Double(min(tokenIds.count, 2))
+            if points > 0 { notes.append("\(Int(points)) guarded") }
+        case .breakthrough:
+            for unitId in Set(entries.filter { $0.kind == .exited }.compactMap(\.unitId)) {
+                let index = try activeUnit(unitId)
+                guard session.units[index].criticalsOwed == 0 else {
+                    throw MatchDomainError.illegalPhaseTransition("Roll the critical first.")
+                }
+                let earned = Double(session.units[index].sz) * ObjectiveRules.clanMultiplier(for: side, objective: .breakthrough, in: session)
+                points += earned
+                // The 'Mech leaves the game; it isn't destroyed, so nobody scores for it as a kill.
+                session.units[index].leftTable = true
+                session.units[index].combatStatus = .removed
+                session.units[index].scoredFor = side
+                notes.append("\(session.units[index].name) broke through (\(ObjectiveRules.format(earned)))")
+            }
+        case .destroyTheEnemy, .findTheTarget:
+            break
+        }
+        state.scoredSides.append(side)
+        session.objectiveState = state
+        session.victoryPoints[side, default: 0] += points
+        let detail = notes.isEmpty ? "no one" : notes.joined(separator: ", ")
+        session.appendLog("\(session.displayName(of: side)) scores \(ObjectiveRules.format(points)) (\(detail)). Total \(ObjectiveRules.format(session.points(of: side)))")
     }
 
     /// Usually the initiative loser; the next side in order if the loser has nothing left to move.

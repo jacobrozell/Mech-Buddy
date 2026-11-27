@@ -10,6 +10,8 @@ public enum ReleaseFlag: String, CaseIterable, Sendable {
     case playMode
     /// Three- and four-side presets in Play (PlayModeSpec § 16, PM7). Teams (1 v 2, 2 v 2) stay under `playMode`.
     case playModeMultiSide
+    /// The objective picker and Score step in Play (PlayModeSpec § 16, PM8). Off = last side standing only.
+    case playObjectives
     case physicalOvWithdrawal
     case classicComingSoonEntry
     case classicPlayTools
@@ -38,7 +40,7 @@ public struct ReleaseSurface: ReleaseSurfaceProviding, Sendable {
             return true
         case .tipJar:
             return false
-        case .fullLancesScenario, .playMode, .playModeMultiSide, .physicalOvWithdrawal,
+        case .fullLancesScenario, .playMode, .playModeMultiSide, .playObjectives, .physicalOvWithdrawal,
              .classicPlayTools, .mulNetworkFetch, .matchHistory:
             return isFullProductSurface
         }
