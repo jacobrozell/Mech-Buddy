@@ -335,7 +335,7 @@
       "sections": [
         {
           "heading": "What the Quick-Start covers",
-          "body": "The Quick-Start (p. 13) plays two teams. A team of any size is one side: it rolls one initiative and moves as one. Three or four sides is not in the Quick-Start. Everything on this page is a [HOUSE] rule: Mech Buddy's own way to fill the gap, marked so you can argue with it. With two sides, even with teams, the app follows the Quick-Start exactly."
+          "body": "The Quick-Start (p. 13) plays two teams. A team of any size is one side: it rolls one initiative and moves as one. Three or four sides is not in the Quick-Start. Everything on this page is a [HOUSE] rule: Mech Buddy’s own way to fill the gap, marked so you can argue with it. With two sides, even with teams, the app follows the Quick-Start exactly."
         },
         {
           "heading": "Initiative [HOUSE]",
@@ -343,15 +343,15 @@
         },
         {
           "heading": "Moving [HOUSE]",
-          "body": "This generalises the unequal-numbers rule (p. 14). Before each round, take the side with the fewest 'Mechs left to move. Every side moves as many 'Mechs as it has multiples of that, at least one, in initiative order. When one side has 'Mechs left, it moves them all. Example: sides with 4, 2 and 2 left move 2, 1, 1 and then 2, 1, 1."
+          "body": "This generalises the unequal-numbers rule (p. 14). Before each round, take the side with the fewest ’Mechs left to move. Every side moves as many ’Mechs as it has multiples of that, at least one, in initiative order. When one side has ’Mechs left, it moves them all. Example: sides with 4, 2 and 2 left move 2, 1, 1 and then 2, 1, 1."
         },
         {
           "heading": "Shooting [HOUSE]",
-          "body": "Shooting stays simultaneous, as in Mech Buddy's two-side games. Any side may shoot in any order; tap Done shooting once. A 'Mech may target any 'Mech on another side, never a teammate. A side that is out has no 'Mechs on the table."
+          "body": "Shooting stays simultaneous, as in Mech Buddy’s two-side games. Any side may shoot in any order; tap Done shooting once. A ’Mech may target any ’Mech on another side, never a teammate. A side that is out has no ’Mechs on the table."
         },
         {
           "heading": "Home edges and zones [HOUSE]",
-          "body": "Each side takes one table edge, highest setup roll picks first. A zone is 6 inches deep and covers the middle 3/8 of that edge (18 inches of a 48-inch edge), so neighbouring zones stay apart. An objective that names the opponent's home edge means any enemy side's home edge. Use a 4 by 4 foot table or bigger, square if you can."
+          "body": "Each side takes one table edge, highest setup roll picks first. A zone is 6 inches deep and covers the middle 3/8 of that edge (18 inches of a 48-inch edge), so neighbouring zones stay apart. An objective that names the opponent’s home edge means any enemy side’s home edge. Use a 4 by 4 foot table or bigger, square if you can."
         },
         {
           "heading": "Terrain setup [HOUSE]",
@@ -359,11 +359,11 @@
         },
         {
           "heading": "Going out and conceding [HOUSE]",
-          "body": "A side is out at the End Phase when it has no 'Mechs left on the table (destroyed or withdrawn). It drops from initiative, move order and the pass lines, and the app keeps its standing for the result. A side can concede from the More menu: its 'Mechs are removed at once."
+          "body": "A side is out at the End Phase when it has no ’Mechs left on the table (destroyed or withdrawn). It drops from initiative, move order and the pass lines, and the app keeps its standing for the result. A side can concede from the More menu: its ’Mechs are removed at once."
         },
         {
           "heading": "Winning [HOUSE]",
-          "body": "The last side with a 'Mech on the table wins. At a turn limit, the most Point Value still in the fight wins; sides level at the top share the result. Default budgets are 250 PV for two sides, 200 for three and 150 for four, so four sides still fit a collection of two boxes."
+          "body": "The last side with a ’Mech on the table wins. At a turn limit, the most Point Value still in the fight wins; sides level at the top share the result. Default budgets are 250 PV for two sides, 200 for three and 150 for four, so four sides still fit a collection of two boxes."
         }
       ]
     }
