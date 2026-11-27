@@ -44,6 +44,7 @@ struct BattleFlowView: View {
 
     var body: some View {
         screen
+            .environment(\.sideNames, SideNames(store.session))
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { battleToolbar }
@@ -339,7 +340,7 @@ struct BattleFlowView: View {
                 // Overlay, not inset: the pass banner used to push the list ~50 pt and then pull it
                 // back, so taps landed on the wrong card.
                 if let passSide {
-                    SidePassBanner(side: passSide)
+                    SidePassBanner(side: passSide, name: sideName(passSide), controller: store.session?.nextController(of: passSide))
                         .padding(.top, TMSpace.sm)
                         .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
                         .allowsHitTesting(false)
@@ -362,7 +363,8 @@ struct BattleFlowView: View {
                 maxTurns: session.ruleset.maxTurns,
                 phase: session.phase,
                 activeSide: BattleChrome.showsActiveSide(coach.step) && !(coach.step == .movement && coach.movementComplete)
-                    ? session.activeSide : nil
+                    ? session.activeSide : nil,
+                activeSideName: session.displayName(of: session.activeSide)
             )
         }
     }
@@ -629,10 +631,10 @@ struct BattleFlowView: View {
             }
             return BattleDockButton(
                 // Lead with who moves: "Side B wins — start moving" read as if Side B moved.
-                title: first.map { "\($0.displayName) moves first — start" } ?? "Enter all four dice",
+                title: first.map { "\(sideName($0)) moves first — start" } ?? "Enter all four dice",
                 identifier: "as.battle.primary",
                 specIdentifier: "as.initiative.confirm",
-                hint: winner.flatMap { w in first.map { "\(w.displayName) won initiative. \($0.displayName) moves first." } }
+                hint: winner.flatMap { w in first.map { "\(sideName(w)) won initiative. \(sideName($0)) moves first." } }
                     ?? "Enter all four dice. Higher total moves last.",
                 disabled: winner == nil,
                 action: applyManualInitiative
@@ -640,10 +642,10 @@ struct BattleFlowView: View {
         case .rollInitiative:
             if let autoPreview, let winner = autoPreview.winner, let first = autoPreview.firstToMove {
                 return BattleDockButton(
-                    title: "\(first.displayName) moves first — start",
+                    title: "\(sideName(first)) moves first — start",
                     identifier: "as.battle.primary",
                     specIdentifier: "as.initiative.confirm",
-                    hint: "\(winner.displayName) won initiative. \(first.displayName) moves first.",
+                    hint: "\(sideName(winner)) won initiative. \(sideName(first)) moves first.",
                     action: applyAutoPreview
                 )
             }
@@ -769,7 +771,7 @@ struct BattleFlowView: View {
         if let previous, sideChanged, sideOwned, next.criticalID == nil {
             presentPassBanner(next.side)
             if !stepChanged && previous.criticalID == next.criticalID {
-                AccessibilityNotification.Announcement("\(next.side.displayName)’s turn — pass the phone").post()
+                AccessibilityNotification.Announcement(session.passLine(for: next.side)).post()
                 return
             }
         }
@@ -785,6 +787,10 @@ struct BattleFlowView: View {
             guard token == undoOfferToken else { return }
             undoOffered = false
         }
+    }
+
+    private func sideName(_ side: SideId) -> String {
+        store.session?.displayName(of: side) ?? side.displayName
     }
 
     private func presentPassBanner(_ side: SideId) {

@@ -175,6 +175,8 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     /// Standing in water this turn (Quick-Start Rulebook pp. 10, 19, 24): partial cover for attackers and −1 heat in the
     /// End Phase. Players set it each turn; `resetTurnFlags` clears it.
     public var inWater: Bool = false
+    /// Which player on a team side moves this 'Mech (PlayModeSpec § 5.3, § 15). Only names pass-the-phone lines. Nil = anyone on the side.
+    public var controller: String?
 
     public var pendingCritical: Bool {
         get { criticalsOwed > 0 }

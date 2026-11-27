@@ -5,6 +5,7 @@ struct CriticalPendingStep: View {
     var unit: MatchUnitState
     /// The side that rolls the critical: the side that hit it (rulebook p. 23).
     var rollingSide: SideId
+    @Environment(\.sideNames) private var sideNames
     var count: Int
     var diceMode: DiceMode
     var landingUnitID: UUID?
@@ -60,7 +61,7 @@ struct CriticalPendingStep: View {
     private var message: String {
         // Name the roller and say it is not a shot: players read "Roll two dice" as their attack.
         // The attacker rolls the critical (rulebook p. 23), so the other side picks up the dice.
-        let who = rollingSide.displayName
+        let who = sideNames(rollingSide)
         return "\(unit.name) took a critical hit. \(who), the side that hit it, rolls two dice for the critical check — this is not a shot."
     }
 }

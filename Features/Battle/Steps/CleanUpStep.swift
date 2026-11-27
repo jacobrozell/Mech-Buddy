@@ -155,12 +155,12 @@ struct CleanUpStep: View {
                 .contentTransition(.numericText())
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(side.displayName) \(value) \(session.isPlayGame ? "PV left" : "structure")")
+        .accessibilityLabel("\(session.displayName(of: side)) \(value) \(session.isPlayGame ? "PV left" : "structure")")
     }
 
     private func verdict(sideA: Int, sideB: Int) -> String {
-        if sideA > sideB { return "Side A would win" }
-        if sideB > sideA { return "Side B would win" }
+        if sideA > sideB { return "\(session.displayName(of: .lanceA)) would win" }
+        if sideB > sideA { return "\(session.displayName(of: .lanceB)) would win" }
         return "It would be a draw"
     }
 }

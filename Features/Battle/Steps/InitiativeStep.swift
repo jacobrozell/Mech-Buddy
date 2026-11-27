@@ -15,6 +15,7 @@ struct InitiativeStep: View {
     private var manual: Bool { diceMode.wrappedValue == .manual }
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.sideNames) private var sideNames
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
@@ -37,8 +38,8 @@ struct InitiativeStep: View {
             if let onAgree {
                 Menu {
                     Section("Moving first gives the other side the advantage") {
-                        Button("Side A moves first") { onAgree(.lanceA) }
-                        Button("Side B moves first") { onAgree(.lanceB) }
+                        Button("\(sideNames(.lanceA)) moves first") { onAgree(.lanceA) }
+                        Button("\(sideNames(.lanceB)) moves first") { onAgree(.lanceB) }
                     }
                 } label: {
                     Label("Skip the roll — we’ll choose who moves first", systemImage: "hand.raised")
@@ -74,7 +75,7 @@ struct InitiativeStep: View {
         } else if let winner = shownWinner {
             TMCard(edgeColor: TMColor.side(winner), isRaised: true) {
                 VStack(alignment: .leading, spacing: TMSpace.xs) {
-                    Text("\(winner.displayName) wins initiative · \(shownFirstToMove?.displayName ?? "") moves first")
+                    Text("\(sideNames(winner)) wins initiative · \(shownFirstToMove.map { sideNames($0) } ?? "") moves first")
                         .font(TMFont.cardTitle)
                 }
             }

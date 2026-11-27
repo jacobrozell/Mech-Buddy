@@ -50,15 +50,16 @@ struct SideBadge: View {
 
 struct SideTag: View {
     var side: SideId
+    @Environment(\.sideNames) private var sideNames
 
     var body: some View {
         HStack(spacing: TMSpace.xs) {
             SideBadge(side: side)
-            Text(side.displayName)
+            Text(sideNames(side))
                 .font(TMFont.cardTitle)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(side.displayName)
+        .accessibilityLabel(sideNames(side))
     }
 }
 

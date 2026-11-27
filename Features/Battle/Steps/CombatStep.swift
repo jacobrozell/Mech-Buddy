@@ -104,7 +104,7 @@ struct CombatStep: View {
     private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {
         let left = units.filter(\.canAttackThisTurn).count
         return VStack(alignment: .leading, spacing: TMSpace.xs) {
-            Eyebrow(side.displayName) {
+            Eyebrow(session.displayName(of: side)) {
                 Text(left == 0 ? "All fired" : "\(left) to fire")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)

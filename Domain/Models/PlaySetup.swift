@@ -84,6 +84,9 @@ public struct ForcePick: Codable, Sendable, Equatable, Identifiable {
     public var size: Int
     public var skill: Int
     public var isClan: Bool
+    /// Which player on a team side moves it (§ 5.3), as a 0-based index into the side's players. Nil = anyone.
+    /// An index, not a name, so renaming a player in setup keeps the tag.
+    public var controllerIndex: Int?
 
     public init(
         id: UUID = UUID(),
@@ -92,8 +95,10 @@ public struct ForcePick: Codable, Sendable, Equatable, Identifiable {
         basePV: Int,
         size: Int,
         skill: Int,
-        isClan: Bool
+        isClan: Bool,
+        controllerIndex: Int? = nil
     ) {
+        self.controllerIndex = controllerIndex
         self.id = id
         self.cardId = cardId
         self.name = name
@@ -358,6 +363,52 @@ public struct PlaySetup: Codable, Sendable, Equatable {
         forces = try c.decodeIfPresent([SideId: [ForcePick]].self, forKey: .forces) ?? [:]
     }
 
+    /// Players per side, e.g. [1, 2] (§ 5.1). At least one each.
+    public var playerCounts: [Int] { sides.map { max(1, $0.players.count) } }
+
+    /// Resizes each side's player list to `counts` (a preset such as 1 v 2), keeping names already typed, and clears
+    /// controller tags that no longer point at a player. Extra sides in `counts` are ignored: teams are two sides (D3).
+    public mutating func setPlayerCounts(_ counts: [Int]) {
+        for (index, count) in counts.enumerated() where sides.indices.contains(index) {
+            var players = sides[index].players
+            if players.count > count { players.removeLast(players.count - count) }
+            while players.count < count { players.append("") }
+            sides[index].players = players
+            let side = sides[index].id
+            forces[side] = forces[side]?.map { pick in
+                var copy = pick
+                if let tag = copy.controllerIndex, tag >= count || count == 1 { copy.controllerIndex = nil }
+                return copy
+            }
+        }
+    }
+
+    /// Setup checks that stop Start (§ 5.1): every side has a player and the format fits four players.
+    /// Keys, not text, so the screen words them. Empty = valid.
+    public var teamIssues: [TeamIssue] {
+        var issues: [TeamIssue] = []
+        if playerCounts.contains(where: { $0 < 1 }) || sides.contains(where: { $0.players.isEmpty }) { issues.append(.sideWithoutPlayer) }
+        if playerCounts.reduce(0, +) > Self.maxPlayers { issues.append(.tooManyPlayers) }
+        return issues
+    }
+
+    /// The name on screen for a player on a side: what was typed, or "Player 2".
+    public func playerLabel(side: SideId, index: Int) -> String {
+        let players = sides.first { $0.id == side }?.players ?? []
+        let typed = players.indices.contains(index) ? players[index].trimmingCharacters(in: .whitespaces) : ""
+        return typed.isEmpty ? "Player \(index + 1)" : typed
+    }
+
+    /// The controller's name for a pick, only on a side with more than one player (§ 15).
+    public func controllerName(of pick: ForcePick, side: SideId) -> String? {
+        guard let index = pick.controllerIndex,
+              (sides.first { $0.id == side }?.players.count ?? 0) > 1 else { return nil }
+        return playerLabel(side: side, index: index)
+    }
+
+    /// Four players at most in all (§ 5.1).
+    public static let maxPlayers = 4
+
     /// "1 v 1": one entry per side, players per side (at least one).
     public var formatName: String {
         sides.map { String(max(1, $0.players.count)) }.joined(separator: " v ")
@@ -408,6 +459,26 @@ public struct PlaySetup: Codable, Sendable, Equatable {
     /// Per-side unit cap and per-game cap **[HOUSE app limit]** (D9).
     public static let maxUnitsPerSide = 10
     public static let maxUnitsPerGame = 24
+}
+
+/// Why a team format can't start (§ 5.1).
+public enum TeamIssue: Sendable, Equatable {
+    case sideWithoutPlayer
+    case tooManyPlayers
+}
+
+/// The player-count presets (§ 5.1). All are two sides, so QSR p. 13 covers them: a team is a player.
+public struct TeamFormat: Sendable, Equatable, Identifiable {
+    public var title: String
+    public var players: [Int]
+    public var id: String { title }
+
+    public static let all: [TeamFormat] = [
+        TeamFormat(title: "1 v 1", players: [1, 1]),
+        TeamFormat(title: "1 v 2", players: [1, 2]),
+        TeamFormat(title: "2 v 2", players: [2, 2]),
+        TeamFormat(title: "1 v 3", players: [1, 3])
+    ]
 }
 
 /// A side's force against its budget (§ 5.3). Over budget is allowed; Review warns.

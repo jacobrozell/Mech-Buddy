@@ -34,7 +34,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 
 1. **PM11** — Battlefield Support, buildings and formations done in Play setup (`PlayRules.buildings`, `PlayRules.formation`); MechWarrior cards remain a placeholder.
 2. ~~**PM5**~~ — done: battle roster groups by side with a colour/name header (`SideGrouping`, `as.battle.side.<sideId>`); shared with Learn missions. Filters not built.
-3. **PM6** — teams (1 v 2, 2 v 2, 1 v 3); custom side names reach the battle screens.
+3. ~~**PM6**~~ — done: teams as players per side (1 v 2, 2 v 2, 1 v 3 presets, `as.play.setup.preset.*`, `as.play.setup.team.*`), controller tags per 'Mech, pass lines naming the controller, custom side names in battle chrome (`SideNames` environment, `MatchSession.passLine`). A team is one side (spec D3); no team map or Balance action. On `main` only after merge.
 4. **PM7** — three and four sides behind `playModeMultiSide` (needs Side C/D colours; owner table test).
 5. **PM8** — objectives (five of six) and victory points behind `playObjectives` (turn limit already built in PM4).
 6. **PM9** — saved forces and hand-entered cards (SwiftData SchemaV2).
@@ -53,7 +53,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 
 - In-battle Clash of Steel flows (calling support, "Attack now", initiative reroll, Lucky) are tested in the domain but not checked on screen.
 - Light-building collapse has no die entry (no scenario uses Light buildings yet); 'Mechs inside or on buildings aren't tracked; no physical attacks on buildings.
-- Play: battle roster headers use the session's side names (custom names arrive with PM6); mini markers are set in battle, not on the Forces screen; hand card entry waits for PM9.
+- Play: battle roster headers and chrome use the session's side names (PM6); mini markers are set in battle, not on the Forces screen; hand card entry waits for PM9.
 - No shipped card uses 0* damage, so the minimal-damage die has not been seen on screen.
 
 ## 6. How to work in this repo

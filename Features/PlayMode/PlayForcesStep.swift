@@ -144,6 +144,9 @@ struct PlayForcesStep: View {
                         }
                         .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString).face")
                     }
+                    if players.count > 1 {
+                        controllerMenu(pick)
+                    }
                     Spacer(minLength: 0)
                     Button(role: .destructive) {
                         setup.forces[side]?.removeAll { $0.id == pick.id }
@@ -159,6 +162,28 @@ struct PlayForcesStep: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString)")
+    }
+
+    private var players: [String] { setup.sides.first { $0.id == side }?.players ?? [] }
+
+    /// Who moves this 'Mech on a team side (§ 5.3). Only names pass-the-phone lines.
+    private func controllerMenu(_ pick: ForcePick) -> some View {
+        let current = pick.controllerIndex.map { setup.playerLabel(side: side, index: $0) } ?? "Anyone"
+        return Menu {
+            Button("Anyone") { setController(nil, for: pick) }
+            ForEach(players.indices, id: \.self) { index in
+                Button(setup.playerLabel(side: side, index: index)) { setController(index, for: pick) }
+            }
+        } label: {
+            Label("Moved by \(current)", systemImage: "person")
+                .frame(minHeight: 44)
+        }
+        .accessibilityIdentifier("as.play.setup.team.controller.\(pick.id.uuidString)")
+    }
+
+    private func setController(_ index: Int?, for pick: ForcePick) {
+        guard let at = setup.forces[side]?.firstIndex(where: { $0.id == pick.id }) else { return }
+        setup.forces[side]?[at].controllerIndex = index
     }
 
     private func skillBinding(_ pick: ForcePick) -> Binding<Int> {
@@ -434,8 +459,9 @@ struct PlayReviewStep: View {
     private func sideCard(_ side: MatchSide) -> some View {
         let check = setup.budgetCheck(side.id)
         return section(side.name, edit: .forces, badge: side.id) {
-            if let player = side.players.first, !player.isEmpty {
-                Text(player).font(TMFont.detail).foregroundStyle(.secondary)
+            let names = side.players.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+            if !names.isEmpty {
+                Text(names.joined(separator: ", ")).font(TMFont.detail).foregroundStyle(.secondary)
             }
             Text("\(setup.totalPV(side.id)) PV · \(PlayModeText.mechs(setup.force(side.id).count)) · \(check.text)")
                 .font(TMFont.stat)

@@ -66,7 +66,7 @@ enum BattleChrome {
         case .initiative:
             return "Turn \(session.turn), Roll."
         case .movement:
-            return "Turn \(session.turn), Move. \(session.activeSide.displayName) moves."
+            return "Turn \(session.turn), Move. \(session.displayName(of: session.activeSide)) moves."
         case .combat:
             return "Turn \(session.turn), Shoot. Both sides shoot, in any order."
         case .end:
@@ -85,6 +85,8 @@ struct BattleStepStrip: View {
     var maxTurns: Int?
     var phase: PhaseId
     var activeSide: SideId?
+    /// The session's name for the active side ("Side B" or the players' choice).
+    var activeSideName: String?
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -116,7 +118,7 @@ struct BattleStepStrip: View {
             bar
             if let activeSide {
                 SideBadge(side: activeSide)
-                    .accessibilityLabel("Active side, \(activeSide.displayName)")
+                    .accessibilityLabel("Active side, \(activeSideName ?? activeSide.displayName)")
                     .accessibilityValue((activeSide ?? .lanceB).rawValue)
                     .accessibilityIdentifier("as.battle.activeSide")
             }
@@ -188,11 +190,19 @@ struct BattleStepStrip: View {
 
 struct SidePassBanner: View {
     var side: SideId
+    /// The session's name for the side.
+    var name: String
+    /// Who moves the side's next 'Mech on a team side (PlayModeSpec § 8.3). Nil = just the side.
+    var controller: String?
+
+    private var line: String {
+        controller.map { "\(name) — \($0)’s turn. Pass the phone." } ?? "\(name)’s turn — pass the phone"
+    }
 
     var body: some View {
         HStack(spacing: TMSpace.sm) {
             SideBadge(side: side)
-            Text("\(side.displayName)’s turn — pass the phone")
+            Text(line)
                 .font(TMFont.cardTitle)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -205,7 +215,7 @@ struct SidePassBanner: View {
         .padding(.horizontal, TMSpace.lg)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
-        .accessibilityLabel("\(side.displayName)’s turn. Pass the phone.")
+        .accessibilityLabel(controller.map { "\(name) — \($0)’s turn. Pass the phone." } ?? "\(name)’s turn. Pass the phone.")
     }
 }
 

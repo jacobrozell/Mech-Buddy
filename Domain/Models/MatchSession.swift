@@ -380,6 +380,27 @@ extension MatchSession {
         sidesInGame.filter { $0 != id }
     }
 
+    /// The player who moves this side's next unmoved 'Mech, when its force has controllers set (§ 8.3, § 15).
+    /// Nil when nobody is named, so the line falls back to the side's name.
+    public func nextController(of id: SideId) -> String? {
+        let pending = units.first {
+            $0.side == id && $0.combatStatus != .removed && !$0.hasMovedThisTurn
+                && !($0.controller ?? "").trimmingCharacters(in: .whitespaces).isEmpty
+        }
+        return pending?.controller?.trimmingCharacters(in: .whitespaces)
+    }
+
+    /// "Side B — Alex's turn. Pass the phone." on a team side; "Side B's turn. Pass the phone." otherwise.
+    public func passLine(for id: SideId) -> String {
+        if let who = nextController(of: id) { return "\(displayName(of: id)) — \(who)’s turn. Pass the phone." }
+        return "\(displayName(of: id))’s turn. Pass the phone."
+    }
+
+    /// Players on the side, blanks dropped.
+    public func playerNames(of id: SideId) -> [String] {
+        (side(id)?.players ?? []).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+    }
+
     /// The next side after this one in seat order, wrapping round. Sides that are out are skipped
     /// unless every other side is out.
     public func nextSide(after id: SideId) -> SideId {

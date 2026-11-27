@@ -100,6 +100,26 @@ final class PlayModePickupUITests: XCTestCase {
         app.descendants(matching: .any)[id]
     }
 
+    /// PM6: a 1 v 2 setup shows the team note and a second player field on Side B (PlayModeSpec § 5.1).
+    @MainActor
+    func testTeamPresetShowsPlayers() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui_testing", "-reset_state", "-skip_onboarding", "-enable_full_product_surface"]
+        app.launch()
+        let tabs = app.tabBars.firstMatch
+        XCTAssertTrue(tabs.waitForExistence(timeout: 20))
+        tabs.buttons["Play"].tap()
+        tap(app.buttons["as.play.new"])
+        XCTAssertTrue(element(app, "as.play.setup.sides").waitForExistence(timeout: 5))
+        XCTAssertFalse(element(app, "as.play.setup.team.note").exists)
+        tap(app.buttons["as.play.setup.preset.1v2"])
+        XCTAssertTrue(element(app, "as.play.setup.team.note").waitForExistence(timeout: 5))
+        let second = element(app, "as.play.setup.side.B.player.2")
+        if !second.exists { app.swipeUp() }
+        XCTAssertTrue(second.waitForExistence(timeout: 5))
+        XCTAssertFalse(element(app, "as.play.setup.side.A.player.2").exists)
+    }
+
     @MainActor
     private func tap(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(element.waitForExistence(timeout: 5), "Missing \(element)", file: file, line: line)

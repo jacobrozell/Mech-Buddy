@@ -5,6 +5,7 @@ struct CritSheet: View {
     let unit: MatchUnitState
     @Bindable var store: MatchStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.sideNames) private var sideNames
     @State private var d1: Int?
     @State private var d2: Int?
     @State private var tableOpen = false
@@ -76,7 +77,7 @@ struct CritSheet: View {
                     StatusChip(kind: .critOwed(unit.criticalsOwed))
                 }
             }
-            Text("\((store.session?.otherSide(of: unit.side) ?? unit.side).displayName) rolls, as the side that hit the \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
+            Text("\(sideNames(store.session?.otherSide(of: unit.side) ?? unit.side)) rolls, as the side that hit the \(unit.name). This is a critical check, not a shot. The app applies the result, including a wreck or no effect.")
                 .font(TMFont.detail)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
