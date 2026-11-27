@@ -328,15 +328,15 @@ public enum BoardZones {
     /// Three or four sides use the middle 3/8 of their edge **[HOUSE]** (§ 6.4).
     public static let houseZoneShare = 3.0 / 8.0
 
-    public static func generate(width: Double, depth: Double, sideCount: Int) -> [BoardLayout.Zone] {
+    public static func generate(width: Double, depth: Double, sideCount: Int, zoneDepth: Double = BoardZones.zoneDepth) -> [BoardLayout.Zone] {
         let edges = [TableEdge.west, .east, .south, .north].prefix(min(max(sideCount, 2), 4))
         let seats = edges.enumerated().map { (letter: ["A", "B", "C", "D"][$0.offset], edge: $0.element) }
-        return generate(width: width, depth: depth, seats: seats)
+        return generate(width: width, depth: depth, seats: seats, zoneDepth: zoneDepth)
     }
 
     /// One zone per side on its home edge, 6″ deep. Two sides take the full edge (p. 11); three or four take
     /// the middle 3/8 of it so neighbouring zones stay apart **[HOUSE]**.
-    public static func generate(width: Double, depth: Double, seats: [(letter: String, edge: TableEdge)]) -> [BoardLayout.Zone] {
+    public static func generate(width: Double, depth: Double, seats: [(letter: String, edge: TableEdge)], zoneDepth: Double = BoardZones.zoneDepth) -> [BoardLayout.Zone] {
         let narrow = seats.count > 2
         return seats.map { seat in
             let vertical = seat.edge == .west || seat.edge == .east

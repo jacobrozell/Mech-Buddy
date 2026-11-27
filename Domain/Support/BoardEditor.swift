@@ -218,6 +218,16 @@ public struct BoardEditor: Sendable, Equatable {
         }
     }
 
+    /// Sets how deep the zones are for a game of `sideCount` sides (2″–12″; the rule is 6″, p. 11).
+    public mutating func setZoneDepth(_ inches: Double, sideCount: Int) {
+        let clamped = min(max(inches, 2), 12)
+        apply {
+            var sets = $0.zonesBySideCount ?? [:]
+            sets[min(max(sideCount, 2), 4)] = BoardZones.generate(width: $0.width, depth: $0.depth, sideCount: sideCount, zoneDepth: clamped)
+            $0.zonesBySideCount = sets
+        }
+    }
+
     /// Re-sizes the table, clamping pieces onto it.
     public mutating func setTable(width: Double, depth: Double) {
         apply {

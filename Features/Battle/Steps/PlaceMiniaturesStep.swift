@@ -45,7 +45,7 @@ struct PlaceMiniaturesStep: View {
     private var freeForAllLayout: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
             if let play = session.play {
-                MissionLayoutView(layout: PlayLayout.layout(for: play.battlefield, sides: session.sides))
+                MissionLayoutView(board: PlayLayout.board(for: play.battlefield, sides: session.sides))
             }
             ForEach(session.sides) { side in
                 HStack(spacing: TMSpace.sm) {

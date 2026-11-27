@@ -140,7 +140,8 @@ final class MatchStore: Identifiable {
             subtitle: "\(setup.budget.summary) · \(setup.battlefield.summary)",
             tableSteps: PlayLayout.tableSteps(for: setup),
             winningSummary: PlayLayout.winningSummary(for: setup),
-            layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides)
+            layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides),
+            board: setup.battlefield.board == nil ? nil : PlayLayout.board(for: setup.battlefield, sides: setup.sides)
         )
         scenarioLoaded = true
     }

@@ -229,7 +229,16 @@ public enum PlayLayout {
             "Lay out the battlefield: \(setup.battlefield.summary)",
             "Each side rolls 2D6. The higher roll places terrain first"
         ]
-        if house {
+        if let board = setup.battlefield.board {
+            // A built board replaces the free terrain checklist (§ 9.9).
+            steps = [
+                "Lay out the battlefield: \(setup.battlefield.summary)",
+                "Set up the table like this: put out the \(board.features.count) terrain \(board.features.count == 1 ? "piece" : "pieces") where the board shows them"
+            ]
+            if house {
+                steps.append("[HOUSE] Home edges, highest setup roll first: one edge each, a zone in the middle 3/8 of the edge, 6″ deep")
+            }
+        } else if house {
             steps.append("[HOUSE] Each side picks 6 pieces of terrain and places them in setup-roll order, one at a time. None inside a deployment zone, and none within 4″ of another unless they form one woods area")
             steps.append("[HOUSE] Home edges, highest setup roll first: one edge each, a zone in the middle 3/8 of the edge, 6″ deep")
         } else {
