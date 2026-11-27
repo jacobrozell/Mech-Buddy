@@ -52,15 +52,12 @@ struct BattleRoster: View {
     private var column: some View {
         ScrollView {
             ScrollViewReader { proxy in
-                LazyVStack(alignment: .leading, spacing: TMSpace.lg) {
-                    ForEach(session.sideIds, id: \.self) { side in
-                        let sideUnits = units(on: side)
-                        if !sideUnits.isEmpty {
-                            VStack(alignment: .leading, spacing: TMSpace.xs) {
-                                Eyebrow(side.displayName)
-                                ForEach(sideUnits) { unit in
-                                    row(unit)
-                                }
+                LazyVStack(alignment: .leading, spacing: TMSpace.md) {
+                    ForEach(SideGrouping.groups(in: session)) { group in
+                        VStack(alignment: .leading, spacing: TMSpace.xs) {
+                            sideHeader(group)
+                            ForEach(group.units) { unit in
+                                row(unit)
                             }
                         }
                     }
@@ -103,11 +100,25 @@ struct BattleRoster: View {
     }
 
     private var rosterUnits: [MatchUnitState] {
-        session.sideIds.flatMap { units(on: $0) }
+        SideGrouping.groups(in: session).flatMap(\.units)
     }
 
-    private func units(on side: SideId) -> [MatchUnitState] {
-        session.units.filter { $0.side == side && $0.combatStatus != .removed }
+    /// Side colour dot, the side's name and a unit count; one short line so 4 v 4 stays on one screen.
+    private func sideHeader(_ group: SideGroup) -> some View {
+        HStack(spacing: TMSpace.xs) {
+            Circle()
+                .fill(TMColor.side(group.side))
+                .frame(width: 8, height: 8)
+                .accessibilityHidden(true)
+            Eyebrow(group.name)
+            Text("\(group.units.count)")
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityIdentifier("as.battle.side.\(group.side.rawValue)")
     }
 
     private func offersShoot(_ unit: MatchUnitState) -> Bool {
