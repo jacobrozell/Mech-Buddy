@@ -12,6 +12,7 @@ struct PlayModeHomeView: View {
     @State private var editingCollection = false
     @State private var route: PlaySetupRoute?
     @State private var confirmDiscardDraft = false
+    @State private var managingSaved = false
 
     var body: some View {
         ScrollView {
@@ -29,6 +30,7 @@ struct PlayModeHomeView: View {
                 if let last = dependencies.preferences.playLastSetup, canOpen(last) {
                     lastSetupRow(last)
                 }
+                savedForcesRow
                 if dependencies.preferences.collection == nil {
                     collectionNote
                 }
@@ -54,6 +56,9 @@ struct PlayModeHomeView: View {
         .confirmationDialog("Discard this setup?", isPresented: $confirmDiscardDraft, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { dependencies.preferences.playDraft = nil }
             Button("Keep", role: .cancel) {}
+        }
+        .sheet(isPresented: $managingSaved) {
+            PlaySavedForcesSheet()
         }
         .sheet(isPresented: $editingCollection) {
             CollectionEditSheet(
@@ -255,6 +260,37 @@ struct PlayModeHomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("as.play.lastSetup")
+    }
+
+    // MARK: Saved forces (PM9)
+
+    private var savedForcesRow: some View {
+        let count = dependencies.userContent.savedForces().count
+        let cards = dependencies.cardLibrary.userFaces.count
+        return Button {
+            managingSaved = true
+        } label: {
+            HStack(spacing: TMSpace.md) {
+                Image(systemName: "tray.full")
+                    .foregroundStyle(TMColor.signal)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text("Saved forces").font(TMFont.cardTitle)
+                    Text("\(count) saved · \(cards) hand-entered \(cards == 1 ? "card" : "cards")")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: TMSpace.sm)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("as.play.savedForces")
     }
 
     // MARK: Collection
