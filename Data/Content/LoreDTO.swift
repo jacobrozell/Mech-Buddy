@@ -62,7 +62,7 @@ public struct LoreEraDTO: Decodable, Sendable, Identifiable, Equatable {
         switch (startYear, endYear) {
         case let (start?, end?): "\(start) – \(end)"
         case let (start?, nil): isOngoing ? "\(start) – Present" : "From \(start)"
-        case let (nil, end?): "Before \(end + 1)"
+        case let (nil, end?): "Up to \(end)"
         case (nil, nil): ""
         }
     }

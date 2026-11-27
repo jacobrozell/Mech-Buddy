@@ -152,13 +152,16 @@ struct LoreEraDetailView: View {
 
     private func subEra(_ sub: LoreSubEraDTO) -> some View {
         VStack(alignment: .leading, spacing: TMSpace.sm) {
-            Text(sub.name)
-                .font(.title3.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityAddTraits(.isHeader)
-            Text(sub.yearLabel)
-                .font(TMFont.detail)
-                .foregroundStyle(.secondary)
+            // An era with one sub-era of the same name would repeat the title and the year chip.
+            if !(era.subEras.count == 1 && sub.name == era.name) {
+                Text(sub.name)
+                    .font(.title3.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                Text(sub.yearLabel)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+            }
             Text(sub.summary)
                 .font(.body)
                 .lineSpacing(3)
