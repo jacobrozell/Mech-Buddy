@@ -212,15 +212,14 @@ struct DestroyTheEnemyTests {
     @Test("Clan scores half points, kept as 3, and reaching 12 wins")
     func clanScoring() throws {
         var session = try game(.destroyTheEnemy, sides: [1, 1], clan: [.lanceA])
+        // Forced Withdrawal off, so a crippled 'Mech still counts as standing and a wipe doesn't end the game first.
+        session.ruleset.forcedWithdrawal = false
         session.units[1].armorCap = 1
         session.units[1].structureCap = 4
         session = try shootAndClearCrit(session, from: "A0", at: "B0")
         session = try closeEndPhase(session)
         #expect(session.points(of: .lanceA) == 3)
         #expect(ObjectiveRules.format(3) == "3" && ObjectiveRules.format(7.5) == "7.5")
-        // Repair the target so a wipe doesn't end the game first.
-        session.units[1].armorDamage = 0
-        session.units[1].structureDamage = 0
         session.victoryPoints[.lanceA] = 11
         session.phase = .end
         session = try MatchReducer.reduce(session, .resolveEndPhase)
