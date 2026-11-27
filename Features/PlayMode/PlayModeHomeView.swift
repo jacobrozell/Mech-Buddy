@@ -8,6 +8,7 @@ struct PlayModeHomeView: View {
     @Environment(PlayMatchCoordinator.self) private var matches
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var editingCollection = false
     @State private var route: PlaySetupRoute?
@@ -170,30 +171,44 @@ struct PlayModeHomeView: View {
 
     /// First visit (§ 4): what Play is, and New game.
     private var hero: some View {
-        TMCard {
-            VStack(spacing: TMSpace.lg) {
-                Image(systemName: "flag.checkered.2.crossed")
-                    .font(.system(size: 48))
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-                VStack(spacing: TMSpace.xs) {
-                    Text("Play a full game of Alpha Strike")
-                        .font(TMFont.stepTitle)
-                        .multilineTextAlignment(.center)
-                        .accessibilityAddTraits(.isHeader)
-                    Text("Pick the players, the ’Mechs and the map. The app keeps score.")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+        let compact = verticalSizeClass == .compact && !dynamicTypeSize.isAccessibilitySize
+        let icon = Image(systemName: "flag.checkered.2.crossed")
+            .font(.system(size: compact ? 32 : 48))
+            .foregroundStyle(TMColor.signal)
+            .accessibilityHidden(true)
+        let copy = VStack(spacing: TMSpace.xs) {
+            Text("Play a full game of Alpha Strike")
+                .font(TMFont.stepTitle)
+                .multilineTextAlignment(compact ? .leading : .center)
+                .accessibilityAddTraits(.isHeader)
+            Text("Pick the players, the ’Mechs and the map. The app keeps score.")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(compact ? .leading : .center)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        let button = PrimaryActionButton(
+            title: "New game",
+            systemImage: "plus",
+            tint: TMColor.signal,
+            accessibilityIdentifier: "as.play.new",
+            action: startNewGame
+        )
+        return TMCard {
+            Group {
+                if compact {
+                    HStack(spacing: TMSpace.lg) {
+                        icon
+                        copy
+                        button.frame(maxWidth: 200)
+                    }
+                } else {
+                    VStack(spacing: TMSpace.lg) {
+                        icon
+                        copy
+                        button
+                    }
                 }
-                .fixedSize(horizontal: false, vertical: true)
-                PrimaryActionButton(
-                    title: "New game",
-                    systemImage: "plus",
-                    tint: TMColor.signal,
-                    accessibilityIdentifier: "as.play.new",
-                    action: startNewGame
-                )
             }
             .frame(maxWidth: .infinity)
         }

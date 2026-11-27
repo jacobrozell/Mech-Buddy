@@ -137,7 +137,10 @@ struct BoardPresetStoreTests {
     @Test("List text")
     func summaryText() {
         #expect(BoardPresets.summary(sampleBoard()) == "4′ × 4′ · 2–4 sides · 3 pieces")
-        #expect(BoardPresets.tableText(BoardLayout(width: 36, depth: 22)) == "3′ × 22″")
+        #expect(BoardPresets.tableText(BoardLayout(width: 36, depth: 22)) == "36″ × 22″")
+        #expect(BoardPresets.tableText(BoardLayout(width: 48, depth: 36)) == "4′ × 3′")
+        #expect(BoardPresets.tableText(BoardLayout(width: 30, depth: 40)) == "30″ × 40″")
+        #expect(BoardPresets.tableText(BoardLayout(width: 22, depth: 36)) == "22″ × 36″")
         #expect(BoardPresets.duplicateName(of: "A", among: ["A", "A copy"]) == "A copy 2")
     }
 }

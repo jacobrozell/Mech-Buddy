@@ -9,6 +9,7 @@ import MechBuddyDomain
 struct PlayBoardsView: View {
     var onPick: ((BoardLayout) -> Void)?
     @Environment(AppDependencies.self) private var dependencies
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var mine: [BoardLayout] = []
     @State private var starters: [BoardListEntry] = []
@@ -199,26 +200,47 @@ struct PlayBoardsView: View {
     }
 
     private func starterPreview(_ entry: BoardListEntry) -> some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: TMSpace.lg) {
-                    MissionLayoutView(board: PlayLayout.board(for: Battlefield(board: entry.board), sides: PlaySetup.pickup().sides))
-                        .accessibilityIdentifier("as.play.board.preview.layout")
-                    Text("\(BoardPresets.summary(entry.board)). Built in, so it can’t be changed. Duplicate it to make your own.")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Button {
-                        duplicate(entry.board)
-                        previewing = nil
-                    } label: {
-                        Label("Duplicate to edit", systemImage: "plus.square.on.square").frame(maxWidth: .infinity, minHeight: 44)
+        let note = Text("\(BoardPresets.summary(entry.board)). Built in, so it can’t be changed. Duplicate it to make your own.")
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        let duplicateButton = Button {
+            duplicate(entry.board)
+            previewing = nil
+        } label: {
+            Label("Duplicate to edit", systemImage: "plus.square.on.square").frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(TMColor.signal)
+        .accessibilityIdentifier("as.play.board.preview.duplicate")
+        let layout = MissionLayoutView(board: PlayLayout.board(for: Battlefield(board: entry.board), sides: PlaySetup.pickup().sides))
+            .accessibilityIdentifier("as.play.board.preview.layout")
+        return NavigationStack {
+            Group {
+                if verticalSizeClass == .compact {
+                    // Landscape: board fitted to the full height beside the note and Duplicate action.
+                    HStack(alignment: .top, spacing: TMSpace.lg) {
+                        layout
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: TMSpace.lg) {
+                                note
+                                duplicateButton
+                            }
+                        }
+                        .frame(maxWidth: 280)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(TMColor.signal)
-                    .accessibilityIdentifier("as.play.board.preview.duplicate")
+                    .padding(TMSpace.lg)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: TMSpace.lg) {
+                            layout
+                            note
+                            duplicateButton
+                        }
+                        .padding(TMSpace.lg)
+                    }
                 }
-                .padding(TMSpace.lg)
             }
             .navigationTitle(entry.name)
             .navigationBarTitleDisplayMode(.inline)

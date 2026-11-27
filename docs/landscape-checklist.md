@@ -45,10 +45,10 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 
 | Screen | How to reach | Status | Notes |
 |---|---|---|---|
-| PlayModeHomeView / PlayHomeView | Play tab | ⚠️ | 2026-11-27: the hero card fills the screen; the Saved forces and Boards rows sit below the fold. Consider a compact hero in landscape. `play-home.png` |
-| PlaySidesStep, team presets (PM6/7) | Setup → Sides | ⚠️ | 2026-11-27: only 1½ of the 7 presets are visible above Continue. Use a 2-column preset grid in landscape. `setup-sides.png` |
+| PlayModeHomeView / PlayHomeView | Play tab | ✅ | 2026-11-27: fixed. In landscape the hero is one compact row (icon, text, New game), so Saved forces and Boards show. Portrait unchanged. `play-home.png` |
+| PlaySidesStep, team presets (PM6/7) | Setup → Sides | ✅ | 2026-11-27: fixed. Landscape uses a 2-column preset grid (one column at accessibility sizes) in a wider 820 pt column; two rows show above Continue, the rest scroll. Portrait unchanged. `setup-sides.png` |
 | PlaySizeStep | Setup → Size | ✅ | 2026-11-27: fits; the presets are just above the Continue bar. `setup-size.png` |
-| PlayForcesStep | Setup → Forces | ⚠️ | 2026-11-27: Add 'Mech sits half under the Continue bar until you scroll. Save/Load force buttons are below the fold. `setup-forces.png` |
+| PlayForcesStep | Setup → Forces | ✅ | 2026-11-27: fixed. The setup scroll view has a bottom content margin, so Add ’Mech and Load a saved force clear the Continue bar when scrolled to the end (at the top the button is simply the next thing to scroll to). `setup-forces.png` |
 | PlayUnitPickerSheet | Add a unit | ⬜ | Search field and keyboard |
 | PlayCardEntrySheet (PM9) | Add your own card | ⬜ | Keyboard covers the lower fields? |
 | PlaySavedForcesSheet (PM9) | Load a saved force | ⬜ | |
@@ -63,12 +63,12 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 
 | Screen | How to reach | Status | Notes |
 |---|---|---|---|
-| PlayBoardsView (boards list) | Play home → Boards | ⚠️ | 2026-11-27: layout fine. Copy: the size reads "3′ × 22″" (mixed units); use 36″ × 22″ or 3′ × 1′10″. `boards-list.png` |
+| PlayBoardsView (boards list) | Play home → Boards | ✅ | 2026-11-27: fixed. Size now reads "36″ × 22″" (one unit; feet only when both sides are whole feet, like the mat presets). `boards-list.png` |
 | BoardEditorView: canvas, palette | Build a board | ⬜ | PM12 has a landscape right column; verify it |
 | BoardInspectorView | Select a piece | ⬜ | |
 | BoardPieceListView (list editor) | Editor → list | ⬜ | |
 | BoardSaveSheet | Save board | ⬜ | Keyboard |
-| Starter board preview | Boards → a starter | ⚠️ | 2026-11-27: the board is fitted to width, so its bottom is cut off in landscape; fit to both width and height. `board-starter-preview.png` |
+| Starter board preview | Boards → a starter | ✅ | 2026-11-27: fixed. Landscape puts the board (aspect fit to width and height) beside the note and Duplicate to edit; portrait unchanged. `board-starter-preview.png` |
 | Import refusal messages | Import a bad `.mechboard` | ⬜ | |
 
 ## Learn, rules, lore, force, onboarding, settings
