@@ -96,7 +96,7 @@ enum BoardDrawing {
         for sheet in board.sheets {
             let box = frame.rect(sheet.area)
             drawLabel(
-                Text(sheet.name).font(.caption2.weight(.semibold)).foregroundStyle(.secondary),
+                Text(BoardRules.sheetCaption(sheet)).font(.caption2.weight(.semibold)).foregroundStyle(.secondary),
                 at: CGPoint(x: box.midX, y: box.minY + 10),
                 in: &context
             )
@@ -232,6 +232,11 @@ enum BoardDrawing {
             local.fill(diamond, with: .color(sideColor.opacity(0.8)))
             local.stroke(diamond, with: .color(Color.primary.opacity(0.6)), lineWidth: 1)
             outline(diamond)
+            // The token's number, so Raid 1 and Raid 2 are told apart without colour.
+            context.draw(
+                Text(BoardTokens.badge(feature)).font(.system(size: max(8, size * 0.42), weight: .bold)).foregroundStyle(Color(.systemBackground)),
+                at: CGPoint(x: box.midX, y: box.midY)
+            )
         }
     }
 

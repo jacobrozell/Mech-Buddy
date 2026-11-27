@@ -16,7 +16,10 @@ struct BoardCanvasView: View {
 
     private enum DragKind {
         case move(id: UUID, grab: BoardLayout.Point)
-        case pan(start: CGSize)
+        /// Dragging empty space pans; a tap on a sheet (no drag) selects it.
+        case pan(start: CGSize, sheet: Int?)
+        /// A selected mapsheet follows the finger (§ 9.2).
+        case moveSheet(index: Int, grab: BoardLayout.Point)
         case measure
     }
 
@@ -85,6 +88,7 @@ struct BoardCanvasView: View {
                 .simultaneousGesture(TapGesture(count: 2).onEnded { fit() })
 
                 accessibilityPieces(t)
+                edgeHandles(t)
                 handles(t)
                 hudOverlay
             }
@@ -116,7 +120,10 @@ struct BoardCanvasView: View {
                 case .move(let id, let grab):
                     let p = t.inches(value.location)
                     model.place(id, x: p.x - grab.x, y: p.y - grab.y)
-                case .pan(let start):
+                case .moveSheet(let index, let grab):
+                    let p = t.inches(value.location)
+                    model.placeSheet(index, x: p.x - grab.x, y: p.y - grab.y)
+                case .pan(let start, _):
                     pan = CGSize(width: start.width + value.translation.width, height: start.height + value.translation.height)
                 case .measure:
                     if moved || !measureStartedFresh { model.measureB = snapped(t.inches(value.location)) }
@@ -129,8 +136,10 @@ struct BoardCanvasView: View {
                 switch drag {
                 case .move:
                     model.endGesture()
-                case .pan:
-                    if !moved { model.selection = nil }
+                case .moveSheet:
+                    model.endGesture()
+                case .pan(_, let sheet):
+                    if !moved { sheet.map { model.selectSheet($0) } ?? model.clearSelection() }
                 case .measure:
                     if measureStartedFresh && !moved { model.measureB = nil }
                 case nil:
@@ -153,11 +162,20 @@ struct BoardCanvasView: View {
         }
         if let index = pieceIndex(at: p, scale: t.scale), let id = model.board.features[index].id {
             let area = model.board.features[index].area
-            model.selection = id
+            model.select(id)
             model.beginGesture()
             drag = .move(id: id, grab: .init(x: p.x - area.x, y: p.y - area.y))
+        } else if let sheet = BoardRules.sheetHit(model.board.sheets, at: p) {
+            // Sheets cover most of a mapsheet table, so a drag only moves one that is already selected.
+            if model.sheetSelection == sheet {
+                let area = model.board.sheets[sheet].area
+                model.beginGesture()
+                drag = .moveSheet(index: sheet, grab: .init(x: p.x - area.x, y: p.y - area.y))
+            } else {
+                drag = .pan(start: pan, sheet: sheet)
+            }
         } else {
-            drag = .pan(start: pan)
+            drag = .pan(start: pan, sheet: nil)
         }
     }
 
@@ -200,6 +218,9 @@ struct BoardCanvasView: View {
         let warned = Set(model.warnings.keys)
         BoardDrawing.drawTable(board, zones: model.zones, in: &context, frame: t.frame, highContrast: high, warned: warned, selected: selected)
         context.stroke(Path(table), with: .color(Color.primary.opacity(0.6)), lineWidth: high ? 2 : 1)
+        if let sheet = model.selectedSheet {
+            context.stroke(Path(roundedRect: t.frame.rect(sheet.area), cornerRadius: 4), with: .color(TMColor.signal), lineWidth: 3)
+        }
 
         if model.showBands, model.sideCount == 2 { drawBands(&context, t: t) }
         drawRulers(&context, table: table, t: t)
@@ -307,6 +328,9 @@ struct BoardCanvasView: View {
     /// One VoiceOver element per piece, placed over the piece, with the move, rotate, resize and delete actions (§ 9.6).
     private func accessibilityPieces(_ t: Transform) -> some View {
         ZStack {
+            ForEach(Array(model.board.sheets.enumerated()), id: \.offset) { index, sheet in
+                sheetElement(index, sheet, t)
+            }
             ForEach(Array(model.board.features.enumerated()), id: \.offset) { index, feature in
                 let box = BoardRules.bounds(of: feature)
                 let center = t.point(feature.area.center)
@@ -316,14 +340,14 @@ struct BoardCanvasView: View {
                         .position(center)
                         .allowsHitTesting(false)
                         .accessibilityElement()
-                        .accessibilityLabel(BoardRules.spoken(feature, in: model.board, sideCount: model.sideCount))
+                        .accessibilityLabel(model.spoken(feature))
                         .accessibilityValue(model.selection == id ? "Selected" : "")
                         .accessibilityAddTraits(.isButton)
                         .accessibilityIdentifier("as.board.piece.\(index)")
                         .accessibilityAdjustableAction { direction in
                             model.rotate(id, by: direction == .increment ? 15 : -15)
                         }
-                        .accessibilityAction { model.selection = id }
+                        .accessibilityAction { model.select(id) }
                         .accessibilityAction(named: "Move left") { model.nudge(id, dx: -model.step, dy: 0) }
                         .accessibilityAction(named: "Move right") { model.nudge(id, dx: model.step, dy: 0) }
                         .accessibilityAction(named: "Move up") { model.nudge(id, dx: 0, dy: -model.step) }
@@ -335,6 +359,63 @@ struct BoardCanvasView: View {
                 }
             }
         }
+    }
+
+    /// One VoiceOver element per mapsheet: select, move by the snap step, turn 90° (§ 9.6).
+    private func sheetElement(_ index: Int, _ sheet: BoardLayout.Sheet, _ t: Transform) -> some View {
+        let frame = t.frame.rect(sheet.area)
+        return Color.clear
+            .frame(width: max(frame.width, 44), height: max(frame.height, 44))
+            .position(x: frame.midX, y: frame.midY)
+            .allowsHitTesting(false)
+            .accessibilityElement()
+            .accessibilityLabel(BoardRules.spoken(sheet, in: model.board))
+            .accessibilityValue(model.sheetSelection == index ? "Selected" : "")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityIdentifier("as.board.sheet.\(index)")
+            .accessibilityAdjustableAction { _ in model.rotateSheet(index) }
+            .accessibilityAction { model.selectSheet(index) }
+            .accessibilityAction(named: "Move left") { model.nudgeSheet(index, dx: -model.step, dy: 0) }
+            .accessibilityAction(named: "Move right") { model.nudgeSheet(index, dx: model.step, dy: 0) }
+            .accessibilityAction(named: "Move up") { model.nudgeSheet(index, dx: 0, dy: -model.step) }
+            .accessibilityAction(named: "Move down") { model.nudgeSheet(index, dx: 0, dy: model.step) }
+            .accessibilityAction(named: "Turn 90 degrees") { model.rotateSheet(index) }
+    }
+
+    /// Zone depth handles on each zone's inner edge, and the sheet turn button. They stay 44 pt at every zoom.
+    @ViewBuilder
+    private func edgeHandles(_ t: Transform) -> some View {
+        ForEach(model.zones, id: \.side) { zone in
+            zoneHandle(zone, t)
+        }
+        if let index = model.sheetSelection, model.board.sheets.indices.contains(index) {
+            let box = t.frame.rect(model.board.sheets[index].area)
+            handle(systemImage: "rotate.right", at: CGPoint(x: box.maxX - 22, y: box.minY + 22), label: "Turn 90°", id: "as.board.handle.sheet.rotate")
+                .onTapGesture { model.rotateSheet(index) }
+                .accessibilityHidden(true)
+        }
+    }
+
+    /// The handle on a zone's inner edge: drag to change its depth (snapped); VoiceOver adjusts by 1″ (§ 9.2, § 9.6).
+    private func zoneHandle(_ zone: BoardLayout.Zone, _ t: Transform) -> some View {
+        let board = model.board
+        let edge = BoardRules.homeEdge(of: zone, width: board.width, depth: board.depth)
+        let point = t.point(BoardRules.innerEdgeMidpoint(of: zone, width: board.width, depth: board.depth))
+        let depth = BoardRules.depth(of: zone, width: board.width, depth: board.depth)
+        let vertical = edge == .west || edge == .east
+        return handleGlyph(vertical ? "arrow.left.and.right" : "arrow.up.and.down")
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Side \(zone.side) deployment zone depth")
+            .accessibilityValue("\(BoardRules.plain(depth)) inches")
+            .accessibilityHint("Swipe up or down to change the depth by 1 inch.")
+            .accessibilityAdjustableAction { direction in
+                model.nudgeZoneDepth(zone.side, by: direction == .increment ? 1 : -1)
+            }
+            .accessibilityIdentifier("as.board.handle.zone.\(zone.side)")
+            .position(point)
+            .gesture(handleDrag { location in
+                model.liveZoneDepth(zone.side, toward: t.inches(location))
+            })
     }
 
     /// Rotate and resize handles on the selected piece. They stay 44 pt at every zoom.
@@ -364,6 +445,13 @@ struct BoardCanvasView: View {
     }
 
     private func handle(systemImage: String, at point: CGPoint, label: String, id: String) -> some View {
+        handleGlyph(systemImage)
+            .position(point)
+            .accessibilityHidden(true)
+            .accessibilityIdentifier(id)
+    }
+
+    private func handleGlyph(_ systemImage: String) -> some View {
         Image(systemName: systemImage)
             .font(.system(size: 9, weight: .bold))
             .foregroundStyle(TMColor.onSignal)
@@ -372,9 +460,6 @@ struct BoardCanvasView: View {
             .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
             .frame(width: 44, height: 44)
             .contentShape(Rectangle())
-            .position(point)
-            .accessibilityHidden(true)
-            .accessibilityIdentifier(id)
     }
 
     private func handleDrag(_ update: @escaping (CGPoint) -> Void) -> some Gesture {

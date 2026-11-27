@@ -530,7 +530,7 @@ struct PlayMapStep: View {
         }
         .navigationDestination(isPresented: $showBuilder) {
             if let board = setup.battlefield.board, let palette = Self.terrainPalette {
-                BoardEditorView(board: board, sides: setup.sides, palette: palette) { setup.battlefield.board = $0 }
+                BoardEditorView(board: board, sides: setup.sides, palette: palette, tokenPlan: BoardTokens.plan(for: setup)) { setup.battlefield.board = $0 }
             }
         }
     }
