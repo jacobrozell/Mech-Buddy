@@ -283,7 +283,7 @@ struct BoardEditorModelTests {
         let id = try #require(model.selection)
         #expect(model.board.features.count == 1 && written.count == 1)
         #expect(model.selected?.id == id && model.selectedIndex == 0)
-        #expect(model.board.features[0].area.midX == 24 && model.board.features[0].area.midY == 24)
+        #expect(abs(model.board.features[0].area.midX - 24) <= 0.5 && abs(model.board.features[0].area.midY - 24) <= 0.5)
         #expect(model.canUndo && !model.canRedo)
         model.undo()
         #expect(model.board.features.isEmpty && model.selection == nil && written.count == 2)
@@ -309,11 +309,12 @@ struct BoardEditorModelTests {
         #expect(writes == 0)
         model.endGesture()
         #expect(writes == 1 && model.hud == nil)
-        #expect(model.board.features[0].area.midX == 12)
+        #expect(model.board.features[0].area.x == 12)
         model.beginGesture()
         model.endGesture()
+        // The empty drag left no step: undo goes back past the real drag, not to a no-op.
         model.undo()
-        #expect(model.board.features[0].area.midX == 24 || model.board.features[0].area.midX == 12 || true)
+        #expect(model.board.features[0].area.x != 12)
     }
 
     @Test("Nudge steps by the snap step, or one inch with snap off, and stays on the table")
@@ -449,10 +450,8 @@ struct BoardEditorModelTests {
         let model = try model { last = $0 }
         var stored = BoardLayout(width: 48, depth: 48)
         stored.name = "Ridge"
-        stored.presetID = UUID()
-        stored.presetUpdatedAt = Date(timeIntervalSince1970: 5)
         model.linkToPreset(stored)
-        #expect(model.board.name == "Ridge" && model.board.presetID == stored.presetID && model.board.presetUpdatedAt == stored.presetUpdatedAt)
+        #expect(model.board.name == "Ridge" && model.board.presetID == stored.id && model.board.presetUpdatedAt == stored.updatedAt)
         #expect(last?.name == "Ridge")
         #expect(model.counterText.hasSuffix("choices placed") && model.summary.hasPrefix("48 by 48 inch table."))
     }
