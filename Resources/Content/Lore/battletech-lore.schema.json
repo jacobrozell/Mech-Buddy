@@ -1,0 +1,738 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:battletech:history:knowledge-base:schema:1.1.0",
+  "title": "BattleTech History Knowledge Base",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "metadata",
+    "summary",
+    "data",
+    "query_guide"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "title",
+        "source",
+        "retrieved_at",
+        "coverage",
+        "date_conventions"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "name",
+            "page_title",
+            "url"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "page_title": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "page_revision_note": {
+              "type": "string"
+            },
+            "license_note": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "coverage": {
+          "type": "object"
+        },
+        "date_conventions": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "one_paragraph",
+        "key_points",
+        "core_themes"
+      ],
+      "properties": {
+        "one_paragraph": {
+          "type": "string"
+        },
+        "key_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "core_themes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "eras",
+        "events",
+        "factions",
+        "people",
+        "places",
+        "technology_concepts",
+        "publishing_history",
+        "lore_concepts",
+        "official_eras"
+      ],
+      "properties": {
+        "eras": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "order",
+              "start_year",
+              "end_year",
+              "date_label",
+              "description",
+              "key_themes",
+              "important_event_ids",
+              "key_faction_ids"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "order": {
+                "type": "integer"
+              },
+              "start_year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "end_year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "date_label": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "key_themes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "important_event_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "key_faction_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "start_year",
+              "end_year",
+              "date_label",
+              "date_precision",
+              "era_id",
+              "summary",
+              "causes",
+              "consequences",
+              "categories",
+              "people_ids",
+              "faction_ids",
+              "place_ids",
+              "technology_ids",
+              "source_section",
+              "source_notes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "start_year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "end_year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "date_label": {
+                "type": "string"
+              },
+              "date_precision": {
+                "enum": [
+                  "exact_date",
+                  "year",
+                  "year_range",
+                  "approximate_period",
+                  "undated_or_unspecified"
+                ]
+              },
+              "era_id": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "causes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "consequences": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "people_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "faction_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "place_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "technology_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "source_section": {
+                "type": "string"
+              },
+              "source_notes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "factions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "aliases",
+              "faction_type",
+              "description",
+              "key_period_ids",
+              "related_event_ids"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "faction_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "key_period_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "related_event_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "people": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "roles",
+              "affiliation_ids",
+              "associated_event_ids",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "affiliation_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "associated_event_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "places": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "aliases",
+              "place_type",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "place_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "technology_concepts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "aliases",
+              "concept_type",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "concept_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "publishing_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "date_label",
+              "summary",
+              "category",
+              "source_section"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "date_label": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "source_section": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "lore_concepts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "concept_type",
+              "description",
+              "related_faction_ids",
+              "related_event_ids"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "concept_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "related_faction_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "related_event_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "official_eras": {
+          "type": "object",
+          "required": [
+            "publisher",
+            "overview",
+            "eras",
+            "bibliography"
+          ],
+          "properties": {
+            "publisher": {
+              "type": "string"
+            },
+            "overview": {
+              "type": "string"
+            },
+            "eras": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/official_era"
+              }
+            },
+            "bibliography": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "query_guide": {
+      "type": "object",
+      "required": [
+        "primary_collections",
+        "recommended_query_fields",
+        "filtering_notes",
+        "example_queries"
+      ],
+      "properties": {
+        "primary_collections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_query_fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "filtering_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "example_queries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "intent",
+              "filter",
+              "sort"
+            ],
+            "properties": {
+              "intent": {
+                "type": "string"
+              },
+              "filter": {
+                "type": "string"
+              },
+              "sort": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "description": "BattleTech lore for Mech Buddy: a condensed history (eras, events, factions, people, places, technology) and the official Catalyst Game Labs era and sub-era divisions used on products.",
+  "$defs": {
+    "official_era": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "region_scope",
+        "start_year",
+        "end_year",
+        "is_ongoing",
+        "sub_eras"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "URL-safe slug identifier for the main era."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region_scope": {
+          "type": "string",
+          "description": "Primary theater of the era (e.g., Inner Sphere, Clan Homeworlds)."
+        },
+        "start_year": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Starting year in the BattleTech calendar, or null if open-ended prior to 1950."
+        },
+        "end_year": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Ending year in the BattleTech calendar, or null if ongoing."
+        },
+        "is_ongoing": {
+          "type": "boolean"
+        },
+        "introduced_year": {
+          "type": "integer",
+          "description": "Real-world publication year if the era was added retroactively."
+        },
+        "sub_eras": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/official_sub_era"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "A Catalyst Game Labs product era. Distinct from data.eras, which follow the sections of Sarna's History page."
+    },
+    "official_sub_era": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "start_year",
+        "end_year",
+        "year_label",
+        "is_ongoing",
+        "summary",
+        "key_events",
+        "key_factions",
+        "key_technologies"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_year": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "end_year": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "year_label": {
+          "type": "string",
+          "description": "Human-readable date range as displayed on Sarna."
+        },
+        "is_ongoing": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "key_events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_factions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_technologies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

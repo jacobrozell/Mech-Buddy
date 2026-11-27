@@ -1,0 +1,4459 @@
+{
+  "schema_version": "1.1.0",
+  "metadata": {
+    "title": "BattleTech Universe History — Curated Lore Knowledge Base",
+    "source": {
+      "name": "Sarna BattleTechWiki",
+      "page_title": "History",
+      "url": "https://www.sarna.net/wiki/History",
+      "page_revision_note": "The retrieved page reports its last edit as 13 October 2026.",
+      "license_note": "The source page identifies its content as available under GNU Free Documentation License 1.2 unless otherwise noted. This JSON is an original, condensed paraphrase and structured extraction, not a reproduction of the page."
+    },
+    "retrieved_at": "2026-11-26",
+    "coverage": {
+      "universe_scope": "BattleTech fictional future history, from the 1990s through the early 3130s",
+      "included_sections": [
+        "Main historical chronology",
+        "Major players",
+        "Faction histories and context",
+        "Selected real-world publishing-history annotations"
+      ],
+      "exclusions": [
+        "The full text of linked Sarna articles",
+        "Exhaustive battle-by-battle histories",
+        "Events not described on the source page"
+      ],
+      "editorial_method": "Curated, normalized, paraphrased facts. Dates and uncertainty are retained where the source is approximate or internally inconsistent."
+    },
+    "date_conventions": {
+      "year_fields": "Integer in-universe year. Null means the source does not establish a precise year.",
+      "date_precision_values": [
+        "exact_date",
+        "year",
+        "year_range",
+        "approximate_period",
+        "undated_or_unspecified"
+      ],
+      "source_discrepancy_policy": "When the page gives conflicting dates in different sections, preserve the conflict in source_notes rather than silently choosing one."
+    }
+  },
+  "summary": {
+    "one_paragraph": "BattleTech is framed as a military and political future history in which humanity expands from Earth into interstellar space, builds successive interstellar governments, and repeatedly fractures through rebellion and war. The Terran Alliance gives way to the Terran Hegemony; the five Great Houses consolidate power; the Star League briefly unites much of human space before Stefan Amaris's coup and the Exodus of Aleksandr Kerensky's army. The Succession Wars then devastate technology and infrastructure until a rediscovery of Star League knowledge helps fuel a renaissance. The return of the Clans forces the Inner Sphere to cooperate, but internal rivalries, the Word of Blake Jihad, and the later collapse of the Republic's communications network continue the cycle of political fragmentation and conflict.",
+    "key_points": [
+      "The setting is a fictional future history extending from the late twentieth century to at least the early 3130s.",
+      "Political authority expands from the Terran Alliance to the Terran Hegemony and later the Star League, then fragments among successor states.",
+      "The five Great Houses become the dominant Inner Sphere powers: Davion, Kurita, Liao, Marik, and Steiner.",
+      "The Ares Conventions attempt to limit atrocities, while the BattleMech becomes the defining ground-combat system.",
+      "The Amaris Coup destroys the Star League's central government; Kerensky's Exodus removes much of its remaining military strength.",
+      "Three Succession Wars cause widespread devastation and technological regression; the Third is characterized by raids and attrition.",
+      "The Helm memory core helps restart a technological renaissance, while the Clan Invasion introduces a technologically advanced external threat.",
+      "The Battle of Tukayyid halts the Clans' advance for fifteen years under the terms described by the page.",
+      "The Inner Sphere briefly recreates the Star League and destroys Clan Smoke Jaguar through Operations BULLDOG and SERPENT.",
+      "The Word of Blake Jihad returns the setting to total war and ends with Devlin Stone's coalition victory on Terra in 3081.",
+      "The Republic of the Sphere is founded in 3081, but the early-3130s HPG network collapse ushers in the Dark Age crisis."
+    ],
+    "core_themes": [
+      "Cycles of unification, imperial overreach, rebellion, and fragmentation",
+      "The strategic importance of interstellar communications and transport",
+      "Technological rise, loss, preservation, and rediscovery",
+      "The tension between military honor, political legitimacy, and civilian welfare",
+      "The recurring difficulty of holding a multi-system polity together"
+    ]
+  },
+  "data": {
+    "eras": [
+      {
+        "id": "early-history",
+        "name": "Early History",
+        "order": 1,
+        "start_year": 1994,
+        "end_year": 2107,
+        "date_label": "1994–2107",
+        "description": "The divergence from contemporary history, the first stages of space settlement, fusion-powered interplanetary travel, and the successful development of faster-than-light travel.",
+        "key_themes": [
+          "Second Cold War",
+          "space expansion",
+          "fusion power",
+          "first FTL jump"
+        ],
+        "important_event_ids": [
+          "event-crippen-plan",
+          "event-second-cold-war",
+          "event-russian-civil-war",
+          "event-solar-system-expansion",
+          "event-fusion-spaceflight",
+          "event-first-ftl-voyage"
+        ],
+        "key_faction_ids": [
+          "faction-western-alliance",
+          "faction-terran-alliance"
+        ]
+      },
+      {
+        "id": "colonization",
+        "name": "Era of Colonization",
+        "order": 2,
+        "start_year": 2116,
+        "end_year": 2366,
+        "date_label": "2116–2366 and the preceding centuries of expansion",
+        "description": "Humanity spreads across nearby stars. The Terran Alliance grants broad independence after the Outer Reaches Rebellion, later collapses into civil war, and is replaced by the Terran Hegemony as five Great House empires consolidate around it.",
+        "key_themes": [
+          "interstellar colonization",
+          "colonial independence",
+          "Terran Hegemony",
+          "Great House formation"
+        ],
+        "important_event_ids": [
+          "event-new-earth-colony",
+          "event-outer-reaches-rebellion",
+          "event-terran-alliance-civil-war",
+          "event-peer-list",
+          "event-five-great-houses"
+        ],
+        "key_faction_ids": [
+          "faction-terran-alliance",
+          "faction-terran-hegemony",
+          "faction-draconis-combine",
+          "faction-federated-suns",
+          "faction-capellan-confederation",
+          "faction-free-worlds-league",
+          "faction-lyran-commonwealth"
+        ]
+      },
+      {
+        "id": "age-of-war",
+        "name": "Age of War",
+        "order": 3,
+        "start_year": 2398,
+        "end_year": 2571,
+        "date_label": "Late 24th century to 2571",
+        "description": "The major successor powers turn on one another. The Ares Conventions constrain some forms of warfare, and the Terran Hegemony develops the BattleMech, which spreads to the Great Houses.",
+        "key_themes": [
+          "Great House rivalry",
+          "Ares Conventions",
+          "BattleMech development",
+          "near-constant warfare"
+        ],
+        "important_event_ids": [
+          "event-first-andurien-war",
+          "event-ares-conventions",
+          "event-battlemech-development",
+          "event-star-league-founded"
+        ],
+        "key_faction_ids": [
+          "faction-terran-hegemony",
+          "faction-draconis-combine",
+          "faction-federated-suns",
+          "faction-capellan-confederation",
+          "faction-free-worlds-league",
+          "faction-lyran-commonwealth"
+        ]
+      },
+      {
+        "id": "star-league",
+        "name": "The Star League",
+        "order": 4,
+        "start_year": 2571,
+        "end_year": 2766,
+        "date_label": "2571–2766/2767 (collapse begins with Amaris Coup)",
+        "description": "Ian Cameron's federation unites the Great Houses and brings a long period of relative peace and technological growth after the Reunification War, but coercive incorporation of the Periphery leaves lasting resentment.",
+        "key_themes": [
+          "federal unity",
+          "Reunification War",
+          "technological golden age",
+          "centralization"
+        ],
+        "important_event_ids": [
+          "event-star-league-founded",
+          "event-reunification-war",
+          "event-hpg-development",
+          "event-amaris-coup"
+        ],
+        "key_faction_ids": [
+          "faction-star-league",
+          "faction-star-league-defense-force",
+          "faction-periphery-states",
+          "faction-terran-hegemony"
+        ]
+      },
+      {
+        "id": "amaris-crisis",
+        "name": "Amaris Coup and Civil War",
+        "order": 5,
+        "start_year": 2766,
+        "end_year": 2779,
+        "date_label": "2766/2767–approximately 2779",
+        "description": "Stefan Amaris seizes power and kills the Cameron ruling family. Aleksandr Kerensky leads the SLDF in a thirteen-year campaign to remove him, leaving Terra and the Hegemony devastated and the Star League effectively broken.",
+        "key_themes": [
+          "coup d'état",
+          "Amaris Civil War",
+          "SLDF depletion",
+          "collapse of central authority"
+        ],
+        "important_event_ids": [
+          "event-amaris-coup",
+          "event-amaris-civil-war"
+        ],
+        "key_faction_ids": [
+          "faction-star-league",
+          "faction-star-league-defense-force",
+          "faction-rim-worlds-republic"
+        ]
+      },
+      {
+        "id": "exodus",
+        "name": "The Exodus",
+        "order": 6,
+        "start_year": 2784,
+        "end_year": 2784,
+        "date_label": "2784",
+        "description": "In 2784, at the start of the Succession Wars era, Aleksandr Kerensky leads most of the remaining SLDF on an Exodus into the Deep Periphery, removing the strongest surviving unified military force from the Inner Sphere.",
+        "key_themes": [
+          "strategic withdrawal",
+          "Deep Periphery",
+          "SLDF diaspora"
+        ],
+        "important_event_ids": [
+          "event-operation-exodus"
+        ],
+        "key_faction_ids": [
+          "faction-star-league-defense-force",
+          "faction-clans"
+        ]
+      },
+      {
+        "id": "succession-wars",
+        "name": "Succession Wars",
+        "order": 7,
+        "start_year": 2786,
+        "end_year": 3025,
+        "date_label": "2786–3025 (First through Third Succession Wars)",
+        "description": "The Great Houses fight over the Star League's legacy. The first two wars devastate worlds and industrial capacity; the Third becomes a prolonged period of limited raids as the states struggle to preserve scarce technology.",
+        "key_themes": [
+          "Great House conflict",
+          "LosTech",
+          "infrastructure destruction",
+          "ComStar neutrality and manipulation"
+        ],
+        "important_event_ids": [
+          "event-first-succession-war",
+          "event-second-succession-war",
+          "event-third-succession-war",
+          "event-comstar-takes-terra"
+        ],
+        "key_faction_ids": [
+          "faction-successor-states",
+          "faction-comstar",
+          "faction-terran-hegemony"
+        ]
+      },
+      {
+        "id": "post-succession",
+        "name": "Fourth Succession War and Interwar Conflicts",
+        "order": 8,
+        "start_year": 3022,
+        "end_year": 3049,
+        "date_label": "3022–3049",
+        "description": "The Davion–Steiner alliance reshapes the balance of power. The Fourth Succession War breaks out in 3028, the Helm memory core helps restore lost technology, and regional wars include the Ronin conflict and War of 3039.",
+        "key_themes": [
+          "Federated Commonwealth",
+          "technological renaissance",
+          "Rasalhague independence",
+          "pre-invasion realignment"
+        ],
+        "important_event_ids": [
+          "event-davion-steiner-alliance",
+          "event-fourth-succession-war",
+          "event-helm-memory-core",
+          "event-ronin-war",
+          "event-war-of-3039"
+        ],
+        "key_faction_ids": [
+          "faction-federated-commonwealth",
+          "faction-free-rasalhague-republic",
+          "faction-comstar",
+          "faction-successor-states"
+        ]
+      },
+      {
+        "id": "clan-invasion",
+        "name": "Clan Invasion",
+        "order": 9,
+        "start_year": 3049,
+        "end_year": 3052,
+        "date_label": "3049–3052 (Tukayyid)",
+        "description": "The Clans return from the Deep Periphery with technology superior to that of the Inner Sphere. Their invasion takes many worlds until the Battle of Tukayyid imposes a fifteen-year limit on further Clan advances.",
+        "key_themes": [
+          "Clan return",
+          "technological asymmetry",
+          "Inner Sphere cooperation",
+          "Tukayyid truce"
+        ],
+        "important_event_ids": [
+          "event-clan-contact",
+          "event-clan-invasion",
+          "event-tukayyid",
+          "event-wof-blake-schism"
+        ],
+        "key_faction_ids": [
+          "faction-clans",
+          "faction-federated-commonwealth",
+          "faction-draconis-combine",
+          "faction-free-rasalhague-republic",
+          "faction-comstar"
+        ]
+      },
+      {
+        "id": "post-invasion",
+        "name": "Post-Invasion Conflicts and New Star League",
+        "order": 10,
+        "start_year": 3052,
+        "end_year": 3067,
+        "date_label": "3052–3067",
+        "description": "The Inner Sphere confronts internal succession struggles, the Refusal War divides Clan Wolf, and a revived Star League is used to launch campaigns against Clan Smoke Jaguar. The Federated Commonwealth later fractures in civil war, while the Word of Blake crisis destabilizes the League.",
+        "key_themes": [
+          "factional realignment",
+          "Clan politics",
+          "New Star League",
+          "FedCom Civil War"
+        ],
+        "important_event_ids": [
+          "event-wof-blake-schism",
+          "event-refusal-war",
+          "event-new-star-league",
+          "event-operation-bulldog",
+          "event-operation-serpent",
+          "event-capellan-st-ives-war",
+          "event-fedcom-civil-war",
+          "event-star-league-collapse"
+        ],
+        "key_faction_ids": [
+          "faction-new-star-league",
+          "faction-word-of-blake",
+          "faction-clan-wolf",
+          "faction-clan-wolf-in-exile",
+          "faction-federated-commonwealth",
+          "faction-lyran-alliance"
+        ]
+      },
+      {
+        "id": "jihad",
+        "name": "Word of Blake Jihad",
+        "order": 11,
+        "start_year": 3067,
+        "end_year": 3081,
+        "date_label": "3067–3081",
+        "description": "After the revived Star League collapses, the Word of Blake launches a system-wide war marked by attacks on civilian populations, strategic bombardment, weapons of mass destruction, and disruption of the HPG network. A coalition led by Devlin Stone defeats the Blakists on Terra.",
+        "key_themes": [
+          "total war",
+          "HPG disruption",
+          "Word of Blake",
+          "coalition victory"
+        ],
+        "important_event_ids": [
+          "event-star-league-collapse",
+          "event-jihad",
+          "event-jihad-ends"
+        ],
+        "key_faction_ids": [
+          "faction-word-of-blake",
+          "faction-successor-states",
+          "faction-comstar"
+        ]
+      },
+      {
+        "id": "republic-era",
+        "name": "Formation of the Republic",
+        "order": 12,
+        "start_year": 3081,
+        "end_year": 3099,
+        "date_label": "3081 through the 3090s",
+        "description": "Devlin Stone establishes the Republic of the Sphere around Terra in an attempt to create a peaceful buffer among exhausted Successor States. The Republic nevertheless faces renewed conflict, including Capellan campaigns.",
+        "key_themes": [
+          "postwar settlement",
+          "Republic of the Sphere",
+          "buffer state",
+          "fragile peace"
+        ],
+        "important_event_ids": [
+          "event-republic-founded",
+          "event-capellan-crusades"
+        ],
+        "key_faction_ids": [
+          "faction-republic-of-the-sphere",
+          "faction-capellan-confederation",
+          "faction-federated-suns"
+        ]
+      },
+      {
+        "id": "dark-age",
+        "name": "Dark Age",
+        "order": 13,
+        "start_year": 3130,
+        "end_year": 3139,
+        "date_label": "Early 3130s onward (page does not give a precise year range)",
+        "description": "The HPG network is disabled by unknown actors, isolating systems and reigniting older national identities. The Republic is fragmented by internal conflict and external pressure, leading to the Fortress Republic strategy.",
+        "key_themes": [
+          "communications collapse",
+          "fragmentation",
+          "Republic civil conflict",
+          "Fortress Republic"
+        ],
+        "important_event_ids": [
+          "event-hpg-network-collapse",
+          "event-fortress-republic"
+        ],
+        "key_faction_ids": [
+          "faction-republic-of-the-sphere",
+          "faction-draconis-combine",
+          "faction-capellan-confederation",
+          "faction-federated-suns",
+          "faction-lyran-alliance"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "id": "event-crippen-plan",
+        "name": "Crippen Station initiative announced",
+        "start_year": 1994,
+        "end_year": null,
+        "date_label": "1994",
+        "date_precision": "year",
+        "era_id": "early-history",
+        "summary": "The United States, Europe, and Japan announce a joint plan to build the orbiting industrial facility Crippen Station.",
+        "causes": [],
+        "consequences": [
+          "Crippen Station is successfully launched in 2005."
+        ],
+        "categories": [
+          "space_development",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-western-alliance"
+        ],
+        "place_ids": [
+          "place-earth",
+          "place-crippen-station"
+        ],
+        "technology_ids": [],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-second-cold-war",
+        "name": "Second Cold War",
+        "start_year": 1997,
+        "end_year": 2005,
+        "date_label": "1997–2005",
+        "date_precision": "year_range",
+        "era_id": "early-history",
+        "summary": "A communist coup restores a militant Soviet-style government in Russia and produces a renewed confrontation with NATO; peaceful reforms under Oleg Tikonov begin in 2005.",
+        "causes": [
+          "1997 coup in Russia"
+        ],
+        "consequences": [
+          "The confrontation eases with reforms in 2005."
+        ],
+        "categories": [
+          "politics",
+          "conflict"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-western-alliance"
+        ],
+        "place_ids": [
+          "place-earth"
+        ],
+        "technology_ids": [],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-russian-civil-war",
+        "name": "Russian civil war and Western Alliance victory",
+        "start_year": 2011,
+        "end_year": 2014,
+        "date_label": "2011–2014",
+        "date_precision": "year_range",
+        "era_id": "early-history",
+        "summary": "The Russian republic collapses into civil war. NATO intervenes, and the Western Orbital Defense Network intercepts a Russian missile attack; the Western Alliance wins in 2014.",
+        "causes": [
+          "Collapse of the Russian republic in 2011"
+        ],
+        "consequences": [
+          "Western Alliance victory in 2014."
+        ],
+        "categories": [
+          "conflict",
+          "space_defense",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-western-alliance"
+        ],
+        "place_ids": [
+          "place-earth"
+        ],
+        "technology_ids": [
+          "tech-woden"
+        ],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-solar-system-expansion",
+        "name": "Alliance Space Command and early off-world settlement",
+        "start_year": 2016,
+        "end_year": 2017,
+        "date_label": "2016–2017",
+        "date_precision": "year_range",
+        "era_id": "early-history",
+        "summary": "The Alliance Space Command is established, a lunar settlement is founded, and the first crewed Mars mission launches the following year.",
+        "causes": [
+          "Western Alliance's growing space capability"
+        ],
+        "consequences": [
+          "Human activity expands beyond Earth into the Solar System."
+        ],
+        "categories": [
+          "space_development",
+          "exploration"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-western-alliance"
+        ],
+        "place_ids": [
+          "place-earth",
+          "place-moon",
+          "place-mars"
+        ],
+        "technology_ids": [],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-fusion-spaceflight",
+        "name": "Fusion power and AS Columbia launch",
+        "start_year": 2020,
+        "end_year": 2027,
+        "date_label": "2020; 12 October 2027",
+        "date_precision": "year_range",
+        "era_id": "early-history",
+        "summary": "Fusion power enables interplanetary spacecraft. The fusion-powered AS Columbia departs Crippen Station on 12 October 2027.",
+        "causes": [
+          "Development of fusion power in 2020"
+        ],
+        "consequences": [
+          "Practical fusion-powered interplanetary travel."
+        ],
+        "categories": [
+          "technology",
+          "space_development"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-western-alliance"
+        ],
+        "place_ids": [
+          "place-crippen-station",
+          "place-earth"
+        ],
+        "technology_ids": [
+          "tech-fusion-power"
+        ],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-habitable-world-probes",
+        "name": "Evidence of nearby habitable worlds",
+        "start_year": 2050,
+        "end_year": null,
+        "date_label": "By 2050",
+        "date_precision": "year",
+        "era_id": "early-history",
+        "summary": "Automated probes sent to neighboring star systems return evidence that nearby habitable worlds exist.",
+        "causes": [
+          "Interstellar probe program"
+        ],
+        "consequences": [
+          "Provides a basis for subsequent extrasolar colonization."
+        ],
+        "categories": [
+          "exploration",
+          "space_development"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-terran-alliance"
+        ],
+        "place_ids": [
+          "place-earth"
+        ],
+        "technology_ids": [],
+        "source_section": "Early History",
+        "source_notes": [
+          "The page says evidence was returned by 2050; it does not identify the specific worlds in this passage."
+        ]
+      },
+      {
+        "id": "event-first-ftl-voyage",
+        "name": "First faster-than-light voyage",
+        "start_year": 2107,
+        "end_year": null,
+        "date_label": "3 September 2107",
+        "date_precision": "exact_date",
+        "era_id": "early-history",
+        "summary": "The TAS Pathfinder completes the first successful faster-than-light voyage, making a 12-light-year jump to Tau Ceti.",
+        "causes": [
+          "Kearny–Fuchida theoretical work on FTL travel"
+        ],
+        "consequences": [
+          "Opens the way to interstellar colonization."
+        ],
+        "categories": [
+          "technology",
+          "exploration"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-terran-alliance"
+        ],
+        "place_ids": [
+          "place-earth",
+          "place-tau-ceti"
+        ],
+        "technology_ids": [
+          "tech-ftl-jump"
+        ],
+        "source_section": "Early History",
+        "source_notes": []
+      },
+      {
+        "id": "event-new-earth-colony",
+        "name": "First extrasolar colony on New Earth",
+        "start_year": 2116,
+        "end_year": null,
+        "date_label": "2116",
+        "date_precision": "year",
+        "era_id": "colonization",
+        "summary": "Humanity establishes its first extrasolar colony on New Earth, Tau Ceti IV, beginning centuries of expansion beyond the Solar System.",
+        "causes": [
+          "Successful FTL travel"
+        ],
+        "consequences": [
+          "Colonization wave continues for centuries."
+        ],
+        "categories": [
+          "colonization",
+          "exploration"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-terran-alliance"
+        ],
+        "place_ids": [
+          "place-new-earth",
+          "place-tau-ceti"
+        ],
+        "technology_ids": [
+          "tech-ftl-jump"
+        ],
+        "source_section": "Era of Colonization",
+        "source_notes": []
+      },
+      {
+        "id": "event-outer-reaches-rebellion",
+        "name": "Outer Reaches Rebellion and Demarcation Declaration",
+        "start_year": 2235,
+        "end_year": null,
+        "date_label": "By 2235; rebellion date not given more precisely",
+        "date_precision": "approximate_period",
+        "era_id": "colonization",
+        "summary": "With roughly 600 colonies established within 120 light-years of Earth, resistance to distant Terran Alliance control grows. The Denebola-led rebellion helps bring the Liberal Party to power and prompts the Alliance to withdraw to a 30-light-year sphere, granting most colonies independence.",
+        "causes": [
+          "Difficulty governing distant colonies",
+          "Uneven economic and political burdens"
+        ],
+        "consequences": [
+          "Demarcation Declaration",
+          "Independence for nearly all colonies",
+          "Terran Alliance's reach contracts."
+        ],
+        "categories": [
+          "rebellion",
+          "decolonization",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-terran-alliance"
+        ],
+        "place_ids": [
+          "place-denebola",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-jump-drive"
+        ],
+        "source_section": "Era of Colonization",
+        "source_notes": []
+      },
+      {
+        "id": "event-terran-alliance-civil-war",
+        "name": "Terran Alliance civil war and creation of the Terran Hegemony",
+        "start_year": 2314,
+        "end_year": 2316,
+        "date_label": "2314–2316",
+        "date_precision": "year_range",
+        "era_id": "colonization",
+        "summary": "Political corruption and economic strain push the Terran Alliance into civil war. James McKenna's Alliance Global Militia ends the conflict, dissolves Parliament, and establishes the Terran Hegemony; McKenna becomes its first Director-General in 2316.",
+        "causes": [
+          "Political instability",
+          "Economic strain of supporting colonies"
+        ],
+        "consequences": [
+          "Terran Hegemony replaces the Alliance government."
+        ],
+        "categories": [
+          "civil_war",
+          "regime_change",
+          "politics"
+        ],
+        "people_ids": [
+          "person-james-mckenna"
+        ],
+        "faction_ids": [
+          "faction-terran-alliance",
+          "faction-terran-hegemony"
+        ],
+        "place_ids": [
+          "place-earth",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Era of Colonization",
+        "source_notes": []
+      },
+      {
+        "id": "event-peer-list",
+        "name": "Peer List and formalization of nobility",
+        "start_year": 2351,
+        "end_year": null,
+        "date_label": "2351",
+        "date_precision": "year",
+        "era_id": "colonization",
+        "summary": "Michael Cameron introduces an aristocratic hierarchy initially associated with achievement but increasingly inherited, helping establish hereditary noble families and later Great House structures.",
+        "causes": [
+          "Terran Hegemony's effort to formalize political hierarchy"
+        ],
+        "consequences": [
+          "Peer List ranks become a foundation for later feudal ruling families."
+        ],
+        "categories": [
+          "politics",
+          "social_structure"
+        ],
+        "people_ids": [
+          "person-michael-cameron"
+        ],
+        "faction_ids": [
+          "faction-terran-hegemony"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Era of Colonization",
+        "source_notes": []
+      },
+      {
+        "id": "event-five-great-houses",
+        "name": "Five Great House empires established",
+        "start_year": 2366,
+        "end_year": null,
+        "date_label": "By 2366",
+        "date_precision": "year",
+        "era_id": "colonization",
+        "summary": "Five major empires have consolidated around the Terran Hegemony: the Draconis Combine, Federated Suns, Capellan Confederation, Free Worlds League, and Lyran Commonwealth.",
+        "causes": [
+          "Centuries of mergers and conquests among post-Demarcation proto-states"
+        ],
+        "consequences": [
+          "The five Great Houses become the central powers of the Inner Sphere."
+        ],
+        "categories": [
+          "state_formation",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-draconis-combine",
+          "faction-federated-suns",
+          "faction-capellan-confederation",
+          "faction-free-worlds-league",
+          "faction-lyran-commonwealth",
+          "faction-terran-hegemony"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Era of Colonization",
+        "source_notes": []
+      },
+      {
+        "id": "event-first-andurien-war",
+        "name": "First Andurien War",
+        "start_year": 2398,
+        "end_year": null,
+        "date_label": "2398",
+        "date_precision": "year",
+        "era_id": "age-of-war",
+        "summary": "A territorial dispute between the Capellan Confederation and Free Worlds League escalates into open war and encourages expansionist moves by surrounding states, marking the beginning of the Age of War.",
+        "causes": [
+          "Territorial dispute between Capellan and League interests"
+        ],
+        "consequences": [
+          "Wider inter-state wars spread across the Inner Sphere."
+        ],
+        "categories": [
+          "war",
+          "territorial_conflict"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-capellan-confederation",
+          "faction-free-worlds-league"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Age of War",
+        "source_notes": []
+      },
+      {
+        "id": "event-ares-conventions",
+        "name": "Ares Conventions adopted",
+        "start_year": 2412,
+        "end_year": null,
+        "date_label": "2412",
+        "date_precision": "year",
+        "era_id": "age-of-war",
+        "summary": "After the near-annihilation of Tintavel's population, the major powers adopt rules restricting where and how war may be fought, including prohibitions on nuclear and biological attacks against planetary targets.",
+        "causes": [
+          "Atrocities on Tintavel"
+        ],
+        "consequences": [
+          "Some weapons and targeting practices are restricted, but war is also given a more formalized legal framework."
+        ],
+        "categories": [
+          "law_of_war",
+          "politics",
+          "military_doctrine"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-successor-states",
+          "faction-terran-hegemony"
+        ],
+        "place_ids": [
+          "place-tintavel",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Age of War",
+        "source_notes": []
+      },
+      {
+        "id": "event-battlemech-development",
+        "name": "BattleMech developed and enters combat",
+        "start_year": 2439,
+        "end_year": 2443,
+        "date_label": "Developed 2439; first combat use 2443",
+        "date_precision": "year_range",
+        "era_id": "age-of-war",
+        "summary": "The Terran Hegemony develops the BattleMech, a large robotic combat vehicle, which first sees combat against the Draconis Combine in 2443. The design is later stolen and spreads among the Great Houses.",
+        "causes": [
+          "Changing military environment after the Ares Conventions"
+        ],
+        "consequences": [
+          "BattleMechs become the defining high-profile combat units of the setting."
+        ],
+        "categories": [
+          "technology",
+          "military_history"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-terran-hegemony",
+          "faction-draconis-combine",
+          "faction-lyran-commonwealth",
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-battlemech"
+        ],
+        "source_section": "Age of War",
+        "source_notes": []
+      },
+      {
+        "id": "event-star-league-founded",
+        "name": "Star League founded",
+        "start_year": 2571,
+        "end_year": null,
+        "date_label": "2571",
+        "date_precision": "year",
+        "era_id": "star-league",
+        "summary": "Ian Cameron's diplomacy brings the Great Houses together in a single federation headed by House Cameron, ending the Age of War among the major Inner Sphere powers.",
+        "causes": [
+          "Diplomatic effort led by Ian Cameron"
+        ],
+        "consequences": [
+          "Creation of the Star League and its ruling Council."
+        ],
+        "categories": [
+          "state_formation",
+          "diplomacy",
+          "politics"
+        ],
+        "people_ids": [
+          "person-ian-cameron"
+        ],
+        "faction_ids": [
+          "faction-star-league",
+          "faction-terran-hegemony",
+          "faction-draconis-combine",
+          "faction-federated-suns",
+          "faction-capellan-confederation",
+          "faction-free-worlds-league",
+          "faction-lyran-commonwealth"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-terra"
+        ],
+        "technology_ids": [],
+        "source_section": "The Star League",
+        "source_notes": []
+      },
+      {
+        "id": "event-reunification-war",
+        "name": "Reunification War",
+        "start_year": 2571,
+        "end_year": 2596,
+        "date_label": "After the Star League is founded in 2571; ends in 2596 (exact start year not specified)",
+        "date_precision": "approximate_period",
+        "era_id": "star-league",
+        "summary": "The Star League forces the Periphery states into the federation after diplomacy and economic pressure fail. The conflict lasts roughly twenty years and ends with the fall of the Taurian Concordat's final stronghold in 2596.",
+        "causes": [
+          "Star League policy of bringing all human space under one banner"
+        ],
+        "consequences": [
+          "Periphery is incorporated by force and resentment deepens.",
+          "The postwar Star League enters a long period of relative peace and technological growth."
+        ],
+        "categories": [
+          "war",
+          "forced_integration",
+          "politics"
+        ],
+        "people_ids": [
+          "person-ian-cameron"
+        ],
+        "faction_ids": [
+          "faction-star-league",
+          "faction-star-league-defense-force",
+          "faction-periphery-states"
+        ],
+        "place_ids": [
+          "place-periphery",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "The Star League; The Major Players — The Star League",
+        "source_notes": [
+          "2571 is the Star League founding year and a lower contextual bound, not an exact start date stated for the war."
+        ]
+      },
+      {
+        "id": "event-hpg-development",
+        "name": "Hyperpulse Generator network developed",
+        "start_year": 2629,
+        "end_year": 2630,
+        "date_label": "2629 in the main chronology; 2630 in the Major Players section",
+        "date_precision": "year_range",
+        "era_id": "star-league",
+        "summary": "The hyperpulse generator enables much faster interstellar communication without relying on message-carrying JumpShips. The article gives 2629 in its main chronology and 2630 in its later summary.",
+        "causes": [
+          "Star League-era technological research"
+        ],
+        "consequences": [
+          "Rapid interstellar communications become a strategic foundation of Inner Sphere governance."
+        ],
+        "categories": [
+          "technology",
+          "communications"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-star-league"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "The Star League; The Major Players — The Star League",
+        "source_notes": [
+          "Date discrepancy: 2629 is stated in the main chronology; 2630 is stated in the Major Players recap. Preserve both rather than treating either as definitively authoritative."
+        ]
+      },
+      {
+        "id": "event-amaris-coup",
+        "name": "Amaris Coup",
+        "start_year": 2766,
+        "end_year": 2767,
+        "date_label": "Christmas Day 2766 in the main chronology; 2767 in the Major Players recap",
+        "date_precision": "year_range",
+        "era_id": "amaris-crisis",
+        "summary": "Stefan Amaris exploits Richard Cameron's youth and the SLDF's deployment away from Terra, kills the Cameron family, and declares himself ruler of the Star League.",
+        "causes": [
+          "Periphery uprising draws SLDF forces away from Terra",
+          "Amaris's long-term plot to replace House Cameron"
+        ],
+        "consequences": [
+          "Aleksandr Kerensky leads the SLDF against Amaris.",
+          "The Star League's central government is destroyed."
+        ],
+        "categories": [
+          "coup",
+          "assassination",
+          "regime_change",
+          "civil_war"
+        ],
+        "people_ids": [
+          "person-stefan-amaris",
+          "person-richard-cameron",
+          "person-aleksandr-kerensky"
+        ],
+        "faction_ids": [
+          "faction-star-league",
+          "faction-star-league-defense-force",
+          "faction-rim-worlds-republic"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "The Amaris Coup; The Major Players — The Star League",
+        "source_notes": [
+          "Date discrepancy: the dedicated chronology dates the coup to Christmas Day 2766; the Major Players recap says 2767."
+        ]
+      },
+      {
+        "id": "event-amaris-civil-war",
+        "name": "Amaris Civil War",
+        "start_year": 2766,
+        "end_year": 2779,
+        "date_label": "Thirteen-year war following the coup; approximate endpoint 2779",
+        "date_precision": "approximate_period",
+        "era_id": "amaris-crisis",
+        "summary": "Aleksandr Kerensky refuses to support Amaris and leads the SLDF through a thirteen-year war that ends with Amaris deposed and executed. Terra and the Terran Hegemony are left in ruins, and the SLDF is too depleted to maintain the Star League.",
+        "causes": [
+          "Amaris Coup"
+        ],
+        "consequences": [
+          "Amaris is deposed and executed.",
+          "The Star League becomes moribund and the SLDF is severely depleted."
+        ],
+        "categories": [
+          "civil_war",
+          "war",
+          "regime_change"
+        ],
+        "people_ids": [
+          "person-stefan-amaris",
+          "person-aleksandr-kerensky"
+        ],
+        "faction_ids": [
+          "faction-star-league",
+          "faction-star-league-defense-force",
+          "faction-rim-worlds-republic"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "The Amaris Coup",
+        "source_notes": [
+          "The page describes the conflict as a thirteen-year war but does not give a separate exact end year; 2779 is an arithmetic approximation from the 2766 start, not a separately stated date."
+        ]
+      },
+      {
+        "id": "event-operation-exodus",
+        "name": "Operation EXODUS",
+        "start_year": 2784,
+        "end_year": null,
+        "date_label": "2784",
+        "date_precision": "year",
+        "era_id": "exodus",
+        "summary": "After the Council strips Kerensky of his authority and the Star League appears headed toward renewed catastrophe, four-fifths of the remaining SLDF follows him into the Deep Periphery.",
+        "causes": [
+          "Kerensky's failed attempt to stabilize the Star League",
+          "Fear of another apocalyptic war among the Houses"
+        ],
+        "consequences": [
+          "The Inner Sphere loses most of the remaining SLDF.",
+          "The descendants of the Exodus force eventually become the Clans."
+        ],
+        "categories": [
+          "exodus",
+          "migration",
+          "military_history"
+        ],
+        "people_ids": [
+          "person-aleksandr-kerensky"
+        ],
+        "faction_ids": [
+          "faction-star-league-defense-force",
+          "faction-clans"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-deep-periphery"
+        ],
+        "technology_ids": [],
+        "source_section": "The Exodus",
+        "source_notes": [
+          "Corrected from 2874 to 2784 (Mech Buddy, 2026-11-26): the Exodus left in 2784, before the First Succession War; the official eras in this file agree (SLDF Exodus 2784)."
+        ]
+      },
+      {
+        "id": "event-first-succession-war",
+        "name": "First Succession War",
+        "start_year": 2786,
+        "end_year": 2821,
+        "date_label": "2786–2821",
+        "date_precision": "year_range",
+        "era_id": "succession-wars",
+        "summary": "The Successor States fight for control of the Star League legacy. Nuclear, biological, and chemical weapons and attacks on JumpShips devastate hundreds of worlds and nearly eliminate WarShip fleets.",
+        "causes": [
+          "Rival Great House claims to the First Lordship after the Star League's collapse and Kerensky's disappearance"
+        ],
+        "consequences": [
+          "Severe destruction of population centers, industry, fleets, and BattleMech forces.",
+          "No Successor State achieves decisive victory."
+        ],
+        "categories": [
+          "succession_war",
+          "total_war",
+          "technology_loss"
+        ],
+        "people_ids": [
+          "person-jerome-blake"
+        ],
+        "faction_ids": [
+          "faction-successor-states",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-terra"
+        ],
+        "technology_ids": [
+          "tech-jumpship",
+          "tech-warship",
+          "tech-los-tech"
+        ],
+        "source_section": "Succession Wars — First Succession War",
+        "source_notes": []
+      },
+      {
+        "id": "event-comstar-takes-terra",
+        "name": "ComStar takes control of Terra",
+        "start_year": null,
+        "end_year": null,
+        "date_label": "During or by the end of the First Succession War; exact year not specified",
+        "date_precision": "approximate_period",
+        "era_id": "succession-wars",
+        "summary": "Jerome Blake turns the Star League communications network into ComStar, takes Terra, and declares it a neutral protectorate under ComStar governance, preserving some Star League technology there.",
+        "causes": [
+          "Destruction caused by the First Succession War"
+        ],
+        "consequences": [
+          "Terra becomes ComStar's headquarters and a protected technology repository."
+        ],
+        "categories": [
+          "state_formation",
+          "neutrality",
+          "communications"
+        ],
+        "people_ids": [
+          "person-jerome-blake"
+        ],
+        "faction_ids": [
+          "faction-comstar",
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-terra"
+        ],
+        "technology_ids": [
+          "tech-hpg",
+          "tech-los-tech"
+        ],
+        "source_section": "Succession Wars — First Succession War; The Major Players — ComStar/Word of Blake",
+        "source_notes": [
+          "The page does not date ComStar's seizure of Terra to a specific year; the record intentionally leaves start_year null."
+        ]
+      },
+      {
+        "id": "event-second-succession-war",
+        "name": "Second Succession War",
+        "start_year": 2830,
+        "end_year": 2864,
+        "date_label": "2830–2864",
+        "date_precision": "year_range",
+        "era_id": "succession-wars",
+        "summary": "A second major conflict further destroys irreplaceable Star League technology and deepens the decline of technological civilization. No Great House succeeds in re-establishing the Star League.",
+        "causes": [
+          "No durable settlement after the First Succession War"
+        ],
+        "consequences": [
+          "Further technological decline and exhaustion among the Successor States.",
+          "ComStar covertly helps keep conflict and decline going, according to the page."
+        ],
+        "categories": [
+          "succession_war",
+          "technology_loss",
+          "politics"
+        ],
+        "people_ids": [
+          "person-jerome-blake"
+        ],
+        "faction_ids": [
+          "faction-successor-states",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-los-tech"
+        ],
+        "source_section": "Succession Wars — Second Succession War",
+        "source_notes": []
+      },
+      {
+        "id": "event-third-succession-war",
+        "name": "Third Succession War",
+        "start_year": 2866,
+        "end_year": 3025,
+        "date_label": "2866–3025",
+        "date_precision": "year_range",
+        "era_id": "succession-wars",
+        "summary": "The Great Houses conduct low-intensity, persistent warfare, often raiding to capture factories, water infrastructure, and surviving BattleMechs rather than destroying them. The war ends through exhaustion rather than a treaty.",
+        "causes": [
+          "Military and industrial exhaustion after the first two Succession Wars"
+        ],
+        "consequences": [
+          "Star League-era technology becomes rare and is often preserved as family heirlooms.",
+          "The Inner Sphere's remaining Star League institutions largely disappear."
+        ],
+        "categories": [
+          "succession_war",
+          "attrition",
+          "raiding",
+          "technology_loss"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-battlemech",
+          "tech-los-tech"
+        ],
+        "source_section": "Succession Wars — Third Succession War",
+        "source_notes": []
+      },
+      {
+        "id": "event-davion-steiner-alliance",
+        "name": "Davion–Steiner alliance proposal",
+        "start_year": 3022,
+        "end_year": 3028,
+        "date_label": "3022–3028",
+        "date_precision": "year_range",
+        "era_id": "post-succession",
+        "summary": "Katrina Steiner's peace proposal is accepted by Hanse Davion, leading to a close alliance between the Federated Suns and Lyran Commonwealth and a planned dynastic union.",
+        "causes": [
+          "Long-running conflict among the Successor States"
+        ],
+        "consequences": [
+          "The Federated Commonwealth is planned as a successor union.",
+          "The other three Successor States respond with their own pact."
+        ],
+        "categories": [
+          "diplomacy",
+          "alliance",
+          "politics"
+        ],
+        "people_ids": [
+          "person-katrina-steiner",
+          "person-hanse-davion"
+        ],
+        "faction_ids": [
+          "faction-federated-suns",
+          "faction-lyran-commonwealth",
+          "faction-federated-commonwealth"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Succession Wars — Fourth Succession War",
+        "source_notes": []
+      },
+      {
+        "id": "event-fourth-succession-war",
+        "name": "Fourth Succession War",
+        "start_year": 3028,
+        "end_year": null,
+        "date_label": "Begins in 3028; page describes subsequent truce but gives no end year",
+        "date_precision": "year",
+        "era_id": "post-succession",
+        "summary": "At Hanse Davion and Melissa Steiner's wedding, Davion announces an attack on the Capellan Confederation. Federated Suns and Lyran forces make major territorial gains before ComStar's communications interdiction disrupts coordination and an uneasy truce follows.",
+        "causes": [
+          "Strategic response to Davion–Steiner alliance",
+          "Hanse Davion's surprise declaration against the Capellan Confederation"
+        ],
+        "consequences": [
+          "Capellan Confederation loses substantial territory.",
+          "ComStar's use of communications control becomes a major strategic factor.",
+          "Interwar conflicts and political realignments follow."
+        ],
+        "categories": [
+          "succession_war",
+          "invasion",
+          "communications_warfare"
+        ],
+        "people_ids": [
+          "person-hanse-davion",
+          "person-katrina-steiner"
+        ],
+        "faction_ids": [
+          "faction-federated-suns",
+          "faction-lyran-commonwealth",
+          "faction-capellan-confederation",
+          "faction-draconis-combine",
+          "faction-free-worlds-league",
+          "faction-comstar",
+          "faction-federated-commonwealth"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-terra",
+          "place-helm"
+        ],
+        "technology_ids": [
+          "tech-hpg",
+          "tech-black-boxes"
+        ],
+        "source_section": "Succession Wars — Fourth Succession War",
+        "source_notes": [
+          "The source narrates the campaign and later truce but does not assign a precise end year in this section."
+        ]
+      },
+      {
+        "id": "event-helm-memory-core",
+        "name": "Helm memory core discovered",
+        "start_year": 3028,
+        "end_year": null,
+        "date_label": "3028",
+        "date_precision": "year",
+        "era_id": "post-succession",
+        "summary": "The Gray Death Legion discovers a functional Star League-era memory core on Helm and shares copies with the Great Houses, triggering a technological renaissance.",
+        "causes": [
+          "Mercenary discovery during the Fourth Succession War era"
+        ],
+        "consequences": [
+          "Star League weapons and systems are rediscovered and manufacturing capability improves.",
+          "The technological balance among Successor States shifts."
+        ],
+        "categories": [
+          "discovery",
+          "technology",
+          "renaissance"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-helm",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-los-tech"
+        ],
+        "source_section": "Succession Wars — Fourth Succession War",
+        "source_notes": []
+      },
+      {
+        "id": "event-ronin-war",
+        "name": "Ronin War",
+        "start_year": null,
+        "end_year": null,
+        "date_label": "After the creation of the Free Rasalhague Republic; exact years not specified in this page section",
+        "date_precision": "undated_or_unspecified",
+        "era_id": "post-succession",
+        "summary": "The Draconis Combine grants Rasalhague independence, but Combine warriors who oppose the decision remain behind as ronin and fight the new state. The conflict helps establish the Free Rasalhague Republic.",
+        "causes": [
+          "Rasalhague independence from the Draconis Combine",
+          "Dissent among Combine warriors"
+        ],
+        "consequences": [
+          "Free Rasalhague Republic is established but faces early insecurity.",
+          "Poor early mercenary contracting leaves lasting anti-mercenary sentiment in Rasalhague."
+        ],
+        "categories": [
+          "secession",
+          "civil_conflict",
+          "state_formation"
+        ],
+        "people_ids": [
+          "person-theodore-kurita"
+        ],
+        "faction_ids": [
+          "faction-draconis-combine",
+          "faction-free-rasalhague-republic",
+          "faction-lyran-commonwealth",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-los-tech"
+        ],
+        "source_section": "Ronin War",
+        "source_notes": [
+          "This article section does not give a specific year for the Ronin War."
+        ]
+      },
+      {
+        "id": "event-war-of-3039",
+        "name": "War of 3039",
+        "start_year": 3039,
+        "end_year": 3039,
+        "date_label": "3039 (the page describes planning and aftermath over a longer period)",
+        "date_precision": "year",
+        "era_id": "post-succession",
+        "summary": "The Federated Commonwealth attacks the Draconis Combine. Logistical and political difficulties, ComStar support for the Combine, and Theodore Kurita's deception help persuade Hanse Davion to halt the offensive.",
+        "causes": [
+          "Federated Commonwealth strategic concern about the Draconis Combine"
+        ],
+        "consequences": [
+          "The campaign fails to remove the Combine as a long-term rival.",
+          "The page notes the alliance's military integration remained incomplete."
+        ],
+        "categories": [
+          "war",
+          "invasion",
+          "strategy"
+        ],
+        "people_ids": [
+          "person-theodore-kurita",
+          "person-hanse-davion"
+        ],
+        "faction_ids": [
+          "faction-federated-commonwealth",
+          "faction-draconis-combine",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-black-boxes",
+          "tech-hpg"
+        ],
+        "source_section": "War of 3039",
+        "source_notes": []
+      },
+      {
+        "id": "event-clan-contact",
+        "name": "First reports of Clan forces",
+        "start_year": 3049,
+        "end_year": 3049,
+        "date_label": "August 3049",
+        "date_precision": "year",
+        "era_id": "clan-invasion",
+        "summary": "The Inner Sphere receives reports of exceptionally advanced invaders in the region coreward of the Free Rasalhague Republic; outlying realms and mercenary units disappear or are destroyed.",
+        "causes": [
+          "Clan reconnaissance and movement toward the Inner Sphere"
+        ],
+        "consequences": [
+          "The Inner Sphere becomes aware of an external military threat."
+        ],
+        "categories": [
+          "first_contact",
+          "military_intelligence"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-clans",
+          "faction-free-rasalhague-republic"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-deep-periphery"
+        ],
+        "technology_ids": [],
+        "source_section": "Clan Invasion",
+        "source_notes": []
+      },
+      {
+        "id": "event-clan-invasion",
+        "name": "Clan Invasion begins in the Inner Sphere",
+        "start_year": 3050,
+        "end_year": 3052,
+        "date_label": "March 3050 onward; first major halt at Tukayyid in 3052",
+        "date_precision": "year_range",
+        "era_id": "clan-invasion",
+        "summary": "Four Clans—Wolf, Jade Falcon, Smoke Jaguar, and Ghost Bear—invade the Inner Sphere, rapidly taking more than a hundred worlds during the first year. Tyra Miraborg's attack kills ilKhan Leo Showers and creates a pause while the Clans select a successor.",
+        "causes": [
+          "Crusader Clans seek to return to and conquer the Inner Sphere"
+        ],
+        "consequences": [
+          "Inner Sphere leaders gain time to coordinate and learn about the Clans.",
+          "The conflict culminates in the Battle of Tukayyid."
+        ],
+        "categories": [
+          "invasion",
+          "war",
+          "first_contact"
+        ],
+        "people_ids": [
+          "person-ulric-kerensky"
+        ],
+        "faction_ids": [
+          "faction-clans",
+          "faction-clan-wolf",
+          "faction-clan-jade-falcon",
+          "faction-clan-smoke-jaguar",
+          "faction-clan-ghost-bear",
+          "faction-federated-commonwealth",
+          "faction-draconis-combine",
+          "faction-free-rasalhague-republic"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-outreach"
+        ],
+        "technology_ids": [
+          "tech-battlemech"
+        ],
+        "source_section": "Clan Invasion",
+        "source_notes": []
+      },
+      {
+        "id": "event-tukayyid",
+        "name": "Battle of Tukayyid",
+        "start_year": 3052,
+        "end_year": 3052,
+        "date_label": "1–5 May 3052",
+        "date_precision": "exact_date",
+        "era_id": "clan-invasion",
+        "summary": "ComStar's forces defend Tukayyid against the invading Clans. The outcome prevents Clan forces from advancing beyond Tukayyid for fifteen years, although the Com Guards suffer extremely heavy losses.",
+        "causes": [
+          "The Clans' stated objective of reaching Terra",
+          "ComStar and Clan agreement to decide the issue through a proxy battle"
+        ],
+        "consequences": [
+          "Clan advance is halted for fifteen years under the truce terms.",
+          "ComStar leadership changes after Anastasius Focht discovers Myndo Waterly's deception."
+        ],
+        "categories": [
+          "battle",
+          "turning_point",
+          "treaty"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-comstar",
+          "faction-clans",
+          "faction-clan-wolf",
+          "faction-clan-ghost-bear",
+          "faction-clan-jade-falcon"
+        ],
+        "place_ids": [
+          "place-tukayyid",
+          "place-terra"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "Clan Invasion",
+        "source_notes": []
+      },
+      {
+        "id": "event-wof-blake-schism",
+        "name": "Word of Blake emerges as a ComStar splinter faction",
+        "start_year": 3052,
+        "end_year": 3052,
+        "date_label": "After the Battle of Tukayyid in 3052",
+        "date_precision": "year",
+        "era_id": "post-invasion",
+        "summary": "Reform efforts within ComStar produce a backlash, and Precentor Atreus Demona Aziz leads a splinter group that becomes the Word of Blake, which receives protection from Thomas Marik.",
+        "causes": [
+          "Disagreement over ComStar's religious identity and institutional reform"
+        ],
+        "consequences": [
+          "The Word of Blake becomes an independent political and religious-military actor."
+        ],
+        "categories": [
+          "schism",
+          "religion",
+          "state_formation"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-comstar",
+          "faction-word-of-blake",
+          "faction-free-worlds-league"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "Clan Invasion",
+        "source_notes": []
+      },
+      {
+        "id": "event-melissa-steiner-assassination",
+        "name": "Melissa Steiner assassinated",
+        "start_year": 3055,
+        "end_year": 3055,
+        "date_label": "3055",
+        "date_precision": "year",
+        "era_id": "post-invasion",
+        "summary": "Archon Melissa Steiner is assassinated. Her son Victor succeeds her and formally inaugurates the Federated Commonwealth as its first Archon-Prince; the page says blame is placed on Victor despite identifying his sister as the assassin.",
+        "causes": [
+          "Internal dynastic conspiracy; details are not fully resolved in this overview"
+        ],
+        "consequences": [
+          "Victor becomes Archon-Prince."
+        ],
+        "categories": [
+          "assassination",
+          "succession",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-federated-commonwealth"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Clan Invasion",
+        "source_notes": []
+      },
+      {
+        "id": "event-joshua-reprisals-and-chaos-march",
+        "name": "Joshua Reprisals and emergence of the Chaos March",
+        "start_year": 3057,
+        "end_year": 3058,
+        "date_label": "3057–3058",
+        "date_precision": "year_range",
+        "era_id": "post-invasion",
+        "summary": "The death of Joshua Marik exposes a deception involving a double and triggers Operation Guerrero by Thomas Marik and Sun-Tzu Liao. Katherine Steiner-Davion uses the crisis to split the Lyran half of the Federated Commonwealth away; the resulting power vacuum becomes the Chaos March. The Word of Blake takes Terra in 3058.",
+        "causes": [
+          "Joshua Marik deception exposed",
+          "Federated Commonwealth political weakness and succession disputes"
+        ],
+        "consequences": [
+          "Lyran Alliance separates from the Federated Commonwealth.",
+          "The Chaos March becomes fragmented among local powers.",
+          "Word of Blake captures Terra from ComStar in 3058."
+        ],
+        "categories": [
+          "invasion",
+          "secession",
+          "political_crisis",
+          "state_fragmentation"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-federated-commonwealth",
+          "faction-lyran-alliance",
+          "faction-free-worlds-league",
+          "faction-capellan-confederation",
+          "faction-word-of-blake",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-chaos-march",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-hpg",
+          "tech-jumpship"
+        ],
+        "source_section": "Joshua Reprisals",
+        "source_notes": []
+      },
+      {
+        "id": "event-refusal-war",
+        "name": "Refusal War",
+        "start_year": 3057,
+        "end_year": null,
+        "date_label": "3057; exact conclusion year not stated in this overview",
+        "date_precision": "year",
+        "era_id": "post-invasion",
+        "summary": "Ulric Kerensky turns a Trial of Refusal into a war between Clan Wolf and Clan Jade Falcon, intending to weaken the Crusader faction's strongest force. The conflict leaves two separate Wolf identities: Clan Wolf-in-Exile and Vladimir Ward's rebuilt Clan Wolf.",
+        "causes": [
+          "Crusader charges against Ulric Kerensky",
+          "Clan disagreement over renewed invasion of the Inner Sphere"
+        ],
+        "consequences": [
+          "Ulric dies, but Jade Falcon is badly weakened.",
+          "Clan Wolf splits into an Inner Sphere exile group and a Crusader successor faction."
+        ],
+        "categories": [
+          "clan_civil_war",
+          "trial_of_refusal",
+          "faction_split"
+        ],
+        "people_ids": [
+          "person-ulric-kerensky"
+        ],
+        "faction_ids": [
+          "faction-clan-wolf",
+          "faction-clan-wolf-in-exile",
+          "faction-clan-jade-falcon"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-battlemech"
+        ],
+        "source_section": "Refusal War",
+        "source_notes": []
+      },
+      {
+        "id": "event-new-star-league",
+        "name": "Star League reborn",
+        "start_year": 3058,
+        "end_year": 3058,
+        "date_label": "3058",
+        "date_precision": "year",
+        "era_id": "post-invasion",
+        "summary": "After cooperation against a Jade Falcon offensive, Inner Sphere powers recreate the Star League. ComStar participates as a nonvoting member.",
+        "causes": [
+          "Cooperation during the Battle of Coventry and Clan threat"
+        ],
+        "consequences": [
+          "A new Star League is established and prepares joint military operations against the Clans."
+        ],
+        "categories": [
+          "state_formation",
+          "alliance",
+          "diplomacy"
+        ],
+        "people_ids": [
+          "person-victor-steiner-davion"
+        ],
+        "faction_ids": [
+          "faction-new-star-league",
+          "faction-federated-commonwealth",
+          "faction-draconis-combine",
+          "faction-free-rasalhague-republic",
+          "faction-lyran-alliance",
+          "faction-free-worlds-league",
+          "faction-capellan-confederation",
+          "faction-st-ives-compact",
+          "faction-comstar"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Star League Reborn",
+        "source_notes": []
+      },
+      {
+        "id": "event-operation-bulldog",
+        "name": "Operation BULLDOG",
+        "start_year": 3058,
+        "end_year": null,
+        "date_label": "After the 3058 re-formation of the Star League; exact year range not specified here",
+        "date_precision": "approximate_period",
+        "era_id": "post-invasion",
+        "summary": "The New Star League launches a major campaign against Clan Smoke Jaguar, driving its forces out of the Inner Sphere. The operation is led by Anastasius Focht and Victor Steiner-Davion.",
+        "causes": [
+          "New Star League seeks legitimacy and retribution for Smoke Jaguar atrocities"
+        ],
+        "consequences": [
+          "Smoke Jaguar forces are pushed out of the Inner Sphere and retreat toward Clan space."
+        ],
+        "categories": [
+          "military_campaign",
+          "anti-clan_war"
+        ],
+        "people_ids": [
+          "person-victor-steiner-davion"
+        ],
+        "faction_ids": [
+          "faction-new-star-league",
+          "faction-clan-smoke-jaguar",
+          "faction-clan-wolf-in-exile"
+        ],
+        "place_ids": [
+          "place-huntress",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Star League Reborn — Operation BULLDOG",
+        "source_notes": []
+      },
+      {
+        "id": "event-operation-serpent",
+        "name": "Operation SERPENT",
+        "start_year": 3058,
+        "end_year": null,
+        "date_label": "Following Operation BULLDOG; exact year not specified in this overview",
+        "date_precision": "approximate_period",
+        "era_id": "post-invasion",
+        "summary": "A Star League task force strikes the Smoke Jaguar homeworld of Huntress. The campaign helps destroy the remaining Smoke Jaguar force, and Victor Steiner-Davion's subsequent challenge on Strana Mechty marks the end of the Clan Invasion as presented by the page.",
+        "causes": [
+          "Smoke Jaguar remnants return to their homeworld after Operation BULLDOG"
+        ],
+        "consequences": [
+          "Clan Smoke Jaguar is annihilated.",
+          "The Clan Invasion is declared over, though Clan Wolf disputes the challenge's applicability to it."
+        ],
+        "categories": [
+          "military_campaign",
+          "anti-clan_war"
+        ],
+        "people_ids": [
+          "person-victor-steiner-davion"
+        ],
+        "faction_ids": [
+          "faction-new-star-league",
+          "faction-clan-smoke-jaguar",
+          "faction-clan-wolf"
+        ],
+        "place_ids": [
+          "place-huntress",
+          "place-strana-mechty"
+        ],
+        "technology_ids": [],
+        "source_section": "Star League Reborn — Operation SERPENT",
+        "source_notes": []
+      },
+      {
+        "id": "event-capellan-st-ives-war",
+        "name": "Capellan–St. Ives War concludes",
+        "start_year": 3061,
+        "end_year": 3061,
+        "date_label": "By 3061",
+        "date_precision": "year",
+        "era_id": "post-invasion",
+        "summary": "Sun-Tzu Liao uses his position as First Lord to employ Star League forces in support of Capellan operations to reintegrate the St. Ives Compact into the Capellan Confederation.",
+        "causes": [
+          "St. Ives secession after the Fourth Succession War"
+        ],
+        "consequences": [
+          "St. Ives is reintegrated into the Capellan Confederation by 3061."
+        ],
+        "categories": [
+          "war",
+          "reunification",
+          "politics"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-capellan-confederation",
+          "faction-st-ives-compact",
+          "faction-new-star-league"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Capellan-St. Ives War",
+        "source_notes": []
+      },
+      {
+        "id": "event-fedcom-civil-war",
+        "name": "FedCom Civil War",
+        "start_year": null,
+        "end_year": null,
+        "date_label": "After Victor's return from Clan space and before the 3067 Star League collapse; page does not specify exact start/end years",
+        "date_precision": "undated_or_unspecified",
+        "era_id": "post-invasion",
+        "summary": "Victor Steiner-Davion leads the Allies against his sister Katherine's Loyalists after she usurps power in the Federated Commonwealth. The war devastates the Commonwealth and Lyran Alliance; the Allies prevail and Katherine is exiled among Clan Wolf.",
+        "causes": [
+          "Katherine's seizure of the regency and political legitimacy crisis",
+          "Apparent assassination of Arthur Steiner-Davion"
+        ],
+        "consequences": [
+          "Victor's faction wins.",
+          "The Federated Commonwealth remains deeply divided and weakened."
+        ],
+        "categories": [
+          "civil_war",
+          "succession",
+          "politics"
+        ],
+        "people_ids": [
+          "person-victor-steiner-davion"
+        ],
+        "faction_ids": [
+          "faction-federated-commonwealth",
+          "faction-lyran-alliance",
+          "faction-clan-wolf"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "FedCom Civil War",
+        "source_notes": [
+          "The Sarna overview does not assign explicit years to this conflict in this section."
+        ]
+      },
+      {
+        "id": "event-star-league-collapse",
+        "name": "New Star League collapses",
+        "start_year": 3067,
+        "end_year": 3067,
+        "date_label": "3067",
+        "date_precision": "year",
+        "era_id": "jihad",
+        "summary": "At the 3067 conference, the Capellan Confederation, Lyran Alliance, and Federated Suns withdraw support, ending the revived Star League and setting the stage for the Word of Blake's war.",
+        "causes": [
+          "Disputes over Word of Blake membership and League politics"
+        ],
+        "consequences": [
+          "The Word of Blake attempts to force reluctant nations back into the League by war."
+        ],
+        "categories": [
+          "state_collapse",
+          "politics",
+          "diplomacy"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-new-star-league",
+          "faction-word-of-blake",
+          "faction-capellan-confederation",
+          "faction-lyran-alliance",
+          "faction-federated-suns"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Word of Blake Jihad",
+        "source_notes": []
+      },
+      {
+        "id": "event-jihad",
+        "name": "Word of Blake Jihad",
+        "start_year": 3067,
+        "end_year": 3081,
+        "date_label": "3067–3081",
+        "date_precision": "year_range",
+        "era_id": "jihad",
+        "summary": "The Word of Blake wages a system-wide campaign using orbital attacks, nuclear and biological weapons, attacks on civilians, and disruption of the HPG network. The conflict fragments political authority and devastates worlds across the Inner Sphere.",
+        "causes": [
+          "Collapse of the revived Star League and radical Blakist response"
+        ],
+        "consequences": [
+          "Massive loss of life and infrastructure.",
+          "The Free Worlds League fragments.",
+          "Devlin Stone leads a coalition that defeats the Blakists on Terra in 3081."
+        ],
+        "categories": [
+          "total_war",
+          "religious_militancy",
+          "communications_warfare",
+          "weapons_of_mass_destruction"
+        ],
+        "people_ids": [
+          "person-devlin-stone"
+        ],
+        "faction_ids": [
+          "faction-word-of-blake",
+          "faction-comstar",
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "Word of Blake Jihad",
+        "source_notes": []
+      },
+      {
+        "id": "event-jihad-ends",
+        "name": "Jihad ends on Terra",
+        "start_year": 3081,
+        "end_year": 3081,
+        "date_label": "3081",
+        "date_precision": "year",
+        "era_id": "jihad",
+        "summary": "Devlin Stone's coalition defeats the Word of Blake on Terra, bringing the Jihad to an end.",
+        "causes": [
+          "Coalition military campaign against the Word of Blake"
+        ],
+        "consequences": [
+          "The postwar political settlement creates the conditions for the Republic of the Sphere."
+        ],
+        "categories": [
+          "war_termination",
+          "battle",
+          "regime_change"
+        ],
+        "people_ids": [
+          "person-devlin-stone"
+        ],
+        "faction_ids": [
+          "faction-word-of-blake",
+          "faction-republic-of-the-sphere"
+        ],
+        "place_ids": [
+          "place-terra"
+        ],
+        "technology_ids": [],
+        "source_section": "Word of Blake Jihad; Formation of the Republic",
+        "source_notes": []
+      },
+      {
+        "id": "event-republic-founded",
+        "name": "Republic of the Sphere founded",
+        "start_year": 3081,
+        "end_year": 3081,
+        "date_label": "3081",
+        "date_precision": "year",
+        "era_id": "republic-era",
+        "summary": "Devlin Stone uses the exhaustion caused by the Jihad to establish the Republic of the Sphere around Terra, taking control of contested worlds in the hope of creating a durable peace.",
+        "causes": [
+          "War exhaustion after the Jihad",
+          "Stone's effort to establish a buffer among the Successor States"
+        ],
+        "consequences": [
+          "A new state centered on Terra is created.",
+          "The peace proves fragile, with renewed conflict in the 3090s."
+        ],
+        "categories": [
+          "state_formation",
+          "postwar_settlement",
+          "politics"
+        ],
+        "people_ids": [
+          "person-devlin-stone"
+        ],
+        "faction_ids": [
+          "faction-republic-of-the-sphere",
+          "faction-successor-states"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Formation of the Republic",
+        "source_notes": []
+      },
+      {
+        "id": "event-capellan-crusades",
+        "name": "Capellan Crusades against the Republic",
+        "start_year": 3090,
+        "end_year": 3099,
+        "date_label": "The 3090s",
+        "date_precision": "approximate_period",
+        "era_id": "republic-era",
+        "summary": "The Republic's attempt to preserve a peaceful buffer is challenged by Capellan campaigns in the 3090s, illustrating the fragility of the post-Jihad settlement.",
+        "causes": [
+          "Continuing territorial and political rivalry"
+        ],
+        "consequences": [
+          "The Republic's stability is undermined."
+        ],
+        "categories": [
+          "war",
+          "territorial_conflict"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-capellan-confederation",
+          "faction-republic-of-the-sphere"
+        ],
+        "place_ids": [
+          "place-inner-sphere"
+        ],
+        "technology_ids": [],
+        "source_section": "Formation of the Republic",
+        "source_notes": [
+          "The page gives the decade rather than precise campaign dates; 3090–3099 is a machine-friendly decade range, not a claim of continuous war in every year."
+        ]
+      },
+      {
+        "id": "event-hpg-network-collapse",
+        "name": "HPG network disabled and Dark Age begins",
+        "start_year": 3130,
+        "end_year": 3139,
+        "date_label": "Early 3130s",
+        "date_precision": "approximate_period",
+        "era_id": "dark-age",
+        "summary": "Unknown actor or actors disable the HPG network. The resulting isolation revives old hostilities, fuels factional movements, and contributes to internal conflict within the Republic of the Sphere.",
+        "causes": [
+          "Sabotage or attack by unidentified actor(s); responsibility remains unconfirmed"
+        ],
+        "consequences": [
+          "Interstellar communication is severely disrupted.",
+          "Regional factions and foreign powers exploit the Republic's instability."
+        ],
+        "categories": [
+          "communications_collapse",
+          "political_fragmentation",
+          "crisis"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-republic-of-the-sphere",
+          "faction-draconis-combine",
+          "faction-capellan-confederation",
+          "faction-federated-suns",
+          "faction-clan-jade-falcon"
+        ],
+        "place_ids": [
+          "place-inner-sphere",
+          "place-terra"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "Dark Age",
+        "source_notes": [
+          "The page says 'early 3130s' and does not identify the perpetrators; the 3130–3139 bounds simply encode that approximate decade."
+        ]
+      },
+      {
+        "id": "event-fortress-republic",
+        "name": "Fortress Republic declared",
+        "start_year": 3130,
+        "end_year": 3139,
+        "date_label": "Early 3130s; exact year not specified",
+        "date_precision": "approximate_period",
+        "era_id": "dark-age",
+        "summary": "As the Republic is carved up by internal and external forces, Exarch Jonah Levin withdraws most Republican forces to Prefecture X and declares the Fortress Republic, prioritizing defense of the interior.",
+        "causes": [
+          "HPG collapse",
+          "Senate-aligned and foreign encroachment",
+          "Republic civil conflict"
+        ],
+        "consequences": [
+          "The Republic concentrates its core defenses in Prefecture X.",
+          "Forces outside the Fortress continue trying to protect remaining Republican worlds."
+        ],
+        "categories": [
+          "military_reorganization",
+          "political_crisis",
+          "territorial_contraction"
+        ],
+        "people_ids": [],
+        "faction_ids": [
+          "faction-republic-of-the-sphere",
+          "faction-federated-suns"
+        ],
+        "place_ids": [
+          "place-terra",
+          "place-inner-sphere"
+        ],
+        "technology_ids": [
+          "tech-hpg"
+        ],
+        "source_section": "Dark Age",
+        "source_notes": [
+          "The exact date is not specified beyond early 3130s."
+        ]
+      }
+    ],
+    "factions": [
+      {
+        "id": "faction-western-alliance",
+        "name": "Western Alliance",
+        "aliases": [
+          "Western Alliance"
+        ],
+        "faction_type": "alliance",
+        "description": "Earth-based coalition associated with the early space program and victory in the 2011–2014 Russian civil war.",
+        "key_period_ids": [
+          "early-history"
+        ],
+        "related_event_ids": [
+          "event-russian-civil-war",
+          "event-solar-system-expansion",
+          "event-fusion-spaceflight"
+        ]
+      },
+      {
+        "id": "faction-terran-alliance",
+        "name": "Terran Alliance",
+        "aliases": [
+          "Alliance"
+        ],
+        "faction_type": "interstellar_state",
+        "description": "Successor to the early Western Alliance that leads humanity's first wave of extrasolar colonization before contraction after the Outer Reaches Rebellion.",
+        "key_period_ids": [
+          "early-history",
+          "colonization"
+        ],
+        "related_event_ids": [
+          "event-outer-reaches-rebellion",
+          "event-terran-alliance-civil-war"
+        ]
+      },
+      {
+        "id": "faction-terran-hegemony",
+        "name": "Terran Hegemony",
+        "aliases": [
+          "Hegemony"
+        ],
+        "faction_type": "interstellar_state",
+        "description": "State founded by James McKenna after the Terran Alliance civil war; it seeks to reassert Terran authority and develops the BattleMech.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "star-league"
+        ],
+        "related_event_ids": [
+          "event-terran-alliance-civil-war",
+          "event-five-great-houses",
+          "event-battlemech-development"
+        ]
+      },
+      {
+        "id": "faction-star-league",
+        "name": "Star League",
+        "aliases": [
+          "First Star League",
+          "Star League (2571)"
+        ],
+        "faction_type": "federation",
+        "description": "Federation of the Great Houses under House Cameron, founded in 2571 and destroyed by the Amaris crisis and subsequent collapse.",
+        "key_period_ids": [
+          "star-league",
+          "amaris-crisis",
+          "succession-wars"
+        ],
+        "related_event_ids": [
+          "event-star-league-founded",
+          "event-reunification-war",
+          "event-amaris-coup"
+        ]
+      },
+      {
+        "id": "faction-star-league-defense-force",
+        "name": "Star League Defense Force",
+        "aliases": [
+          "SLDF"
+        ],
+        "faction_type": "military",
+        "description": "The Star League's military. It fights Amaris, is severely depleted, and most of its remaining strength departs with Kerensky in the Exodus.",
+        "key_period_ids": [
+          "star-league",
+          "amaris-crisis",
+          "exodus"
+        ],
+        "related_event_ids": [
+          "event-amaris-civil-war",
+          "event-operation-exodus"
+        ]
+      },
+      {
+        "id": "faction-rim-worlds-republic",
+        "name": "Rim Worlds Republic",
+        "aliases": [
+          "Rim Worlds"
+        ],
+        "faction_type": "interstellar_state",
+        "description": "Periphery state led by Stefan Amaris, whose ruler seizes the Star League during the Amaris Coup.",
+        "key_period_ids": [
+          "amaris-crisis"
+        ],
+        "related_event_ids": [
+          "event-amaris-coup",
+          "event-amaris-civil-war"
+        ]
+      },
+      {
+        "id": "faction-draconis-combine",
+        "name": "Draconis Combine",
+        "aliases": [
+          "Combine",
+          "DC",
+          "House Kurita"
+        ],
+        "faction_type": "successor_state",
+        "description": "Great House realm ruled by House Kurita; one of the five major Successor States and a recurring military rival of the Federated Suns and other powers.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "succession-wars",
+          "post-succession",
+          "clan-invasion",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-five-great-houses",
+          "event-battlemech-development",
+          "event-ronin-war",
+          "event-war-of-3039",
+          "event-clan-invasion"
+        ]
+      },
+      {
+        "id": "faction-federated-suns",
+        "name": "Federated Suns",
+        "aliases": [
+          "FedSuns",
+          "FS",
+          "House Davion"
+        ],
+        "faction_type": "successor_state",
+        "description": "Great House realm ruled by House Davion; later forms the core of the Federated Commonwealth with the Lyran Commonwealth.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "succession-wars",
+          "post-succession",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-five-great-houses",
+          "event-davion-steiner-alliance",
+          "event-fourth-succession-war"
+        ]
+      },
+      {
+        "id": "faction-capellan-confederation",
+        "name": "Capellan Confederation",
+        "aliases": [
+          "Capellans",
+          "CC",
+          "House Liao"
+        ],
+        "faction_type": "successor_state",
+        "description": "Great House realm ruled by House Liao; involved in the First Andurien War, Fourth Succession War, and later conflicts with St. Ives and the Republic.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "succession-wars",
+          "post-invasion",
+          "republic-era",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-five-great-houses",
+          "event-first-andurien-war",
+          "event-fourth-succession-war",
+          "event-capellan-st-ives-war",
+          "event-capellan-crusades"
+        ]
+      },
+      {
+        "id": "faction-free-worlds-league",
+        "name": "Free Worlds League",
+        "aliases": [
+          "FWL",
+          "League",
+          "House Marik"
+        ],
+        "faction_type": "successor_state",
+        "description": "Great House realm ruled by House Marik; a major player in the formation of the New Star League and the political crises around the Jihad.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "succession-wars",
+          "post-invasion",
+          "jihad"
+        ],
+        "related_event_ids": [
+          "event-five-great-houses",
+          "event-first-andurien-war",
+          "event-star-league-collapse",
+          "event-jihad"
+        ]
+      },
+      {
+        "id": "faction-lyran-commonwealth",
+        "name": "Lyran Commonwealth",
+        "aliases": [
+          "Lyrans",
+          "LC",
+          "House Steiner"
+        ],
+        "faction_type": "successor_state",
+        "description": "Great House realm ruled by House Steiner; allies with the Federated Suns and later forms part of the Federated Commonwealth.",
+        "key_period_ids": [
+          "colonization",
+          "age-of-war",
+          "succession-wars",
+          "post-succession"
+        ],
+        "related_event_ids": [
+          "event-five-great-houses",
+          "event-davion-steiner-alliance",
+          "event-fourth-succession-war"
+        ]
+      },
+      {
+        "id": "faction-successor-states",
+        "name": "Successor States",
+        "aliases": [
+          "Successor States",
+          "Great House states"
+        ],
+        "faction_type": "collective",
+        "description": "Collective term for the major states that inherit the Star League's Inner Sphere territories and compete in the Succession Wars.",
+        "key_period_ids": [
+          "succession-wars",
+          "jihad",
+          "republic-era"
+        ],
+        "related_event_ids": [
+          "event-first-succession-war",
+          "event-second-succession-war",
+          "event-third-succession-war",
+          "event-jihad"
+        ]
+      },
+      {
+        "id": "faction-periphery-states",
+        "name": "Periphery States",
+        "aliases": [
+          "Periphery",
+          "Periphery realms"
+        ],
+        "faction_type": "collective",
+        "description": "Independent or semi-independent states beyond the core Inner Sphere. The page characterizes most as technologically poorer than the Successor States, with only the largest approaching an early-31st-century technology base; many are forced into the Star League during the Reunification War.",
+        "key_period_ids": [
+          "star-league",
+          "amaris-crisis"
+        ],
+        "related_event_ids": [
+          "event-reunification-war",
+          "event-amaris-coup"
+        ]
+      },
+      {
+        "id": "faction-comstar",
+        "name": "ComStar",
+        "aliases": [
+          "ComStar",
+          "Blessed Order",
+          "Com Guards"
+        ],
+        "faction_type": "communications_religious_order",
+        "description": "Organization founded by Jerome Blake from the Star League communications ministry. It controls the HPG network, governed Terra for a period, and is also described as a major financial institution, operator of the Explorer Corps and Mercenary Review and Bonding Commission, and holder of the Com Guards and a concealed WarShip fleet.",
+        "key_period_ids": [
+          "succession-wars",
+          "post-succession",
+          "clan-invasion",
+          "post-invasion",
+          "jihad"
+        ],
+        "related_event_ids": [
+          "event-comstar-takes-terra",
+          "event-fourth-succession-war",
+          "event-tukayyid",
+          "event-wof-blake-schism"
+        ]
+      },
+      {
+        "id": "faction-word-of-blake",
+        "name": "Word of Blake",
+        "aliases": [
+          "Blakists",
+          "WoB"
+        ],
+        "faction_type": "religious_military_order",
+        "description": "A ComStar splinter faction that later launches the Jihad and briefly captures Terra.",
+        "key_period_ids": [
+          "post-invasion",
+          "jihad"
+        ],
+        "related_event_ids": [
+          "event-wof-blake-schism",
+          "event-joshua-reprisals-and-chaos-march",
+          "event-jihad"
+        ]
+      },
+      {
+        "id": "faction-clans",
+        "name": "The Clans",
+        "aliases": [
+          "Clans",
+          "Kerensky Clans"
+        ],
+        "faction_type": "collective",
+        "description": "Descendants of the SLDF Exodus who develop a highly militarized society in the Deep Periphery. Nicholas Kerensky organizes them into twenty Clans; warrior status, genetic engineering, honor, and martial prowess are central to their social order. Their technology eventually surpasses the Star League-era Inner Sphere.",
+        "key_period_ids": [
+          "exodus",
+          "clan-invasion",
+          "post-invasion",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-operation-exodus",
+          "event-clan-contact",
+          "event-clan-invasion",
+          "event-tukayyid"
+        ]
+      },
+      {
+        "id": "faction-clan-wolf",
+        "name": "Clan Wolf",
+        "aliases": [
+          "Wolves",
+          "Clan Wolf (Vladimir Ward's faction)"
+        ],
+        "faction_type": "clan",
+        "description": "A Clan with a Warden tradition that participates in the invasion; after the Refusal War, a separate Crusader Clan Wolf is rebuilt under Vladimir Ward.",
+        "key_period_ids": [
+          "clan-invasion",
+          "post-invasion"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion",
+          "event-tukayyid",
+          "event-refusal-war"
+        ]
+      },
+      {
+        "id": "faction-clan-wolf-in-exile",
+        "name": "Clan Wolf-in-Exile",
+        "aliases": [
+          "Wolf-in-Exile",
+          "Exiled Wolves"
+        ],
+        "faction_type": "clan",
+        "description": "The Inner Sphere-based remnant of Ulric Kerensky's Clan Wolf, formed after the Refusal War and aligned with defending the Inner Sphere.",
+        "key_period_ids": [
+          "post-invasion"
+        ],
+        "related_event_ids": [
+          "event-refusal-war",
+          "event-operation-bulldog"
+        ]
+      },
+      {
+        "id": "faction-clan-jade-falcon",
+        "name": "Clan Jade Falcon",
+        "aliases": [
+          "Jade Falcons",
+          "Falcons"
+        ],
+        "faction_type": "clan",
+        "description": "A powerful Crusader Clan that fights Clan Wolf during the Refusal War and later participates in the renewed conflict with the Inner Sphere.",
+        "key_period_ids": [
+          "clan-invasion",
+          "post-invasion",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion",
+          "event-refusal-war",
+          "event-new-star-league"
+        ]
+      },
+      {
+        "id": "faction-clan-smoke-jaguar",
+        "name": "Clan Smoke Jaguar",
+        "aliases": [
+          "Smoke Jaguars",
+          "Jaguars"
+        ],
+        "faction_type": "clan",
+        "description": "One of the four initial invading Clans, later targeted and destroyed in the New Star League's Operations BULLDOG and SERPENT.",
+        "key_period_ids": [
+          "clan-invasion",
+          "post-invasion"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion",
+          "event-operation-bulldog",
+          "event-operation-serpent"
+        ]
+      },
+      {
+        "id": "faction-clan-ghost-bear",
+        "name": "Clan Ghost Bear",
+        "aliases": [
+          "Ghost Bears"
+        ],
+        "faction_type": "clan",
+        "description": "One of the four Clans that first invade the Inner Sphere in 3050.",
+        "key_period_ids": [
+          "clan-invasion"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion",
+          "event-tukayyid"
+        ]
+      },
+      {
+        "id": "faction-federated-commonwealth",
+        "name": "Federated Commonwealth",
+        "aliases": [
+          "FedCom",
+          "Fed-Com"
+        ],
+        "faction_type": "alliance_state",
+        "description": "Political and military union built from the Federated Suns and Lyran Commonwealth under the Davion–Steiner alliance.",
+        "key_period_ids": [
+          "post-succession",
+          "clan-invasion",
+          "post-invasion"
+        ],
+        "related_event_ids": [
+          "event-davion-steiner-alliance",
+          "event-fourth-succession-war",
+          "event-clan-invasion",
+          "event-fedcom-civil-war"
+        ]
+      },
+      {
+        "id": "faction-free-rasalhague-republic",
+        "name": "Free Rasalhague Republic",
+        "aliases": [
+          "FRR",
+          "Rasalhague"
+        ],
+        "faction_type": "successor_state",
+        "description": "Newly independent state created from former Draconis Combine territory; it is devastated early in the Clan Invasion.",
+        "key_period_ids": [
+          "post-succession",
+          "clan-invasion"
+        ],
+        "related_event_ids": [
+          "event-ronin-war",
+          "event-clan-invasion",
+          "event-tukayyid"
+        ]
+      },
+      {
+        "id": "faction-lyran-alliance",
+        "name": "Lyran Alliance",
+        "aliases": [
+          "Lyran Alliance"
+        ],
+        "faction_type": "successor_state",
+        "description": "State created when the Lyran half of the Federated Commonwealth secedes during the Joshua Reprisals crisis.",
+        "key_period_ids": [
+          "post-invasion",
+          "jihad",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-joshua-reprisals-and-chaos-march",
+          "event-new-star-league",
+          "event-star-league-collapse"
+        ]
+      },
+      {
+        "id": "faction-new-star-league",
+        "name": "New Star League",
+        "aliases": [
+          "Second Star League",
+          "Star League reborn"
+        ],
+        "faction_type": "federation",
+        "description": "A revived federation created in 3058 by Inner Sphere states after cooperation against Clan Jade Falcon; it later collapses in 3067.",
+        "key_period_ids": [
+          "post-invasion",
+          "jihad"
+        ],
+        "related_event_ids": [
+          "event-new-star-league",
+          "event-operation-bulldog",
+          "event-operation-serpent",
+          "event-star-league-collapse"
+        ]
+      },
+      {
+        "id": "faction-st-ives-compact",
+        "name": "St. Ives Compact",
+        "aliases": [
+          "St. Ives"
+        ],
+        "faction_type": "breakaway_state",
+        "description": "State formed after the St. Ives Commonality separates from the Capellan Confederation following the Fourth Succession War; it is reintegrated by 3061.",
+        "key_period_ids": [
+          "post-invasion"
+        ],
+        "related_event_ids": [
+          "event-capellan-st-ives-war"
+        ]
+      },
+      {
+        "id": "faction-republic-of-the-sphere",
+        "name": "Republic of the Sphere",
+        "aliases": [
+          "Republic",
+          "RotS"
+        ],
+        "faction_type": "interstellar_state",
+        "description": "State founded by Devlin Stone around Terra in 3081. It later faces Capellan campaigns and the Dark Age crisis, ultimately concentrating its defenses in the Fortress Republic.",
+        "key_period_ids": [
+          "republic-era",
+          "dark-age"
+        ],
+        "related_event_ids": [
+          "event-republic-founded",
+          "event-capellan-crusades",
+          "event-hpg-network-collapse",
+          "event-fortress-republic"
+        ]
+      }
+    ],
+    "people": [
+      {
+        "id": "person-james-mckenna",
+        "name": "James McKenna",
+        "roles": [
+          "Alliance Global Militia admiral",
+          "first Director-General of the Terran Hegemony"
+        ],
+        "affiliation_ids": [
+          "faction-terran-alliance",
+          "faction-terran-hegemony"
+        ],
+        "associated_event_ids": [
+          "event-terran-alliance-civil-war"
+        ],
+        "description": "Leads the force that ends the Terran Alliance civil war and establishes the Terran Hegemony."
+      },
+      {
+        "id": "person-michael-cameron",
+        "name": "Michael Cameron",
+        "roles": [
+          "Terran Hegemony Director-General"
+        ],
+        "affiliation_ids": [
+          "faction-terran-hegemony"
+        ],
+        "associated_event_ids": [
+          "event-peer-list"
+        ],
+        "description": "James McKenna's successor, associated with a more peaceful foreign policy and the formalization of hereditary aristocratic ranks."
+      },
+      {
+        "id": "person-ian-cameron",
+        "name": "Ian Cameron",
+        "roles": [
+          "Star League founder",
+          "First Lord"
+        ],
+        "affiliation_ids": [
+          "faction-star-league"
+        ],
+        "associated_event_ids": [
+          "event-star-league-founded",
+          "event-reunification-war"
+        ],
+        "description": "Architect of the Star League federation and the policy of bringing the Periphery into it."
+      },
+      {
+        "id": "person-stefan-amaris",
+        "name": "Stefan Amaris",
+        "roles": [
+          "Rim Worlds Republic leader",
+          "usurper of the Star League"
+        ],
+        "affiliation_ids": [
+          "faction-rim-worlds-republic"
+        ],
+        "associated_event_ids": [
+          "event-amaris-coup",
+          "event-amaris-civil-war"
+        ],
+        "description": "Orchestrates the Amaris Coup and is ultimately deposed and executed by Kerensky's forces."
+      },
+      {
+        "id": "person-richard-cameron",
+        "name": "Richard Cameron",
+        "roles": [
+          "Star League First Lord"
+        ],
+        "affiliation_ids": [
+          "faction-star-league"
+        ],
+        "associated_event_ids": [
+          "event-amaris-coup"
+        ],
+        "description": "Young First Lord whose relationship with Amaris is exploited before the coup."
+      },
+      {
+        "id": "person-aleksandr-kerensky",
+        "name": "Aleksandr Kerensky",
+        "roles": [
+          "SLDF Commanding General",
+          "regent",
+          "Exodus leader"
+        ],
+        "affiliation_ids": [
+          "faction-star-league-defense-force"
+        ],
+        "associated_event_ids": [
+          "event-amaris-coup",
+          "event-amaris-civil-war",
+          "event-operation-exodus"
+        ],
+        "description": "Leads the SLDF against Amaris and later takes most of the remaining force on the Exodus."
+      },
+      {
+        "id": "person-nicholas-kerensky",
+        "name": "Nicholas Kerensky",
+        "roles": [
+          "Clan founder"
+        ],
+        "affiliation_ids": [
+          "faction-clans"
+        ],
+        "associated_event_ids": [],
+        "description": "Aleksandr Kerensky's son, who organizes the Exodus descendants into the Clans according to the page's faction history."
+      },
+      {
+        "id": "person-jerome-blake",
+        "name": "Jerome Blake",
+        "roles": [
+          "last Star League Minister of Communications",
+          "ComStar founder"
+        ],
+        "affiliation_ids": [
+          "faction-comstar"
+        ],
+        "associated_event_ids": [
+          "event-comstar-takes-terra",
+          "event-first-succession-war"
+        ],
+        "description": "Creates ComStar from the Star League communications apparatus and establishes its control of Terra."
+      },
+      {
+        "id": "person-hanse-davion",
+        "name": "Hanse Davion",
+        "roles": [
+          "First Prince of the Federated Suns"
+        ],
+        "affiliation_ids": [
+          "faction-federated-suns",
+          "faction-federated-commonwealth"
+        ],
+        "associated_event_ids": [
+          "event-davion-steiner-alliance",
+          "event-fourth-succession-war",
+          "event-war-of-3039"
+        ],
+        "description": "Forges the alliance with Katrina Steiner and initiates the Fourth Succession War with his surprise announcement."
+      },
+      {
+        "id": "person-katrina-steiner",
+        "name": "Katrina Steiner",
+        "roles": [
+          "Lyran Archon"
+        ],
+        "affiliation_ids": [
+          "faction-lyran-commonwealth",
+          "faction-federated-commonwealth"
+        ],
+        "associated_event_ids": [
+          "event-davion-steiner-alliance"
+        ],
+        "description": "Proposes peace and alliance to the other Successor States, leading to the Davion–Steiner union."
+      },
+      {
+        "id": "person-theodore-kurita",
+        "name": "Theodore Kurita",
+        "roles": [
+          "Draconis Combine Gunji-no-Kanrei"
+        ],
+        "affiliation_ids": [
+          "faction-draconis-combine"
+        ],
+        "associated_event_ids": [
+          "event-ronin-war",
+          "event-war-of-3039"
+        ],
+        "description": "Grants Rasalhague independence for strategic reasons and later uses deception to blunt the Federated Commonwealth's 3039 offensive."
+      },
+      {
+        "id": "person-ulric-kerensky",
+        "name": "Ulric Kerensky",
+        "roles": [
+          "Clan Wolf Khan",
+          "ilKhan"
+        ],
+        "affiliation_ids": [
+          "faction-clan-wolf"
+        ],
+        "associated_event_ids": [
+          "event-clan-invasion",
+          "event-refusal-war"
+        ],
+        "description": "Leads the Clans during a key part of the invasion and engineers the Refusal War to weaken Crusader ambitions."
+      },
+      {
+        "id": "person-victor-steiner-davion",
+        "name": "Victor Steiner-Davion",
+        "roles": [
+          "Archon-Prince",
+          "Star League military leader",
+          "ComStar Precentor Martial"
+        ],
+        "affiliation_ids": [
+          "faction-federated-commonwealth",
+          "faction-new-star-league"
+        ],
+        "associated_event_ids": [
+          "event-new-star-league",
+          "event-operation-bulldog",
+          "event-operation-serpent",
+          "event-fedcom-civil-war"
+        ],
+        "description": "Leads the New Star League's anti-Clan campaigns and the Allied side in the FedCom Civil War."
+      },
+      {
+        "id": "person-devlin-stone",
+        "name": "Devlin Stone",
+        "roles": [
+          "coalition leader",
+          "founder of the Republic of the Sphere"
+        ],
+        "affiliation_ids": [
+          "faction-republic-of-the-sphere"
+        ],
+        "associated_event_ids": [
+          "event-jihad-ends",
+          "event-republic-founded"
+        ],
+        "description": "Leads the coalition that defeats the Word of Blake on Terra and establishes the Republic of the Sphere."
+      }
+    ],
+    "places": [
+      {
+        "id": "place-earth",
+        "name": "Earth",
+        "aliases": [
+          "Earth"
+        ],
+        "place_type": "planet",
+        "description": "Humanity's homeworld and the origin point of the setting's future history."
+      },
+      {
+        "id": "place-terra",
+        "name": "Terra",
+        "aliases": [
+          "Terra",
+          "Earth"
+        ],
+        "place_type": "planet",
+        "description": "The BattleTech name for Earth; central to the Star League, ComStar, Word of Blake, and Republic histories."
+      },
+      {
+        "id": "place-crippen-station",
+        "name": "Crippen Station",
+        "aliases": [
+          "Crippen"
+        ],
+        "place_type": "orbital_station",
+        "description": "Early orbital industrial station associated with the first wave of human space development."
+      },
+      {
+        "id": "place-moon",
+        "name": "Moon",
+        "aliases": [
+          "Luna"
+        ],
+        "place_type": "natural_satellite",
+        "description": "Site of humanity's first lunar settlement in 2016."
+      },
+      {
+        "id": "place-mars",
+        "name": "Mars",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Destination of the first manned Mars mission launched in 2017."
+      },
+      {
+        "id": "place-tau-ceti",
+        "name": "Tau Ceti",
+        "aliases": [],
+        "place_type": "star_system",
+        "description": "Nearby star system reached by the first successful FTL voyage in 2107; New Earth is Tau Ceti IV."
+      },
+      {
+        "id": "place-new-earth",
+        "name": "New Earth",
+        "aliases": [
+          "Tau Ceti IV"
+        ],
+        "place_type": "planet",
+        "description": "Site of the first extrasolar human colony, established in 2116."
+      },
+      {
+        "id": "place-denebola",
+        "name": "Denebola",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Colony world that leads the Outer Reaches Rebellion."
+      },
+      {
+        "id": "place-inner-sphere",
+        "name": "Inner Sphere",
+        "aliases": [],
+        "place_type": "region",
+        "description": "The central region of human-settled space and the principal arena for the Great Houses, Star League, Successor States, and Clan Invasion."
+      },
+      {
+        "id": "place-periphery",
+        "name": "Periphery",
+        "aliases": [],
+        "place_type": "region",
+        "description": "The regions and states beyond the Inner Sphere; many are incorporated into the Star League by force."
+      },
+      {
+        "id": "place-deep-periphery",
+        "name": "Deep Periphery",
+        "aliases": [],
+        "place_type": "region",
+        "description": "Distant region into which Kerensky leads the Exodus fleet; the Clans develop there."
+      },
+      {
+        "id": "place-tintavel",
+        "name": "Tintavel",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Capellan world whose near-annihilation in 2412 prompts the Ares Conventions."
+      },
+      {
+        "id": "place-helm",
+        "name": "Helm",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "World where the Gray Death Legion finds the Star League memory core in 3028."
+      },
+      {
+        "id": "place-outreach",
+        "name": "Outreach",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Wolf's Dragoons' homeworld and a training and coordination center for Inner Sphere leaders during the Clan Invasion."
+      },
+      {
+        "id": "place-tukayyid",
+        "name": "Tukayyid",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Site of the 3052 battle between ComStar and the Clans that halts the invasion for fifteen years."
+      },
+      {
+        "id": "place-strana-mechty",
+        "name": "Strana Mechty",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Clan homeworld and political center where ilKhan selection and the later Trial of Refusal against the invasion take place."
+      },
+      {
+        "id": "place-huntress",
+        "name": "Huntress",
+        "aliases": [],
+        "place_type": "planet",
+        "description": "Capital world of Clan Smoke Jaguar, targeted in Operations BULLDOG and SERPENT."
+      },
+      {
+        "id": "place-chaos-march",
+        "name": "Chaos March",
+        "aliases": [
+          "Sarna March (before the withdrawal)"
+        ],
+        "place_type": "region",
+        "description": "Unstable region created when Lyran forces retreat and the Federated Commonwealth cannot reinforce the worlds they leave behind."
+      }
+    ],
+    "technology_concepts": [
+      {
+        "id": "tech-woden",
+        "name": "Western Orbital Defense Network",
+        "aliases": [
+          "WODeN"
+        ],
+        "concept_type": "orbital_defense",
+        "description": "Successor to the Strategic Defense Initiative; used to intercept a Russian missile attack in the 2011–2014 civil war."
+      },
+      {
+        "id": "tech-fusion-power",
+        "name": "Fusion power",
+        "aliases": [],
+        "concept_type": "energy",
+        "description": "Developed in 2020 in the setting; enables fusion-powered interplanetary spacecraft."
+      },
+      {
+        "id": "tech-ftl-jump",
+        "name": "Faster-than-light travel",
+        "aliases": [
+          "FTL"
+        ],
+        "concept_type": "propulsion",
+        "description": "Enables the first interstellar jump in 2107 and the subsequent colonization of nearby star systems."
+      },
+      {
+        "id": "tech-jump-drive",
+        "name": "Jump technology",
+        "aliases": [
+          "Jump"
+        ],
+        "concept_type": "propulsion",
+        "description": "Interstellar transport technology that underpins the colonization era and later strategic movement between star systems."
+      },
+      {
+        "id": "tech-battlemech",
+        "name": "BattleMech",
+        "aliases": [
+          "'Mech",
+          "Mech"
+        ],
+        "concept_type": "military_vehicle",
+        "description": "Large humanoid combat machine developed by the Terran Hegemony in 2439 and first used in combat in 2443."
+      },
+      {
+        "id": "tech-hpg",
+        "name": "Hyperpulse Generator network",
+        "aliases": [
+          "HPG network",
+          "HPG"
+        ],
+        "concept_type": "communications",
+        "description": "Interstellar communications infrastructure central to ComStar's power and to the later Jihad and Dark Age disruptions."
+      },
+      {
+        "id": "tech-los-tech",
+        "name": "LosTech",
+        "aliases": [
+          "Lost technology"
+        ],
+        "concept_type": "technology_state",
+        "description": "Term for advanced technology lost or made scarce through the Succession Wars and later partially recovered."
+      },
+      {
+        "id": "tech-jumpship",
+        "name": "JumpShip",
+        "aliases": [
+          "JumpShips"
+        ],
+        "concept_type": "spacecraft",
+        "description": "Interstellar transport vessels whose destruction during the Succession Wars severely damages interstellar logistics."
+      },
+      {
+        "id": "tech-warship",
+        "name": "WarShip",
+        "aliases": [
+          "WarShips"
+        ],
+        "concept_type": "military_spacecraft",
+        "description": "Military spacecraft fleets that are nearly wiped out during the First Succession War."
+      },
+      {
+        "id": "tech-black-boxes",
+        "name": "Black Boxes",
+        "aliases": [],
+        "concept_type": "communications_device",
+        "description": "Devices used by Federated Commonwealth forces to coordinate movements and bypass ComStar's communications interdiction."
+      }
+    ],
+    "publishing_history": [
+      {
+        "id": "publishing-fasa-timeskip",
+        "date_label": "Real-world publication decision; during development of the 3030–3050 storyline",
+        "summary": "The page notes that FASA largely skipped the in-universe timeline from 3030 to 3050, briefly referencing selected conflicts to allow the technological renaissance to support new equipment in the tabletop game.",
+        "category": "game_line_development",
+        "source_section": "Fourth Succession War real-world annotation"
+      },
+      {
+        "id": "publishing-fasa-wizkids-transition",
+        "date_label": "During the FedCom Civil War storyline",
+        "summary": "FASA announced it was shutting down; WizKids acquired the BattleTech intellectual property and announced a roughly sixty-year jump to the MechWarrior: Dark Age setting.",
+        "category": "intellectual_property_history",
+        "source_section": "FedCom Civil War real-world annotation"
+      },
+      {
+        "id": "publishing-fanpro-classic-battletech",
+        "date_label": "After the WizKids acquisition",
+        "summary": "FanPro licensed tabletop and sourcebook publishing for the pre-3130 setting and branded it Classic BattleTech to distinguish it from the Dark Age line.",
+        "category": "licensing",
+        "source_section": "FedCom Civil War real-world annotation"
+      },
+      {
+        "id": "publishing-inmediares-battlecorps",
+        "date_label": "By January 2007",
+        "summary": "InMediaRes licensed new fiction in the Classic BattleTech timeline through BattleCorps and published its first print anthology in January 2007.",
+        "category": "fiction_publishing",
+        "source_section": "FedCom Civil War real-world annotation"
+      }
+    ],
+    "lore_concepts": [
+      {
+        "id": "concept-warden-crusader-schism",
+        "name": "Warden–Crusader divide",
+        "concept_type": "clan_political_ideology",
+        "description": "The Clans split over how to interpret Aleksandr Kerensky's message about returning to the Inner Sphere. Wardens see the message as an ideal to protect humanity from external threats rather than a literal mandate to conquer; Crusaders believe they must reconquer the Inner Sphere and restore the Star League.",
+        "related_faction_ids": [
+          "faction-clans",
+          "faction-clan-wolf",
+          "faction-clan-jade-falcon"
+        ],
+        "related_event_ids": [
+          "event-clan-contact",
+          "event-clan-invasion",
+          "event-refusal-war"
+        ]
+      },
+      {
+        "id": "concept-dragoon-compromise",
+        "name": "Dragoon Compromise",
+        "concept_type": "clan_strategy",
+        "description": "A Warden-backed compromise in which Clan Wolf sends a force equipped with older Star League-era BattleMechs into the Inner Sphere disguised as a mercenary unit. Wolf's Dragoons serve as reconnaissance and are intended to prepare the Inner Sphere for the later Clan return.",
+        "related_faction_ids": [
+          "faction-clans",
+          "faction-clan-wolf"
+        ],
+        "related_event_ids": [
+          "event-clan-contact",
+          "event-clan-invasion"
+        ]
+      },
+      {
+        "id": "concept-clan-social-order",
+        "name": "Clan social and warrior order",
+        "concept_type": "social_structure",
+        "description": "The page describes Clan society as warrior-centered, with warriors valued over civilians, genetically engineered trueborn warriors elevated over naturally born freeborn warriors, and honor and military prowess prioritized. This system supports a powerful military culture.",
+        "related_faction_ids": [
+          "faction-clans"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion",
+          "event-refusal-war"
+        ]
+      },
+      {
+        "id": "concept-clan-technology",
+        "name": "Clan technological advantage",
+        "concept_type": "technology_doctrine",
+        "description": "During their isolation, the Clans develop advanced military and biological technologies, including powered battle armor, genetic programs, and artificial wombs for trueborn warriors. Their technology is described as surpassing even the Star League at its height.",
+        "related_faction_ids": [
+          "faction-clans"
+        ],
+        "related_event_ids": [
+          "event-clan-invasion"
+        ]
+      },
+      {
+        "id": "concept-comstar-institutional-power",
+        "name": "ComStar's institutional power",
+        "concept_type": "institutional_role",
+        "description": "Beyond operating the HPG network, ComStar is described as a major bank and money-transfer institution, operator of the Explorer Corps and Mercenary Review and Bonding Commission, and controller of the Com Guards and a concealed WarShip fleet.",
+        "related_faction_ids": [
+          "faction-comstar"
+        ],
+        "related_event_ids": [
+          "event-comstar-takes-terra",
+          "event-tukayyid",
+          "event-wof-blake-schism"
+        ]
+      },
+      {
+        "id": "concept-lostech-cycle",
+        "name": "LosTech and technological regression",
+        "concept_type": "historical_pattern",
+        "description": "The Succession Wars destroy factories, shipyards, spacecraft, and technical knowledge. This produces LosTech: advanced systems become rare, irreplaceable, or poorly understood until discoveries such as the Helm memory core help restart technological development.",
+        "related_faction_ids": [
+          "faction-successor-states",
+          "faction-comstar"
+        ],
+        "related_event_ids": [
+          "event-first-succession-war",
+          "event-second-succession-war",
+          "event-third-succession-war",
+          "event-helm-memory-core"
+        ]
+      },
+      {
+        "id": "concept-ares-conventions",
+        "name": "Ares Conventions",
+        "concept_type": "law_of_war",
+        "description": "A set of rules adopted by the major powers after the Tintavel atrocity. The conventions restrict the conduct and targets of warfare, discourage orbital bombardment, and prohibit nuclear and biological weapons against planetary targets; the page notes that they also inadvertently formalize war as a dispute-settlement tool.",
+        "related_faction_ids": [
+          "faction-successor-states",
+          "faction-terran-hegemony"
+        ],
+        "related_event_ids": [
+          "event-ares-conventions"
+        ]
+      }
+    ],
+    "official_eras": {
+      "publisher": "Catalyst Game Labs",
+      "overview": "Catalyst Game Labs divides BattleTech history and product lines into chronological eras and sub-eras, including a separate concurrent Clan Homeworlds era created in 2021 to reflect the 1,000-lightyear separation between the Inner Sphere and the Clans.",
+      "eras": [
+        {
+          "id": "pre-star-league",
+          "name": "Pre–Star League",
+          "region_scope": "Inner Sphere / Sol",
+          "start_year": null,
+          "end_year": 2005,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "pre-spaceflight",
+              "name": "Pre-Spaceflight",
+              "start_year": null,
+              "end_year": 1949,
+              "year_label": "Before 1950",
+              "is_ongoing": false,
+              "summary": "Earliest era referenced, when humanity resides exclusively on Terra.",
+              "key_events": [],
+              "key_factions": [
+                "Humanity (Terra)"
+              ],
+              "key_technologies": []
+            },
+            {
+              "id": "early-spaceflight",
+              "name": "Early Spaceflight",
+              "start_year": 1950,
+              "end_year": 2005,
+              "year_label": "1950 – 2005",
+              "is_ongoing": false,
+              "summary": "Early spaceflight restricted to the bounds of the Sol system.",
+              "key_events": [
+                "Second Cold War",
+                "Reestablishment of the Soviet Union"
+              ],
+              "key_factions": [
+                "Soviet Union"
+              ],
+              "key_technologies": [
+                "Early spaceflight"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "star-league",
+          "name": "Star League",
+          "region_scope": "Inner Sphere & Periphery",
+          "start_year": 2005,
+          "end_year": 2780,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "age-of-war",
+              "name": "Age of War",
+              "start_year": 2005,
+              "end_year": 2570,
+              "year_label": "2005 – 2570",
+              "is_ongoing": false,
+              "summary": "Colonization of the Inner Sphere, rise of the Terran Hegemony and Great Houses, and the Age of War (2398–mid-26th century).",
+              "key_events": [
+                "First Terran Exodus",
+                "Outer Reaches Rebellion (2235)",
+                "Demarcation Declaration & Second Terran Exodus",
+                "Outbreak of the Age of War (2398)",
+                "Signing of the Ares Conventions (2412)",
+                "Debut of the Mackie BattleMech (2439)"
+              ],
+              "key_factions": [
+                "Terran Alliance",
+                "Terran Hegemony",
+                "Great Houses"
+              ],
+              "key_technologies": [
+                "KF Drive",
+                "Mackie BattleMech"
+              ]
+            },
+            {
+              "id": "star-league-sub-era",
+              "name": "Star League",
+              "start_year": 2571,
+              "end_year": 2780,
+              "year_label": "2571 – 2780",
+              "is_ongoing": false,
+              "summary": "Nearly two centuries of unified Inner Sphere peace and scientific advancement under House Cameron, ending in the Amaris Civil War.",
+              "key_events": [
+                "Founding of the First Star League (2571)",
+                "Reunification War",
+                "Hidden Wars",
+                "Periphery Uprisings (2765)",
+                "Amaris Coup & Amaris Civil War",
+                "Fall of the Star League (2780)"
+              ],
+              "key_factions": [
+                "Star League",
+                "House Cameron",
+                "Terran Hegemony",
+                "Star League Defense Force (SLDF)",
+                "Amaris Empire"
+              ],
+              "key_technologies": [
+                "Peak Star League technology"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "succession-wars",
+          "name": "Succession Wars",
+          "region_scope": "Inner Sphere",
+          "start_year": 2781,
+          "end_year": 3049,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "early-succession-war",
+              "name": "Early Succession War",
+              "start_year": 2781,
+              "end_year": 2900,
+              "year_label": "2781 – 2900",
+              "is_ongoing": false,
+              "summary": "Following the SLDF Exodus, the five Successor States wage nuclear total war in the First and Second Succession Wars before conflict degrades into the Third Succession War.",
+              "key_events": [
+                "SLDF Exodus (2784)",
+                "First Succession War",
+                "Second Succession War",
+                "Rise of ComStar on Terra",
+                "Start of the Third Succession War (2866)"
+              ],
+              "key_factions": [
+                "Successor States",
+                "ComStar",
+                "SLDF"
+              ],
+              "key_technologies": [
+                "Nuclear weapons",
+                "HPG communications monopoly"
+              ]
+            },
+            {
+              "id": "late-succession-war-lostech",
+              "name": "Late Succession War - LosTech",
+              "start_year": 2901,
+              "end_year": 3019,
+              "year_label": "2901 – 3019",
+              "is_ongoing": false,
+              "summary": "Low-intensity, ritualized warfare continues during the Third Succession War as advanced Star League knowledge becomes LosTech.",
+              "key_events": [
+                "Continuation of the Third Succession War",
+                "Ritualized MechWarrior duels to preserve surviving hardware"
+              ],
+              "key_factions": [
+                "Successor States",
+                "ComStar"
+              ],
+              "key_technologies": [
+                "LosTech"
+              ]
+            },
+            {
+              "id": "late-succession-war-renaissance",
+              "name": "Late Succession War - Renaissance",
+              "start_year": 3020,
+              "end_year": 3049,
+              "year_label": "3020 – 3049",
+              "is_ongoing": false,
+              "summary": "The Federated Commonwealth rises to dominance, the Third Succession War ends, and the Helm Memory Core triggers a technological renaissance.",
+              "key_events": [
+                "Marriage of Hanse Davion and Melissa Steiner",
+                "Discovery of the Helm Memory Core (3028)",
+                "Fourth Succession War",
+                "Independence of the Free Rasalhague Republic",
+                "War of 3039"
+              ],
+              "key_factions": [
+                "Federated Commonwealth",
+                "House Steiner-Davion",
+                "Capellan Confederation",
+                "Draconis Combine",
+                "Free Rasalhague Republic",
+                "ComStar"
+              ],
+              "key_technologies": [
+                "Helm Memory Core",
+                "Recovered Star League technology"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "clan-invasion",
+          "name": "Clan Invasion",
+          "region_scope": "Inner Sphere",
+          "start_year": 3050,
+          "end_year": 3061,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "clan-invasion-sub-era",
+              "name": "Clan Invasion",
+              "start_year": 3050,
+              "end_year": 3061,
+              "year_label": "3050 – 3061",
+              "is_ongoing": false,
+              "summary": "Descendants of the SLDF invade from the Deep Periphery until halted at Tukayyid and defeated by the Second Star League.",
+              "key_events": [
+                "Operation REVIVAL (3050)",
+                "Battle of Tukayyid",
+                "ComStar schism & founding of Word of Blake",
+                "Refusal War (3057)",
+                "Operation GUERRERO & Lyran Alliance secession (3057)",
+                "Battle of Coventry & founding of Second Star League (3058)",
+                "Operation BULLDOG, Task Force Serpent, and annihilation of Clan Smoke Jaguar",
+                "Great Refusal"
+              ],
+              "key_factions": [
+                "The Clans",
+                "Clan Wolf",
+                "Clan Jade Falcon",
+                "Clan Smoke Jaguar",
+                "ComStar",
+                "Word of Blake",
+                "Second Star League",
+                "Federated Commonwealth",
+                "Lyran Alliance",
+                "Draconis Combine",
+                "Free Rasalhague Republic",
+                "Free Worlds League",
+                "Capellan Confederation"
+              ],
+              "key_technologies": [
+                "OmniMechs",
+                "Elemental battle armor",
+                "Clan weaponry"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "civil-war",
+          "name": "Civil War",
+          "region_scope": "Inner Sphere",
+          "start_year": 3062,
+          "end_year": 3067,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "civil-war-sub-era",
+              "name": "Civil War",
+              "start_year": 3062,
+              "end_year": 3067,
+              "year_label": "3062 – 3067",
+              "is_ongoing": false,
+              "summary": "Internal wars erupt across the Inner Sphere—led by the FedCom Civil War—while the Word of Blake quietly expands from Terra.",
+              "key_events": [
+                "Capellan-St. Ives War & Xin Sheng movement",
+                "FedCom Civil War (Katherine Loyalists vs. Victor's Allies)",
+                "Clan Jade Falcon attacks on the Lyran Alliance",
+                "Draconis Combine border wars with Clan Ghost Bear and the Draconis March"
+              ],
+              "key_factions": [
+                "Federated Commonwealth",
+                "Lyran Alliance",
+                "Capellan Confederation",
+                "St. Ives Compact",
+                "Clan Jade Falcon",
+                "Clan Ghost Bear",
+                "Draconis Combine",
+                "Word of Blake"
+              ],
+              "key_technologies": []
+            }
+          ]
+        },
+        {
+          "id": "jihad",
+          "name": "Jihad",
+          "region_scope": "Inner Sphere",
+          "start_year": 3068,
+          "end_year": 3080,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "jihad-sub-era",
+              "name": "Jihad",
+              "start_year": 3068,
+              "end_year": 3080,
+              "year_label": "3068 – 3080",
+              "is_ongoing": false,
+              "summary": "Following the dissolution of the Second Star League, the Word of Blake wages a devastating Inner Sphere-wide Jihad until crushed by Devlin Stone's coalition.",
+              "key_events": [
+                "Dissolution of the Second Star League (3068)",
+                "Blakist attacks on Tharkad and New Avalon",
+                "HPG network white-out",
+                "Formation of the Word of Blake Protectorate",
+                "Draconis Combine three-way civil conflict",
+                "Fragmentation of the Free Worlds League (3079)",
+                "Wars of Reaving (Clans)",
+                "Devlin Stone's coalition defeats the Word of Blake"
+              ],
+              "key_factions": [
+                "Word of Blake",
+                "Stone's Coalition",
+                "Draconis Combine",
+                "Black Dragons",
+                "Free Worlds League",
+                "Invading Clans"
+              ],
+              "key_technologies": [
+                "HPG network"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dark-age",
+          "name": "Dark Age",
+          "region_scope": "Inner Sphere",
+          "start_year": 3081,
+          "end_year": 3150,
+          "is_ongoing": false,
+          "sub_eras": [
+            {
+              "id": "republic-age",
+              "name": "Republic Age",
+              "start_year": 3081,
+              "end_year": 3130,
+              "year_label": "3081 – 3130",
+              "is_ongoing": false,
+              "summary": "Devlin Stone and David Lear establish the Republic of the Sphere, leading widespread disarmament and relative peace until Stone disappears in 3130.",
+              "key_events": [
+                "Founding of the Republic of the Sphere",
+                "Inner Sphere disarmament program",
+                "Disappearance of Devlin Stone (3130)"
+              ],
+              "key_factions": [
+                "Republic of the Sphere",
+                "Great Houses",
+                "Clans"
+              ],
+              "key_technologies": [
+                "Decommissioned BattleMechs"
+              ]
+            },
+            {
+              "id": "dark-age-sub-era",
+              "name": "Dark Age",
+              "start_year": 3131,
+              "end_year": 3150,
+              "year_label": "3131 – 3150",
+              "is_ongoing": false,
+              "summary": "The HPG Blackout plunges the Inner Sphere into renewed total war, the Republic raises the Wall around its core, and Clans Wolf and Jade Falcon reach Terra's doorstep.",
+              "key_events": [
+                "HPG Blackout",
+                "Creation of the Wall around core Republic systems",
+                "Clan Wolf migration and creation of the Wolf Empire",
+                "Reunification of the Free Worlds League (3139)",
+                "Malvina Hazen's Mongol Doctrine campaign",
+                "Draconis Combine civil war & annihilation of Clan Nova Cat",
+                "Fall of New Avalon to the Draconis Combine",
+                "Devlin Stone returns and drops the Wall (3149)"
+              ],
+              "key_factions": [
+                "Republic of the Sphere",
+                "Clan Wolf / Wolf Empire",
+                "Clan Jade Falcon",
+                "Lyran Commonwealth",
+                "Free Worlds League",
+                "Draconis Combine",
+                "Clan Nova Cat",
+                "Federated Suns",
+                "Capellan Confederation"
+              ],
+              "key_technologies": [
+                "Militarized IndustrialMechs",
+                "The Wall (JumpShip barrier)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ilclan",
+          "name": "ilClan",
+          "region_scope": "Inner Sphere",
+          "start_year": 3151,
+          "end_year": null,
+          "is_ongoing": true,
+          "sub_eras": [
+            {
+              "id": "ilclan-sub-era",
+              "name": "ilClan",
+              "start_year": 3151,
+              "end_year": null,
+              "year_label": "3151 – Present",
+              "is_ongoing": true,
+              "summary": "Clan Wolf conquers Terra to become ilClan and founds a new Star League under Alaric Ward while warfare rages across the fractured Inner Sphere.",
+              "key_events": [
+                "Fall of the Republic of the Sphere and Devlin Stone",
+                "Clan Wolf wins the ilClan Trial on Terra",
+                "Alaric Ward declares the third Star League",
+                "Emergence of the Hinterlands",
+                "Federated Suns recaptures New Avalon",
+                "Rasalhague Dominion civil war",
+                "Establishment of the Star League Protectorate (mid-3152)"
+              ],
+              "key_factions": [
+                "Clan Wolf (ilClan) / Star League",
+                "Clan Jade Falcon",
+                "Clan Smoke Jaguar (reborn)",
+                "Raven Alliance",
+                "Clan Sea Fox",
+                "Federated Suns",
+                "Draconis Combine",
+                "Capellan Confederation",
+                "Free Worlds League",
+                "Wolf Empire",
+                "Rasalhague Dominion",
+                "Taurian Concordat"
+              ],
+              "key_technologies": []
+            }
+          ]
+        },
+        {
+          "id": "clan-homeworlds",
+          "name": "Clan Homeworlds",
+          "region_scope": "Clan Homeworlds / Pentagon Worlds",
+          "start_year": 2786,
+          "end_year": null,
+          "is_ongoing": true,
+          "introduced_year": 2021,
+          "sub_eras": [
+            {
+              "id": "clan-homeworlds-sub-era",
+              "name": "Clan Homeworlds",
+              "start_year": 2786,
+              "end_year": null,
+              "year_label": "2786 – Present",
+              "is_ongoing": true,
+              "summary": "Concurrent timeline tracking Aleksandr Kerensky's SLDF Exodus to the Pentagon Worlds, the civil wars that forged Clan society, and their 3049 return to the Inner Sphere.",
+              "key_events": [
+                "Operation EXODUS (2784)",
+                "Arrival at the Pentagon Worlds (2786)",
+                "Pentagon civil wars & creation of the Clans",
+                "Return to the Inner Sphere (3049)"
+              ],
+              "key_factions": [
+                "Star League-in-Exile (SLDF)",
+                "The Clans"
+              ],
+              "key_technologies": []
+            }
+          ]
+        }
+      ],
+      "bibliography": [
+        "Blake Ascending: A Jihad Compilation",
+        "Dominions Divided",
+        "Era Digest: Age of War",
+        "Era Report: 2750",
+        "Field Manual: 3085",
+        "Field Manual: 3145",
+        "Field Manual: Crusader Clans",
+        "Field Manual: SLDF",
+        "Field Manual: Updates",
+        "Field Manual: Warden Clans",
+        "First Succession War",
+        "Handbook: House Davion",
+        "Handbook: House Kurita",
+        "Handbook: House Liao",
+        "Handbook: House Marik",
+        "Handbook: House Steiner",
+        "Handbook: Major Periphery States",
+        "Historical: Liberation of Terra Volume 1",
+        "Historical: Liberation of Terra Volume 2",
+        "Historical: Operation Klondike",
+        "Second Succession War"
+      ]
+    }
+  },
+  "query_guide": {
+    "primary_collections": [
+      "data.eras",
+      "data.events",
+      "data.factions",
+      "data.people",
+      "data.places",
+      "data.technology_concepts",
+      "data.publishing_history",
+      "data.lore_concepts",
+      "official_eras.eras"
+    ],
+    "recommended_query_fields": {
+      "events_by_year": "data.events where start_year <= requested_year and (end_year is null or end_year >= requested_year); also inspect date_label and date_precision for approximate or undated items.",
+      "events_by_faction": "data.events where faction_ids contains a faction id; resolve aliases using data.factions[].aliases.",
+      "events_by_person": "data.events where people_ids contains a person id; cross-check data.people[].associated_event_ids.",
+      "events_by_place": "data.events where place_ids contains a place id.",
+      "technology_history": "data.events where technology_ids contains a technology id; resolve names and aliases from data.technology_concepts.",
+      "era_overview": "Find an item in data.eras by id or name, then load important_event_ids and key_faction_ids.",
+      "faction_profile": "Find data.factions by id, name, or aliases, then retrieve related_event_ids and key_period_ids.",
+      "publishing_vs_lore": "Use data.publishing_history for real-world product/licensing notes; use data.events and data.eras for in-universe events.",
+      "concept_lookup": "Find data.lore_concepts by id, name, or concept_type, then use related_faction_ids and related_event_ids to traverse the lore graph."
+    },
+    "filtering_notes": [
+      "IDs are stable machine keys; prefer IDs over string matching once an entity has been resolved.",
+      "Arrays such as faction_ids, people_ids, place_ids, and technology_ids support reverse lookups without graph traversal.",
+      "Use date_precision and source_notes before presenting uncertain dates as exact facts.",
+      "Some page sections do not state exact dates. Those records intentionally use null years or broad approximate ranges.",
+      "The source page mixes in-universe chronology with explicitly indented real-world publishing annotations; they are stored separately.",
+      "Use data.lore_concepts for cross-cutting doctrines and institutional background that are not single dated events.",
+      "data.eras follows the sections of Sarna's History page; data.official_eras follows Catalyst Game Labs' product eras. Their boundaries differ; use official_eras to label a product or a 'Mech's era, and eras/events for the story."
+    ],
+    "example_queries": [
+      {
+        "intent": "List events involving ComStar",
+        "filter": "data.events where faction_ids contains 'faction-comstar'",
+        "sort": "start_year ascending, null dates last"
+      },
+      {
+        "intent": "Find all events in 3052",
+        "filter": "data.events where start_year <= 3052 and (end_year is null or end_year >= 3052)",
+        "sort": "start_year ascending"
+      },
+      {
+        "intent": "Trace the BattleMech's history",
+        "filter": "data.events where technology_ids contains 'tech-battlemech'",
+        "sort": "start_year ascending"
+      },
+      {
+        "intent": "Summarize the Clan Invasion",
+        "filter": "data.eras where id = 'clan-invasion'; then fetch its important_event_ids",
+        "sort": "era order"
+      },
+      {
+        "intent": "Separate fictional history from franchise publication history",
+        "filter": "Use data.events for fictional events and data.publishing_history for real-world publication notes",
+        "sort": "date_label"
+      }
+    ]
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:battletech:history:knowledge-base:schema:1.0.0",
+    "title": "BattleTech History Knowledge Base",
+    "type": "object",
+    "required": [
+      "schema_version",
+      "metadata",
+      "summary",
+      "data",
+      "query_guide"
+    ],
+    "properties": {
+      "schema_version": {
+        "type": "string"
+      },
+      "metadata": {
+        "type": "object",
+        "required": [
+          "title",
+          "source",
+          "retrieved_at",
+          "coverage",
+          "date_conventions"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "name",
+              "page_title",
+              "url"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "page_title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "page_revision_note": {
+                "type": "string"
+              },
+              "license_note": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "coverage": {
+            "type": "object"
+          },
+          "date_conventions": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      },
+      "summary": {
+        "type": "object",
+        "required": [
+          "one_paragraph",
+          "key_points",
+          "core_themes"
+        ],
+        "properties": {
+          "one_paragraph": {
+            "type": "string"
+          },
+          "key_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "core_themes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "data": {
+        "type": "object",
+        "required": [
+          "eras",
+          "events",
+          "factions",
+          "people",
+          "places",
+          "technology_concepts",
+          "publishing_history",
+          "lore_concepts"
+        ],
+        "properties": {
+          "eras": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "order",
+                "start_year",
+                "end_year",
+                "date_label",
+                "description",
+                "key_themes",
+                "important_event_ids",
+                "key_faction_ids"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "integer"
+                },
+                "start_year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "end_year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "date_label": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "key_themes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "important_event_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "key_faction_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "start_year",
+                "end_year",
+                "date_label",
+                "date_precision",
+                "era_id",
+                "summary",
+                "causes",
+                "consequences",
+                "categories",
+                "people_ids",
+                "faction_ids",
+                "place_ids",
+                "technology_ids",
+                "source_section",
+                "source_notes"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "start_year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "end_year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "date_label": {
+                  "type": "string"
+                },
+                "date_precision": {
+                  "enum": [
+                    "exact_date",
+                    "year",
+                    "year_range",
+                    "approximate_period",
+                    "undated_or_unspecified"
+                  ]
+                },
+                "era_id": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "causes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "consequences": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "categories": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "people_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "faction_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "place_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "technology_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "source_section": {
+                  "type": "string"
+                },
+                "source_notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "factions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "aliases",
+                "faction_type",
+                "description",
+                "key_period_ids",
+                "related_event_ids"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "faction_type": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "key_period_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "related_event_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "roles",
+                "affiliation_ids",
+                "associated_event_ids",
+                "description"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "affiliation_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "associated_event_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "places": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "aliases",
+                "place_type",
+                "description"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "place_type": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "technology_concepts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "aliases",
+                "concept_type",
+                "description"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "concept_type": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "publishing_history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "date_label",
+                "summary",
+                "category",
+                "source_section"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "date_label": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "source_section": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "lore_concepts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "concept_type",
+                "description",
+                "related_faction_ids",
+                "related_event_ids"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "concept_type": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "related_faction_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "related_event_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "query_guide": {
+        "type": "object",
+        "required": [
+          "primary_collections",
+          "recommended_query_fields",
+          "filtering_notes",
+          "example_queries"
+        ],
+        "properties": {
+          "primary_collections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommended_query_fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "filtering_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "example_queries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "intent",
+                "filter",
+                "sort"
+              ],
+              "properties": {
+                "intent": {
+                  "type": "string"
+                },
+                "filter": {
+                  "type": "string"
+                },
+                "sort": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
