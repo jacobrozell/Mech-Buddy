@@ -13,6 +13,7 @@ struct PlayModeHomeView: View {
     @State private var route: PlaySetupRoute?
     @State private var confirmDiscardDraft = false
     @State private var managingSaved = false
+    @State private var showBoards = false
 
     var body: some View {
         ScrollView {
@@ -28,9 +29,12 @@ struct PlayModeHomeView: View {
                 }
                 newGameBlock
                 if let last = dependencies.preferences.playLastSetup, canOpen(last) {
-                    lastSetupRow(last)
+                    lastSetupBlock(last)
                 }
                 savedForcesRow
+                if dependencies.releaseSurface.isEnabled(.playBoards) {
+                    boardsRow
+                }
                 if dependencies.preferences.collection == nil {
                     collectionNote
                 }
@@ -43,6 +47,9 @@ struct PlayModeHomeView: View {
         .accessibilityIdentifier("as.play.home")
         .navigationDestination(item: $route) { route in
             PlaySetupFlowView(route: route)
+        }
+        .navigationDestination(isPresented: $showBoards) {
+            PlayBoardsView()
         }
         .onChange(of: matches.matchStore == nil) { _, closed in
             // Play game started: leave setup so Play home shows Resume when the cover closes.
@@ -232,6 +239,31 @@ struct PlayModeHomeView: View {
             .accessibilityIdentifier("as.play.draft.discard")
     }
 
+    /// Last setup, and when its board was saved again since: a note and **Use the new version** (§ 9.7).
+    /// The setup keeps its own copy until the player asks.
+    private func lastSetupBlock(_ last: PlaySetup) -> some View {
+        VStack(alignment: .leading, spacing: TMSpace.xs) {
+            lastSetupRow(last)
+            if dependencies.releaseSurface.isEnabled(.playBoards),
+               let board = last.battlefield.board,
+               let newer = BoardPresets.newerVersion(of: board, in: dependencies.userContent.boardPresets()) {
+                Label("Board changed since: “\(newer.name ?? "your board")” was saved again. This setup keeps its own copy.", systemImage: "arrow.triangle.2.circlepath")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.play.lastSetup.boardChanged")
+                Button("Use the new version") {
+                    var updated = last
+                    updated.battlefield.board = BoardPresets.copyForSetup(newer)
+                    dependencies.preferences.playLastSetup = updated
+                }
+                .font(TMFont.detail.weight(.semibold))
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("as.play.lastSetup.useNewBoard")
+            }
+        }
+    }
+
     private func lastSetupRow(_ last: PlaySetup) -> some View {
         Button {
             var fresh = last
@@ -291,6 +323,36 @@ struct PlayModeHomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("as.play.savedForces")
+    }
+
+    // MARK: Boards (PM13, behind playBoards)
+
+    private var boardsRow: some View {
+        let count = dependencies.userContent.boardPresets().count
+        return Button {
+            showBoards = true
+        } label: {
+            HStack(spacing: TMSpace.md) {
+                Image(systemName: "square.grid.3x3.topleft.filled")
+                    .foregroundStyle(TMColor.signal)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text("Boards").font(TMFont.cardTitle)
+                    Text("\(count) saved · \(StarterBoards.missionIDs.count + 2) starter boards")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: TMSpace.sm)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("as.play.boards")
     }
 
     // MARK: Collection

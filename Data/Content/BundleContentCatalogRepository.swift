@@ -98,6 +98,11 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("as-terrain-palette", subdirectory: "Content/AlphaStrike", as: TerrainPaletteFile.self)
     }
 
+    /// The open-table starter boards (PlayModeSpec § 9.7). The missions' boards are read from their own JSON.
+    public func starterBoards() throws -> [BoardLayout] {
+        try load("as-starter-boards", subdirectory: "Content/AlphaStrike", as: [BoardLayout].self)
+    }
+
     public func boxSets() throws -> BoxSetsDTO {
         try load("as-box-sets", subdirectory: "Content/AlphaStrike", as: BoxSetsDTO.self)
     }

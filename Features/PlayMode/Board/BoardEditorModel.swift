@@ -190,6 +190,16 @@ final class BoardEditorModel {
     var canUndo: Bool { editor.canUndo }
     var canRedo: Bool { editor.canRedo }
 
+    /// After Save board: the copy now names the saved board it matches, so setup can tell when that board changes.
+    func linkToPreset(_ stored: BoardLayout) {
+        editor.mutate {
+            $0.name = stored.name
+            $0.presetID = stored.id
+            $0.presetUpdatedAt = stored.updatedAt
+        }
+        commit()
+    }
+
     func resetZones() {
         editor.resetZones()
         commit()

@@ -311,6 +311,10 @@ struct PlayMapStep: View {
     @Binding var setup: PlaySetup
     @Environment(AppDependencies.self) private var dependencies
     @State private var showBuilder = false
+    @State private var showPicker = false
+    @State private var showSave = false
+    /// A picked board smaller than the chosen table, waiting for "Stretch" or "Keep size" (§ 9.7).
+    @State private var fitting: BoardLayout?
 
     private static let terrainPalette: TerrainPaletteFile? = try? BundleContentCatalogRepository().terrainPalette()
     private static let catalogMaps: [String] = (try? BundleContentCatalogRepository().mapCatalog().allMaps) ?? []
@@ -424,6 +428,23 @@ struct PlayMapStep: View {
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("as.play.setup.board.remove")
                 }
+                Button { showSave = true } label: {
+                    Label("Save board", systemImage: "square.and.arrow.down").frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityHint("Saves this board so you can pick it in another game")
+                .accessibilityIdentifier("as.play.setup.board.save")
+                if let newer = BoardPresets.newerVersion(of: board, in: dependencies.userContent.boardPresets()) {
+                    VStack(alignment: .leading, spacing: TMSpace.sm) {
+                        Label("Board changed since you chose it. This game keeps its own copy.", systemImage: "arrow.triangle.2.circlepath")
+                            .font(TMFont.detail)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("as.play.setup.board.changed")
+                        Button("Use the new version") { useNewVersion(newer) }
+                            .frame(minHeight: 44)
+                            .accessibilityIdentifier("as.play.setup.board.useNew")
+                    }
+                }
             } else {
                 Button { startBoard(ridgeLine: false) } label: {
                     Label("Build a board", systemImage: "square.grid.3x3.topleft.filled").frame(maxWidth: .infinity, minHeight: 44)
@@ -438,13 +459,85 @@ struct PlayMapStep: View {
                 .buttonStyle(.bordered)
                 .accessibilityHint("Opens the builder with Ridge Line’s table and terrain")
                 .accessibilityIdentifier("as.play.setup.board.ridgeLine")
+                Button { showPicker = true } label: {
+                    Label("Choose a saved board", systemImage: "tray.full").frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityHint("Yours, or a starter board such as a mission’s table")
+                .accessibilityIdentifier("as.play.setup.board.pick")
             }
+        }
+        .sheet(isPresented: $showPicker) {
+            NavigationStack {
+                PlayBoardsView { picked in
+                    showPicker = false
+                    choose(picked)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { showPicker = false }
+                            .accessibilityIdentifier("as.play.board.pick.cancel")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showSave) {
+            if let board = setup.battlefield.board {
+                BoardSaveSheet(board: board) { stored in
+                    setup.battlefield.board?.name = stored.name
+                    setup.battlefield.board?.presetID = stored.id
+                    setup.battlefield.board?.presetUpdatedAt = stored.updatedAt
+                }
+            }
+        }
+        .confirmationDialog(
+            fitting.map { "This board is \(Int($0.width))″ × \(Int($0.depth))″. Your table is bigger." } ?? "",
+            isPresented: Binding(get: { fitting != nil }, set: { if !$0 { fitting = nil } }),
+            titleVisibility: .visible
+        ) {
+            if let board = fitting {
+                let w = max(board.width, setup.battlefield.matWidth)
+                let d = max(board.depth, setup.battlefield.matDepth)
+                Button("Stretch to \(Int(w)) × \(Int(d))″") {
+                    setup.battlefield.board = board.stretched(toWidth: w, depth: d)
+                    fitting = nil
+                }
+                .accessibilityIdentifier("as.play.setup.board.fit.stretch")
+                Button("Keep size, centre it") {
+                    setup.battlefield.board = board.centred(onWidth: w, depth: d)
+                    fitting = nil
+                }
+                .accessibilityIdentifier("as.play.setup.board.fit.centre")
+                Button("Use the board’s own size") {
+                    setup.battlefield.board = board
+                    fitting = nil
+                }
+                .accessibilityIdentifier("as.play.setup.board.fit.asIs")
+            }
+            Button("Cancel", role: .cancel) { fitting = nil }
+        } message: {
+            Text("Stretching spreads the pieces over the bigger table at their own sizes. Keeping the size puts the board in the middle. Zones are drawn again for the new table.")
         }
         .navigationDestination(isPresented: $showBuilder) {
             if let board = setup.battlefield.board, let palette = Self.terrainPalette {
                 BoardEditorView(board: board, sides: setup.sides, palette: palette) { setup.battlefield.board = $0 }
             }
         }
+    }
+
+    /// A picked board becomes this game's own copy. One smaller than the table chosen above asks first (§ 9.7).
+    private func choose(_ picked: BoardLayout) {
+        let copy = BoardPresets.copyForSetup(picked)
+        if setup.battlefield.kind == .mat,
+           copy.width < setup.battlefield.matWidth || copy.depth < setup.battlefield.matDepth {
+            fitting = copy
+        } else {
+            setup.battlefield.board = copy
+        }
+    }
+
+    private func useNewVersion(_ preset: BoardLayout) {
+        setup.battlefield.board = BoardPresets.copyForSetup(preset)
     }
 
     /// A blank board on the table chosen above, or Ridge Line's table and terrain (the starter board, § 9.7).

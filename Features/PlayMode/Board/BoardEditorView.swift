@@ -10,12 +10,16 @@ struct BoardEditorView: View {
     @State private var dragging: (item: TerrainPaletteItem, location: CGPoint)?
     @State private var canvasFrame: CGRect = .zero
     @State private var showInspectorSheet = false
+    @State private var showSave = false
+    /// False when the builder opens a saved board from the Boards list, which saves each change itself.
+    private let canSave: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, onChange: @escaping (BoardLayout) -> Void) {
+    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, canSave: Bool = true, onChange: @escaping (BoardLayout) -> Void) {
+        self.canSave = canSave
         _model = State(initialValue: BoardEditorModel(board: board, sides: sides, palette: palette, onChange: onChange))
     }
 
@@ -31,6 +35,9 @@ struct BoardEditorView: View {
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .tabBar)
             .toolbar { toolbar }
+            .sheet(isPresented: $showSave) {
+                BoardSaveSheet(board: model.board) { model.linkToPreset($0) }
+            }
             .sheet(isPresented: $showList, onDismiss: { model.selection = nil }) {
                 BoardPieceListView(model: model)
                     .presentationDetents([.medium, .large])
@@ -188,6 +195,10 @@ struct BoardEditorView: View {
                             }
                         }
                     }
+                }
+                if canSave {
+                    Button("Save board", systemImage: "square.and.arrow.down") { showSave = true }
+                        .accessibilityIdentifier("as.board.save")
                 }
                 Button("Reset zones", systemImage: "arrow.counterclockwise") { model.resetZones() }
                     .accessibilityIdentifier("as.board.resetZones")

@@ -166,6 +166,10 @@ public struct BoardLayout: Codable, Sendable, Equatable {
     public var createdAt: Date?
     public var updatedAt: Date?
     public var isStarter: Bool?
+    /// Set on the copy a game or setup holds: the saved board it came from, and that board's `updatedAt` at
+    /// the time. Lets setup say "Board changed since" (§ 9.7). Nil on presets and starters.
+    public var presetID: UUID?
+    public var presetUpdatedAt: Date?
     public var width: Double
     public var depth: Double
     /// Suggested mapsheets. Empty when played on an open table.
@@ -212,7 +216,7 @@ public struct BoardLayout: Codable, Sendable, Equatable {
     // MARK: Codable
 
     private enum CodingKeys: String, CodingKey {
-        case schemaVersion, id, name, createdAt, updatedAt, isStarter
+        case schemaVersion, id, name, createdAt, updatedAt, isStarter, presetID, presetUpdatedAt
         case width, depth, sheets, zones, zonesBySideCount, features, openTable
     }
 
@@ -230,6 +234,8 @@ public struct BoardLayout: Codable, Sendable, Equatable {
         createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt)
         updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt)
         isStarter = try c.decodeIfPresent(Bool.self, forKey: .isStarter)
+        presetID = try c.decodeIfPresent(UUID.self, forKey: .presetID)
+        presetUpdatedAt = try c.decodeIfPresent(Date.self, forKey: .presetUpdatedAt)
         width = try c.decode(Double.self, forKey: .width)
         depth = try c.decode(Double.self, forKey: .depth)
         sheets = try c.decodeIfPresent([Sheet].self, forKey: .sheets) ?? []
@@ -255,6 +261,8 @@ public struct BoardLayout: Codable, Sendable, Equatable {
         try c.encodeIfPresent(createdAt, forKey: .createdAt)
         try c.encodeIfPresent(updatedAt, forKey: .updatedAt)
         try c.encodeIfPresent(isStarter, forKey: .isStarter)
+        try c.encodeIfPresent(presetID, forKey: .presetID)
+        try c.encodeIfPresent(presetUpdatedAt, forKey: .presetUpdatedAt)
         try c.encode(width, forKey: .width)
         try c.encode(depth, forKey: .depth)
         try c.encode(sheets, forKey: .sheets)
@@ -315,6 +323,42 @@ public struct BoardLayout: Codable, Sendable, Equatable {
             return piece
         }
         return copy
+    }
+
+    // MARK: Fitting a bigger table (§ 9.7)
+
+    /// The board on a bigger table with positions spread in proportion: every piece and sheet keeps its size,
+    /// its centre moves to the same share of the new width and depth. Zones are regenerated for the new table.
+    public func stretched(toWidth newWidth: Double, depth newDepth: Double) -> BoardLayout {
+        remapped(toWidth: newWidth, depth: newDepth) { rect in
+            let cx = width > 0 ? rect.midX / width * newWidth : rect.midX
+            let cy = depth > 0 ? rect.midY / depth * newDepth : rect.midY
+            return Rect(x: cx - rect.width / 2, y: cy - rect.depth / 2, width: rect.width, depth: rect.depth)
+        }
+    }
+
+    /// The board kept at its own size in the middle of a bigger table. Zones are regenerated for the new table.
+    public func centred(onWidth newWidth: Double, depth newDepth: Double) -> BoardLayout {
+        let dx = (newWidth - width) / 2
+        let dy = (newDepth - depth) / 2
+        return remapped(toWidth: newWidth, depth: newDepth) { rect in
+            Rect(x: rect.x + dx, y: rect.y + dy, width: rect.width, depth: rect.depth)
+        }
+    }
+
+    private func remapped(toWidth newWidth: Double, depth newDepth: Double, _ move: (Rect) -> Rect) -> BoardLayout {
+        var copy = self
+        copy.width = newWidth
+        copy.depth = newDepth
+        copy.sheets = sheets.map { Sheet(name: $0.name, area: move($0.area), rotation: $0.rotation) }
+        copy.features = features.map { feature in
+            var piece = feature
+            piece.area = move(feature.area)
+            return piece
+        }
+        copy.zones = []
+        copy.zonesBySideCount = nil
+        return copy.clampedToTable()
     }
 
     /// Terrain pieces only (not tokens).
