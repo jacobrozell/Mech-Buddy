@@ -289,7 +289,7 @@ public enum PlayLayout {
     public static func winningSummary(for setup: PlaySetup) -> String {
         if setup.perSideObjectives {
             let parts = setup.sides.compactMap { side in
-                setup.objectiveId(for: side.id).map { "\(side.name.isEmpty ? side.id.displayName : side.name): \($0.title) to \(ObjectiveRules.format($0.baseThreshold))" }
+                setup.objectiveId(for: side.id).map { "\(side.label): \($0.title) to \(ObjectiveRules.format($0.baseThreshold))" }
             }
             var line = "[HOUSE] Each side has its own objective (p. 7 optional rule). " + parts.joined(separator: ". ") + "."
             if let limit = setup.turnLimit { line += " At turn \(limit), most points wins, then most PV [HOUSE]." }
@@ -326,7 +326,7 @@ public enum PlayLayout {
         if setup.perSideObjectives {
             for side in setup.sides {
                 if let objective = setup.objectiveId(for: side.id), let placing = objective.setupStep {
-                    steps.append("\(side.name.isEmpty ? side.id.displayName : side.name) objective (\(objective.page)): " + placing)
+                    steps.append("\(side.label) objective (\(objective.page)): " + placing)
                 }
             }
         } else if let objective = setup.objectiveId, objective.isBuilt, let placing = objective.setupStep {

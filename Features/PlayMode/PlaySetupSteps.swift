@@ -966,7 +966,7 @@ struct PlayRulesStep: View {
     }
 
     private func sideLabel(_ side: MatchSide) -> String {
-        side.name.trimmingCharacters(in: .whitespaces).isEmpty ? side.id.displayName : side.name
+        side.label
     }
 
     private func rollForEverySide() {

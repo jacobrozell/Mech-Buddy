@@ -143,7 +143,7 @@ public enum MatchReducer {
                 ruleset: setup.ruleset,
                 sides: setup.sides.map { side in
                     var fresh = MatchSide(id: side.id, name: side.name, players: side.players, homeEdge: side.homeEdge)
-                    fresh.name = side.name.trimmingCharacters(in: .whitespaces).isEmpty ? side.id.displayName : side.name
+                    fresh.name = side.label
                     return fresh
                 },
                 play: setup,

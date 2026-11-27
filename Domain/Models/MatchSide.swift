@@ -55,6 +55,11 @@ public struct MatchSide: Codable, Sendable, Equatable, Identifiable {
         conceded = try container.decodeIfPresent(Bool.self, forKey: .conceded) ?? false
     }
 
+    /// The name to show: what the players typed, or "Side A" when it is blank.
+    public var label: String {
+        name.trimmingCharacters(in: .whitespaces).isEmpty ? id.displayName : name
+    }
+
     /// Side A and Side B with default names: every mission, and every save from before payload v2.
     public static var missionPair: [MatchSide] {
         SideId.missionPair.map { MatchSide(id: $0) }

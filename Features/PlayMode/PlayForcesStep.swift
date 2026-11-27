@@ -708,7 +708,7 @@ struct PlayReviewStep: View {
         if setup.perSideObjectives {
             let missing = setup.sides.filter { setup.objectiveId(for: $0.id) == nil }
             if !missing.isEmpty {
-                list.append("\(missing.map { $0.name.trimmingCharacters(in: .whitespaces).isEmpty ? $0.id.displayName : $0.name }.joined(separator: ", ")) hasn’t rolled an objective. Until every side has one, everyone plays the same objective, or last side standing.")
+                list.append("\(missing.map(\.label).joined(separator: ", ")) hasn’t rolled an objective. Until every side has one, everyone plays the same objective, or last side standing.")
             }
         }
         if let advice = setup.battlefield.advice(sides: setup.sides.count, budgetPV: pv) {
