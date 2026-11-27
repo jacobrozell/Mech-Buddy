@@ -93,6 +93,11 @@ public struct BundleContentCatalogRepository: ContentCatalogRepository, Sendable
         try load("map-catalog", subdirectory: "Content", as: MapCatalogDTO.self)
     }
 
+    /// The terrain palette's sizes and rules copy for the board builder (PlayModeSpec § 9.3). Not on the protocol: only Play's builder uses it.
+    public func terrainPalette() throws -> TerrainPaletteFile {
+        try load("as-terrain-palette", subdirectory: "Content/AlphaStrike", as: TerrainPaletteFile.self)
+    }
+
     public func boxSets() throws -> BoxSetsDTO {
         try load("as-box-sets", subdirectory: "Content/AlphaStrike", as: BoxSetsDTO.self)
     }

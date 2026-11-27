@@ -1,5 +1,6 @@
 import Foundation
 import MechBuddyData
+import MechBuddyDomain
 
 /// Briefing copy for the open mission. Cached on `MatchStore` so the battle screen does not decode JSON in `body`.
 struct ScenarioPresentation: Equatable, Sendable {
@@ -15,6 +16,8 @@ struct ScenarioPresentation: Equatable, Sendable {
     var coachNotes: [String] = []
     /// Maps needed and the table diagram, when the pack has one.
     var layout: MissionLayoutDTO? = nil
+    /// A terrain board built in Play (PM12): shown at table setup and from Board in battle.
+    var board: BoardLayout? = nil
 
     static let fallback = ScenarioPresentation(
         title: "Ridge Line",

@@ -310,7 +310,9 @@ struct PlaySizeStep: View {
 struct PlayMapStep: View {
     @Binding var setup: PlaySetup
     @Environment(AppDependencies.self) private var dependencies
+    @State private var showBuilder = false
 
+    private static let terrainPalette: TerrainPaletteFile? = try? BundleContentCatalogRepository().terrainPalette()
     private static let catalogMaps: [String] = (try? BundleContentCatalogRepository().mapCatalog().allMaps) ?? []
 
     private var ownedMaps: [String] {
@@ -332,18 +334,28 @@ struct PlayMapStep: View {
                     Text("Mapsheets").tag(Battlefield.Kind.mapsheets)
                 }
                 .pickerStyle(.segmented)
+                .disabled(hasBoard)
                 .accessibilityIdentifier("as.play.setup.mapSource")
-                if setup.battlefield.kind == .mat {
+                if hasBoard {
+                    Text("The table is the size of your board.")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                } else if setup.battlefield.kind == .mat {
                     matControls
                 } else {
                     sheetControls
                 }
             }
+            if boardsOn, Self.terrainPalette != nil {
+                boardSection
+            }
             VStack(alignment: .leading, spacing: TMSpace.sm) {
                 Eyebrow("Layout")
-                MissionLayoutView(layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides))
+                MissionLayoutView(board: PlayLayout.board(for: setup.battlefield, sides: setup.sides))
                     .accessibilityIdentifier("as.play.setup.layout")
-                Text("\(setup.battlefield.summary) · each side deploys within 6″ of its home edge.")
+                Text(hasBoard
+                     ? "\(setup.battlefield.summary) · \(boardCounter)."
+                     : "\(setup.battlefield.summary) · each side deploys within 6″ of its home edge.")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -355,10 +367,16 @@ struct PlayMapStep: View {
                 }
             }
             PlaySetupSection(title: "Terrain") {
-                ForEach(PlayLayout.tableSteps(for: setup).dropFirst().prefix(2), id: \.self) { line in
-                    Label(line, systemImage: "tree")
+                if hasBoard {
+                    Label("Set up the table like the board above. At the table, each side still takes turns placing the terrain pieces.", systemImage: "tree")
                         .font(TMFont.detail)
                         .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    ForEach(PlayLayout.tableSteps(for: setup).dropFirst().prefix(2), id: \.self) { line in
+                        Label(line, systemImage: "tree")
+                            .font(TMFont.detail)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 Text("Buildings block sight and slow movement. The app doesn’t track their damage yet.")
                     .font(TMFont.detail)
@@ -371,6 +389,80 @@ struct PlayMapStep: View {
     private var budgetPV: Int? {
         if case .pointValue(let pv) = setup.budget { return pv }
         return nil
+    }
+
+    // MARK: Board builder (PM12, behind playBoards)
+
+    private var boardsOn: Bool { dependencies.releaseSurface.isEnabled(.playBoards) }
+    private var hasBoard: Bool { setup.battlefield.board != nil }
+
+    private var boardCounter: String {
+        guard let board = setup.battlefield.board else { return "" }
+        return BoardRules.choiceSummary(board.features, sideCount: setup.sides.count)
+    }
+
+    private var boardSection: some View {
+        PlaySetupSection(
+            title: "Terrain board",
+            footnote: "A plan of your table to set up by. The app never checks the real table."
+        ) {
+            if let board = setup.battlefield.board {
+                Text("\(board.name ?? "Your board"): \(board.features.count) \(board.features.count == 1 ? "piece" : "pieces"), \(boardCounter).")
+                    .font(TMFont.detail)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("as.play.setup.board.summary")
+                HStack(spacing: TMSpace.md) {
+                    Button { showBuilder = true } label: {
+                        Label("Edit board", systemImage: "square.and.pencil").frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(TMColor.signal)
+                    .accessibilityIdentifier("as.play.setup.board.edit")
+                    Button(role: .destructive) { setup.battlefield.board = nil } label: {
+                        Label("Remove", systemImage: "trash").frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("as.play.setup.board.remove")
+                }
+            } else {
+                Button { startBoard(ridgeLine: false) } label: {
+                    Label("Build a board", systemImage: "square.grid.3x3.topleft.filled").frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(TMColor.signal)
+                .accessibilityHint("Opens the terrain board builder with the table above")
+                .accessibilityIdentifier("as.play.setup.board.build")
+                Button { startBoard(ridgeLine: true) } label: {
+                    Label("Start from Ridge Line", systemImage: "map").frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityHint("Opens the builder with Ridge Line’s table and terrain")
+                .accessibilityIdentifier("as.play.setup.board.ridgeLine")
+            }
+        }
+        .navigationDestination(isPresented: $showBuilder) {
+            if let board = setup.battlefield.board, let palette = Self.terrainPalette {
+                BoardEditorView(board: board, sides: setup.sides, palette: palette) { setup.battlefield.board = $0 }
+            }
+        }
+    }
+
+    /// A blank board on the table chosen above, or Ridge Line's table and terrain (the starter board, § 9.7).
+    private func startBoard(ridgeLine: Bool) {
+        var board: BoardLayout
+        if ridgeLine, let dto = try? dependencies.content.scenario(id: .ridgeLine).layout {
+            board = BoardLayout(dto)
+            board.name = "Ridge Line"
+        } else {
+            let table = PlayLayout.layout(for: setup.battlefield, sides: setup.sides)
+            board = BoardLayout(width: table.width, depth: table.depth, sheets: BoardLayout(table).sheets, openTable: setup.battlefield.summary)
+        }
+        board.schemaVersion = BoardLayout.currentSchemaVersion
+        board.id = UUID()
+        board.createdAt = Date()
+        board.updatedAt = board.createdAt
+        setup.battlefield.board = board.clampedToTable().assigningIDs()
+        showBuilder = true
     }
 
     private var matControls: some View {

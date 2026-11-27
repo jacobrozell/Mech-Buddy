@@ -85,7 +85,9 @@ struct TableSetupStep: View {
                 newInThisMission
             }
 
-            if let layout = scenario.layout {
+            if let board = scenario.board {
+                BoardBriefing(board: board, sideCount: session.sides.count)
+            } else if let layout = scenario.layout {
                 VStack(alignment: .leading, spacing: TMSpace.md) {
                     Eyebrow("Table layout")
                     MissionMapsSection(layout: layout, ownedMaps: nil, missionId: scenario.id.isEmpty ? nil : scenario.id)
@@ -252,3 +254,59 @@ struct TableSetupStep: View {
     }
 }
 #endif
+
+
+/// "Set up the table like this" (§ 9.9): the built board, with the terrain count and the zones.
+struct BoardBriefing: View {
+    var board: BoardLayout
+    var sideCount: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: TMSpace.md) {
+            Eyebrow("Set up the table like this")
+            MissionLayoutView(board: board)
+                .accessibilityIdentifier("as.battle.boardPreview")
+            Text("\(BoardRules.summary(board, sideCount: sideCount))")
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("Buildings block sight and slow movement. The app doesn’t track their damage yet.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("as.battle.board.briefing")
+    }
+}
+
+/// Board in battle (§ 9.9): the board, read-only, from the toolbar.
+struct BoardSheet: View {
+    var board: BoardLayout
+    var sideCount: Int
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: TMSpace.md) {
+                    MissionLayoutView(board: board)
+                    Text(BoardRules.summary(board, sideCount: sideCount))
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(TMSpace.lg)
+            }
+            .navigationTitle("Board")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                        .accessibilityIdentifier("as.battle.board.done")
+                }
+            }
+        }
+        .accessibilityIdentifier("as.battle.board.sheet")
+    }
+}

@@ -1,14 +1,24 @@
 import SwiftUI
 import MechBuddyData
+import MechBuddyDomain
 
 // Top-down table diagram for a mission, like the scenario map layouts in A Game of Armored Combat:
 // mapsheets, each side's setup zone, and suggested terrain. Spec: specs/features/GuidedMissionSpec.md § Maps.
 
 struct MissionLayoutView: View {
-    var layout: MissionLayoutDTO
+    var board: BoardLayout
+    @Environment(\.colorSchemeContrast) private var contrast
 
+    init(layout: MissionLayoutDTO) {
+        board = BoardLayout(layout)
+    }
 
-    private var aspect: CGFloat { CGFloat(layout.width / max(layout.depth, 1)) }
+    /// A board, with zones already chosen for the game (`PlayLayout.board(for:sides:)`).
+    init(board: BoardLayout) {
+        self.board = board
+    }
+
+    private var aspect: CGFloat { CGFloat(board.width / max(board.depth, 1)) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.xs) {
@@ -19,7 +29,7 @@ struct MissionLayoutView: View {
             .frame(maxWidth: .infinity)
             .background(TMColor.readout, in: RoundedRectangle(cornerRadius: TMRadius.chip, style: .continuous))
             HStack(spacing: TMSpace.md) {
-                ForEach(layout.zones.map(\.side), id: \.self) { letter in
+                ForEach(board.zones.map(\.side), id: \.self) { letter in
                     legendItem(color: Self.color(forZone: letter), text: "Side \(letter) sets up")
                 }
             }
@@ -27,19 +37,12 @@ struct MissionLayoutView: View {
             .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(MissionLayoutDescription.spoken(layout))
+        .accessibilityLabel(MissionLayoutDescription.spoken(board))
         .accessibilityIdentifier("mission.layout")
     }
 
     /// Zones name their side by letter ("A" to "D").
-    static func color(forZone letter: String) -> Color {
-        switch letter {
-        case "B": TMColor.sideB
-        case "C": TMColor.sideC
-        case "D": TMColor.sideD
-        default: TMColor.sideA
-        }
-    }
+    static func color(forZone letter: String) -> Color { BoardDrawing.color(forZone: letter) }
 
     private func legendItem(color: Color, text: String) -> some View {
         HStack(spacing: TMSpace.xs) {
@@ -49,109 +52,38 @@ struct MissionLayoutView: View {
     }
 
     private func draw(in context: inout GraphicsContext, size: CGSize) {
-        let scale = min(size.width / layout.width, size.height / layout.depth)
-        func rect(_ r: MissionLayoutDTO.Rect) -> CGRect {
-            CGRect(x: r.x * scale, y: r.y * scale, width: r.width * scale, height: r.depth * scale)
-        }
-        let line = Color.primary.opacity(0.35)
-
-        // Mapsheets: outlined (names go on last, above the zones).
-        for sheet in layout.sheets {
-            let frame = rect(sheet.area).insetBy(dx: 1, dy: 1)
-            context.stroke(Path(roundedRect: frame, cornerRadius: 4), with: .color(line), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
-        }
-
-        // Setup zones in side colours.
-        for zone in layout.zones {
-            let color = Self.color(forZone: zone.side)
-            let frame = rect(zone.area)
-            context.fill(Path(frame), with: .color(color.opacity(0.3)))
-            context.draw(
-                Text(zone.side).font(.headline.weight(.bold)).foregroundStyle(color),
-                at: CGPoint(x: frame.midX, y: frame.midY)
-            )
-        }
-
-        // Terrain.
-        let woods = Color(red: 0.25, green: 0.55, blue: 0.3)
-        let hill = Color(red: 0.6, green: 0.47, blue: 0.3)
-        for feature in layout.features {
-            let frame = rect(feature.area)
-            switch feature.kind {
-            case .hill:
-                context.fill(Path(ellipseIn: frame), with: .color(hill.opacity(0.35)))
-                context.stroke(Path(ellipseIn: frame.insetBy(dx: frame.width * 0.2, dy: frame.height * 0.2)),
-                               with: .color(hill.opacity(0.6)), lineWidth: 1)
-                Self.drawLabel(Text("Hill").font(.caption2).foregroundStyle(hill), at: CGPoint(x: frame.midX, y: frame.midY), in: &context)
-            case .woods:
-                context.fill(Path(roundedRect: frame, cornerRadius: min(frame.width, frame.height) / 2),
-                             with: .color(woods.opacity(0.4)))
-                context.draw(Text(Image(systemName: "tree.fill")).font(.caption).foregroundStyle(woods),
-                             at: CGPoint(x: frame.midX, y: frame.midY))
-            case .tree:
-                let dot = CGRect(x: frame.midX - 5, y: frame.midY - 5, width: 10, height: 10)
-                context.fill(Path(ellipseIn: dot), with: .color(woods.opacity(0.8)))
-            case .wall:
-                var path = Path()
-                if frame.width >= frame.height {
-                    path.move(to: CGPoint(x: frame.minX, y: frame.midY))
-                    path.addLine(to: CGPoint(x: frame.maxX, y: frame.midY))
-                } else {
-                    path.move(to: CGPoint(x: frame.midX, y: frame.minY))
-                    path.addLine(to: CGPoint(x: frame.midX, y: frame.maxY))
-                }
-                context.stroke(path, with: .color(Color.primary.opacity(0.55)), style: StrokeStyle(lineWidth: 4, lineCap: .round))
-            case .building:
-                // Box buildings: small (Medium) and large (Heavy), Quick-Start p. 28.
-                context.fill(Path(roundedRect: frame, cornerRadius: 2), with: .color(Color.gray.opacity(0.45)))
-                context.stroke(Path(roundedRect: frame, cornerRadius: 2), with: .color(Color.primary.opacity(0.6)), lineWidth: 1)
-            }
-        }
-
-        // Map names, centred at the top of each sheet.
-        for sheet in layout.sheets {
-            let frame = rect(sheet.area)
-            Self.drawLabel(
-                Text(sheet.name).font(.caption2.weight(.semibold)).foregroundStyle(.secondary),
-                at: CGPoint(x: frame.midX, y: frame.minY + 10),
-                in: &context
-            )
-        }
+        let scale = min(size.width / board.width, size.height / board.depth)
+        BoardDrawing.drawTable(
+            board,
+            zones: board.zones,
+            in: &context,
+            frame: .init(scale: scale),
+            highContrast: contrast == .increased
+        )
 
         // Scale bar: 6 inches, bottom centre (clear of both setup zones).
         let bar = 6 * scale
-        let y = layout.depth * scale - 8
+        let y = board.depth * scale - 8
         // Three or four zones: the bottom edge may hold one, so the bar moves to the corner (zones there are narrow).
-        let x = layout.zones.count > 2 ? 8 : (layout.width * scale - bar) / 2
+        let x = board.zones.count > 2 ? 8 : (board.width * scale - bar) / 2
         var scalePath = Path()
         scalePath.move(to: CGPoint(x: x, y: y))
         scalePath.addLine(to: CGPoint(x: x + bar, y: y))
         context.stroke(scalePath, with: .color(Color.primary.opacity(0.5)), lineWidth: 2)
-        Self.drawLabel(Text("6″").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: x + bar / 2, y: y - 8), in: &context)
-    }
-
-    /// Draws a label on a small pill so a mapsheet seam or terrain edge never runs through the letters
-    /// (the seam between two maps crossed "Hill" and "6″").
-    private static func drawLabel(_ text: Text, at point: CGPoint, in context: inout GraphicsContext) {
-        let resolved = context.resolve(text)
-        let size = resolved.measure(in: CGSize(width: 200, height: 50))
-        let pill = CGRect(
-            x: point.x - size.width / 2 - 4,
-            y: point.y - size.height / 2 - 1,
-            width: size.width + 8,
-            height: size.height + 2
-        )
-        context.fill(Path(roundedRect: pill, cornerRadius: pill.height / 2), with: .color(Color(.systemBackground).opacity(0.85)))
-        context.draw(resolved, at: point)
+        BoardDrawing.drawLabel(Text("6″").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: x + bar / 2, y: y - 8), in: &context)
     }
 }
 
 /// The diagram in words, for VoiceOver and the printed guide.
 enum MissionLayoutDescription {
     static func spoken(_ layout: MissionLayoutDTO) -> String {
+        spoken(BoardLayout(layout))
+    }
+
+    static func spoken(_ layout: BoardLayout) -> String {
         var parts = ["Table \(inches(layout.width)) by \(inches(layout.depth)) inches."]
         if !layout.sheets.isEmpty {
-            parts.append("Maps, left to right: \(layout.sheetNames.joined(separator: ", ")).")
+            parts.append("Maps, left to right: \(layout.sheets.map(\.name).joined(separator: ", ")).")
         }
         for zone in layout.zones {
             let vertical = zone.area.depth > zone.area.width
@@ -165,7 +97,7 @@ enum MissionLayoutDescription {
             parts.append("Side \(zone.side) sets up within \(depth) inches of the \(edge) edge.")
         }
         let counts = Dictionary(grouping: layout.features, by: \.kind).mapValues(\.count)
-        let terrain = MissionLayoutDTO.FeatureKind.allCases.compactMap { kind -> String? in
+        let terrain = BoardLayout.FeatureKind.allCases.compactMap { kind -> String? in
             guard let n = counts[kind], n > 0 else { return nil }
             switch kind {
             case .hill: return n == 1 ? "a hill in the middle" : "\(n) hills"
@@ -173,6 +105,10 @@ enum MissionLayoutDescription {
             case .wall: return n == 1 ? "a low wall" : "\(n) low walls"
             case .tree: return n == 1 ? "a single tree" : "\(n) single trees"
             case .building: return n == 1 ? "a building" : "\(n) buildings"
+            case .water: return n == 1 ? "a water feature" : "\(n) water features"
+            case .rough: return n == 1 ? "a patch of rough ground" : "\(n) patches of rough ground"
+            case .rubble: return n == 1 ? "a patch of rubble" : "\(n) patches of rubble"
+            case .objectiveToken: return n == 1 ? "an objective marker" : "\(n) objective markers"
             }
         }
         if !terrain.isEmpty {

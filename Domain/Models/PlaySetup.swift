@@ -169,14 +169,19 @@ public struct Battlefield: Codable, Sendable, Equatable {
     public var arrangement: MapArrangement
     /// One name per sheet, as printed ("Grassland #2").
     public var sheets: [String]
+    /// A terrain board built in Play (PM12, § 9.9). It is a copy: later edits elsewhere don't change a game
+    /// or a saved setup. When set, the table is the board's.
+    public var board: BoardLayout?
 
     public init(
         kind: Kind = .mat,
         matWidth: Double = 48,
         matDepth: Double = 36,
         arrangement: MapArrangement = .pair,
-        sheets: [String] = []
+        sheets: [String] = [],
+        board: BoardLayout? = nil
     ) {
+        self.board = board
         self.kind = kind
         self.matWidth = matWidth
         self.matDepth = matDepth
@@ -193,22 +198,28 @@ public struct Battlefield: Codable, Sendable, Equatable {
 
     /// Table width in inches, between the two home edges.
     public var width: Double {
+        if let board { return board.width }
         switch kind {
-        case .mat: matWidth
-        case .mapsheets: Double(arrangement.grid.columns) * MapArrangement.sheetWidth
+        case .mat: return matWidth
+        case .mapsheets: return Double(arrangement.grid.columns) * MapArrangement.sheetWidth
         }
     }
 
     /// Table depth in inches.
     public var depth: Double {
+        if let board { return board.depth }
         switch kind {
-        case .mat: matDepth
-        case .mapsheets: Double(arrangement.grid.rows) * MapArrangement.sheetDepth
+        case .mat: return matDepth
+        case .mapsheets: return Double(arrangement.grid.rows) * MapArrangement.sheetDepth
         }
     }
 
     /// "Grassland #2 + Desert #2" or "Mat 48″ × 36″".
     public var summary: String {
+        if let board {
+            let name = board.name.flatMap { $0.isEmpty ? nil : $0 } ?? "Your board"
+            return "\(name), \(Self.inches(board.width)) × \(Self.inches(board.depth))"
+        }
         switch kind {
         case .mat:
             return "Mat \(Self.inches(matWidth)) × \(Self.inches(matDepth))"

@@ -39,6 +39,7 @@ struct BattleFlowView: View {
     @State private var showBackConfirm = false
     @State private var showDoneShootingConfirm = false
     @State private var focusFollowUp: FocusFollowUp?
+    @State private var showBoard = false
 
     @State private var passSide: SideId?
     @State private var passToken = 0
@@ -122,6 +123,12 @@ struct BattleFlowView: View {
             }
             .sheet(isPresented: $showEventLog) {
                 EventLogSheet(store: store)
+            }
+            .sheet(isPresented: $showBoard) {
+                if let board = store.scenario.board {
+                    BoardSheet(board: board, sideCount: store.session?.sides.count ?? 2)
+                        .presentationDetents([.medium, .large])
+                }
             }
             .sheet(isPresented: $showBoxRules, onDismiss: {
                 // Combat Intuition: open the shot sheet for that 'Mech once this sheet has gone.
@@ -583,6 +590,15 @@ struct BattleFlowView: View {
                 }
                 .accessibilityLabel("Scenario rules")
                 .accessibilityIdentifier("cos.rules.open")
+            }
+            if store.scenario.board != nil {
+                Button {
+                    showBoard = true
+                } label: {
+                    Image(systemName: "map")
+                }
+                .accessibilityLabel("Board")
+                .accessibilityIdentifier("as.battle.board")
             }
             Button {
                 showEventLog = true
