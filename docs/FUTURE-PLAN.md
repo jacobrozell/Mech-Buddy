@@ -152,5 +152,5 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
 - [x] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M) Follow-up: a Saved forces entry on the Force tab; Master Unit List card checks.
 - [ ] **PM10** Release: accessibility pass, screen catalog, inventory, flags on, TestFlight table test. (M)
 - [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L) *Battlefield Support done; buildings and formations remain.*
-- [ ] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L)
+- [x] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L) Built 2026-11-27 (`Features/PlayMode/Board/`, `as.board.*`). [HOUSE] calls: a woods/hill/water footprint over 30 sq in counts as two choices; 4″ spacing hint for 3–4 sides. Left for PM13: presets, starter list, stretch-to-table, random board, zone-edge dragging, mapsheet move/rotate.
 - [ ] **PM13** Board presets: save, duplicate, delete, starter boards from the missions. (M)
