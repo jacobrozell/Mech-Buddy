@@ -104,12 +104,19 @@ struct CombatStep: View {
     private func unitGroup(side: SideId, units: [MatchUnitState]) -> some View {
         let left = units.filter(\.canAttackThisTurn).count
         return VStack(alignment: .leading, spacing: TMSpace.xs) {
-            Eyebrow(session.displayName(of: side)) {
-                Text(left == 0 ? "All fired" : "\(left) to fire")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+            HStack(spacing: TMSpace.xs) {
+                // Three or four sides: letter, shape and colour in the header, so sides tell apart without colour (§ 14).
+                if session.sides.count > 2 {
+                    SideBadge(side: side)
+                }
+                Eyebrow(session.displayName(of: side)) {
+                    Text(left == 0 ? "All fired" : "\(left) to fire")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
             }
+            .accessibilityElement(children: .combine)
             .accessibilityIdentifier("as.battle.shooters.\(side.rawValue)")
             ForEach(units) { unit in
                 BattleUnitRow(

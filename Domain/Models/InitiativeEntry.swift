@@ -37,6 +37,11 @@ public struct InitiativeEntry: Sendable, Equatable {
     public struct Pending: Sendable, Equatable {
         public var round: Int
         public var sides: [SideId]
+
+        public init(round: Int, sides: [SideId]) {
+            self.round = round
+            self.sides = sides
+        }
     }
 
     public func dice(round: Int, side: SideId) -> Dice {
