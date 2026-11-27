@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import MechBuddyData
 import MechBuddyDomain
 
@@ -17,6 +18,8 @@ struct PlayBoardsView: View {
     @State private var previewing: BoardListEntry?
     @State private var editing: UUID?
     @State private var message: String?
+    @State private var notice: String?
+    @State private var importing = false
 
     private static let terrainPalette: TerrainPaletteFile? = try? BundleContentCatalogRepository().terrainPalette()
     private var isPicking: Bool { onPick != nil }
@@ -25,6 +28,14 @@ struct PlayBoardsView: View {
         List {
             if let message {
                 Section { ErrorBanner(message: message) }
+            }
+            if let notice {
+                Section {
+                    Label(notice, systemImage: "info.circle")
+                        .font(TMFont.detail)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("as.play.board.import.notice")
+                }
             }
             Section {
                 if mine.isEmpty {
@@ -55,6 +66,19 @@ struct PlayBoardsView: View {
         .navigationTitle(isPicking ? "Choose a board" : "Boards")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: reload)
+        .toolbar {
+            if !isPicking {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { importing = true } label: {
+                        Label("Import a board", systemImage: "square.and.arrow.down.on.square")
+                    }
+                    .accessibilityIdentifier("as.play.board.import")
+                }
+            }
+        }
+        .fileImporter(isPresented: $importing, allowedContentTypes: [BoardFileType.type, .json], allowsMultipleSelection: false) { result in
+            importFile(result)
+        }
         .alert("Rename board", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
                 .accessibilityIdentifier("as.play.board.rename.name")
@@ -106,6 +130,10 @@ struct PlayBoardsView: View {
                     .accessibilityIdentifier("as.play.board.rename")
                     Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(board) }
                         .accessibilityIdentifier("as.play.board.duplicate")
+                    ShareLink(item: BoardFileTransfer(board: board), preview: SharePreview(board.name ?? "Board")) {
+                        Label("Share as a file", systemImage: "square.and.arrow.up")
+                    }
+                    .accessibilityIdentifier("as.play.board.share")
                     Button("Delete", systemImage: "trash", role: .destructive) { deleting = board }
                         .accessibilityIdentifier("as.play.board.delete")
                 } label: {
@@ -237,6 +265,29 @@ struct PlayBoardsView: View {
         run { try dependencies.userContent.saveBoard(copy, name: copy.name ?? "Board") }
     }
 
+    /// A `.mechboard` file becomes a new board. A bad file is refused with a message and nothing is saved (§ 9.7).
+    private func importFile(_ result: Result<[URL], Error>) {
+        guard case .success(let urls) = result, let url = urls.first else { return }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+            guard size <= BoardFile.maxBytes else { throw BoardFile.ImportError.tooLarge }
+            let data = try Data(contentsOf: url)
+            let imported = try BoardFile.importBoard(from: data, existingNames: mine.compactMap(\.name))
+            try dependencies.userContent.saveBoard(imported.board, name: imported.board.name ?? "Board")
+            message = nil
+            notice = "Added “\(imported.board.name ?? "board")”." + (imported.notice.map { " " + $0 } ?? "")
+        } catch let error as BoardFile.ImportError {
+            notice = nil
+            message = error.message
+        } catch {
+            notice = nil
+            message = "Couldn’t read that file."
+        }
+        reload()
+    }
+
     private func commitRename() {
         guard let board = renaming, let id = board.id else { return }
         renaming = nil
@@ -269,5 +320,25 @@ struct PlayBoardsView: View {
             dependencies.logger.error("boards: \(error)", category: "persistence")
         }
         reload()
+    }
+}
+
+/// The `.mechboard` type (declared in Info.plist; JSON underneath).
+enum BoardFileType {
+    static let type = UTType("com.jacobrozell.mechbuddy.board") ?? UTType(filenameExtension: BoardFile.fileExtension, conformingTo: .json) ?? .json
+}
+
+/// A board handed to the share sheet as a `.mechboard` file.
+struct BoardFileTransfer: Transferable {
+    var board: BoardLayout
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: BoardFileType.type) { item in
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("board-share-\(UUID().uuidString)", isDirectory: true)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let url = dir.appendingPathComponent(BoardFile.fileName(for: item.board))
+            try BoardFile.export(item.board).write(to: url)
+            return SentTransferredFile(url)
+        }
     }
 }
