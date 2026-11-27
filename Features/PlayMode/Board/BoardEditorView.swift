@@ -31,7 +31,7 @@ struct BoardEditorView: View {
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .tabBar)
             .toolbar { toolbar }
-            .sheet(isPresented: $showList) {
+            .sheet(isPresented: $showList, onDismiss: { model.selection = nil }) {
                 BoardPieceListView(model: model)
                     .presentationDetents([.medium, .large])
             }

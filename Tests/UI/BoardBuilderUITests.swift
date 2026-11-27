@@ -23,7 +23,7 @@ final class BoardBuilderUITests: XCTestCase {
         let woods = element(app, "as.board.palette.woods")
         XCTAssertTrue(woods.waitForExistence(timeout: 5))
         let drop = canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-        woods.press(forDuration: 0.6, thenDragTo: drop)
+        woods.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.6, thenDragTo: drop)
         XCTAssertTrue(element(app, "as.board.piece.0").waitForExistence(timeout: 5), "Woods was not placed")
         XCTAssertEqual(element(app, "as.board.counter").label, "1 of 16 choices placed")
         XCTAssertTrue(canvas.label.contains("1 woods"), canvas.label)
@@ -93,6 +93,8 @@ final class BoardBuilderUITests: XCTestCase {
     func testRidgeLineStarterBoardGoesIntoSetupAndTheGame() throws {
         let app = launch()
         goToBattlefield(app)
+        var scrolls = 0
+        while !app.buttons["as.play.setup.board.ridgeLine"].isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }
         tap(app.buttons["as.play.setup.board.ridgeLine"])
         let canvas = element(app, "as.board.canvas")
         XCTAssertTrue(canvas.waitForExistence(timeout: 5))
@@ -131,7 +133,7 @@ final class BoardBuilderUITests: XCTestCase {
         app.launch()
         // Release surface: no Play tab, so no Build a board anywhere.
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 20))
-        XCTAssertFalse(app.tabBars.firstMatch.buttons["Play"].exists)
+        XCTAssertFalse(app.tabBars.firstMatch.buttons["Learn"].exists)
         XCTAssertFalse(app.buttons["as.play.setup.board.build"].exists)
     }
 
