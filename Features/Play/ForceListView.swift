@@ -13,6 +13,7 @@ struct ForceListView: View {
     @State private var didLoad: Bool
     @State private var selection: ForceSelection?
     @State private var editingCollection = false
+    @State private var managingSaved = false
 
     init(previewUnits: [MatchUnitState]? = nil) {
         self.previewUnits = previewUnits
@@ -62,6 +63,9 @@ struct ForceListView: View {
                 isReadOnly: true
             )
         }
+        .sheet(isPresented: $managingSaved) {
+            PlaySavedForcesSheet()
+        }
         .sheet(isPresented: $editingCollection) {
             CollectionEditSheet(
                 boxes: dependencies.boxSets,
@@ -96,6 +100,10 @@ struct ForceListView: View {
                     boxes: dependencies.boxSets,
                     onEdit: { editingCollection = true }
                 )
+                // Saved forces live with Play mode (PM9), so the entry follows the same flag.
+                if dependencies.releaseSurface.isEnabled(.playMode) {
+                    PlaySavedForcesRow(identifier: "force.as.savedForces") { managingSaved = true }
+                }
             }
             .padding(TMSpace.lg)
             .frame(maxWidth: 720)

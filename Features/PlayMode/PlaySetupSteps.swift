@@ -679,7 +679,7 @@ struct PlayRulesStep: View {
                 Divider()
                 PlaySetupRow(title: "Turn limit", detail: setup.turnLimit == nil
                     ? "Play until one side is left (p. 13)."
-                    : (objectivesOn && setup.objectiveId?.isBuilt == true
+                    : (objectivesOn && (setup.objectiveId != nil || setup.perSideObjectives)
                         ? "[HOUSE] At the limit, most victory points wins; then most PV on the table."
                         : "At the limit, most PV still on the table wins.")) {
                     Picker("Turn limit", selection: $setup.turnLimit) {
@@ -794,7 +794,32 @@ struct PlayRulesStep: View {
                         : "Seven Lucky attack rerolls shared by the Formation (p. 32).")
                         .font(TMFont.detail).foregroundStyle(.secondary)
                 }
-                comingSoon("MechWarrior cards", id: "mechWarriorCards")
+                Toggle(isOn: Binding(
+                    get: { setup.rules.mechWarriorCards },
+                    set: { on in
+                        setup.rules.mechWarriorCards = on
+                        if !on {
+                            for side in setup.forces.keys { setup.forces[side] = setup.forces[side]?.map { var p = $0; p.pilotName = nil; return p } }
+                            PlayUnits.resetSkills(&setup)
+                        }
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                        Text("MechWarrior cards").font(TMFont.body)
+                        Text(setup.rules.mechWarriorCards
+                            ? "[HOUSE] One named pilot per side, set on the Forces step"
+                            : "Off")
+                            .font(TMFont.detail).foregroundStyle(.secondary)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                .tint(TMColor.signal)
+                .accessibilityIdentifier("as.play.setup.rules.mechWarriorCards")
+                if setup.rules.mechWarriorCards {
+                    Text("[HOUSE] A card gives one ’Mech a named pilot and replaces its skill. Give each side one card of equal cost; the opponent improves a skill by the same amount (p. 48, Alpha Strike box scenarios). The Forces step checks the cost.")
+                        .font(TMFont.detail).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             PlaySetupSection(title: "Dice") {
                 Picker("Dice", selection: $setup.diceMode) {
@@ -814,24 +839,61 @@ struct PlayRulesStep: View {
 
     @ViewBuilder
     private var objectivePicker: some View {
+        Toggle(isOn: Binding(
+            get: { setup.perSideObjectives },
+            set: { on in
+                rolledObjective = nil
+                if on { rollForEverySide() } else { setup.sideObjectives = [:] }
+            }
+        )) {
+            VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                Text("Each side rolls its own").font(TMFont.body)
+                Text("[HOUSE] Optional rule (p. 7): every side plays a different objective. Points are compared at the end.")
+                    .font(TMFont.detail).foregroundStyle(.secondary)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .tint(TMColor.signal)
+        .accessibilityIdentifier("as.play.setup.objective.perSide")
+        if setup.perSideObjectives {
+            perSidePicker
+        } else {
+            sharedPicker
+        }
+    }
+
+    /// One objective for every side (p. 7 default).
+    @ViewBuilder
+    private var sharedPicker: some View {
         objectiveTile(nil, title: "None: last side standing", detail: "Destroy every enemy ’Mech (p. 13). With Forced Withdrawal on, ’Mechs that leave count as destroyed.", id: "as.play.setup.objective")
         ForEach(ObjectiveId.built, id: \.self) { objective in
             objectiveTile(objective, title: objective.title, detail: objective.summary, id: "as.play.setup.objective.\(objective.rawValue)")
         }
-        HStack(spacing: TMSpace.md) {
-            Image(systemName: "lock")
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-            Text("Find the Target needs buildings: coming later.")
-                .font(TMFont.detail)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        if setup.hasBuildingsForTargets {
+            objectiveTile(.findTheTarget, title: ObjectiveId.findTheTarget.title, detail: ObjectiveId.findTheTarget.summary + " [HOUSE]", id: "as.play.setup.objective.findTheTarget")
+        } else {
+            HStack(spacing: TMSpace.md) {
+                Image(systemName: "lock")
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+                Text("Find the Target needs at least \(ObjectiveId.minimumBuildings) buildings. Turn on Buildings below and add some.")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("as.play.setup.objective.findTheTarget")
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("as.play.setup.objective.findTheTarget")
+        if setup.objectiveId == .findTheTarget, !setup.hasBuildingsForTargets {
+            Label("Find the Target needs \(ObjectiveId.minimumBuildings) buildings. Without them the game plays as last side standing.", systemImage: "exclamationmark.triangle")
+                .font(TMFont.detail)
+                .foregroundStyle(TMColor.warning)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("as.play.setup.objective.needsBuildings")
+        }
         Button {
             var generator = SystemRandomNumberGenerator()
-            let rolled = ObjectiveId.roll(using: &generator)
+            let rolled = ObjectiveId.roll(using: &generator, hasBuildings: setup.hasBuildingsForTargets)
             rolledObjective = rolled
             setup.objectiveId = rolled
         } label: {
@@ -839,23 +901,83 @@ struct PlayRulesStep: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.bordered)
-        .accessibilityHint("Rolls 1D6: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough. A 6 rolls again.")
+        .accessibilityHint("Rolls 1D6: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough, 6 Find the Target. A 6 rolls again unless there are buildings.")
         .accessibilityIdentifier("as.play.setup.objective.roll")
         Text(rolledObjective != nil && rolledObjective == setup.objectiveId
-            ? "Rolled: \(rolledObjective?.title ?? ""). [HOUSE] The Quick-Start says to pick one at random (p. 7) without a table, so 1D6 follows the book’s list order; a 6 is Find the Target, so it rolls again."
-            : "[HOUSE] Roll 1D6 in the book’s order: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough. A 6 rolls again.")
+            ? "Rolled: \(rolledObjective?.title ?? ""). [HOUSE] The Quick-Start says to pick one at random (p. 7) without a table, so 1D6 follows the book’s list order: a 6 is Find the Target, which needs \(ObjectiveId.minimumBuildings) buildings, otherwise it rolls again."
+            : "[HOUSE] Roll 1D6 in the book’s order: 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough, 6 Find the Target (needs \(ObjectiveId.minimumBuildings) buildings; otherwise a 6 rolls again).")
             .font(TMFont.detail)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("as.play.setup.objective.rolled")
-        if let objective = setup.objectiveId, objective.isBuilt {
+        if let objective = setup.objectiveId {
             Divider()
             objectiveNotes(objective)
         }
     }
 
+    /// Each side rolls its own objective (p. 7 optional rule), or picks one from the menu.
+    @ViewBuilder
+    private var perSidePicker: some View {
+        ForEach(setup.sides) { side in
+            HStack(spacing: TMSpace.md) {
+                SideBadge(side: side.id)
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text(sideLabel(side)).font(TMFont.cardTitle)
+                    Text(setup.objectiveId(for: side.id).map { "\($0.title) · to \(ObjectiveRules.format($0.baseThreshold))" } ?? "Not rolled")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("as.play.setup.objective.side.\(side.id.letter).value")
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: TMSpace.sm)
+                Menu {
+                    ForEach(ObjectiveId.allCases.filter { !$0.needsBuildings || setup.hasBuildingsForTargets }, id: \.self) { objective in
+                        Button(objective.title) { setup.setObjective(objective, for: side.id) }
+                    }
+                } label: {
+                    Text("Pick").frame(minHeight: 44)
+                }
+                .accessibilityLabel("Pick \(sideLabel(side))’s objective")
+                .accessibilityIdentifier("as.play.setup.objective.side.\(side.id.letter).pick")
+                Button {
+                    var generator = SystemRandomNumberGenerator()
+                    setup.setObjective(ObjectiveId.roll(using: &generator, hasBuildings: setup.hasBuildingsForTargets), for: side.id)
+                } label: {
+                    Image(systemName: "dice").frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("Roll \(sideLabel(side))’s objective")
+                .accessibilityIdentifier("as.play.setup.objective.side.\(side.id.letter).roll")
+            }
+        }
+        Button {
+            rollForEverySide()
+        } label: {
+            Label("Roll for every side", systemImage: "dice")
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityIdentifier("as.play.setup.objective.rollAll")
+        Text("[HOUSE] Each side plays its own objective and wins at its own total (p. 7 optional rule). Raid tokens go out for every side when any side rolls Raid, so a Raid side has tokens to take. At the turn limit, most points wins; then most PV.")
+            .font(TMFont.detail)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("as.play.setup.objective.perSide.notes")
+    }
+
+    private func sideLabel(_ side: MatchSide) -> String {
+        side.name.trimmingCharacters(in: .whitespaces).isEmpty ? side.id.displayName : side.name
+    }
+
+    private func rollForEverySide() {
+        var generator = SystemRandomNumberGenerator()
+        for side in setup.sides {
+            setup.setObjective(ObjectiveId.roll(using: &generator, hasBuildings: setup.hasBuildingsForTargets), for: side.id)
+        }
+    }
+
     private func objectiveTile(_ objective: ObjectiveId?, title: String, detail: String, id: String) -> some View {
-        let selected = setup.objectiveId == objective || (objective == nil && setup.objectiveId?.isBuilt != true)
+        let selected = setup.objectiveId == objective
         return ChoiceTile(
             title: title,
             detail: detail,

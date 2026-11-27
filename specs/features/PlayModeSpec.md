@@ -284,10 +284,10 @@ Buildings are allowed as terrain for line of sight and movement cost the players
 | Choice | Meaning |
 |---|---|
 | **None: last side standing** (default) | Pickup game. Win by destroying every enemy 'Mech (p. 13). With Forced Withdrawal on, 'Mechs that leave count as destroyed (p. 12) |
-| **Pick one** | Raid, Control the Field, Destroy the Enemy, Hold the Fort, Breakthrough. Find the Target shows "Needs buildings: coming later" until PM11 |
+| **Pick one** | Raid, Control the Field, Destroy the Enemy, Hold the Fort, Breakthrough. Find the Target is offered once the table has 3 or more buildings (§ 7.1), otherwise it shows why not |
 | **Roll for it** | The app rolls (or you roll 1D6 and enter it): 1 Raid, 2 Control the Field, 3 Destroy the Enemy, 4 Hold the Fort, 5 Breakthrough, 6 Find the Target. A 6 re-rolls until Find the Target is built **[HOUSE mapping]**; the QSR says "randomly determine" with no table (p. 7) |
 
-All sides use the same objective (p. 7 default). "Each side rolls its own" (p. 7 optional) is later (PM11). Scoring is in § 7.
+All sides use the same objective (p. 7 default). "Each side rolls its own" (p. 7 optional, PM11) is a switch (`as.play.setup.objective.perSide`): each side rolls or picks its own objective and wins at its own total **[HOUSE]**. Raid tokens go out for every side if any side plays Raid. Scoring is in § 7.
 
 **Turn limit** (`as.play.setup.turnLimit`): None (default, p. 7/13), 6, 8, 10 or 12 turns **[HOUSE option]**. At the limit the game ends in that End Phase; § 7.3 decides the winner. The hint: "Most 250 PV games take 6–8 turns."
 
@@ -299,7 +299,8 @@ All sides use the same objective (p. 7 default). "Each side rolls its own" (p. 7
 | Punch and kick | On | `physicalAttacksAllowed` |
 | Forced Withdrawal | On | `forcedWithdrawal` (p. 12) |
 | Start on the table | On (D13) | Off = 'Mechs enter from their home edge on Turn 1 (p. 11 default) |
-| Buildings, Battlefield Support, Formations | Off | Built (PM11). MechWarrior cards stay "Coming later" |
+| Buildings, Battlefield Support, Formations | Off | Built (PM11) |
+| MechWarrior cards | Off | Built (PM11) **[HOUSE]**: one named pilot per side, set on the Forces step; its skill replaces the 'Mech's (0 to the card skill); the review warns if the sides' cards cost different PV (p. 48) |
 
 **Dice** (`as.play.setup.dice`): Real dice (default, owner lock) or Let the app roll. Same `DiceMode` as missions; it can be changed in game.
 
@@ -396,7 +397,7 @@ The app can't see the table. Each objective adds a **Score** step to the End Pha
 | Destroy the Enemy | — | None: computed from damage (§ 6.6) | Size per enemy destroyed or crippled | 10 (12 for the Clan player) | p. 7 |
 | Hold the Fort | Place 2 tokens ≥ 12″ from your edge, 18″ apart | From Turn 3: "Which of your tokens have your 'Mech within 6″ and no enemy within 12″?" | 1 per token, max 2 a turn | 10 | p. 7 |
 | Breakthrough | — | "Which of your 'Mechs touch an enemy home edge?" They leave the game (not destroyed) | Size of each | 10 | p. 7 |
-| Find the Target | Needs buildings | PM11 | 5 per target | 10 | p. 7 |
+| Find the Target | **[HOUSE]** Needs 3+ buildings; the app hides 3 targets among them | "Which buildings did your 'Mechs search?" (end a move beside one). The first side to search a target finds it | 5 per target | 10 | p. 7 |
 
 **Clan and Inner Sphere** (Destroy the Enemy, Breakthrough): when a side of all-Clan 'Mechs plays a side of all-Inner-Sphere 'Mechs, each Clan 'Mech scores 1.5 × Size, and the Clan side needs 12 in Destroy the Enemy (p. 7). Mixed forces use no multiplier **[HOUSE]** (D12). Half points are kept ("7.5") and never rounded.
 

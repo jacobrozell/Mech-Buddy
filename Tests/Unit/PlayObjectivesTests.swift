@@ -87,7 +87,7 @@ struct PlayObjectivesFlagTests {
         for _ in 0..<50 { #expect(ObjectiveId.roll(using: &generator).isBuilt) }
     }
 
-    @Test("Find the Target is not scored: a game that names it plays last side standing")
+    @Test("Find the Target without buildings is not scored: the game plays last side standing (PM11 adds buildings)")
     func findTheTargetNotBuilt() throws {
         let session = try game(.findTheTarget)
         #expect(session.objective == nil)

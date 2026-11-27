@@ -96,6 +96,12 @@ struct UnitFocusSheet: View {
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
             }
+            if let pilot = unit.pilotName {
+                Label("MechWarrior \(pilot) · Skill \(unit.skill)", systemImage: "person.text.rectangle")
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("as.unitFocus.pilot")
+            }
             if let headerChip {
                 StatusChip(kind: headerChip)
             }

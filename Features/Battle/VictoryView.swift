@@ -177,7 +177,7 @@ struct VictoryView: View {
         let mechs = VictoryEvaluator.unitsLeft(side: side, in: session)
         var line = "\(pv) PV · \(mechs) ’Mech\(mechs == 1 ? "" : "s") left"
         // An objective game ranks by victory points first (§ 7.4).
-        if session.objective != nil {
+        if session.hasObjective {
             let points = session.points(of: side)
             line = "\(ObjectiveRules.format(points)) point\(points == 1 ? "" : "s") · " + line
         }

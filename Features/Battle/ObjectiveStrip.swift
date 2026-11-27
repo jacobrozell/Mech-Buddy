@@ -5,7 +5,8 @@ import MechBuddyDomain
 /// (PlayModeSpec § 7.1). Sides with no 'Mechs left stay in the row, marked out; the numbers are text, never colour alone.
 struct ObjectiveVPStrip: View {
     var session: MatchSession
-    var objective: ObjectiveId
+    /// The one objective every side plays; nil when each side rolled its own (PM11).
+    var objective: ObjectiveId?
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -16,17 +17,19 @@ struct ObjectiveVPStrip: View {
         VStack(alignment: .leading, spacing: 0) {
             // One wrapping row: the title, each side's points, the win total. Wraps at large text.
             FlowLayout(spacing: TMSpace.md) {
-                if session.sides.count <= 2 || dynamicTypeSize.isAccessibilitySize {
+                if let objective, session.sides.count <= 2 || dynamicTypeSize.isAccessibilitySize {
                     Text(objective.title)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
                 items
-                Text("to \(ObjectiveRules.format(objective.baseThreshold))")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                if let objective {
+                    Text("to \(ObjectiveRules.format(objective.baseThreshold))")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             .accessibilityHidden(true)
@@ -54,6 +57,13 @@ struct ObjectiveVPStrip: View {
                     .font(TMFont.stat)
                     .monospacedDigit()
                     .contentTransition(.numericText())
+                // Own objectives: each side's name and target, since the row can't say it once.
+                if objective == nil, let own = session.objective(for: side.id) {
+                    Text("\(own.shortTitle) to \(ObjectiveRules.format(ObjectiveRules.threshold(for: side.id, objective: own, in: session)))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
                 if side.isOut {
                     Text("out").font(.caption).foregroundStyle(.secondary)
                 }
@@ -63,14 +73,21 @@ struct ObjectiveVPStrip: View {
     }
 
     /// "Raid. Side A 6 points, Side B 4 points, 10 to win." A side with its own threshold says so.
-    static func spoken(session: MatchSession, objective: ObjectiveId) -> String {
+    static func spoken(session: MatchSession, objective: ObjectiveId?) -> String {
         let sides = session.sides.map { side -> String in
             let points = session.points(of: side.id)
             let name = session.displayName(of: side.id)
-            let needs = ObjectiveRules.threshold(for: side.id, objective: objective, in: session)
-            let own = needs != objective.baseThreshold ? ", needs \(ObjectiveRules.format(needs))" : ""
+            guard let sideObjective = objective ?? session.objective(for: side.id) else {
+                return "\(name) \(ObjectiveRules.format(points)) \(points == 1 ? "point" : "points")\(side.isOut ? ", out" : "")"
+            }
+            let needs = ObjectiveRules.threshold(for: side.id, objective: sideObjective, in: session)
+            // Shared objective: only a differing threshold is worth saying. Own objective: name it and its target.
+            let own = objective == nil
+                ? ", \(sideObjective.title), \(ObjectiveRules.format(needs)) to win"
+                : (needs != sideObjective.baseThreshold ? ", needs \(ObjectiveRules.format(needs))" : "")
             return "\(name) \(ObjectiveRules.format(points)) \(points == 1 ? "point" : "points")\(own)\(side.isOut ? ", out" : "")"
         }
+        guard let objective else { return "Objectives. " + sides.joined(separator: ", ") }
         return "\(objective.title). " + sides.joined(separator: ", ") + ", \(ObjectiveRules.format(objective.baseThreshold)) to win"
     }
 }

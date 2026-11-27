@@ -95,8 +95,8 @@ struct CleanUpStep: View {
                     }
                 }
             }
-            if let objective = session.objective {
-                ObjectiveScoreCard(session: session, objective: objective, answers: objectiveAnswers)
+            if session.hasObjective {
+                ObjectiveScoreCard(session: session, objective: session.objective, answers: objectiveAnswers)
             }
             // From turn 5 so players can plan the structure tiebreak, not only on the last turn.
             if coach.isLastTurn || session.ruleset.maxTurns.map({ session.turn >= $0 - 1 }) == true {
