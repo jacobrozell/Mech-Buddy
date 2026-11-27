@@ -312,9 +312,9 @@ public struct PlaySetup: Codable, Sendable, Equatable {
     public var minimumSkill: Int
     public var pool: UnitPool
     public var battlefield: Battlefield
-    /// Nil = last side standing (PM4). Objectives come in PM8.
+    /// An `ObjectiveId` raw value (PM8); nil = last side standing. Read and set it through `objectiveId`.
     public var objective: String?
-    /// Nil = no limit (PM4). Turn limits come in PM8.
+    /// Nil = no limit.
     public var turnLimit: Int?
     public var rules: PlayRules
     public var diceMode: DiceMode

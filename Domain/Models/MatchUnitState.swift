@@ -177,6 +177,16 @@ public struct MatchUnitState: Identifiable, Codable, Sendable, Equatable {
     public var inWater: Bool = false
     /// Which player on a team side moves this 'Mech (PlayModeSpec § 5.3, § 15). Only names pass-the-phone lines. Nil = anyone on the side.
     public var controller: String?
+    /// Clan tech base (PlayModeSpec § 7.1, D12). Set for Play games from the card; false for missions and old saves.
+    public var isClan: Bool = false
+    /// The side whose attack last dealt damage to this 'Mech (§ 6.6, § 12). Nil until it is damaged.
+    public var lastDamagedBy: SideId?
+    /// The side whose attack caused the critical roll this 'Mech still owes (§ 6.6). Cleared when none are owed.
+    public var critCausedBy: SideId?
+    /// The side whose attack (or critical) first crippled or destroyed this 'Mech (§ 6.6 [HOUSE] D11). Set once.
+    public var downedBy: SideId?
+    /// The side that banked this 'Mech's points (Destroy the Enemy, Breakthrough). Set once, so it scores once.
+    public var scoredFor: SideId?
 
     public var pendingCritical: Bool {
         get { criticalsOwed > 0 }
@@ -506,6 +516,7 @@ extension MatchUnitState {
         case pendingCritical, criticalsOwed, overheatThisTurn, mini, incomingHeatThisTurn
         case rearShot, rearFireReduction
         case leftTable, withdrawalAnnounced, minimalDamage, inWater
+        case controller, isClan, lastDamagedBy, critCausedBy, downedBy, scoredFor
     }
 
     public init(from decoder: Decoder) throws {
@@ -551,6 +562,12 @@ extension MatchUnitState {
         withdrawalAnnounced = try container.decodeIfPresent(Bool.self, forKey: .withdrawalAnnounced) ?? false
         minimalDamage = try container.decodeIfPresent(MinimalDamageBands.self, forKey: .minimalDamage) ?? .none
         inWater = try container.decodeIfPresent(Bool.self, forKey: .inWater) ?? false
+        controller = try container.decodeIfPresent(String.self, forKey: .controller)
+        isClan = try container.decodeIfPresent(Bool.self, forKey: .isClan) ?? false
+        lastDamagedBy = try container.decodeIfPresent(SideId.self, forKey: .lastDamagedBy)
+        critCausedBy = try container.decodeIfPresent(SideId.self, forKey: .critCausedBy)
+        downedBy = try container.decodeIfPresent(SideId.self, forKey: .downedBy)
+        scoredFor = try container.decodeIfPresent(SideId.self, forKey: .scoredFor)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -592,5 +609,11 @@ extension MatchUnitState {
         try container.encode(withdrawalAnnounced, forKey: .withdrawalAnnounced)
         if !minimalDamage.isEmpty { try container.encode(minimalDamage, forKey: .minimalDamage) }
         if inWater { try container.encode(inWater, forKey: .inWater) }
+        try container.encodeIfPresent(controller, forKey: .controller)
+        if isClan { try container.encode(isClan, forKey: .isClan) }
+        try container.encodeIfPresent(lastDamagedBy, forKey: .lastDamagedBy)
+        try container.encodeIfPresent(critCausedBy, forKey: .critCausedBy)
+        try container.encodeIfPresent(downedBy, forKey: .downedBy)
+        try container.encodeIfPresent(scoredFor, forKey: .scoredFor)
     }
 }

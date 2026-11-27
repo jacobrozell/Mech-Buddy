@@ -14,6 +14,7 @@ public enum PlayUnits {
                 guard let face = library.face(id: pick.cardId), let dto = face.scenarioUnit(skill: pick.skill) else { continue }
                 var unit = GuidedScenarioFactory.mapUnit(dto, side: side)
                 unit.controller = setup.controllerName(of: pick, side: side)
+                unit.isClan = pick.isClan
                 units.append(unit)
             }
         }

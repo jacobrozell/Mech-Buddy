@@ -225,6 +225,10 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
     public var recoverySnapshots: [MatchSession]
     /// Battlefield Support, Formations and buildings (Clash of Steel). Nil for other missions; old saves decode as nil.
     public var boxRules: BoxRulesState?
+    /// Victory points by side while a Play objective is on (PlayModeSpec § 7.1). Empty otherwise; old saves decode empty.
+    public var victoryPoints: [SideId: Double]
+    /// Objective tokens and this turn's Score step. Nil without an objective.
+    public var objectiveState: ObjectiveState?
 
     public init(
         id: UUID = UUID(),
@@ -250,7 +254,9 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         deploymentAcknowledged: Bool = false,
         updatedAt: Date = Date(),
         recoverySnapshots: [MatchSession] = [],
-        boxRules: BoxRulesState? = nil
+        boxRules: BoxRulesState? = nil,
+        victoryPoints: [SideId: Double] = [:],
+        objectiveState: ObjectiveState? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -277,13 +283,15 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         self.updatedAt = updatedAt
         self.recoverySnapshots = recoverySnapshots
         self.boxRules = boxRules
+        self.victoryPoints = victoryPoints
+        self.objectiveState = objectiveState
     }
 
     private enum CodingKeys: String, CodingKey {
         case id, schemaVersion, modeId, scenarioId, ruleset, turn, phase, activeSide, sides, play
         case initiativeWinner, initiativeRolls, initiativeOrder, units, eventLog, status, outcome
         case tableReady, forcesLoaded, updatedAt, recoverySnapshots, diceMode, deploymentAcknowledged
-        case boxRules
+        case boxRules, victoryPoints, objectiveState
     }
 
     public init(from decoder: Decoder) throws {
@@ -317,6 +325,8 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         recoverySnapshots = try container.decodeIfPresent([MatchSession].self, forKey: .recoverySnapshots) ?? []
         boxRules = try container.decodeIfPresent(BoxRulesState.self, forKey: .boxRules)
+        victoryPoints = try container.decodeIfPresent([SideId: Double].self, forKey: .victoryPoints) ?? [:]
+        objectiveState = try container.decodeIfPresent(ObjectiveState.self, forKey: .objectiveState)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -345,6 +355,8 @@ public struct MatchSession: Identifiable, Codable, Sendable, Equatable {
         try container.encode(updatedAt, forKey: .updatedAt)
         try container.encode(recoverySnapshots, forKey: .recoverySnapshots)
         try container.encodeIfPresent(boxRules, forKey: .boxRules)
+        if !victoryPoints.isEmpty { try container.encode(victoryPoints, forKey: .victoryPoints) }
+        try container.encodeIfPresent(objectiveState, forKey: .objectiveState)
     }
 }
 
@@ -401,15 +413,16 @@ extension MatchSession {
         (side(id)?.players ?? []).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
     }
 
-    /// The side that made a critical roll or hit this 'Mech, when the table settles it: with exactly one
-    /// other side in the game that is it. With three or four sides the attacker isn't recorded until PM8, so
-    /// this is nil and the screen says "the side that hit it" (§ 6.6).
+    /// The side that made a critical roll or hit this 'Mech (§ 6.6). The attacker is recorded on every damage event:
+    /// the side whose hit caused the critical, else the side that last damaged it. With exactly one other side in the
+    /// game that is it, whatever was recorded (saves from before PM8 recorded nothing).
     public func sideThatHit(_ unit: MatchUnitState) -> SideId? {
         let others = opponents(of: unit.side)
+        if let recorded = unit.critCausedBy ?? unit.lastDamagedBy, recorded != unit.side { return recorded }
         return others.count == 1 ? others[0] : nil
     }
 
-    /// Words for who rolls a critical (p. 23): "Side B", or "The side that hit it" with several enemies.
+    /// Words for who rolls a critical (p. 23): "Side B", or "The side that hit it" when nobody was recorded.
     public func criticalRollerName(for unit: MatchUnitState) -> String {
         sideThatHit(unit).map { displayName(of: $0) } ?? "The side that hit it"
     }

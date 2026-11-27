@@ -109,6 +109,21 @@ public enum AlphaStrikePhaseEngine {
         return wentOut
     }
 
+    /// Raid: a token whose carrier is destroyed, off the table or gone drops where it stood (§ 7.1). It can be
+    /// picked up again.
+    public static func dropOrphanedTokens(_ session: inout MatchSession) {
+        guard var state = session.objectiveState else { return }
+        let active = Set(session.units.filter { $0.combatStatus == .active }.map(\.id))
+        var dropped = false
+        for index in state.tokens.indices {
+            if let carrier = state.tokens[index].carrier, !active.contains(carrier) {
+                state.tokens[index].carrier = nil
+                dropped = true
+            }
+        }
+        if dropped { session.objectiveState = state }
+    }
+
     public static func movementComplete(units: [MatchUnitState]) -> Bool {
         units
             .filter { $0.combatStatus == .active }
