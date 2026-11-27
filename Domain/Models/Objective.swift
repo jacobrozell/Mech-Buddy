@@ -236,6 +236,26 @@ public enum ObjectiveRules {
         session.objectiveState?.scoredTurn == session.turn && session.objectiveState?.scoredSides.contains(side) == true
     }
 
+    /// Points the answers would add, for the Score step's preview. The reducer does the real scoring.
+    public static func previewPoints(_ objective: ObjectiveId, side: SideId, entries: [ObjectiveScoreEntry], in session: MatchSession) -> Double {
+        func size(_ id: UUID?) -> Double {
+            Double(session.units.first { $0.id == id }?.sz ?? 0)
+        }
+        switch objective {
+        case .raid:
+            return 2 * Double(entries.filter { $0.kind == .returned }.count)
+        case .controlTheField:
+            return Set(entries.filter { $0.kind == .inPosition }.compactMap(\.unitId)).reduce(0) { $0 + size($1) }
+        case .holdTheFort:
+            return Double(min(Set(entries.filter { $0.kind == .guarded }.compactMap(\.tokenId)).count, 2))
+        case .breakthrough:
+            let sum = Set(entries.filter { $0.kind == .exited }.compactMap(\.unitId)).reduce(0) { $0 + size($1) }
+            return sum * clanMultiplier(for: side, objective: .breakthrough, in: session)
+        case .destroyTheEnemy, .findTheTarget:
+            return 0
+        }
+    }
+
     /// "7.5", "10": half points are kept, whole points drop the ".0" (never rounded).
     public static func format(_ points: Double) -> String {
         points == points.rounded() ? String(Int(points)) : String(format: "%.1f", points)

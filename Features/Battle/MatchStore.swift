@@ -139,7 +139,7 @@ final class MatchStore: Identifiable {
             title: setup.formatName,
             subtitle: "\(setup.budget.summary) · \(setup.battlefield.summary)",
             tableSteps: PlayLayout.tableSteps(for: setup),
-            winningSummary: "Destroy every enemy ’Mech",
+            winningSummary: PlayLayout.winningSummary(for: setup),
             layout: PlayLayout.layout(for: setup.battlefield, sides: setup.sides)
         )
         scenarioLoaded = true
@@ -358,6 +358,26 @@ final class MatchStore: Identifiable {
 
     func resolveEnd() {
         mutate(.resolveEndPhase, failureTitle: "Couldn’t finish the turn")
+    }
+
+    /// The End Phase Score step and the end of the turn in one undoable change (PlayModeSpec § 8.5). `answers` holds
+    /// each side's entries; a side with none scores nothing.
+    func scoreObjectiveAndFinish(_ answers: [SideId: [ObjectiveScoreEntry]]) {
+        guard let session else { return }
+        do {
+            var next = session
+            for side in ObjectiveRules.sidesStillToScore(in: session) {
+                next = try MatchReducer.reduce(next, .scoreObjective(side: side, entries: answers[side] ?? []))
+            }
+            next = try MatchReducer.reduce(next, .resolveEndPhase)
+            pushUndo(session)
+            self.session = next
+            lastError = nil
+            persist()
+        } catch {
+            lastErrorTitle = "Couldn’t score the turn"
+            lastError = error.localizedDescription
+        }
     }
 
     @discardableResult

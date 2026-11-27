@@ -364,6 +364,10 @@
         {
           "heading": "Winning [HOUSE]",
           "body": "The last side with a ’Mech on the table wins. At a turn limit, the most Point Value still in the fight wins; sides level at the top share the result. Default budgets are 250 PV for two sides, 200 for three and 150 for four, so four sides still fit a collection of two boxes."
+        },
+        {
+          "heading": "Objectives [HOUSE]",
+          "body": "The Quick-Start (p. 7) gives each objective for two sides. With three or four, the app uses the same points and win totals, and: a ’Mech scores in Destroy the Enemy for the side whose attack crippled or destroyed it (a critical hit that does it counts for the side whose hit caused the roll), each ’Mech scores once, and a conceded side’s ’Mechs score for nobody. Several sides reaching the win total in the same End Phase: the higher score wins; equal scores tie. At a turn limit the most victory points wins, then the most Point Value still in the fight. A Clan side only gets the 1.5 × Size bonus when every other side is Inner Sphere; mixed forces get none."
         }
       ]
     }

@@ -195,6 +195,14 @@ public enum PlayLayout {
         }
     }
 
+    /// "How you win" on the briefing (§ 7.1). Last side standing without an objective.
+    public static func winningSummary(for setup: PlaySetup) -> String {
+        guard let objective = setup.objectiveId, objective.isBuilt else { return "Destroy every enemy ’Mech" }
+        var line = "\(objective.title): \(objective.summary) First to \(ObjectiveRules.format(objective.baseThreshold)) points wins (\(objective.page))."
+        if let limit = setup.turnLimit { line += " At turn \(limit), most points wins, then most PV [HOUSE]." }
+        return line
+    }
+
     /// Table setup checklist for a Play game (§ 8.1, p. 8, p. 11). Three or four sides use house rules (§ 5.4, D29).
     public static func tableSteps(for setup: PlaySetup) -> [String] {
         let house = setup.usesHouseRules
@@ -207,6 +215,9 @@ public enum PlayLayout {
             steps.append("[HOUSE] Home edges, highest setup roll first: one edge each, a zone in the middle 3/8 of the edge, 6″ deep")
         } else {
             steps.append("Each side picks 8 pieces of terrain and places them in turn: 4 toward the enemy, 2 toward its own edge, 2 near the centre line")
+        }
+        if let objective = setup.objectiveId, objective.isBuilt, let placing = objective.setupStep {
+            steps.append("Objective (\(objective.page)): " + placing)
         }
         if setup.rules.startOnTable {
             steps.append(house
