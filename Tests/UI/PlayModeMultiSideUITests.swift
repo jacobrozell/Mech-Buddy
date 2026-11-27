@@ -79,6 +79,7 @@ final class PlayModeMultiSideUITests: XCTestCase {
         let deadline = Date().addingTimeInterval(90)
         let shooters = element(app, "as.battle.shooters.lanceA")
         while Date() < deadline, !shooters.exists {
+            if shooters.exists { break }
             for title in ["Start shooting anyway"] where app.buttons[title].exists && app.buttons[title].isHittable {
                 taps.append(title)
                 app.buttons[title].tap()
@@ -90,7 +91,7 @@ final class PlayModeMultiSideUITests: XCTestCase {
                 taps.append("tableReady"); tableReady.tap()
             } else if skip.exists, skip.isHittable {
                 taps.append("skip"); skip.tap()
-            } else if primary.exists, primary.isHittable {
+            } else if primary.exists, primary.isHittable, primary.label != "Solve a shot" {
                 taps.append(primary.label); primary.tap()
             } else {
                 Thread.sleep(forTimeInterval: 0.5)
@@ -112,7 +113,9 @@ final class PlayModeMultiSideUITests: XCTestCase {
         for side in ["lanceA", "lanceB", "lanceC", "lanceD"] {
             let header = element(app, "as.battle.shooters.\(side)")
             XCTAssertTrue(header.exists, "Header for \(side) missing. Taps: \(taps.joined(separator: " > "))")
-            XCTAssertTrue(window.contains(header.frame), "Header for \(side) is off screen: \(header.frame) in \(window)")
+            // Above the dock (the Solve a shot button), not just inside the window.
+            let dock = app.buttons["as.battle.primary"].frame.minY
+            XCTAssertTrue(window.contains(header.frame) && header.frame.maxY <= dock, "Header for \(side) is hidden: \(header.frame), dock at \(dock)")
         }
     }
 

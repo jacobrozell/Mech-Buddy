@@ -14,6 +14,8 @@ struct CombatStep: View {
         ShotFeed.rows(in: session)
     }
 
+    @Environment(\.coachDisplay) private var coachDisplay
+
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
             CoachPrompt(
@@ -23,6 +25,8 @@ struct CombatStep: View {
                     : "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",
                 accessibilityIdentifier: "as.battle.table"
             )
+            // Three or four sides: the prompt folds to its title so every side fits the screen.
+            .environment(\.coachDisplay, session.sides.count > 2 ? .brief : coachDisplay)
             // The ’Mechs first, so a 4 vs 4 fits above the fold; each row's chip already shows its
             // own hit or miss, and the feed with the rolls follows below.
             if showsUnits {
@@ -125,7 +129,8 @@ struct CombatStep: View {
                     offersShoot: unit.canAttackThisTurn,
                     landingUnitID: landingUnitID,
                     onOpenUnit: { onOpenUnit(unit) },
-                    onShoot: { onShoot(unit) }
+                    onShoot: { onShoot(unit) },
+                    isDense: session.sides.count > 2
                 )
             }
         }

@@ -96,6 +96,9 @@ struct UnitRowCard: View {
     var isActiveSide: Bool
     var accessibilityIdentifier: String
     var showsIdleStatus: Bool = true
+    /// One line per 'Mech (short name, pips, Shoot) for three or four sides, so a whole table fits one portrait
+    /// screen (PlayModeSpec § 8.6). Accessibility sizes ignore it.
+    var isDense: Bool = false
     var shootingOver: Bool = false
     var hint: String = "Opens this ’Mech"
     /// Shows the trailing Shoot button when set.
@@ -124,6 +127,8 @@ struct UnitRowCard: View {
             VStack(alignment: .leading, spacing: TMSpace.xs) {
                 if isLarge {
                     largeLayout
+                } else if isDense {
+                    denseLayout
                 } else {
                     HStack(alignment: .center, spacing: TMSpace.sm) {
                         openButton {
@@ -152,6 +157,28 @@ struct UnitRowCard: View {
         }
         .accessibilityElement(children: .contain)
         .id(unit.id)
+    }
+
+    private var denseLayout: some View {
+        HStack(alignment: .center, spacing: TMSpace.sm) {
+            openButton {
+                HStack(alignment: .center, spacing: TMSpace.sm) {
+                    if let mini = unit.mini { MiniDot(marker: mini) }
+                    nameText(StatusChip.Kind.short(unit.name))
+                    Spacer(minLength: TMSpace.xs)
+                    // The move chip is dropped here so the name keeps its room; the sheet shows how it moved.
+                    if onShoot == nil, let chip {
+                        StatusChip(kind: chip).lineLimit(1).fixedSize()
+                    }
+                    armorTrack
+                    structureTrack
+                }
+                .frame(minHeight: 30)
+            }
+            if let onShoot {
+                shootButton(onShoot)
+            }
+        }
     }
 
     /// Accessibility sizes: name on its own line, then the chip, pips, and a full-width Shoot.
