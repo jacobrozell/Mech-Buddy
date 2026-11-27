@@ -148,7 +148,7 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
 - [x] **PM7** Three and four sides (free-for-all) behind `playModeMultiSide`. (L) Built 2026-11-26: Side C cobalt ▲ / D orchid ■ tokens (contrast checked), presets 1 v 1 v 1, 1 v 1 v 2, 1 v 1 v 1 v 1 (`as.play.setup.preset.*`), [HOUSE] note, info sheet (`as.play.setup.houseRules`) and Rules topic `play-house-rules`, N-side initiative with tie re-rolls and "choose the order", home edges and 3/8 zones with an edge menu in placement, concede (`as.battle.concede`), out-side labels and tied results. **Still owed: the owner's table test of a 1 v 1 v 1 v 1** (150 PV, 4′ × 4′); attacker attribution for critical rolls and Destroy the Enemy scoring wait for PM8.
   - [ ] **Owner:** table test of 1 v 1 v 1 v 1.
 - [ ] **PM8** Objectives (five of six), victory points and turn limit, behind `playObjectives`. (L)
-- [ ] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M)
+- [x] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M) Follow-up: a Saved forces entry on the Force tab; Master Unit List card checks.
 - [ ] **PM10** Release: accessibility pass, screen catalog, inventory, flags on, TestFlight table test. (M)
 - [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L) *Battlefield Support done; buildings and formations remain.*
 - [ ] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L)
