@@ -9,7 +9,12 @@ import MechBuddyDomain
 struct PlaySidesStep: View {
     @Binding var setup: PlaySetup
     @Environment(AppDependencies.self) private var dependencies
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showHouseRules = false
+
+    /// Landscape phone: presets go two-up so more than one and a half show above Continue.
+    private var twoColumnPresets: Bool { verticalSizeClass == .compact && !dynamicTypeSize.isAccessibilitySize }
 
     private var multiSide: Bool { dependencies.releaseSurface.isEnabled(.playModeMultiSide) }
 
@@ -19,8 +24,13 @@ struct PlaySidesStep: View {
                 Text("Who is playing?")
                     .font(TMFont.stepTitle)
                     .accessibilityAddTraits(.isHeader)
-                ForEach(TeamFormat.available(multiSide: multiSide)) { format in
-                    presetTile(format)
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(), spacing: TMSpace.sm, alignment: .top), count: twoColumnPresets ? 2 : 1),
+                    spacing: TMSpace.sm
+                ) {
+                    ForEach(TeamFormat.available(multiSide: multiSide)) { format in
+                        presetTile(format)
+                    }
                 }
                 if !multiSide {
                     Text("Three or four sides are coming in a later update.")

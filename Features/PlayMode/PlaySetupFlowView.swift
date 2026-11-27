@@ -47,6 +47,7 @@ struct PlaySetupFlowView: View {
     @Environment(PlayMatchCoordinator.self) private var matches
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var setup: PlaySetup
     @State private var step: PlaySetupStep
@@ -68,9 +69,10 @@ struct PlaySetupFlowView: View {
             ScrollView {
                 content
                     .padding(TMSpace.lg)
-                    .frame(maxWidth: horizontalSizeClass == .regular ? 760 : 640)
+                    .frame(maxWidth: horizontalSizeClass == .regular ? 760 : (verticalSizeClass == .compact ? 820 : 640))
                     .frame(maxWidth: .infinity)
             }
+            .contentMargins(.bottom, TMSpace.lg, for: .scrollContent)
             .id(step)
             .scrollDismissesKeyboard(.interactively)
         }
@@ -180,7 +182,7 @@ struct PlaySetupFlowView: View {
         }
         .padding(.horizontal, TMSpace.lg)
         .padding(.vertical, TMSpace.sm)
-        .frame(maxWidth: 640)
+        .frame(maxWidth: verticalSizeClass == .compact ? 820 : 640)
         .frame(maxWidth: .infinity)
         .background(.bar)
     }
