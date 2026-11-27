@@ -22,6 +22,10 @@ struct MovementStep: View {
         AlphaStrikePhaseEngine.unitsNeedingMove(side: session.activeSide, units: session.units)
     }
 
+    /// Three or four sides: one tight line per 'Mech in the move order and the table list, so a whole table fits one
+    /// portrait screen (PlayModeSpec § 8.6, as the roster does). Accessibility sizes keep the roomy rows.
+    private var isDense: Bool { session.sides.count > 2 && !dynamicTypeSize.isAccessibilitySize }
+
     private var current: MatchUnitState? {
         candidates.first { $0.id == chosenUnitId } ?? candidates.first
     }
@@ -217,7 +221,7 @@ struct MovementStep: View {
     }
 
     private var orderSection: some View {
-        VStack(alignment: .leading, spacing: TMSpace.md) {
+        VStack(alignment: .leading, spacing: isDense ? TMSpace.xs : TMSpace.md) {
             Eyebrow("Move order this turn")
             ForEach(moveOrder) { entry in
                 orderRow(entry)
@@ -228,12 +232,25 @@ struct MovementStep: View {
     private func orderRow(_ entry: MoveOrderEntry) -> some View {
         HStack(spacing: TMSpace.sm) {
             SideBadge(side: entry.unit.side)
-            VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                Text(entry.unit.name)
-                    .font(TMFont.cardTitle)
-                Text(entry.marker.label(recordedMoveName(entry.unit.movementMode)))
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
+            if isDense {
+                // One line: short name, then the marker or recorded move.
+                HStack(alignment: .firstTextBaseline, spacing: TMSpace.sm) {
+                    Text(StatusChip.Kind.short(entry.unit.name))
+                        .font(TMFont.cardTitle)
+                        .lineLimit(1)
+                    Text(entry.marker.label(recordedMoveName(entry.unit.movementMode)))
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    Text(entry.unit.name)
+                        .font(TMFont.cardTitle)
+                    Text(entry.marker.label(recordedMoveName(entry.unit.movementMode)))
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                }
             }
             Spacer(minLength: TMSpace.sm)
             if entry.marker == .done {
@@ -290,6 +307,7 @@ struct MovementStep: View {
                         unit: unit,
                         isActiveSide: unit.side == session.activeSide && unit.id == current?.id,
                         accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
+                        isDense: session.sides.count > 2,
                         action: { onOpenUnit(unit) }
                     )
                 }

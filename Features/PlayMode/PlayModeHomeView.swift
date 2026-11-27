@@ -265,32 +265,7 @@ struct PlayModeHomeView: View {
     // MARK: Saved forces (PM9)
 
     private var savedForcesRow: some View {
-        let count = dependencies.userContent.savedForces().count
-        let cards = dependencies.cardLibrary.userFaces.count
-        return Button {
-            managingSaved = true
-        } label: {
-            HStack(spacing: TMSpace.md) {
-                Image(systemName: "tray.full")
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                    Text("Saved forces").font(TMFont.cardTitle)
-                    Text("\(count) saved · \(cards) hand-entered \(cards == 1 ? "card" : "cards")")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: TMSpace.sm)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .frame(minHeight: 44)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("as.play.savedForces")
+        PlaySavedForcesRow(identifier: "as.play.savedForces") { managingSaved = true }
     }
 
     // MARK: Collection
