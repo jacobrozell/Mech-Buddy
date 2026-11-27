@@ -17,6 +17,8 @@ struct PlaySavedForcesSheet: View {
     @State private var editingCard: CardFaceDTO?
     @State private var enteringCard = false
     @State private var failure: String?
+    @State private var deletingForce: SavedForce?
+    @State private var deletingCard: CardFaceDTO?
 
     private var isLoading: Bool { onLoad != nil }
 
@@ -47,7 +49,7 @@ struct PlaySavedForcesSheet: View {
                             Button { editingCard = face } label: { cardRow(face) }
                                 .buttonStyle(.plain)
                                 .swipeActions {
-                                    Button("Delete", role: .destructive) { deleteCard(face) }
+                                    Button("Delete", role: .destructive) { deletingCard = face }
                                 }
                                 .accessibilityIdentifier("as.card.entry.row.\(face.id)")
                         }
@@ -80,6 +82,34 @@ struct PlaySavedForcesSheet: View {
                 Button("Save") { commitRename() }
                 Button("Cancel", role: .cancel) {}
             }
+            .confirmationDialog(
+                "Delete “\(deletingForce?.name ?? "")”?",
+                isPresented: Binding(get: { deletingForce != nil }, set: { if !$0 { deletingForce = nil } }),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let force = deletingForce { delete(force) }
+                    deletingForce = nil
+                }
+                .accessibilityIdentifier("as.play.forces.saved.delete.confirm")
+                Button("Keep", role: .cancel) {}
+            } message: {
+                Text("This can’t be undone. Games already set up keep their own copy.")
+            }
+            .confirmationDialog(
+                "Delete “\(deletingCard?.name ?? "")”?",
+                isPresented: Binding(get: { deletingCard != nil }, set: { if !$0 { deletingCard = nil } }),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let face = deletingCard { deleteCard(face) }
+                    deletingCard = nil
+                }
+                .accessibilityIdentifier("as.card.entry.delete.confirm")
+                Button("Keep", role: .cancel) {}
+            } message: {
+                Text("This can’t be undone. Games already started keep their own copy.")
+            }
             .sheet(item: $editingCard) { face in
                 PlayCardEntrySheet(draft: UserCardDraft(face: face), editingId: face.id, onSave: saveCard)
             }
@@ -92,28 +122,12 @@ struct PlaySavedForcesSheet: View {
 
     @ViewBuilder
     private func forceRow(_ force: SavedForce) -> some View {
-        let content = HStack(spacing: TMSpace.md) {
-            VStack(alignment: .leading, spacing: TMSpace.xxs) {
-                Text(force.name).font(TMFont.cardTitle)
-                Text("\(PlayModeText.mechs(force.picks.count)) · \(force.totalPV) PV")
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                Text(force.picks.map(\.name).joined(separator: ", "))
-                    .font(TMFont.detail)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: TMSpace.sm)
-            if isLoading {
-                Image(systemName: "square.and.arrow.down")
-                    .foregroundStyle(TMColor.signal)
-                    .accessibilityHidden(true)
-            }
-        }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
+        let content = PlayRowLabel(
+            title: force.name,
+            detail: "\(PlayModeText.mechs(force.picks.count)) · \(force.totalPV) PV",
+            extraDetail: force.picks.map(\.name).joined(separator: ", "),
+            trailingSymbol: isLoading ? "square.and.arrow.down" : nil
+        )
         Group {
             if let onLoad {
                 Button { onLoad(force) } label: { content }
@@ -124,7 +138,7 @@ struct PlaySavedForcesSheet: View {
             }
         }
         .swipeActions {
-            Button("Delete", role: .destructive) { delete(force) }
+            Button("Delete", role: .destructive) { deletingForce = force }
             Button("Rename") {
                 newName = force.name
                 renaming = force

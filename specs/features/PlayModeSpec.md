@@ -1,6 +1,6 @@
 # Play Mode Spec — Alpha Strike
 
-**Status:** accepted, 2026-11-26. **PM1 (N-side Domain) built** on `feature/pm1-n-sides`, 2026-11-26: domain and payload only, no screen changes. **PM2 (card library)** built. **PM3 (Learn | Play shell) and PM4 (1 v 1 pickup game)** built on `feature/play-pm3-pm4`, 2026-11-26, behind `playMode`; see the PM4 notes under Verification for what is deferred. PM5 onward not built. The owner asked for this mode to be fully specced before any work starts, and accepted every recommended default in § 18.
+**Status:** accepted, 2026-11-26. **PM1 (N-side Domain) built** on `feature/pm1-n-sides`, 2026-11-26: domain and payload only, no screen changes. **PM2 (card library)** built. **PM3 (Learn | Play shell) and PM4 (1 v 1 pickup game)** built on `feature/play-pm3-pm4`, 2026-11-26, behind `playMode`; see the PM4 notes under Verification for what is deferred. PM5–PM9 and PM11–PM13 are built (see docs/STATUS.md); PM10 (release) is not. The owner asked for this mode to be fully specced before any work starts, and accepted every recommended default in § 18.
 
 Companions: [ModeHomeSpec](ModeHomeSpec.md) · [AppShellSpec](../AppShellSpec.md) · [MatchSessionSpec](MatchSessionSpec.md) · [HotseatSpec](HotseatSpec.md) · [BattleTableSpec](BattleTableSpec.md) · [RosterSpec](RosterSpec.md) · [GuidedMissionSpec](GuidedMissionSpec.md) · [ReleaseSurfaceSpec](../ReleaseSurfaceSpec.md) · [DataSchemaSpec](../DataSchemaSpec.md) · [ContentPackSpec](../ContentPackSpec.md) · [AccessibilitySpec](../AccessibilitySpec.md).
 
@@ -275,7 +275,7 @@ Size guidance, shown under the picker (`as.play.setup.mapAdvice`):
 
 For 3–4 sides **[HOUSE]**: each side picks 6 pieces; place in setup-roll order, one at a time; none inside a deployment zone; no piece within 4″ of another unless they form one woods area.
 
-Buildings are allowed as terrain for line of sight and movement cost the players work out, but the app has no building rules until PM11. Placing one shows: "Buildings block sight and slow movement. The app doesn't track their damage yet."
+Buildings are allowed as terrain for line of sight and movement cost the players work out, but the app tracks no damage for buildings drawn on a board (building rules from PM11 apply only to buildings added in the Rules step). Placing one shows: "Buildings block sight and slow movement. The app doesn't track their damage yet."
 
 ### 5.5 Objective and rules
 
@@ -548,7 +548,7 @@ Notes:
 
 - **Light and heavy woods are not Quick-Start terrain.** The QSR has one kind of woods (a diagram on p. 17 is labelled "light woods", but no rule differs). The palette offers one Woods piece. Heavy woods would be a Commander's Edition rule; out of scope (§ 1).
 - **Level-change cost is [OPEN]:** the Movement Cost Table (p. 15) prints +2″ per 1″ of elevation; the Level Change paragraph on the same page says +1″ per inch. The inspector quotes the table and links the question ([Clash of Steel intake](../../docs/game-modes/alpha-strike/clash-of-steel-rules-intake.md)). Owner decision D27.
-- **Buildings** carry a class (Light, Medium, Heavy, Hardened), height 1″–12″ and CF (default by class, p. 28). Box defaults: small = Medium, large = Heavy (p. 10). The app has no building damage until PM11; the inspector says so.
+- **Buildings** carry a class (Light, Medium, Heavy, Hardened), height 1″–12″ and CF (default by class, p. 28). Box defaults: small = Medium, large = Heavy (p. 10). The app tracks no damage for buildings drawn on a board (the Rules step's buildings are the tracked ones, PM11); the inspector says so.
 - **Hills** stack: a hill placed inside another hill's outline gets the next level (p. 9). Each hill shows its level ("Level 2″").
 - Every piece can be named ("North ridge"). Pieces from a mapsheet's printed terrain are not added; the sheet is the terrain.
 - **Objective tokens** (§ 7.1) are a marker kind (`objectiveToken`) owned by a side. Not terrain; they have no rules effect on the board.
@@ -604,7 +604,7 @@ Dragging on a canvas is not accessible enough on its own. Every action has a non
 - A board made on a smaller table can't be used on a bigger one without opening it (the app asks "Stretch to 48 × 48?" or "Keep size, centre it").
 - Zones follow the game's side count: the board keeps a 2-, 3- and 4-side zone set; unset ones are generated from § 6.4.
 
-**Share as a file** (owner decision D26): export a board as `.mechboard` (JSON, UTType conforming to `public.json`) through the share sheet, and open one from Files or AirDrop to import it as a new preset. Recommended: **later** (PM13 stretch). Imported files are data only: validated against the schema, sizes clamped, unknown kinds dropped with a notice. No network.
+**Share as a file** (owner decision D26): export a board as `.mechboard` (JSON, UTType conforming to `public.json`) through the share sheet, and open one from Files or AirDrop to import it as a new preset. **Built in PM13** for export and import through the Boards list; opening a file straight from Files or AirDrop is still later. Imported files are data only: validated against the schema, sizes clamped, unknown kinds dropped with a notice. No network.
 
 ### 9.8 Model changes
 
@@ -968,7 +968,7 @@ Each has a recommended default. "Silent" means the default is built.
 | D23 | Board builder timing | Ship with the first Play release, or after it behind `playBoards` | **After**: PM12–PM13 follow PM4; Play first ships with mat/mapsheets and generated zones |
 | D24 | Grid and snap default | 1″ snap, 6″ major lines, 15° rotation; ½″ and off available | **As listed** |
 | D25 | Starter boards | Every mission layout (training path and Meet and Greet) plus two open tables, read-only, duplicate to edit | **Yes** |
-| D26 | Share boards as files | Export/import `.mechboard` JSON through the share sheet and Files; no network | **Later** (PM13 stretch) |
+| D26 | Share boards as files | Export/import `.mechboard` JSON through the share sheet and Files; no network | **Built in PM13** (import through the Boards list; open-from-Files later) |
 | D27 | Level-change cost shown in the hill inspector | +2″ per 1″ (Movement Cost Table, p. 15) or +1″ per 1″ (paragraph, p. 15) | **Quote the table (+2″) and flag the conflict**, same answer as the Clash of Steel intake's open item |
 | D28 | Shot sheet uses the board (pre-tick woods or cover) | Needs players to tap where each 'Mech stands | **Later**, not in PM12–PM13 |
 | D29 | Terrain pieces per side with 3–4 sides | 6 per side (house), or 8 like two sides | **6 per side** |

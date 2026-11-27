@@ -403,7 +403,10 @@ public struct PlaySetup: Codable, Sendable, Equatable {
         if wanted != sides.count {
             let oldDefault = ForceBudget.pointValue(ForceBudget.defaultPV(sides: sides.count))
             if sides.count > wanted {
-                for dropped in sides[wanted...] { forces[dropped.id] = nil }
+                for dropped in sides[wanted...] {
+                    forces[dropped.id] = nil
+                    sideObjectives[dropped.id.rawValue] = nil
+                }
                 sides.removeLast(sides.count - wanted)
             }
             while sides.count < wanted {
@@ -424,6 +427,19 @@ public struct PlaySetup: Codable, Sendable, Equatable {
                 return copy
             }
         }
+    }
+
+    /// The setup as a build with these release flags can play it (§ 16): a saved draft or last setup may come from a
+    /// build with more switched on. Objectives off = last side standing; boards off = the mat or mapsheets. Sides
+    /// are not trimmed here (the home screen hides a setup it can't open, § 16).
+    public func limited(objectives: Bool, boards: Bool) -> PlaySetup {
+        var copy = self
+        if !objectives {
+            copy.objective = nil
+            copy.sideObjectives = [:]
+        }
+        if !boards { copy.battlefield.board = nil }
+        return copy
     }
 
     /// Home edges by seat. Two sides: west and east (p. 8). Three or four **[HOUSE]**: one edge each, in seat
