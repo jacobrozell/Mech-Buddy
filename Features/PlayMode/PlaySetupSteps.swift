@@ -438,9 +438,66 @@ struct PlayRulesStep: View {
                 always("Heat abilities (HT)", detail: "Applied in the shot sheet", id: "heat")
                 always("Water", detail: "Mark a ’Mech in water on its unit sheet", id: "water")
             }
-            PlaySetupSection(title: "Coming with Clash of Steel") {
-                comingSoon("Buildings", id: "buildings")
-                comingSoon("Formations", id: "formations")
+            PlaySetupSection(title: "Buildings", footnote: "Buildings block sight and slow movement; shots and walking through them wear down their CF (p. 28). Track them from the shield button in battle.") {
+                Toggle(isOn: Binding(
+                    get: { !setup.rules.buildings.isEmpty },
+                    set: { setup.rules.buildings = $0 ? [BuildingState(id: "B1", name: "Building 1", type: .medium)] : [] }
+                )) {
+                    VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                        Text("Buildings").font(TMFont.body)
+                        Text(setup.rules.buildings.isEmpty ? "Off" : "\(setup.rules.buildings.count) on the table")
+                            .font(TMFont.detail).foregroundStyle(.secondary)
+                    }
+                }
+                .tint(TMColor.signal)
+                .accessibilityIdentifier("as.play.setup.buildings")
+                ForEach(setup.rules.buildings) { b in
+                    HStack {
+                        Text(b.name).font(TMFont.body)
+                        Spacer()
+                        Text("\(b.type.displayName), CF \(b.cf)").font(TMFont.detail).foregroundStyle(.secondary)
+                        Button(role: .destructive) {
+                            setup.rules.buildings.removeAll { $0.id == b.id }
+                        } label: { Image(systemName: "minus.circle") }
+                        .accessibilityLabel("Remove \(b.name)")
+                        .accessibilityIdentifier("as.play.setup.buildings.remove.\(b.id)")
+                    }
+                }
+                if !setup.rules.buildings.isEmpty {
+                    Menu("Add a building") {
+                        ForEach(BuildingType.allCases, id: \.self) { type in
+                            Button("\(type.displayName) (CF \(type.defaultCF))") {
+                                let n = (setup.rules.buildings.compactMap { Int($0.id.dropFirst()) }.max() ?? 0) + 1
+                                setup.rules.buildings.append(BuildingState(id: "B\(n)", name: "Building \(n)", type: type))
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("as.play.setup.buildings.add")
+                }
+            }
+            PlaySetupSection(title: "Formations", footnote: "Each side with 3 or more ’Mechs becomes one Formation. Its bonus works while 3 of its ’Mechs survive (pp. 32, 37).") {
+                Toggle(isOn: Binding(
+                    get: { setup.rules.formation != nil },
+                    set: { setup.rules.formation = $0 ? .commandLance : nil }
+                )) {
+                    VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                        Text("Formations").font(TMFont.body)
+                        Text(setup.rules.formation?.displayName ?? "Off")
+                            .font(TMFont.detail).foregroundStyle(.secondary)
+                    }
+                }
+                .tint(TMColor.signal)
+                .accessibilityIdentifier("as.play.setup.formations")
+                if let kind = setup.rules.formation {
+                    Picker("Formation", selection: Binding(get: { kind }, set: { setup.rules.formation = $0 })) {
+                        ForEach(FormationKind.allCases, id: \.self) { Text($0.displayName).tag($0) }
+                    }
+                    .accessibilityIdentifier("as.play.setup.formations.kind")
+                    Text(kind == .commandLance ? "Initiative reroll while the command ’Mech stands, plus Combat Intuition on two ’Mechs (p. 32)."
+                        : kind == .reconLance ? "Maneuvering Ace: woods cost 1″ less per inch (p. 32)."
+                        : "Seven Lucky attack rerolls shared by the Formation (p. 32).")
+                        .font(TMFont.detail).foregroundStyle(.secondary)
+                }
                 comingSoon("MechWarrior cards", id: "mechWarriorCards")
             }
             PlaySetupSection(title: "Dice") {

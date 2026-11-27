@@ -144,10 +144,13 @@ public enum MatchReducer {
                 forcesLoaded: true,
                 diceMode: setup.diceMode
             )
+            var box = BoxRulesState()
             if let points = setup.rules.battlefieldSupport, points > 0 {
-                next.boxRules = BoxRulesState(support: Dictionary(
-                    uniqueKeysWithValues: setup.sides.map { ($0.id, SupportInventory(budget: points)) }))
+                box.support = Dictionary(uniqueKeysWithValues: setup.sides.map { ($0.id, SupportInventory(budget: points)) })
             }
+            box.buildings = setup.rules.buildings
+            if let kind = setup.rules.formation { box.formations = PlayRules.makeFormations(kind, units: units) }
+            if !box.support.isEmpty || !box.buildings.isEmpty || !box.formations.isEmpty { next.boxRules = box }
             next.appendLog("New game: \(setup.formatName), \(setup.budget.summary)")
 
         case .markTableReady:

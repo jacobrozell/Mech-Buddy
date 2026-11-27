@@ -238,7 +238,7 @@ public struct Battlefield: Codable, Sendable, Equatable {
 /// Optional rules for a Play game (§ 5.5). Defaults per D16 and D13.
 public struct PlayRules: Codable, Sendable, Equatable {
     private enum CodingKeys: String, CodingKey {
-        case overheat, physicalAttacks, forcedWithdrawal, startOnTable, battlefieldSupport
+        case overheat, physicalAttacks, forcedWithdrawal, startOnTable, battlefieldSupport, buildings, formation
     }
 
     public init(from decoder: Decoder) throws {
@@ -248,6 +248,8 @@ public struct PlayRules: Codable, Sendable, Equatable {
         forcedWithdrawal = try c.decodeIfPresent(Bool.self, forKey: .forcedWithdrawal) ?? true
         startOnTable = try c.decodeIfPresent(Bool.self, forKey: .startOnTable) ?? true
         battlefieldSupport = try c.decodeIfPresent(Int.self, forKey: .battlefieldSupport)
+        buildings = try c.decodeIfPresent([BuildingState].self, forKey: .buildings) ?? []
+        formation = try c.decodeIfPresent(FormationKind.self, forKey: .formation)
     }
 
     public var overheat: Bool
@@ -257,17 +259,40 @@ public struct PlayRules: Codable, Sendable, Equatable {
     public var startOnTable: Bool
     /// Battlefield Support Points per side (pp. 12, 29-30). Nil = off. 0, 5 or 12.
     public var battlefieldSupport: Int?
+    /// Buildings on the table (pp. 10, 28). Empty = none. Each starts at its type's CF; players may change it in battle.
+    public var buildings: [BuildingState] = []
+    /// One Formation type given to every side with at least 3 'Mechs (pp. 32, 37). Nil = off.
+    public var formation: FormationKind?
 
     /// 1D6: 1-2 = 0, 3-4 = 5, 5-6 = 12 BSPs (p. 12).
     public static func supportPoints(forRoll roll: Int) -> Int { roll <= 2 ? 0 : (roll <= 4 ? 5 : 12) }
 
     public init(overheat: Bool = true, physicalAttacks: Bool = true, forcedWithdrawal: Bool = true, startOnTable: Bool = true,
-                battlefieldSupport: Int? = nil) {
+                battlefieldSupport: Int? = nil, buildings: [BuildingState] = [], formation: FormationKind? = nil) {
         self.battlefieldSupport = battlefieldSupport
+        self.buildings = buildings
+        self.formation = formation
         self.overheat = overheat
         self.physicalAttacks = physicalAttacks
         self.forcedWithdrawal = forcedWithdrawal
         self.startOnTable = startOnTable
+    }
+}
+
+extension PlayRules {
+    /// One Formation per side with at least 3 'Mechs (the bonus needs 3 survivors, p. 37). Command Lance: the
+    /// costliest 'Mech is the command 'Mech and two others get Combat Intuition; Battle Star: seven Lucky uses (p. 32).
+    public static func makeFormations(_ kind: FormationKind, units: [MatchUnitState]) -> [FormationState] {
+        Dictionary(grouping: units, by: \.side).sorted { $0.key.letter < $1.key.letter }.compactMap { side, members in
+            guard members.count >= FormationRules.minimumSurvivors else { return nil }
+            let commander = members.max { $0.pv < $1.pv }
+            return FormationState(
+                id: "\(side.letter)-\(kind.rawValue)", kind: kind, name: "\(side.displayName) \(kind.displayName)",
+                memberIds: members.map(\.id),
+                commandUnitId: kind == .commandLance ? commander?.id : nil,
+                combatIntuitionCount: kind == .commandLance ? 2 : 0,
+                luckyUsesLeft: kind == .battleStar ? 7 : 0)
+        }
     }
 }
 

@@ -31,7 +31,7 @@
 
 From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for each milestone's definition.
 
-1. **PM11** — Battlefield Support done; buildings and formations remain (switch on the Clash of Steel rules in Play; the setup's "Coming with Clash of Steel" toggles are placeholders the owner approved).
+1. **PM11** — Battlefield Support, buildings and formations done in Play setup (`PlayRules.buildings`, `PlayRules.formation`); MechWarrior cards remain a placeholder.
 2. **PM5** — finish compact battle mode for Play: group by side (1.1–1.6 are done). Needed before PM7.
 3. **PM6** — teams (1 v 2, 2 v 2, 1 v 3); custom side names reach the battle screens.
 4. **PM7** — three and four sides behind `playModeMultiSide` (needs Side C/D colours; owner table test).
