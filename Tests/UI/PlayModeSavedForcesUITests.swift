@@ -62,7 +62,7 @@ final class PlayModeSavedForcesUITests: XCTestCase {
     private func fill(_ app: XCUIApplication, _ field: String, _ text: String) {
         let element = app.textFields["as.card.entry.\(field)"]
         var tries = 0
-        while !element.isHittable && tries < 8 { app.swipeUp(); tries += 1 }
+        while (!element.exists || !element.isHittable) && tries < 10 { app.swipeUp(); tries += 1 }
         tap(element)
         element.typeText(text)
     }
