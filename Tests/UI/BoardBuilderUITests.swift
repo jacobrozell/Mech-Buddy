@@ -101,7 +101,7 @@ final class BoardBuilderUITests: XCTestCase {
         // Ridge Line's table is 36 by 22 with three woods.
         XCTAssertTrue(canvas.label.contains("36 by 22 inch table"), canvas.label)
         XCTAssertTrue(canvas.label.contains("3 woods"), canvas.label)
-        XCTAssertEqual(element(app, "as.board.counter").label, "3 of 16 choices placed")
+        XCTAssertEqual(element(app, "as.board.counter").label, "4 of 16 choices placed") // the 6″ × 6″ woods is a large template: 2 choices
         tap(app.buttons["as.board.done"])
 
         XCTAssertTrue(element(app, "as.play.setup.board.summary").waitForExistence(timeout: 5))

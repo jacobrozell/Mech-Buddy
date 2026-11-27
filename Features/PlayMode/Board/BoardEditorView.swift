@@ -46,7 +46,14 @@ struct BoardEditorView: View {
                         .presentationDragIndicator(.visible)
                 }
             }
-            .accessibilityIdentifier("as.board.editor")
+            // An identifier on the container would replace the ones on the canvas and palette, so it sits on a marker.
+            .background {
+                Color.clear
+                    .accessibilityElement()
+                    .accessibilityLabel("Board builder")
+                    .accessibilityIdentifier("as.board.editor")
+                    .allowsHitTesting(false)
+            }
     }
 
     @ViewBuilder
