@@ -19,7 +19,7 @@ struct CombatStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.md) {
             CoachPrompt(
-                title: "Both sides shoot",
+                title: session.sides.count > 2 ? "All sides shoot" : "Both sides shoot",
                 message: session.ruleset.physicalAttacksAllowed
                     ? "Roll together, in any order. Within 1″ of an enemy, a ’Mech can punch or kick instead of shooting. Damage lands at the end of the phase."
                     : "Roll together, in any order. Damage lands at the end of the phase, so a ’Mech wrecked now still fires.",

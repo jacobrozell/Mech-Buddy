@@ -772,7 +772,7 @@ struct BattleFlowView: View {
                 title: "Done shooting",
                 identifier: "as.battle.doneShooting",
                 specIdentifier: "as.battle.phaseDock.doneSide",
-                hint: "Both sides are done shooting. Ends the phase.",
+                hint: session.sides.count > 2 ? "All sides are done shooting. Ends the phase." : "Both sides are done shooting. Ends the phase.",
                 action: { finishShooting(coach) }
             )
         }
