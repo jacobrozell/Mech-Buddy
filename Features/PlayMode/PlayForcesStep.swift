@@ -12,6 +12,10 @@ struct PlayForcesStep: View {
     var onAdd: (SideId) -> Void
     @Environment(AppDependencies.self) private var dependencies
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var savingForce = false
+    @State private var forceName = ""
+    @State private var loadingForce = false
+    @State private var savedNotice: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: TMSpace.lg) {
@@ -39,6 +43,20 @@ struct PlayForcesStep: View {
                 HStack(spacing: TMSpace.lg) { extraActions }
                 VStack(alignment: .leading, spacing: TMSpace.sm) { extraActions }
             }
+        }
+        .alert("Save this force", isPresented: $savingForce) {
+            TextField("Name", text: $forceName)
+                .accessibilityIdentifier("as.play.forces.saved.name")
+            Button("Save", action: saveForce)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Saving under an existing name replaces that force.")
+        }
+        .sheet(isPresented: $loadingForce) {
+            PlaySavedForcesSheet(
+                loadingInto: setup.sides.first { $0.id == side }?.name ?? side.displayName,
+                onLoad: load
+            )
         }
     }
 
@@ -94,6 +112,62 @@ struct PlayForcesStep: View {
                 .frame(minHeight: 44)
                 .accessibilityIdentifier("as.play.setup.forces.clear.\(side.letter)")
         }
+        savedForceActions
+    }
+
+    // MARK: Saved forces (PM9)
+
+    @ViewBuilder
+    private var savedForceActions: some View {
+        if !setup.force(side).isEmpty {
+            Button {
+                forceName = ""
+                savingForce = true
+            } label: {
+                Label("Save this force", systemImage: "square.and.arrow.down").frame(minHeight: 44)
+            }
+            .accessibilityIdentifier("as.play.forces.saved.save")
+        }
+        Button {
+            loadingForce = true
+        } label: {
+            Label("Load a saved force", systemImage: "tray.full").frame(minHeight: 44)
+        }
+        .accessibilityIdentifier("as.play.forces.saved.load")
+        if let savedNotice {
+            Text(savedNotice)
+                .font(TMFont.detail)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("as.play.forces.saved.notice")
+        }
+    }
+
+    private func saveForce() {
+        let name = forceName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let force = SavedForces.make(name: name, setup: setup, side: side, library: dependencies.cardLibrary)
+        do {
+            try dependencies.userContent.save(force)
+            savedNotice = "Saved “\(name)”."
+        } catch {
+            savedNotice = "Couldn’t save that force. Try again."
+            dependencies.logger.error("save force: \(error)", category: "persistence")
+        }
+    }
+
+    private func load(_ force: SavedForce) {
+        // Bring back hand-entered cards that were deleted since, then rebuild the library.
+        let known = Set(dependencies.cardLibrary.userFaces.map(\.id))
+        for card in force.cards where !known.contains(card.id) {
+            try? dependencies.userContent.saveUserCard(card)
+        }
+        dependencies.reloadUserCards()
+        let result = SavedForces.load(force, into: &setup, side: side, library: dependencies.cardLibrary)
+        loadingForce = false
+        savedNotice = result.skipped == 0
+            ? "Loaded “\(force.name)”."
+            : "Loaded “\(force.name)”. \(result.skipped) left out: card unavailable or no room."
     }
 
     private func unitRow(_ pick: ForcePick) -> some View {
@@ -126,6 +200,12 @@ struct PlayForcesStep: View {
                     Text("Skill \(pick.skill)")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
+                }
+                if dependencies.cardLibrary.face(id: pick.cardId)?.isUserCard == true {
+                    Label("Your numbers", systemImage: "square.and.pencil")
+                        .font(TMFont.detail)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("as.play.setup.forces.unit.\(pick.id.uuidString).yourNumbers")
                 }
                 if isStandIn(pick) {
                     Label("Uses a stand-in", systemImage: "arrow.triangle.swap")
@@ -255,6 +335,11 @@ struct PlayBudgetBar: View {
 
 // MARK: - Unit picker
 
+struct CardEntryRequest: Identifiable {
+    let id = UUID()
+    var draft: UserCardDraft
+}
+
 struct PlayUnitPickerSheet: View {
     @Binding var setup: PlaySetup
     var side: SideId
@@ -266,6 +351,7 @@ struct PlayUnitPickerSheet: View {
     @State private var techBase: CardTechBase?
     @State private var showAll = false
     @State private var toast: String?
+    @State private var entryDraft: CardEntryRequest?
 
     private var library: CardLibrary { dependencies.cardLibrary }
     private var usesOwned: Bool { setup.pool == .owned && !(dependencies.preferences.collection?.isEmpty ?? true) }
@@ -282,6 +368,14 @@ struct PlayUnitPickerSheet: View {
                     if usesOwned {
                         Toggle("Show all cards", isOn: $showAll)
                             .accessibilityIdentifier("as.play.setup.unitPicker.showAll")
+                    }
+                }
+                if !library.userFaces.isEmpty {
+                    let mine = library.userFaces.filter(matches)
+                    if !mine.isEmpty {
+                        Section("Your cards") {
+                            ForEach(mine) { row($0) }
+                        }
                     }
                 }
                 if usesOwned {
@@ -308,9 +402,14 @@ struct PlayUnitPickerSheet: View {
                     }
                 }
                 Section {
-                    Text("A mini with no card here? Entering a card by hand is coming in a later update.")
-                        .font(TMFont.detail)
-                        .foregroundStyle(.secondary)
+                    Button {
+                        entryDraft = CardEntryRequest(draft: UserCardDraft())
+                    } label: {
+                        Label("Enter a card by hand", systemImage: "square.and.pencil").frame(minHeight: 44)
+                    }
+                    .accessibilityIdentifier("as.play.setup.cardEntry")
+                } footer: {
+                    Text("A mini with no card here? Type the numbers from its card. Saved for later games.")
                 }
             }
             .accessibilityIdentifier("as.play.setup.unitPicker")
@@ -336,6 +435,17 @@ struct PlayUnitPickerSheet: View {
             }
         }
         .presentationDetents([.large])
+        .sheet(item: $entryDraft) { item in
+            PlayCardEntrySheet(draft: item.draft) { face in
+                do {
+                    try dependencies.userContent.saveUserCard(face)
+                    dependencies.reloadUserCards()
+                    add(face)
+                } catch {
+                    dependencies.logger.error("save card: \(error)", category: "persistence")
+                }
+            }
+        }
     }
 
     private var sideName: String {
@@ -374,19 +484,27 @@ struct PlayUnitPickerSheet: View {
     private func row(_ face: CardFaceDTO) -> some View {
         let pick = PlayUnits.pick(face)
         return Button {
-            add(face)
+            if pick == nil {
+                var draft = UserCardDraft()
+                draft.name = face.name
+                draft.size = face.sz
+                draft.isClan = face.techBase == .clan
+                entryDraft = CardEntryRequest(draft: draft)
+            } else {
+                add(face)
+            }
         } label: {
             HStack(spacing: TMSpace.md) {
                 VStack(alignment: .leading, spacing: TMSpace.xxs) {
                     Text(face.name).font(TMFont.body)
-                    Text(pick.map { "Size \(face.sz) · \(face.mv ?? "—") · \($0.adjustedPV) PV at Skill \($0.skill)" }
-                        ?? "Size \(face.sz) · numbers not checked yet")
+                    Text(pick.map { "Size \(face.sz) · \(face.mv ?? "—") · \($0.adjustedPV) PV at Skill \($0.skill)\(face.isUserCard ? " · Your numbers" : "")" }
+                        ?? "Size \(face.sz) · numbers not checked yet · enter numbers from your card")
                         .font(TMFont.detail)
                         .foregroundStyle(.secondary)
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: TMSpace.sm)
-                Image(systemName: pick == nil ? "lock" : "plus.circle.fill")
+                Image(systemName: pick == nil ? "square.and.pencil" : "plus.circle.fill")
                     .foregroundStyle(pick == nil ? Color.secondary : TMColor.side(side))
                     .accessibilityHidden(true)
             }
@@ -394,8 +512,8 @@ struct PlayUnitPickerSheet: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(pick == nil || isFull)
-        .accessibilityHint(pick == nil ? "Its numbers aren’t checked yet, so it can’t be played." : "Adds it to \(sideName).")
+        .disabled(pick != nil && isFull)
+        .accessibilityHint(pick == nil ? "Its numbers aren’t checked yet. Opens card entry so you can type them from your card." : "Adds it to \(sideName).")
         .accessibilityIdentifier("as.play.setup.unitPicker.card.\(face.id)")
     }
 

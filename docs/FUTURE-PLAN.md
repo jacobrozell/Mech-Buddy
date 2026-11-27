@@ -149,7 +149,7 @@ Owner, 2026-11-26: finish Alpha Strike fully before Classic, so this section com
   - [ ] **Owner:** table test of 1 v 1 v 1 v 1.
 - [x] **PM8** Objectives (five of six), victory points and turn limit, behind `playObjectives`. (L) Built 2026-11-27: Raid, Control the Field, Destroy the Enemy, Hold the Fort, Breakthrough (`as.play.setup.objective.*`, roll for it), tokens on the table checklist, VP strip `as.battle.vp`, End Phase Score step `as.battle.objective.*`, Destroy the Enemy attribution (attacker recorded per damage event, which also fixes the three-side critical prompt), Clan × 1.5 and 12 to win, points then PV at the turn limit, standings by points. Not built: Find the Target (PM11), per-side objective rolls (PM11), objective copy as `as-objectives.json`.
   - [ ] **Owner:** table-test an objective game (Score step wording, Raid token pickup).
-- [ ] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M)
+- [x] **PM9** Saved forces and hand-entered cards (SwiftData SchemaV2). (M) Follow-up: a Saved forces entry on the Force tab; Master Unit List card checks.
 - [ ] **PM10** Release: accessibility pass, screen catalog, inventory, flags on, TestFlight table test. (M)
 - [ ] **PM11** Clash of Steel rules in Play: buildings, Battlefield Support, formations, Find the Target. After Clash of Steel ships. (L) *Battlefield Support done; buildings and formations remain.*
 - [ ] **PM12** Terrain board builder behind `playBoards`: drag terrain onto the table, list editor for VoiceOver, zones for 2–4 sides. (L)
