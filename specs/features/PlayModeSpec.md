@@ -299,7 +299,7 @@ All sides use the same objective (p. 7 default). "Each side rolls its own" (p. 7
 | Punch and kick | On | `physicalAttacksAllowed` |
 | Forced Withdrawal | On | `forcedWithdrawal` (p. 12) |
 | Start on the table | On (D13) | Off = 'Mechs enter from their home edge on Turn 1 (p. 11 default) |
-| Buildings, Battlefield Support, Formations, MechWarrior cards | Off, disabled | "Coming later", PM11 |
+| Buildings, Battlefield Support, Formations | Off | Built (PM11). MechWarrior cards stay "Coming later" |
 
 **Dice** (`as.play.setup.dice`): Real dice (default, owner lock) or Let the app roll. Same `DiceMode` as missions; it can be changed in game.
 
