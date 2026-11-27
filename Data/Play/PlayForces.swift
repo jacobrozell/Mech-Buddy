@@ -130,10 +130,28 @@ public enum PlayPicker {
 /// The table drawing for a Play game (§ 5.4): sheets or a mat, each side's home edge and zone.
 public enum PlayLayout {
     /// Deployment depth from the home edge, inches (p. 11, "within 6 inches").
-    public static let zoneDepth = 6.0
+    public static let zoneDepth = BoardZones.zoneDepth
 
     /// Three or four sides use the middle 3/8 of their edge **[HOUSE]** (§ 6.4): 18″ on a 48″ edge.
-    public static let houseZoneShare = 3.0 / 8.0
+    public static let houseZoneShare = BoardZones.houseZoneShare
+
+    /// What the table looks like for this game: the built board with zones for the game's sides, or the
+    /// generated mat / mapsheet layout without terrain (PM12, § 5.4).
+    public static func board(for battlefield: Battlefield, sides: [MatchSide] = []) -> BoardLayout {
+        guard var board = battlefield.board else {
+            return BoardLayout(layout(for: battlefield, sides: sides))
+        }
+        let count = max(sides.count, 2)
+        if let stored = board.zonesBySideCount?[count], !stored.isEmpty {
+            board.zones = stored
+        } else if count == 2, !board.zones.isEmpty, sides.allSatisfy({ $0.homeEdge == nil || [.west, .east].contains($0.homeEdge) }) {
+            // The board's own two-side zones (a mission's, or ones the builder stored).
+        } else {
+            board.zones = zones(width: board.width, depth: board.depth, sides: sides).map { BoardLayout.Zone(side: $0.side, area: .init($0.area)) }
+        }
+        board.zonesBySideCount = nil
+        return board
+    }
 
     /// `sides` carries each side's home edge. Without it the layout is the two-side table (west, east).
     public static func layout(for battlefield: Battlefield, sides: [MatchSide] = []) -> MissionLayoutDTO {
@@ -172,6 +190,7 @@ public enum PlayLayout {
     /// One zone per side on its home edge, 6″ deep. Two sides take the full edge (p. 11); three or four take
     /// the middle 3/8 of it so neighbouring zones stay apart **[HOUSE]**.
     static func zones(width: Double, depth: Double, sides: [MatchSide]) -> [MissionLayoutDTO.Zone] {
+        // Same rule as `BoardZones.generate`, with each side's own home edge.
         let seats = sides.isEmpty
             ? [(letter: "A", edge: TableEdge.west), (letter: "B", edge: .east)]
             : sides.enumerated().map { index, side in

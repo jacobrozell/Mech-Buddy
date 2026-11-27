@@ -12,6 +12,8 @@ public enum ReleaseFlag: String, CaseIterable, Sendable {
     case playModeMultiSide
     /// The objective picker and Score step in Play (PlayModeSpec § 16, PM8). Off = last side standing only.
     case playObjectives
+    /// Terrain board builder and the board in setup, table setup and battle (PlayModeSpec § 16, PM12). Off = mat or mapsheets with generated zones only.
+    case playBoards
     case physicalOvWithdrawal
     case classicComingSoonEntry
     case classicPlayTools
@@ -40,7 +42,7 @@ public struct ReleaseSurface: ReleaseSurfaceProviding, Sendable {
             return true
         case .tipJar:
             return false
-        case .fullLancesScenario, .playMode, .playModeMultiSide, .playObjectives, .physicalOvWithdrawal,
+        case .fullLancesScenario, .playMode, .playModeMultiSide, .playObjectives, .playBoards, .physicalOvWithdrawal,
              .classicPlayTools, .mulNetworkFetch, .matchHistory:
             return isFullProductSurface
         }
