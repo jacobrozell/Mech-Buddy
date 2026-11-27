@@ -1,6 +1,6 @@
 # Mech Buddy — where we are (handoff for agents)
 
-**Read this after [AGENTS.md](../AGENTS.md) and before starting work.** It says what is built, where it lives, what the owner has decided, and what comes next. Last updated 2026-11-26 at `main` `62a2c9d` (pushed). Update it whenever you finish a milestone.
+**Read this after [AGENTS.md](../AGENTS.md) and before starting work.** It says what is built, where it lives, what the owner has decided, and what comes next. Last updated 2026-11-27 (PM8 on branch `feature/pm8-objectives`, not merged). Update it whenever you finish a milestone.
 
 ## 1. Owner priorities
 
@@ -62,7 +62,7 @@ From [FUTURE-PLAN.md](FUTURE-PLAN.md) §8 and §1. Check the spec's § 19 for ea
 ## 6. How to work in this repo
 
 - **Project file:** `MechBuddy.xcodeproj` is generated and untracked. Run `xcodegen generate` after adding files or after merging a branch that adds files.
-- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 390 on 2026-11-26) and `-scheme MechBuddyUI` (5 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game). Use your own `-derivedDataPath` when several agents build at once. **Run the UI suite on an iPhone 17-size simulator or larger**: on the iPhone 17e the Clash of Steel and Play pickup UI tests fail because controls sit off-screen.
+- **Tests:** `xcodebuild -scheme MechBuddyCI -destination 'platform=iOS Simulator,name=iPhone 17' test` (unit, 470 on 2026-11-27) and `-scheme MechBuddyUI` (9 UI tests: Ridge Line, Clash of Steel, Play shell ×2, Play pickup game, four-side preset and roster, objectives ×2). If several simulators share a name, pass `id=<udid>`; don't run two xcodebuild test runs into one derived-data path. Use your own `-derivedDataPath` when several agents build at once. **Run the UI suite on an iPhone 17-size simulator or larger**: on the iPhone 17e the Clash of Steel and Play pickup UI tests fail because controls sit off-screen.
 - **Parallel agents:** each works in its own git worktree (`git worktree add ../MechBuddy-wt-<name> -b <branch> main`), its own simulator and its own derived data, with a list of files it must not touch. Commit often ("WIP …:" prefixes) so usage limits don't lose work. The coordinator reviews, merges with `--no-ff`, re-runs both suites on `main`, then removes the worktree.
 - **Debug launch arguments:** `-ui_testing` (in-memory store), `-reset_state`, `-skip_onboarding`, `-open_rules`, `-enable_full_product_surface`, DEBUG `-open_mission <id>` and `-debug_damage`.
 - **Never** rename or remove an accessibility identifier; add new ones beside old ones (UI tests depend on them).
