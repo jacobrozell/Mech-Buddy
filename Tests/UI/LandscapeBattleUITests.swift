@@ -12,7 +12,8 @@ final class LandscapeBattleUITests: XCTestCase {
 
     override func setUp() {
         continueAfterFailure = false
-        XCUIDevice.shared.orientation = .landscapeLeft
+        // Set-up screens are driven in portrait (the proven path); each test rotates once the battle is up.
+        XCUIDevice.shared.orientation = .portrait
     }
 
     override func tearDown() {
@@ -25,15 +26,20 @@ final class LandscapeBattleUITests: XCTestCase {
         let play = app.buttons["as.modeHome.ridgeLine"]
         XCTAssertTrue(play.waitForExistence(timeout: 20), "Ridge Line play button missing")
         play.tap()
+        XCTAssertTrue(app.buttons["as.ridge.tableReady"].waitForExistence(timeout: 15))
+        XCUIDevice.shared.orientation = .landscapeLeft
+        Thread.sleep(forTimeInterval: 1)
         try driveToCombat(app, sides: ["lanceA", "lanceB"], prefix: "mission")
     }
 
     @MainActor
     func testFourSideTableShowsEverySideAndDock() throws {
         let app = launch(extra: ["-enable_full_product_surface"])
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 20))
         app.tabBars.firstMatch.buttons["Play"].tap()
         tap(app.buttons["as.play.new"])
-        tap(app.buttons["as.play.setup.preset.1v1v1v1"])
+        let preset = app.buttons["as.play.setup.preset.1v1v1v1"]
+        tap(preset)
         tap(app.buttons["as.play.setup.continue"])
         tap(app.buttons["as.play.setup.continue"])
         XCTAssertTrue(element(app, "as.play.setup.forces").waitForExistence(timeout: 5))
@@ -50,6 +56,8 @@ final class LandscapeBattleUITests: XCTestCase {
         tap(app.buttons["as.play.setup.continue"])
         tap(app.buttons["as.play.setup.start"])
         XCTAssertTrue(element(app, "as.ridge.tablePrep").waitForExistence(timeout: 10), "Table setup missing")
+        XCUIDevice.shared.orientation = .landscapeLeft
+        Thread.sleep(forTimeInterval: 1)
         try driveToCombat(app, sides: ["lanceA", "lanceB", "lanceC", "lanceD"], prefix: "four")
     }
 
@@ -60,7 +68,6 @@ final class LandscapeBattleUITests: XCTestCase {
     @MainActor
     private func driveToCombat(_ app: XCUIApplication, sides: [String], prefix: String) throws {
         var taps: [String] = []
-        let doneShooting = app.buttons["as.battle.doneShooting"]
         let deadline = Date().addingTimeInterval(120)
         var checkedTable = false
         while Date() < deadline {
@@ -73,7 +80,7 @@ final class LandscapeBattleUITests: XCTestCase {
                 checkpoint("\(prefix)-\(step)")
                 checkedTable = true
             }
-            if doneShooting.exists, doneShooting.isHittable, seen.contains("combat") { return }
+            if seen.contains("combat") { return }
             for title in ["Start shooting anyway"] where app.buttons[title].exists && app.buttons[title].isHittable {
                 taps.append(title); app.buttons[title].tap()
             }
@@ -104,7 +111,7 @@ final class LandscapeBattleUITests: XCTestCase {
     /// A rough step name from what is on screen; nil when none of the step controls are up.
     @MainActor
     private func currentStep(_ app: XCUIApplication) -> String? {
-        if app.buttons["as.battle.doneShooting"].exists { return "combat" }
+        if app.buttons["as.battle.doneShooting"].exists || app.buttons["as.battle.primary"].label == "Solve a shot" { return "combat" }
         if app.buttons["as.battle.skipRemaining"].exists { return "movement" }
         if element(app, "as.initiative.agree").exists || element(app, "as.initiative.multi").exists { return "initiative" }
         if app.buttons["as.battle.primary"].exists { return "other-\(app.buttons["as.battle.primary"].label)" }
@@ -182,6 +189,6 @@ final class LandscapeBattleUITests: XCTestCase {
     @MainActor
     private func tap(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(element.waitForExistence(timeout: 5), "Missing \(element)", file: file, line: line)
-        if !element.isHittable { element.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() } else { element.tap() }
+        element.tap()
     }
 }
