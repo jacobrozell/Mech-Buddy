@@ -24,14 +24,12 @@ private func appSession(phase: PhaseId = .initiative, turn: Int = 1, ready: Bool
 @MainActor
 @Suite("Battle chrome")
 struct BattleChromeTests {
-    @Test("iPad with a regular width uses columns; everything else stacks")
+    @Test("Landscape phones and regular-width iPads use the table; portrait stacks (details in BattleStageLayoutTests)")
     func layout() {
-        #expect(BattleStageLayout.resolve(idiom: .pad, horizontal: .regular, vertical: .regular) == .padColumns)
+        #expect(BattleStageLayout.resolve(idiom: .pad, horizontal: .regular, vertical: .regular) == .table)
         #expect(BattleStageLayout.resolve(idiom: .pad, horizontal: .compact, vertical: .regular) == .stacked)
-        #expect(BattleStageLayout.resolve(idiom: .phone, horizontal: .regular, vertical: .compact) == .stacked)
+        #expect(BattleStageLayout.resolve(idiom: .phone, horizontal: .regular, vertical: .compact) == .table)
         #expect(BattleStageLayout.resolve(idiom: .phone, horizontal: nil, vertical: nil) == .stacked)
-        #expect(!BattleStageLayout.stacked.showsSideRoster && BattleStageLayout.padColumns.showsSideRoster)
-        #expect(BattleStageLayout.phoneLandscape.showsSideRoster)
     }
 
     @Test("The header hides at table setup and the result; only Movement has one side up")

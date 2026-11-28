@@ -90,21 +90,9 @@ struct MovementStep: View {
                 if verticalSizeClass != .compact {
                     Eyebrow("Now moving")
                 }
-                HStack(spacing: TMSpace.sm) {
-                    SideBadge(side: unit.side)
-                    if let mini = unit.mini {
-                        MiniDot(marker: mini, size: 18)
-                    }
-                    Text(unit.name)
-                        .font(TMFont.stepTitle)
-                    // Landscape: move stats share the name row so the tiles stay above the fold.
-                    if verticalSizeClass == .compact, !unit.isImmobile, let move {
-                        Spacer(minLength: TMSpace.sm)
-                        Text(move.summary)
-                            .font(TMFont.cardTitle)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(move.spokenSummary)
-                    }
+                ViewThatFits(in: .horizontal) {
+                    moverTitleRow(unit, move: move, stacked: false)
+                    moverTitleRow(unit, move: move, stacked: true)
                 }
                 if verticalSizeClass == .compact, !unit.isImmobile {
                     EmptyView()
@@ -140,6 +128,44 @@ struct MovementStep: View {
                     }
                 }
             }
+        }
+    }
+
+    /// Name row. Landscape puts the move stats on it so the tiles stay above the fold; in the narrow
+    /// table-view column they drop under the name instead of wrapping it.
+    @ViewBuilder
+    private func moverTitleRow(_ unit: MatchUnitState, move: PrintedMove?, stacked: Bool) -> some View {
+        let showsStats = verticalSizeClass == .compact && !unit.isImmobile && move != nil
+        let identity = HStack(spacing: TMSpace.sm) {
+            SideBadge(side: unit.side)
+            if let mini = unit.mini {
+                MiniDot(marker: mini, size: 18)
+            }
+            Text(unit.name)
+                .font(TMFont.stepTitle)
+                .lineLimit(2)
+        }
+        if let move, showsStats {
+            if stacked {
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    identity
+                    Text(move.summary)
+                        .font(TMFont.cardTitle)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(move.spokenSummary)
+                }
+            } else {
+                HStack(spacing: TMSpace.sm) {
+                    identity
+                    Spacer(minLength: TMSpace.sm)
+                    Text(move.summary)
+                        .font(TMFont.cardTitle)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(move.spokenSummary)
+                }
+            }
+        } else {
+            identity
         }
     }
 

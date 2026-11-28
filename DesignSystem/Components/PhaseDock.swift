@@ -32,32 +32,48 @@ struct PhaseDock: View {
         dynamicTypeSize.isAccessibilitySize && verticalSizeClass != .compact
     }
 
+    private var primaryButton: some View {
+        PrimaryActionButton(
+            title: primaryTitle,
+            placement: .dock,
+            tint: primaryTint,
+            isDisabled: primaryDisabled,
+            accessibilityHint: primaryHint,
+            action: primaryAction
+        )
+        .accessibilityIdentifiers(
+            primary: primaryIdentifier,
+            extra: primarySpecIdentifier,
+            label: primaryTitle
+        )
+    }
+
     var body: some View {
-        let layout = stacks
-            ? AnyLayout(VStackLayout(spacing: TMSpace.xxs))
-            : AnyLayout(HStackLayout(spacing: TMSpace.md))
-        layout {
-            if !stacks {
-                leadingButton
-                secondaryButton
-            }
-            PrimaryActionButton(
-                title: primaryTitle,
-                placement: .dock,
-                tint: primaryTint,
-                isDisabled: primaryDisabled,
-                accessibilityHint: primaryHint,
-                action: primaryAction
-            )
-            .accessibilityIdentifiers(
-                primary: primaryIdentifier,
-                extra: primarySpecIdentifier,
-                label: primaryTitle
-            )
+        Group {
             if stacks {
-                HStack(spacing: TMSpace.lg) {
-                    leadingButton
-                    secondaryButton
+                VStack(spacing: TMSpace.xxs) {
+                    primaryButton
+                    HStack(spacing: TMSpace.lg) {
+                        leadingButton
+                        secondaryButton
+                    }
+                }
+            } else {
+                // One row when it fits; in a narrow column (landscape table view) the text buttons sit above
+                // the primary instead of squeezing it.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: TMSpace.md) {
+                        leadingButton
+                        secondaryButton
+                        primaryButton
+                    }
+                    VStack(spacing: TMSpace.xxs) {
+                        HStack(spacing: TMSpace.lg) {
+                            leadingButton
+                            secondaryButton
+                        }
+                        primaryButton
+                    }
                 }
             }
         }

@@ -21,21 +21,21 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 
 | Screen | How to reach | Status | Notes |
 |---|---|---|---|
-| BattleFlowView / battle stage | Any game, turn 1 | ⬜ | 1.7 wants Side A \| Side B in two columns with the dock on the right |
-| Side headers, pinned side (PM5) | 3–4 side game | ⬜ | |
-| Dense unit rows, 4 sides (PM7) | 1v1v1v1 preset | ⬜ | |
-| InitiativeStep | Turn start, 2 sides | ⬜ | |
-| MultiSideInitiativeStep (PM7) | Turn start, 3–4 sides | ⬜ | |
-| MovementStep, incl. dense list (PM11 follow-up) | Movement phase, 4 sides | ⬜ | |
-| CombatStep / shot picker | Combat phase | ✅ | Rear weapons checked earlier; re-check "All sides shoot" with 3–4 sides |
-| CombatSolverSheet | Resolve a shot | ⬜ | |
+| BattleFlowView / battle stage | Any game, turn 1 | ✅ | 2026-11-27: built (1.7). Sides in columns on the left, step and dock in a 300 pt column on the right (iPad: 380 pt, regular width). Set-up and placing minis keep the full-width column. Large text falls back to one column. `battle-mission-initiative.png`, `battle-portrait-initiative.png` (portrait unchanged). iPad not run on a simulator; covered by unit tests only |
+| Side headers, pinned side (PM5) | 3–4 side game | ✅ | 2026-11-27: 4 sides make a 2 x 2 grid, acting side first; headers keep `as.battle.side.*` ids. `battle-four-combat.png` |
+| Dense unit rows, 4 sides (PM7) | 1v1v1v1 preset | ⚠️ | 2026-11-27: rows use the new half-width `isNarrow` card (name and Shoot on line 1, pips on line 2, status line only when not idle). 8 ’Mechs need a short scroll (~1.5 rows of the grid off screen at default size). `battle-four-initiative.png` |
+| InitiativeStep | Turn start, 2 sides | ✅ | 2026-11-27: dice cards scroll in the right column; dock wraps Undo above the primary when narrow. `battle-mission-initiative.png` |
+| MultiSideInitiativeStep (PM7) | Turn start, 3–4 sides | ✅ | 2026-11-27: Roll all sides and the dock are reachable with all four sides visible. `battle-four-initiative.png` |
+| MovementStep, incl. dense list (PM11 follow-up) | Movement phase, 4 sides | ⚠️ | 2026-11-27: roster stands in for the table list; mover card name and stats stack in the narrow column, move tiles are a short scroll below the fold. `battle-mission-movement.png`, `battle-four-movement.png` |
+| CombatStep / shot picker | Combat phase | ✅ | 2026-11-27: Shoot sits inside each row in the table; "All sides shoot" with 4 sides checked. `battle-mission-combat.png`, `battle-four-combat.png` |
+| CombatSolverSheet | Resolve a shot | ⚠️ | 2026-11-27: opens from a row’s Shoot with Close reachable; attacker and target lists are two columns and scroll (no regression from the table view; full dice section not re-checked). `battle-sheet-solver.png` |
 | DamagePreviewCard | Shot result | ⬜ | |
 | CriticalPendingStep / CritSheet | A crit | ⬜ | Check that the attacker side name fits |
 | CleanUpStep | End phase | ⬜ | |
 | ObjectiveStrip (PM8) | Game with an objective | ⬜ | Under the step bar |
 | ObjectiveScoreCard (PM8) | Clean up with an objective | ⬜ | |
-| UnitFocusSheet | Tap a unit | ⬜ | |
-| EventLogSheet | Toolbar | ⬜ | |
+| UnitFocusSheet | Tap a unit | ✅ | 2026-11-27: Close and the Shoot button are reachable; content scrolls. `battle-sheet-unitfocus.png` |
+| EventLogSheet | Toolbar | ✅ | 2026-11-27: opens from the toolbar with Close hittable (asserted in `LandscapeBattleUITests`). `battle-sheet-eventlog.png` |
 | BoardSheet (PM12) | Battle toolbar → Board | ⬜ | |
 | UseSupportView / BattlefieldSupportView / BuildingRulesView (PM11) | Game with support or buildings | ⬜ | |
 | Mission 5 withdrawal; Close Quarters punch | Missions 4–5 | ✅ | |
