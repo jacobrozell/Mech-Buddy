@@ -10,11 +10,11 @@ enum BattleStageLayout: Equatable {
 
     /// Width of the step-and-dock column on the right.
     static func toolColumnWidth(idiom: UIUserInterfaceIdiom) -> CGFloat {
-        idiom == .pad ? 380 : 330
+        idiom == .pad ? 380 : 300
     }
 
     /// Narrowest a side column may get before the grid drops a column.
-    static let minSideColumnWidth: CGFloat = 200
+    static let minSideColumnWidth: CGFloat = 190
 
     /// Phone landscape is compact height (large phones can still report a regular width). iPad uses the idiom
     /// with a regular width, so Split View and Slide Over fall back to the portrait column. Accessibility text
@@ -51,9 +51,6 @@ enum BattleStageLayout: Equatable {
         let n = max(1, columns)
         return stride(from: 0, to: groups.count, by: n).map { Array(groups[$0..<min($0 + n, groups.count)]) }
     }
-
-    /// 3 or 4 sides use the one-line rows, as the portrait lists do; a 1 v 1 column has room for two lines.
-    static func usesDenseRows(sideCount: Int) -> Bool { sideCount > 2 }
 }
 
 struct BattleRoster: View {
@@ -92,6 +89,7 @@ struct BattleRoster: View {
             }
         }
         .background(Color(.secondarySystemBackground))
+        .clipped()
     }
 
     private func sideColumn(_ group: SideGroup) -> some View {
@@ -112,7 +110,7 @@ struct BattleRoster: View {
             landingUnitID: landingUnitID,
             onOpenUnit: { onOpenUnit(unit) },
             onShoot: { onShoot(unit) },
-            isDense: BattleStageLayout.usesDenseRows(sideCount: session.sides.count)
+            isNarrow: true
         )
     }
 
@@ -184,7 +182,7 @@ struct BattleUnitRow: View {
     var landingUnitID: UUID?
     var onOpenUnit: () -> Void
     var onShoot: () -> Void
-    var isDense = false
+    var isNarrow = false
 
     var body: some View {
         // Dense row with Shoot inside the card (FUTURE-PLAN §1.2); it used to float in its own row.
@@ -192,7 +190,7 @@ struct BattleUnitRow: View {
             unit: unit,
             isActiveSide: isActiveSide,
             accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
-            isDense: isDense,
+            isNarrow: isNarrow,
             onShoot: offersShoot ? onShoot : nil,
             action: onOpenUnit
         )

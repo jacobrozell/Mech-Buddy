@@ -99,6 +99,10 @@ struct UnitRowCard: View {
     /// One line per 'Mech (short name, pips, Shoot) for three or four sides, so a whole table fits one portrait
     /// screen (PlayModeSpec § 8.6). Accessibility sizes ignore it.
     var isDense: Bool = false
+    /// Half-width side column (landscape table view, FUTURE-PLAN 1.7): name and Shoot on line 1, pips on line 2,
+    /// and a status chip on its own line only when it says something (idle "waits" chips are dropped).
+    /// Accessibility sizes ignore it.
+    var isNarrow: Bool = false
     var shootingOver: Bool = false
     var hint: String = "Opens this ’Mech"
     /// Shows the trailing Shoot button when set.
@@ -116,7 +120,7 @@ struct UnitRowCard: View {
             for: unit,
             isActiveSide: isActiveSide,
             // The Shoot button already says "ready", so the row skips that chip.
-            showsIdleStatus: showsIdleStatus && onShoot == nil,
+            showsIdleStatus: showsIdleStatus && onShoot == nil && !isNarrow,
             shootingOver: shootingOver,
             forcedWithdrawal: forcedWithdrawal
         )
@@ -127,6 +131,8 @@ struct UnitRowCard: View {
             VStack(alignment: .leading, spacing: TMSpace.xs) {
                 if isLarge {
                     largeLayout
+                } else if isNarrow {
+                    narrowLayout
                 } else if isDense {
                     denseLayout
                 } else {
@@ -157,6 +163,52 @@ struct UnitRowCard: View {
         }
         .accessibilityElement(children: .contain)
         .id(unit.id)
+    }
+
+    private var narrowLayout: some View {
+        VStack(alignment: .leading, spacing: TMSpace.xxs) {
+            HStack(alignment: .center, spacing: TMSpace.xs) {
+                openButton {
+                    HStack(alignment: .center, spacing: TMSpace.xs) {
+                        if let mini = unit.mini { MiniDot(marker: mini) }
+                        ViewThatFits(in: .horizontal) {
+                            nameText(unit.name)
+                            nameText(StatusChip.Kind.short(unit.name))
+                        }
+                        Spacer(minLength: 0)
+                        if onShoot == nil { chevron }
+                    }
+                    .frame(minHeight: 30)
+                }
+                if let onShoot {
+                    shootButton(onShoot)
+                }
+            }
+            openButton {
+                VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: TMSpace.sm) {
+                            armorTrack
+                            structureTrack
+                        }
+                        VStack(alignment: .leading, spacing: TMSpace.xxs) {
+                            armorTrack
+                            structureTrack
+                        }
+                    }
+                    if let chip {
+                        StatusChip(kind: chip).lineLimit(1)
+                    }
+                    if let conditions = UnitConditions.line(for: unit) {
+                        Text(conditions)
+                            .font(TMFont.detail)
+                            .foregroundStyle(TMColor.warning)
+                            .lineLimit(1)
+                    }
+                }
+            }
+            .accessibilityHidden(true)
+        }
     }
 
     private var denseLayout: some View {
