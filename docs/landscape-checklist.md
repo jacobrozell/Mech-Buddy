@@ -28,14 +28,14 @@ Status: ✅ checked and fine · ⚠️ checked, issue noted · ⬜ not checked
 | MultiSideInitiativeStep (PM7) | Turn start, 3–4 sides | ✅ | 2026-11-27: Roll all sides and the dock are reachable with all four sides visible. `battle-four-initiative.png` |
 | MovementStep, incl. dense list (PM11 follow-up) | Movement phase, 4 sides | ⚠️ | 2026-11-27: roster stands in for the table list; mover card name and stats stack in the narrow column, move tiles are a short scroll below the fold. `battle-mission-movement.png`, `battle-four-movement.png` |
 | CombatStep / shot picker | Combat phase | ✅ | 2026-11-27: Shoot sits inside each row in the table; "All sides shoot" with 4 sides checked. `battle-mission-combat.png`, `battle-four-combat.png` |
-| CombatSolverSheet | Resolve a shot | ⬜ | |
+| CombatSolverSheet | Resolve a shot | ⚠️ | 2026-11-27: opens from a row’s Shoot with Close reachable; attacker and target lists are two columns and scroll (no regression from the table view; full dice section not re-checked). `battle-sheet-solver.png` |
 | DamagePreviewCard | Shot result | ⬜ | |
 | CriticalPendingStep / CritSheet | A crit | ⬜ | Check that the attacker side name fits |
 | CleanUpStep | End phase | ⬜ | |
 | ObjectiveStrip (PM8) | Game with an objective | ⬜ | Under the step bar |
 | ObjectiveScoreCard (PM8) | Clean up with an objective | ⬜ | |
-| UnitFocusSheet | Tap a unit | ⬜ | |
-| EventLogSheet | Toolbar | ⬜ | |
+| UnitFocusSheet | Tap a unit | ✅ | 2026-11-27: Close and the Shoot button are reachable; content scrolls. `battle-sheet-unitfocus.png` |
+| EventLogSheet | Toolbar | ✅ | 2026-11-27: opens from the toolbar with Close hittable (asserted in `LandscapeBattleUITests`). `battle-sheet-eventlog.png` |
 | BoardSheet (PM12) | Battle toolbar → Board | ⬜ | |
 | UseSupportView / BattlefieldSupportView / BuildingRulesView (PM11) | Game with support or buildings | ⬜ | |
 | Mission 5 withdrawal; Close Quarters punch | Missions 4–5 | ✅ | |
