@@ -18,9 +18,9 @@ struct BoardEditorView: View {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, canSave: Bool = true, onChange: @escaping (BoardLayout) -> Void) {
+    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, canSave: Bool = true, tokenPlan: [BoardTokens.Spec] = [], onChange: @escaping (BoardLayout) -> Void) {
         self.canSave = canSave
-        _model = State(initialValue: BoardEditorModel(board: board, sides: sides, palette: palette, onChange: onChange))
+        _model = State(initialValue: BoardEditorModel(board: board, sides: sides, palette: palette, tokenPlan: tokenPlan, onChange: onChange))
     }
 
     private var isRegular: Bool { horizontalSizeClass == .regular && verticalSizeClass == .regular }
@@ -38,16 +38,16 @@ struct BoardEditorView: View {
             .sheet(isPresented: $showSave) {
                 BoardSaveSheet(board: model.board) { model.linkToPreset($0) }
             }
-            .sheet(isPresented: $showList, onDismiss: { model.selection = nil }) {
+            .sheet(isPresented: $showList, onDismiss: { model.clearSelection() }) {
                 BoardPieceListView(model: model)
                     .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: Binding(
-                get: { model.selection != nil && !showList && !isRegular && !isLandscapePhone },
-                set: { if !$0 { model.selection = nil } }
+                get: { model.hasSelection && !showList && !isRegular && !isLandscapePhone },
+                set: { if !$0 { model.clearSelection() } }
             )) {
-                if let id = model.selection {
-                    BoardInspectorView(model: model, pieceID: id)
+                if model.hasSelection {
+                    BoardSelectionInspector(model: model)
                         .presentationDetents([.height(240), .medium, .large])
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                         .presentationDragIndicator(.visible)
@@ -67,13 +67,13 @@ struct BoardEditorView: View {
     private var content: some View {
         if isRegular {
             HStack(spacing: 0) {
-                BoardPaletteView(items: model.palette.items, axis: .vertical, onTap: { model.add($0) }, onDrag: handleDrag)
+                BoardPaletteView(items: model.paletteItems, axis: .vertical, onTap: { model.add($0) }, onDrag: handleDrag)
                     .frame(width: 220)
                 Divider()
                 canvasColumn
-                if let id = model.selection {
+                if model.hasSelection {
                     Divider()
-                    BoardInspectorView(model: model, pieceID: id)
+                    BoardSelectionInspector(model: model)
                         .frame(width: 340)
                 }
             }
@@ -82,11 +82,11 @@ struct BoardEditorView: View {
                 canvasColumn
                 Divider()
                 VStack(spacing: 0) {
-                    BoardPaletteView(items: model.palette.items, axis: .vertical, onTap: { model.add($0) }, onDrag: handleDrag)
-                        .frame(maxHeight: model.selection == nil ? .infinity : 150)
-                    if let id = model.selection {
+                    BoardPaletteView(items: model.paletteItems, axis: .vertical, onTap: { model.add($0) }, onDrag: handleDrag)
+                        .frame(maxHeight: model.hasSelection ? 150 : .infinity)
+                    if model.hasSelection {
                         Divider()
-                        BoardInspectorView(model: model, pieceID: id)
+                        BoardSelectionInspector(model: model)
                     }
                 }
                 .frame(width: 300)
@@ -94,7 +94,7 @@ struct BoardEditorView: View {
         } else {
             VStack(spacing: 0) {
                 canvasColumn
-                BoardPaletteView(items: model.palette.items, axis: .horizontal, onTap: { model.add($0) }, onDrag: handleDrag)
+                BoardPaletteView(items: model.paletteItems, axis: .horizontal, onTap: { model.add($0) }, onDrag: handleDrag)
                     .frame(height: 84)
             }
         }
@@ -126,6 +126,18 @@ struct BoardEditorView: View {
                 Text("Snap \(model.snap.title)")
                     .font(TMFont.detail)
                     .foregroundStyle(.secondary)
+            }
+            if let tokens = model.tokenCounterText {
+                Text(tokens)
+                    .font(TMFont.detail)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("as.board.tokens.counter")
+            }
+            if let warning = model.sheetWarning {
+                Label(warning, systemImage: "exclamationmark.triangle.fill")
+                    .font(TMFont.detail)
+                    .foregroundStyle(TMColor.warning)
+                    .accessibilityIdentifier("as.board.sheetWarning")
             }
             if !model.warnings.isEmpty {
                 Label("\(model.warnings.count) \(model.warnings.count == 1 ? "piece is" : "pieces are") inside a deployment zone.",
@@ -199,6 +211,10 @@ struct BoardEditorView: View {
                 if canSave {
                     Button("Save board", systemImage: "square.and.arrow.down") { showSave = true }
                         .accessibilityIdentifier("as.board.save")
+                }
+                if !model.board.sheets.isEmpty {
+                    Button("Fit table to sheets", systemImage: "arrow.up.left.and.arrow.down.right") { model.fitTableToSheets() }
+                        .accessibilityIdentifier("as.board.fitTable")
                 }
                 Button("Reset zones", systemImage: "arrow.counterclockwise") { model.resetZones() }
                     .accessibilityIdentifier("as.board.resetZones")

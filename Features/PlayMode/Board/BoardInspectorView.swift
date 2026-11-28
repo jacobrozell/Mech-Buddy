@@ -38,11 +38,21 @@ struct BoardInspectorView: View {
                 ))
                 .textFieldStyle(.roundedBorder)
                 .accessibilityIdentifier("as.board.inspector.name")
-                stepper("Width", value: f.area.width, range: 0.5...model.board.width, id: "width") {
-                    model.resize(pieceID, width: $0, depth: f.area.depth)
-                }
-                stepper("Depth", value: f.area.depth, range: 0.5...model.board.depth, id: "depth") {
-                    model.resize(pieceID, width: f.area.width, depth: $0)
+                if f.kind == .objectiveToken {
+                    Picker("Owner", selection: Binding(
+                        get: { f.side ?? "A" },
+                        set: { model.setSide(pieceID, $0) }
+                    )) {
+                        ForEach(model.sideLetters, id: \.self) { Text("Side \($0)").tag($0) }
+                    }
+                    .accessibilityIdentifier("as.board.inspector.side")
+                } else {
+                    stepper("Width", value: f.area.width, range: 0.5...model.board.width, id: "width") {
+                        model.resize(pieceID, width: $0, depth: f.area.depth)
+                    }
+                    stepper("Depth", value: f.area.depth, range: 0.5...model.board.depth, id: "depth") {
+                        model.resize(pieceID, width: f.area.width, depth: $0)
+                    }
                 }
                 if f.kind == .hill || f.kind == .building {
                     let top: Double = f.kind == .hill ? 4 : 12
@@ -71,6 +81,7 @@ struct BoardInspectorView: View {
                 stepper("Centre from top", value: f.area.midY, range: 0...model.board.depth, id: "y", step: model.step) {
                     model.setPosition(pieceID, y: $0 - f.area.depth / 2)
                 }
+                if f.kind != .objectiveToken {
                 HStack {
                     Text("Turned \(BoardRules.plain(f.degrees))°")
                         .font(TMFont.body)
@@ -87,6 +98,7 @@ struct BoardInspectorView: View {
                     .accessibilityIdentifier("as.board.inspector.rotate.plus")
                 }
                 .buttonStyle(.bordered)
+                }
                 nudgePad
             }
             HStack(spacing: TMSpace.md) {
@@ -104,7 +116,9 @@ struct BoardInspectorView: View {
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("as.board.inspector.delete")
             }
-            if let item { rules(item) }
+            if f.kind == .objectiveToken {
+                tokenNote(f)
+            } else if let item { rules(item) }
         }
     }
 
@@ -130,6 +144,11 @@ struct BoardInspectorView: View {
                 Label("Inside " + sides.map { "Side \($0)’s zone" }.joined(separator: " and "), systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(TMColor.warning)
                     .accessibilityIdentifier("as.board.inspector.zoneWarning")
+            }
+            ForEach(Array(model.tokenWarnings(f).enumerated()), id: \.offset) { _, text in
+                Label(text, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(TMColor.warning)
+                    .accessibilityIdentifier("as.board.inspector.tokenWarning")
             }
             ForEach(near, id: \.index) { neighbour in
                 let other = model.board.features[neighbour.index]
@@ -183,6 +202,17 @@ struct BoardInspectorView: View {
             Text("\(title) \(BoardRules.plain(value))″").monospacedDigit()
         }
         .accessibilityIdentifier("as.board.inspector.\(id)")
+    }
+
+    /// What a token is for, from the game's objective when the setup has one (§ 7.1).
+    private func tokenNote(_ f: BoardLayout.Feature) -> some View {
+        let spec = BoardTokens.spec(for: f, plan: model.tokenPlan)
+        let text = spec.map { "\($0.objective.title): " + ($0.objective.setupStep ?? "") }
+            ?? "A marker for an objective token. It has no effect on the board. Raid and Hold the Fort name theirs from the game’s objective."
+        return PlaySetupSection(title: "Objective token", footnote: "Quick-Start p. 7.") {
+            Text(text).font(TMFont.detail).fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityIdentifier("as.board.inspector.tokenNote")
     }
 
     /// What the piece does in play, in plain words, with the page (§ 9.3).

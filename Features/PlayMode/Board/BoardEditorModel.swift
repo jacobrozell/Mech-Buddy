@@ -9,6 +9,8 @@ import MechBuddyDomain
 final class BoardEditorModel {
     private(set) var editor: BoardEditor
     var selection: UUID?
+    /// The selected mapsheet, by index (sheets have no ids and never reorder). Only one of piece and sheet is selected.
+    var sheetSelection: Int?
     var snap: BoardSnap = .whole
     var showBands = false
     var isMeasuring = false
@@ -21,12 +23,15 @@ final class BoardEditorModel {
     var pan: CGSize = .zero
     let palette: TerrainPaletteFile
     let sides: [MatchSide]
+    /// Tokens the game's objective calls for (§ 7.1); empty means generic numbered tokens.
+    let tokenPlan: [BoardTokens.Spec]
     private let onChange: (BoardLayout) -> Void
 
-    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, onChange: @escaping (BoardLayout) -> Void) {
+    init(board: BoardLayout, sides: [MatchSide], palette: TerrainPaletteFile, tokenPlan: [BoardTokens.Spec] = [], onChange: @escaping (BoardLayout) -> Void) {
         editor = BoardEditor(board: board)
         self.sides = sides
         self.palette = palette
+        self.tokenPlan = tokenPlan
         self.onChange = onChange
     }
 
@@ -34,6 +39,30 @@ final class BoardEditorModel {
     var sideCount: Int { max(sides.count, 2) }
     var selected: BoardLayout.Feature? { selection.flatMap { editor.feature($0) } }
     var selectedIndex: Int? { selection.flatMap { editor.index(of: $0) } }
+    var hasSelection: Bool { selection != nil || sheetSelection != nil }
+
+    /// The palette's terrain plus the objective token tile.
+    var paletteItems: [TerrainPaletteItem] { palette.items + [.objectiveToken] }
+
+    func select(_ id: UUID?) {
+        selection = id
+        if id != nil { sheetSelection = nil }
+    }
+
+    func selectSheet(_ index: Int?) {
+        sheetSelection = index
+        if index != nil { selection = nil }
+    }
+
+    func clearSelection() {
+        selection = nil
+        sheetSelection = nil
+    }
+
+    /// What VoiceOver says for one piece (tokens read as tokens).
+    func spoken(_ feature: BoardLayout.Feature) -> String {
+        feature.kind == .objectiveToken ? BoardTokens.spoken(feature) : BoardRules.spoken(feature, in: board, sideCount: sideCount)
+    }
 
     /// The zones for this game: the board's own for the game's sides, or generated from § 6.4.
     var zones: [BoardLayout.Zone] {
@@ -58,7 +87,7 @@ final class BoardEditorModel {
 
     func paletteItem(_ feature: BoardLayout.Feature) -> TerrainPaletteItem? {
         // The closest palette piece of the same kind: used for the rules copy in the inspector.
-        let candidates = palette.items.filter { $0.kind == feature.kind }
+        let candidates = paletteItems.filter { $0.kind == feature.kind }
         return candidates.min { abs($0.width * $0.depth - feature.area.width * feature.area.depth) < abs($1.width * $1.depth - feature.area.width * feature.area.depth) }
     }
 
@@ -73,10 +102,40 @@ final class BoardEditorModel {
 
     func add(_ item: TerrainPaletteItem, centredAt point: BoardLayout.Point? = nil) {
         let p = point ?? .init(x: board.width / 2, y: board.depth / 2)
-        selection = editor.add(item, centredAt: p.x, p.y, snap: snap)
+        if item.kind == .objectiveToken {
+            addToken(centredAt: point == nil ? nil : p)
+            return
+        }
+        select(editor.add(item, centredAt: p.x, p.y, snap: snap))
         commit()
         announce("\(item.title) added")
     }
+
+    // MARK: Objective tokens (§ 7.1)
+
+    /// Adds the next token the game's objective wants (or a generic numbered one). Tapped in with no place given,
+    /// each token steps 2″ along from the centre so they don't stack.
+    func addToken(centredAt point: BoardLayout.Point? = nil) {
+        let slot = BoardTokens.nextSlot(in: board, plan: tokenPlan)
+        let existing = board.features.filter { $0.kind == .objectiveToken }.count
+        let p = point ?? .init(x: board.width / 2 + Double(existing % 8) * 2 - 7, y: board.depth / 2)
+        select(editor.addToken(side: slot.side, name: slot.name, centredAt: p.x, p.y, snap: snap))
+        commit()
+        announce("\(slot.name) added")
+    }
+
+    func setSide(_ id: UUID, _ side: String) { editor.setSide(id, side); commit() }
+
+    /// "Raid tokens: A 2 of 3, B 0 of 3", or nil with no objective tokens to place.
+    var tokenCounterText: String? { BoardTokens.counterText(board, plan: tokenPlan) }
+
+    /// Hints for one token: too near its own edge, or too near a sibling (p. 7).
+    func tokenWarnings(_ feature: BoardLayout.Feature) -> [String] {
+        BoardTokens.warnings(for: feature, in: board, plan: tokenPlan, zones: zones)
+    }
+
+    /// Sides a token can belong to: the game's.
+    var sideLetters: [String] { Array(["A", "B", "C", "D"].prefix(sideCount)) }
 
     func beginGesture() {
         editor.checkpoint()
@@ -162,7 +221,7 @@ final class BoardEditorModel {
     }
 
     func duplicate(_ id: UUID) {
-        selection = editor.duplicate(id)
+        select(editor.duplicate(id))
         commit()
         announce("Duplicated")
     }
@@ -184,6 +243,7 @@ final class BoardEditorModel {
 
     private func afterHistory() {
         if let selection, editor.feature(selection) == nil { self.selection = nil }
+        if let sheet = sheetSelection, !board.sheets.indices.contains(sheet) { sheetSelection = nil }
         commit()
     }
 
@@ -206,10 +266,90 @@ final class BoardEditorModel {
         announce("Zones reset")
     }
 
+    /// The menu: every zone for this game's sides to the same depth, along each side's own home edge.
     func setZoneDepth(_ inches: Double) {
-        editor.setZoneDepth(inches, sideCount: sideCount)
+        let set = zones.map { BoardRules.resized($0, toDepth: inches, width: board.width, depth: board.depth, snap: .whole) }
+        editor.setZoneSet(set, sideCount: sideCount)
         commit()
     }
+
+    // MARK: Zone edges (§ 9.2)
+
+    func zone(_ side: String) -> BoardLayout.Zone? { zones.first { $0.side == side } }
+
+    func zoneDepth(of side: String) -> Double? {
+        zone(side).map { BoardRules.depth(of: $0, width: board.width, depth: board.depth) }
+    }
+
+    /// During a handle drag (a checkpoint is already taken): the zone's inner edge follows the finger, snapped.
+    func liveZoneDepth(_ side: String, toward point: BoardLayout.Point) {
+        guard let zone = zone(side) else { return }
+        let edge = BoardRules.homeEdge(of: zone, width: board.width, depth: board.depth)
+        let wanted = BoardRules.depth(toward: point, edge: edge, width: board.width, depth: board.depth)
+        let changed = BoardRules.resized(zone, toDepth: wanted, width: board.width, depth: board.depth, snap: snap)
+        editor.liveZoneSet(zones.map { $0.side == side ? changed : $0 }, sideCount: sideCount)
+        let inside = BoardRules.piecesInsideZones(board.features, zones: self.zones)
+        hud = "Side \(side) zone \(BoardRules.plain(BoardRules.depth(of: changed, width: board.width, depth: board.depth)))″"
+            + (inside > 0 ? " · \(inside) inside" : "")
+        commit()
+    }
+
+    /// VoiceOver's adjustable action: 1″ deeper or shallower, one undoable change.
+    func nudgeZoneDepth(_ side: String, by inches: Double) {
+        guard let zone = zone(side) else { return }
+        let now = BoardRules.depth(of: zone, width: board.width, depth: board.depth)
+        let changed = BoardRules.resized(zone, toDepth: now + inches, width: board.width, depth: board.depth, snap: .off)
+        editor.setZoneSet(zones.map { $0.side == side ? changed : $0 }, sideCount: sideCount)
+        commit()
+        let depth = BoardRules.plain(BoardRules.depth(of: changed, width: board.width, depth: board.depth))
+        announce("Side \(side) zone \(depth) inches" + (BoardRules.zoneWarningText(count: BoardRules.piecesInsideZones(board.features, zones: zones)).map { ". \($0)" } ?? ""))
+    }
+
+    // MARK: Mapsheets (§ 9.2)
+
+    var selectedSheet: BoardLayout.Sheet? {
+        sheetSelection.flatMap { board.sheets.indices.contains($0) ? board.sheets[$0] : nil }
+    }
+
+    /// During a sheet drag (a checkpoint is already taken).
+    func placeSheet(_ index: Int, x: Double, y: Double) {
+        editor.placeSheet(index, x: x, y: y, snap: snap)
+        if board.sheets.indices.contains(index) {
+            let a = board.sheets[index].area
+            hud = "\(BoardRules.plain(a.x))″, \(BoardRules.plain(a.y))″"
+        }
+        commit()
+    }
+
+    func nudgeSheet(_ index: Int, dx: Double, dy: Double) {
+        editor.nudgeSheet(index, dx: dx, dy: dy)
+        commit()
+        if board.sheets.indices.contains(index) {
+            let a = board.sheets[index].area
+            announce("Top left \(BoardRules.plain(a.x)) from the left, \(BoardRules.plain(a.y)) from the top")
+        }
+    }
+
+    func setSheetPosition(_ index: Int, x: Double? = nil, y: Double? = nil) {
+        editor.setSheetPosition(index, x: x, y: y)
+        commit()
+    }
+
+    func rotateSheet(_ index: Int) {
+        editor.rotateSheet(index)
+        commit()
+        if board.sheets.indices.contains(index) {
+            announce("Turned \(board.sheets[index].rotation ?? 0) degrees")
+        }
+    }
+
+    func fitTableToSheets() {
+        editor.fitTableToSheets()
+        commit()
+        announce("Table is \(BoardRules.plain(board.width)) by \(BoardRules.plain(board.depth)) inches")
+    }
+
+    var sheetWarning: String? { BoardRules.sheetWarningText(board) }
 
     /// Distance readout for the Measure tool.
     var measureText: String? {
