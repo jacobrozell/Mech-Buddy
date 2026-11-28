@@ -606,6 +606,7 @@ struct BattleFlowView: View {
                 Image(systemName: "list.bullet.rectangle")
             }
             .accessibilityLabel("What just happened")
+            .accessibilityIdentifier("as.battle.eventLog")
             Menu {
                 if store.canUndo {
                     Button(store.undoMenuTitle, systemImage: "arrow.uturn.backward") {
