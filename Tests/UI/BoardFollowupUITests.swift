@@ -55,9 +55,15 @@ final class BoardFollowupUITests: XCTestCase {
         XCTAssertTrue(position.waitForExistence(timeout: 15), "The sheet did not open its inspector")
         let before = position.label
 
-        // Turn it 90 degrees (undo of every sheet change is covered in BoardFollowupTests).
+        // Turn it 90 degrees, then Undo on the canvas turns it back.
+        let rotation = element(app, "as.board.sheet.inspector.rotation")
+        let turnedBack = rotation.label
         tap(app.buttons["as.board.sheet.inspector.rotate"])
-        XCTAssertTrue(element(app, "as.board.sheet.inspector.rotation").label.contains("90"), element(app, "as.board.sheet.inspector.rotation").label)
+        XCTAssertTrue(rotation.label.contains("90"), rotation.label)
+        tap(app.buttons["as.board.undo"])
+        XCTAssertEqual(rotation.label, turnedBack, "Undo did not revert the turn")
+        tap(app.buttons["as.board.sheet.inspector.rotate"])
+        XCTAssertTrue(rotation.label.contains("90"), rotation.label)
 
         // Now it follows a drag.
         let from = sheet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))

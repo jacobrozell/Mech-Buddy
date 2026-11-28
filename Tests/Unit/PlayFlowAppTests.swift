@@ -274,6 +274,24 @@ struct BoardEditorModelTests {
         return BoardEditorModel(board: board, sides: sides, palette: palette, onChange: onChange)
     }
 
+    @Test("Turning a selected sheet through the model, as the canvas and inspector do, undoes and writes through")
+    func turnSheetThenUndo() throws {
+        var written: [BoardLayout] = []
+        let palette = try BundleContentCatalogRepository(bundle: .main).terrainPalette()
+        let sheet = BoardLayout.Sheet(name: "Grassland #1", area: .init(x: 0, y: 0, width: 22, depth: 17))
+        let board = BoardLayout(width: 48, depth: 48, sheets: [sheet], zones: BoardZones.generate(width: 48, depth: 48, sideCount: 2))
+        let model = BoardEditorModel(board: board, sides: [], palette: palette) { written.append($0) }
+        model.selectSheet(0)
+        model.rotateSheet(0)
+        #expect(model.board.sheets[0].rotation == 90 && model.canUndo && written.count == 1)
+        model.undo()
+        #expect(model.board.sheets[0] == sheet)
+        #expect(model.sheetSelection == 0, "Undo keeps the sheet selected")
+        #expect(written.count == 2 && written.last?.sheets[0] == sheet)
+        model.redo()
+        #expect(model.board.sheets[0].rotation == 90)
+    }
+
     @Test("Adding a piece selects it, writes the board through, and can be undone and redone")
     func addUndoRedo() throws {
         var written: [BoardLayout] = []

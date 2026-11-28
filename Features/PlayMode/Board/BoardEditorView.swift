@@ -159,7 +159,8 @@ struct BoardEditorView: View {
             Button("Done") { dismiss() }
                 .accessibilityIdentifier("as.board.done")
         }
-        ToolbarItemGroup(placement: .bottomBar) {
+        // Undo and Redo sit at the top: the selection inspector sheet covers the bottom bar.
+        ToolbarItemGroup(placement: .topBarLeading) {
             Button { model.undo() } label: {
                 Label("Undo", systemImage: "arrow.uturn.backward")
             }
@@ -172,6 +173,8 @@ struct BoardEditorView: View {
             .disabled(!model.canRedo)
             .keyboardShortcut("z", modifiers: [.command, .shift])
             .accessibilityIdentifier("as.board.redo")
+        }
+        ToolbarItemGroup(placement: .bottomBar) {
             Spacer()
             Button {
                 model.isMeasuring.toggle()
