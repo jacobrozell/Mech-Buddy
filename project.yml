@@ -116,6 +116,8 @@ targets:
     dependencies:
       - target: MechBuddyDomain
       - target: MechBuddyData
+      # Hosted by the app so the tests can `@testable import MechBuddy` and cover Features/ logic.
+      - target: MechBuddy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.mechbuddy.tests

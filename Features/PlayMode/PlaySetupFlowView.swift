@@ -173,8 +173,7 @@ struct PlaySetupFlowView: View {
                     title: "Continue",
                     placement: .dock,
                     tint: TMColor.signal,
-                    isDisabled: (step == .sides && !setup.teamIssues.isEmpty)
-                        || (step == .forces && setup.sides.contains { setup.force($0.id).isEmpty }),
+                    isDisabled: PlaySetupRules.isContinueDisabled(step: step, setup: setup),
                     accessibilityIdentifier: "as.play.setup.continue",
                     action: advance
                 )
@@ -191,36 +190,22 @@ struct PlaySetupFlowView: View {
         !(dependencies.preferences.collection?.isEmpty ?? true)
     }
 
-    private var startBlockedReason: String? {
-        if let issue = setup.teamIssues.first { return PlaySidesStep.text(for: issue) }
-        if let empty = setup.sides.first(where: { setup.force($0.id).isEmpty }) {
-            return "\(empty.name) needs at least one ’Mech."
-        }
-        if setup.unitCount > PlaySetup.maxUnitsPerGame {
-            return "Up to \(PlaySetup.maxUnitsPerGame) ’Mechs in one game."
-        }
-        return nil
-    }
+    private var startBlockedReason: String? { PlaySetupRules.startBlockedReason(for: setup) }
 
-    private var overBudgetTitle: String {
-        guard let side = overBudgetSide else { return "" }
-        let check = setup.budgetCheck(side)
-        let name = setup.sides.first { $0.id == side }?.name ?? side.displayName
-        return "\(name) is \(check.text). Play anyway?"
-    }
+    private var overBudgetTitle: String { PlaySetupRules.overBudgetTitle(side: overBudgetSide, in: setup) }
 
     private func advance() {
-        if step == .forces, let over = setup.sides.first(where: { setup.budgetCheck($0.id).isOver }) {
-            overBudgetSide = over.id
+        if step == .forces, let over = PlaySetupRules.overBudgetSide(in: setup) {
+            overBudgetSide = over
             return
         }
-        if let next = PlaySetupStep(rawValue: step.rawValue + 1) {
+        if let next = PlaySetupRules.next(after: step) {
             step = next
         }
     }
 
     private func goBack() {
-        if let previous = PlaySetupStep(rawValue: step.rawValue - 1) {
+        if let previous = PlaySetupRules.previous(before: step) {
             step = previous
         } else {
             dismiss()
@@ -236,12 +221,7 @@ struct PlaySetupFlowView: View {
     }
 
     private func start() {
-        var ready = setup
-        for index in ready.sides.indices {
-            let trimmed = ready.sides[index].name.trimmingCharacters(in: .whitespaces)
-            ready.sides[index].name = trimmed.isEmpty ? ready.sides[index].id.displayName : trimmed
-        }
-        matches.requestPlay(ready, using: dependencies)
+        matches.requestPlay(PlaySetupRules.readyToStart(setup), using: dependencies)
     }
 }
 

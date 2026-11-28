@@ -131,17 +131,18 @@ struct PlayHomeView: View {
         dependencies.releaseSurface.isEnabled(.missionLadder) && ladder.count > 1
     }
 
-    /// Missions the player can start now, in ladder order.
-    private var playable: [GuidedScenarioDTO] {
-        ladder.filter { !$0.gated }.compactMap { missions[$0.id] }
+    /// The ladder's pure rules: what is playable, which mission is next, the path's stops and copy.
+    private var model: MissionLadder {
+        MissionLadder(
+            items: ladder,
+            missions: missions,
+            completed: dependencies.preferences.completedMissions,
+            ridgeLineEnabled: dependencies.releaseSurface.isEnabled(.ridgeLineMission)
+        )
     }
 
     /// The next mission to play: the first one not finished yet, else the last one.
-    private var featured: GuidedScenarioDTO? {
-        guard dependencies.releaseSurface.isEnabled(.ridgeLineMission) else { return nil }
-        let done = dependencies.preferences.completedMissions
-        return playable.first { !done.contains($0.scenarioId) } ?? playable.last
-    }
+    private var featured: GuidedScenarioDTO? { model.featured }
 
     @ViewBuilder
     private var heroes: some View {
@@ -176,10 +177,7 @@ struct PlayHomeView: View {
         return title(for: session.scenarioId)
     }
 
-    private func title(for id: ScenarioId?) -> String {
-        let key = (id ?? .ridgeLine).rawValue
-        return missions[key]?.title ?? ladder.first { $0.id == key }?.title ?? "Ridge Line"
-    }
+    private func title(for id: ScenarioId?) -> String { model.title(for: id) }
 
     private func startMission(_ mission: GuidedScenarioDTO, source: String, prefersZoom: Bool) {
         matches.requestNew(
@@ -288,65 +286,21 @@ struct PlayHomeView: View {
         }
     }
 
-    private func missionEyebrow(_ scenario: GuidedScenarioDTO) -> String {
-        if let stage = ladder.first(where: { $0.id == scenario.scenarioId })?.stage {
-            return stage
-        }
-        guard let number = scenario.missionNumber, number > 1 else { return "Beginner mission" }
-        return "Mission \(number) of \(max(trainingLadder.count, number))"
-    }
+    private func missionEyebrow(_ scenario: GuidedScenarioDTO) -> String { model.eyebrow(for: scenario) }
 
-    private func missionSubtitle(_ scenario: GuidedScenarioDTO) -> String {
-        let size = "\(scenario.sides.lanceA.count) vs \(scenario.sides.lanceB.count)"
-        if let minutes = scenario.estimatedMinutes {
-            return "\(size) · about \(minutes) minutes"
-        }
-        return scenario.subtitle ?? size
-    }
+    private func missionSubtitle(_ scenario: GuidedScenarioDTO) -> String { MissionLadder.subtitle(for: scenario) }
 
     /// The training path: catalog missions without a stage.
-    private var trainingLadder: [ScenarioCatalogItemDTO] { ladder.filter { $0.stage == nil } }
+    private var trainingLadder: [ScenarioCatalogItemDTO] { model.training }
 
     /// Later sections (book scenarios), in catalog order of their first mission.
-    private var stagedLadders: [(title: String, items: [ScenarioCatalogItemDTO])] {
-        var order: [String] = []
-        var items: [String: [ScenarioCatalogItemDTO]] = [:]
-        for item in ladder {
-            guard let stage = item.stage else { continue }
-            if items[stage] == nil { order.append(stage) }
-            items[stage, default: []].append(item)
-        }
-        return order.map { ($0, items[$0] ?? []) }
-    }
+    private var stagedLadders: [(title: String, items: [ScenarioCatalogItemDTO])] { model.staged }
 
     /// The training path's missions as stops.
-    private var stops: [MissionStop] { pathStops(for: trainingLadder) }
+    private var stops: [MissionStop] { model.stops }
 
     /// Missions as stops on a path, in ladder order.
-    private func pathStops(for items: [ScenarioCatalogItemDTO]) -> [MissionStop] {
-        let done = dependencies.preferences.completedMissions
-        let next = featured?.scenarioId
-        return items.enumerated().map { index, item in
-            let state: MissionStop.State
-            if item.gated || missions[item.id] == nil {
-                state = .locked
-            } else if done.contains(item.id) {
-                state = .cleared
-            } else {
-                state = item.id == next ? .next : .open
-            }
-            return MissionStop(
-                id: item.id,
-                number: item.missionNumber ?? index + 1,
-                title: item.title,
-                icon: item.icon ?? "scope",
-                unlocks: item.introduces ?? [],
-                comingSoon: item.comingSoonSummary,
-                state: state,
-                stage: item.stage
-            )
-        }
-    }
+    private func pathStops(for items: [ScenarioCatalogItemDTO]) -> [MissionStop] { model.stops(for: items) }
 
     // MARK: Learn tab
 
