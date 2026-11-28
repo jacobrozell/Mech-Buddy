@@ -32,6 +32,41 @@ final class LandscapeBattleUITests: XCTestCase {
         try driveToCombat(app, sides: ["lanceA", "lanceB"], prefix: "mission")
     }
 
+    /// The battle sheets in landscape: Close stays reachable and each sheet opens over the table.
+    @MainActor
+    func testBattleSheetsOpenInLandscape() throws {
+        let app = launch(extra: [])
+        let play = app.buttons["as.modeHome.ridgeLine"]
+        XCTAssertTrue(play.waitForExistence(timeout: 20))
+        play.tap()
+        XCTAssertTrue(app.buttons["as.ridge.tableReady"].waitForExistence(timeout: 15))
+        XCUIDevice.shared.orientation = .landscapeLeft
+        Thread.sleep(forTimeInterval: 1)
+        try driveToCombat(app, sides: ["lanceA", "lanceB"], prefix: "sheets")
+        // Unit focus: tap a 'Mech in the table.
+        let unit = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'as.battle.unit.'")).firstMatch
+        XCTAssertTrue(unit.waitForExistence(timeout: 5))
+        unit.tap()
+        XCTAssertTrue(element(app, "as.unitFocus.sheet").waitForExistence(timeout: 5))
+        checkpoint("sheet-unitfocus")
+        XCTAssertTrue(app.buttons["Close"].isHittable, "Close hidden on the unit sheet")
+        app.buttons["Close"].tap()
+        // Shot solver from the row's Shoot button.
+        let shoot = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'as.battle.shoot.'")).firstMatch
+        XCTAssertTrue(shoot.waitForExistence(timeout: 5))
+        shoot.tap()
+        XCTAssertTrue(element(app, "as.sator.sheet").waitForExistence(timeout: 5))
+        checkpoint("sheet-solver")
+        // The event log from the toolbar.
+        if app.buttons["Close"].exists { app.buttons["Close"].tap() } else { app.swipeDown() }
+        let log = app.buttons["What just happened"]
+        XCTAssertTrue(log.waitForExistence(timeout: 5))
+        log.tap()
+        XCTAssertTrue(element(app, "as.battle.log").waitForExistence(timeout: 5))
+        checkpoint("sheet-eventlog")
+        XCTAssertTrue(app.buttons["Close"].isHittable, "Close hidden on the event log")
+    }
+
     @MainActor
     func testFourSideTableShowsEverySideAndDock() throws {
         let app = launch(extra: ["-enable_full_product_surface"])
