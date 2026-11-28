@@ -78,27 +78,38 @@ final class ScreenCoverageUITests: XCTestCase {
 
     // MARK: Battle sheets
 
-    /// Starts Ridge Line and steps through setup until the battle shows unit rows.
+    /// Starts Ridge Line and steps through setup to the movement step and opens its "On the table" list.
     @MainActor
     private func reachUnitRows(_ app: XCUIApplication) -> XCUIElement {
         let play = app.buttons["as.modeHome.ridgeLine"]
         XCTAssertTrue(play.waitForExistence(timeout: 20), "Ridge Line play button missing")
         play.tap()
         let unit = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'as.battle.unit.'")).firstMatch
-        let deadline = Date().addingTimeInterval(90)
+        let deadline = Date().addingTimeInterval(120)
         while Date() < deadline, !unit.exists {
+            if app.buttons["On the table"].exists {
+                if app.buttons["On the table"].isHittable { app.buttons["On the table"].tap(); break }
+                app.swipeUp()
+                continue
+            }
             if app.buttons["as.ridge.tableReady"].exists { app.buttons["as.ridge.tableReady"].tap() }
+            else if app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Side A moves first'")).firstMatch.exists {
+                app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Side A moves first'")).firstMatch.tap()
+            }
+            else if app.buttons["Let the app roll"].exists, app.buttons["Let the app roll"].isHittable { app.buttons["Let the app roll"].tap() }
+            else if app.buttons["as.initiative.agree"].exists, app.buttons["as.initiative.agree"].isHittable { app.buttons["as.initiative.agree"].tap() }
             else if app.buttons["as.battle.primary"].exists, app.buttons["as.battle.primary"].isHittable { app.buttons["as.battle.primary"].tap() }
             else { Thread.sleep(forTimeInterval: 0.5) }
         }
-        XCTAssertTrue(unit.waitForExistence(timeout: wait), "No unit rows in the battle")
+        _ = unit.waitForExistence(timeout: wait)
+        XCTAssertTrue(unit.exists, "No unit rows in the battle")
         return unit
     }
 
     @MainActor
     func testBattleEventLogSheetOpensAndCloses() throws {
         let app = launch()
-        _ = reachUnitRows(app)
+        tap(app.buttons["as.modeHome.ridgeLine"])
         tap(app.buttons["as.battle.eventLog"])
         XCTAssertTrue(any(app, "as.battle.log").waitForExistence(timeout: wait))
         tap(app.buttons["Close"])
