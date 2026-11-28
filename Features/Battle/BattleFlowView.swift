@@ -12,6 +12,7 @@ struct BattleFlowView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var showSATOR = false
     @State private var showCrit: MatchUnitState?
@@ -289,41 +290,24 @@ struct BattleFlowView: View {
 
     @ViewBuilder
     private func stage(_ session: MatchSession, coach: BattleCoach) -> some View {
-        switch stageLayout {
-        case .stacked:
+        if BattleStageLayout.usesTable(stageLayout, step: coach.step) {
+            // Landscape table (FUTURE-PLAN 1.7): sides in columns on the left, the step and dock on the right.
+            HStack(alignment: .top, spacing: 0) {
+                BattleRoster(
+                    session: session,
+                    coach: coach,
+                    landingUnitID: landingUnitID,
+                    onOpenUnit: { focusUnit = $0 },
+                    onShoot: openShot
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                Divider()
+                toolColumn(session, coach: coach, showsUnits: false)
+                    .frame(width: BattleStageLayout.toolColumnWidth(idiom: UIDevice.current.userInterfaceIdiom))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        } else {
             toolColumn(session, coach: coach, showsUnits: true)
-        case .phoneLandscape:
-            HStack(alignment: .top, spacing: 0) {
-                BattleRoster(
-                    session: session,
-                    coach: coach,
-                    layout: .phoneLandscape,
-                    landingUnitID: landingUnitID,
-                    onOpenUnit: { focusUnit = $0 },
-                    onShoot: openShot
-                )
-                .frame(width: BattleStageLayout.unitStripWidth, alignment: .top)
-                .frame(maxHeight: .infinity, alignment: .top)
-                Divider()
-                toolColumn(session, coach: coach, showsUnits: false)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        case .padColumns:
-            HStack(alignment: .top, spacing: 0) {
-                toolColumn(session, coach: coach, showsUnits: false)
-                Divider()
-                BattleRoster(
-                    session: session,
-                    coach: coach,
-                    layout: .padColumns,
-                    landingUnitID: landingUnitID,
-                    onOpenUnit: { focusUnit = $0 },
-                    onShoot: openShot
-                )
-                .frame(width: BattleStageLayout.rosterColumnWidth)
-                .frame(maxHeight: .infinity, alignment: .top)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -449,7 +433,8 @@ struct BattleFlowView: View {
         BattleStageLayout.resolve(
             idiom: UIDevice.current.userInterfaceIdiom,
             horizontal: horizontalSizeClass,
-            vertical: verticalSizeClass
+            vertical: verticalSizeClass,
+            isAccessibilitySize: dynamicTypeSize.isAccessibilitySize
         )
     }
 
