@@ -69,7 +69,15 @@ final class PlayModeSavedForcesUITests: XCTestCase {
         }
         while (!element.exists || !element.isHittable) && tries < 10 { drag(0.38, 0.18); tries += 1 }
         while (!element.exists || !element.isHittable) && tries < 22 { drag(0.18, 0.38); tries += 1 }
+        // The keyboard can still be settling from the previous field; re-tap until this one has focus.
+        func hasFocus() -> Bool { (element.value(forKey: "hasKeyboardFocus") as? Bool) ?? false }
         tap(element)
+        var focusTries = 0
+        while !hasFocus() && focusTries < 3 {
+            _ = app.keyboards.firstMatch.waitForExistence(timeout: 2)
+            if !hasFocus() { element.tap() }
+            focusTries += 1
+        }
         element.typeText(text)
     }
 
