@@ -88,8 +88,8 @@ struct BattleRoster: View {
                 }
             }
         }
-        .background(Color(.secondarySystemBackground))
         .clipped()
+        .background(Color(.secondarySystemBackground).ignoresSafeArea())
     }
 
     private func sideColumn(_ group: SideGroup) -> some View {
@@ -182,6 +182,7 @@ struct BattleUnitRow: View {
     var landingUnitID: UUID?
     var onOpenUnit: () -> Void
     var onShoot: () -> Void
+    var isDense = false
     var isNarrow = false
 
     var body: some View {
@@ -190,6 +191,7 @@ struct BattleUnitRow: View {
             unit: unit,
             isActiveSide: isActiveSide,
             accessibilityIdentifier: "as.battle.unit.\(unit.id.uuidString)",
+            isDense: isDense,
             isNarrow: isNarrow,
             onShoot: offersShoot ? onShoot : nil,
             action: onOpenUnit
