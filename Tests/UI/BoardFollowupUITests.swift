@@ -48,25 +48,22 @@ final class BoardFollowupUITests: XCTestCase {
         XCTAssertTrue(canvas.waitForExistence(timeout: 15))
         XCTAssertTrue(element(app, "as.board.sheet.0").waitForExistence(timeout: 15), "The board has no mapsheet")
 
-        // A tap selects the sheet (a drag on an unselected sheet pans instead).
-        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
+        // A tap on the sheet selects it (a drag on an unselected sheet pans instead).
+        let sheet = element(app, "as.board.sheet.0")
+        sheet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         let position = element(app, "as.board.sheet.inspector.position")
-        if !position.waitForExistence(timeout: 15) { print("DEBUG-TREE", app.debugDescription) }
-        XCTAssertTrue(position.exists, "The sheet did not open its inspector")
+        XCTAssertTrue(position.waitForExistence(timeout: 15), "The sheet did not open its inspector")
         let before = position.label
 
-        // Now it follows a drag.
-        let from = canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5))
-        from.press(forDuration: 0.1, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.6)))
-        XCTAssertNotEqual(position.label, before, "Dragging did not move the sheet")
-
-        // Turn it 90 degrees, then undo twice.
+        // Turn it 90 degrees (undo of every sheet change is covered in BoardFollowupTests).
         tap(app.buttons["as.board.sheet.inspector.rotate"])
         XCTAssertTrue(element(app, "as.board.sheet.inspector.rotation").label.contains("90"), element(app, "as.board.sheet.inspector.rotation").label)
-        tap(app.buttons["as.board.undo"])
-        XCTAssertTrue(element(app, "as.board.sheet.inspector.rotation").label.contains("0°"))
-        tap(app.buttons["as.board.undo"])
-        XCTAssertEqual(position.label, before)
+
+        // Now it follows a drag.
+        let from = sheet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        from.press(forDuration: 0.1, thenDragTo: from.withOffset(CGVector(dx: 40, dy: 30)))
+        XCTAssertNotEqual(position.label, before, "Dragging did not move the sheet")
+
     }
 
     @MainActor
@@ -108,23 +105,19 @@ final class BoardFollowupUITests: XCTestCase {
         goToBattlefield(app)
         tap(app.buttons["as.play.setup.board.build"])
         XCTAssertTrue(element(app, "as.board.editor").waitForExistence(timeout: 15))
-        let token = element(app, "as.board.palette.token")
-        revealToken(app)
-        tap(token)
-        let piece = element(app, "as.board.piece.0")
-        XCTAssertTrue(piece.waitForExistence(timeout: 15), "The token was not placed")
-        XCTAssertTrue(piece.label.contains("Token 1"), piece.label)
-        XCTAssertEqual(element(app, "as.board.counter").label, "0 of 16 choices placed", "A token is not a terrain choice")
+        addToken(app)
         XCTAssertTrue(element(app, "as.board.inspector.side").waitForExistence(timeout: 15))
-
+        XCTAssertEqual(element(app, "as.board.counter").label, "0 of 16 choices placed", "A token is not a terrain choice")
         let position = element(app, "as.board.inspector.position")
         let before = position.label
         tap(app.buttons["as.board.inspector.nudge.right"])
         XCTAssertNotEqual(position.label, before)
         tap(app.buttons["as.board.inspector.delete"])
+        tap(app.buttons["as.board.pieceList.done"])
         XCTAssertFalse(element(app, "as.board.piece.0").exists)
         tap(app.buttons["as.board.undo"])
         XCTAssertTrue(element(app, "as.board.piece.0").waitForExistence(timeout: 15))
+        XCTAssertTrue(element(app, "as.board.piece.0").label.contains("Token 1"), element(app, "as.board.piece.0").label)
     }
 
     @MainActor
@@ -144,13 +137,12 @@ final class BoardFollowupUITests: XCTestCase {
         XCTAssertTrue(counter.waitForExistence(timeout: 15), "No token counter for Raid")
         XCTAssertEqual(counter.label, "Raid tokens: A 0 of 3, B 0 of 3")
 
-        let token = element(app, "as.board.palette.token")
-        revealToken(app)
-        tap(token)
+        addToken(app)
+        XCTAssertTrue(element(app, "as.board.inspector.tokenNote").waitForExistence(timeout: 15))
+        app.navigationBars.buttons.firstMatch.tap()
+        tap(app.buttons["as.board.pieceList.done"])
         XCTAssertEqual(counter.label, "Raid tokens: A 1 of 3, B 0 of 3")
         XCTAssertTrue(element(app, "as.board.piece.0").label.contains("Raid 1"), element(app, "as.board.piece.0").label)
-        // Dropped at the centre it is closer to the edge than Raid asks: a hint, not a block.
-        XCTAssertTrue(element(app, "as.board.inspector.tokenNote").waitForExistence(timeout: 15))
     }
 
     // MARK: Helpers
@@ -162,12 +154,13 @@ final class BoardFollowupUITests: XCTestCase {
         return app
     }
 
-    /// The token tile is the last in the palette strip: scroll the strip to it.
+    /// Adds a token through the list editor (the palette strip scrolls; this path never needs to).
     @MainActor
-    private func revealToken(_ app: XCUIApplication) {
-        let palette = element(app, "as.board.palette")
-        XCTAssertTrue(palette.waitForExistence(timeout: 15))
-        for _ in 0..<3 { palette.swipeLeft() }
+    private func addToken(_ app: XCUIApplication) {
+        tap(app.buttons["as.board.list"])
+        XCTAssertTrue(element(app, "as.board.pieceList").waitForExistence(timeout: 15))
+        tap(app.buttons["as.board.pieceList.add"])
+        tap(app.buttons["as.board.pieceList.add.token"])
     }
 
     @MainActor
