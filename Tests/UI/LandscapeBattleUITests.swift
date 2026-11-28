@@ -111,10 +111,11 @@ final class LandscapeBattleUITests: XCTestCase {
     /// A rough step name from what is on screen; nil when none of the step controls are up.
     @MainActor
     private func currentStep(_ app: XCUIApplication) -> String? {
-        if app.buttons["as.battle.doneShooting"].exists || app.buttons["as.battle.primary"].label == "Solve a shot" { return "combat" }
+        let primary = app.buttons["as.battle.primary"]
+        if app.buttons["as.battle.doneShooting"].exists || (primary.exists && primary.label == "Solve a shot") { return "combat" }
         if app.buttons["as.battle.skipRemaining"].exists { return "movement" }
         if element(app, "as.initiative.agree").exists || element(app, "as.initiative.multi").exists { return "initiative" }
-        if app.buttons["as.battle.primary"].exists { return "other-\(app.buttons["as.battle.primary"].label)" }
+        if primary.exists { return "other-\(primary.label)" }
         return nil
     }
 
